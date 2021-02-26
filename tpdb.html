@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+</head>
+
+<body>
+	<div id="main"></div>
+	<script>
+		var get_args = {};
+		if( 1 < window.location.search.length ) {
+			var pairs = window.location.search.substring(1).split('&');
+			for( var i in pairs ) {
+				var ler = pairs[i];
+				var e = ler.indexOf('=');
+				var key = decodeURIComponent(ler.substring(0,e));
+				var val = decodeURIComponent(ler.substr(e+1));
+				get_args[key] = val;
+			}
+		}
+		var dom_parser = new DOMParser();
+		function parseXML(text) {
+			return dom_parser.parseFromString(text, "text/xml");
+		}
+		function newXMLHttp() {
+			return window.ActiveXObject ? new ActiveXObject("Msxml2.XMLHTTP") : new XMLHttpRequest();
+		}
+		function loadURL(url, handle) {
+			var xhttp = newXMLHttp();
+			xhttp.onreadystatechange = function () {
+				if (this.readyState == 4 && this.status == 200) {
+					handle(this);
+				}
+			};
+			xhttp.open("GET", url);
+			xhttp.send();
+		}
+		function applyXSL(xmlUrl, xslUrl, elm) {
+			var xml, xsl;
+			function doit() {
+				if( xml != undefined && xsl != undefined ) {
+					if( window.ActiveXObject ) {// code for IE
+						elm.innerHTML = xml.transformNode(xsl);
+					}
+					else if( document.implementation && document.implementation.createDocument ) {
+						xsltProcessor = new XSLTProcessor();
+						xsltProcessor.importStylesheet(xsl);
+						res = xsltProcessor.transformToFragment(xml, document);
+						elm.appendChild(res);
+					}
+				}
+			}
+			loadURL(xmlUrl, function(xhttp) {
+				xml = parseXML(xhttp.responseText);
+				doit();
+			});
+			loadURL(xslUrl, function(xhttp) {
+				xsl = parseXML(xhttp.responseText);
+				doit();
+			});
+		}
+		var elm = document.getElementById("main");
+		if( "path" in get_args ) {
+			var path = get_args["path"];
+			var ver = "ver" in get_args ? get_args["ver"] : "master";
+			var base = "https://raw.githubusercontent.com/TermCOMP/TPDB/" + ver + "/";
+			applyXSL(base + path, base + "xml/xtcHTML.xsl", elm);
+		} else {
+			elm.innerHTML = "No path is specified.";
+		}
+	</script>
+</body>
+
+</html>
