@@ -2,113 +2,64 @@
 <html lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <link rel="stylesheet" type="text/css" href="master.css">
-<script>
-var get_args = {};
-if( 1 < window.location.search.length ) {
-	var pairs = window.location.search.substring(1).split('&');
-	for( var i in pairs ) {
-		var ler = pairs[i];
-		var e = ler.indexOf('=');
-		var key = decodeURIComponent(ler.substring(0,e));
-		var val = decodeURIComponent(ler.substr(e+1));
-		get_args[key] = val;
-	}
-}
-function loadURL(obj,url) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      obj.innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", url, false);
-  xhttp.send();
-}
-function FilteredTable(table) {
-	var ret = {};
-	ret.table = table;
-	ret.filters = [];
-	ret.refresh = function () {
-		var trs = ret.table.getElementsByTagName("tr");
-		var i;
-		for(i = 0; i < trs.length; i++) {
-			if( trs[i].classList.contains("head") ) {// row of class "head" won't be filtered
-				continue;
-			}
-			var tds = trs[i].getElementsByTagName("td");
-			var test = true;
-			var j;
-			for(j = 0; j < ret.filters.length; j++) {
-				var td = tds[j];
-				var text = td == null ? "" : (td.textContent || td.innerText);
-				var id = ret.filters[j];
-				if( id != null && text.indexOf(document.getElementById(id).value) < 0) {
-					test = false;
-					break;
-				}
-			}
-			trs[i].style.display = test ? "" : "none";
-		}
-	}
-	ret.register = function(column,id) {
-		ret.filters[column] = id;
-	}
-	return ret;
-}
-function StyleToggler(button, select, options) {
-	var ret = {};
-	ret.button = button;
-	ret.select = select;
-	ret.options = options;
-	ret.index = 0;
-	ret.apply = function(elm) {
-		var option = ret.options[ret.index];
-		ret.button.innerHTML = option.text;
-		var targets = elm.querySelectorAll(select);
-		for( var i = 0; i < targets.length; i++ ) {
-			for( var key in option.assign ) {
-				targets[i].style[key] = option.assign[key];
-			}
-		}
-	}
-	ret.toggle = function() {
-		ret.index = (ret.index + 1) % ret.options.length;
-		ret.apply(document);
-	}
-	ret.apply(document);
-	ret.button.onclick = ret.toggle;
-	return ret;
-}
-</script>
- <title>Termination Competition 2020 (Final Run)</title>
+<script src="definitions.js"></script>
+ <title>Termination Competition 2020</title>
 </head>
 <body>
- <h1>Termination Competition 2020 (Final Run) <span id=scoreToggler class=button></span>
- <span id=columnToggler class=button></span>
+ <h1>Termination Competition 2020 <span class="headerFollower">
+  (Final Run. First run is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>)
+  <span id=configToggler class=button></span>
+  <span id=scoreToggler class=button></span>
+  <span id=columnToggler class=button></span>
+ </span>
 </h1>
 <script>
+var configToggler = StyleToggler(
+	document.getElementById("configToggler"), ".config", [
+		{ text: "Show configs", assign: { display: "none" } },
+		{ text: "Hide configs", assign: { display: "" } },
+	],
+	0);
 var scoreToggler = StyleToggler(
 	document.getElementById("scoreToggler"), ".score", [
-		{ text: "Hide scores", assign: {display: "inline"} },
-		{ text: "Show scores", assign: {display: "none"} },
+		{ text: "Hide scores", assign: { display: "" } },
+		{ text: "Show scores", assign: { display: "none" } },
 	]
 );
 var columnToggler = StyleToggler(
 	document.getElementById("columnToggler"), "span.category", [
-		{ text: "One column", assign: {display: "inline"} },
-		{ text: "Many column", assign: {display: "block"} },
+		{ text: "One column", assign: { display: "inline" } },
+		{ text: "Many column", assign: { display: "block" } },
 	]
 );
 </script>
-The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
-<h2>Termination of Rewriting<span id=stat0 class=stats></span></h2>
+<h2>Termination of Rewriting <span id=stat0 class=stats></span></h2>
+ <script>
+  var progress0 = [];
+  function updateProgress0() {
+   var sum = progress0.reduce(function(a,b){return {done: a.done + b.done, cpu: a.cpu + b.cpu, time: a.time + b.time, togo: a.togo + b.togo}});
+   document.getElementById("stat0").innerHTML =
+    "Progress: " + Math.floor(1000 * sum.done / (sum.done + sum.togo))/10 +
+    "%, CPU Time: " + seconds2str(sum.cpu) + ", Node Time: "+ seconds2str(sum.time);
+  }
+</script>
  <span id=41483 class=category></span>
  <script>
   function load41483() {
    var elm = document.getElementById("41483");
-   loadURL(elm,"graph_41483.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41483.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41483_sum.json", function(xhttp) {
+    progress0[41483] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41483();
   setInterval(load41483, 10000);
@@ -117,8 +68,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41501() {
    var elm = document.getElementById("41501");
-   loadURL(elm,"graph_41501.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41501.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41501_sum.json", function(xhttp) {
+    progress0[41501] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41501();
   setInterval(load41501, 10000);
@@ -127,8 +85,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41485() {
    var elm = document.getElementById("41485");
-   loadURL(elm,"graph_41485.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41485.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41485_sum.json", function(xhttp) {
+    progress0[41485] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41485();
   setInterval(load41485, 10000);
@@ -137,8 +102,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41502() {
    var elm = document.getElementById("41502");
-   loadURL(elm,"graph_41502.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41502.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41502_sum.json", function(xhttp) {
+    progress0[41502] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41502();
   setInterval(load41502, 10000);
@@ -147,8 +119,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41486() {
    var elm = document.getElementById("41486");
-   loadURL(elm,"graph_41486.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41486.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41486_sum.json", function(xhttp) {
+    progress0[41486] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41486();
   setInterval(load41486, 10000);
@@ -157,8 +136,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41503() {
    var elm = document.getElementById("41503");
-   loadURL(elm,"graph_41503.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41503.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41503_sum.json", function(xhttp) {
+    progress0[41503] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41503();
   setInterval(load41503, 10000);
@@ -167,8 +153,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41488() {
    var elm = document.getElementById("41488");
-   loadURL(elm,"graph_41488.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41488.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41488_sum.json", function(xhttp) {
+    progress0[41488] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41488();
   setInterval(load41488, 10000);
@@ -177,8 +170,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41504() {
    var elm = document.getElementById("41504");
-   loadURL(elm,"graph_41504.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41504.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41504_sum.json", function(xhttp) {
+    progress0[41504] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41504();
   setInterval(load41504, 10000);
@@ -187,8 +187,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41490() {
    var elm = document.getElementById("41490");
-   loadURL(elm,"graph_41490.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41490.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41490_sum.json", function(xhttp) {
+    progress0[41490] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41490();
   setInterval(load41490, 10000);
@@ -197,8 +204,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41505() {
    var elm = document.getElementById("41505");
-   loadURL(elm,"graph_41505.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41505.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41505_sum.json", function(xhttp) {
+    progress0[41505] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41505();
   setInterval(load41505, 10000);
@@ -207,8 +221,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41511() {
    var elm = document.getElementById("41511");
-   loadURL(elm,"graph_41511.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41511.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41511_sum.json", function(xhttp) {
+    progress0[41511] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41511();
   setInterval(load41511, 10000);
@@ -217,8 +238,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41493() {
    var elm = document.getElementById("41493");
-   loadURL(elm,"graph_41493.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41493.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41493_sum.json", function(xhttp) {
+    progress0[41493] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41493();
   setInterval(load41493, 10000);
@@ -227,8 +255,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41494() {
    var elm = document.getElementById("41494");
-   loadURL(elm,"graph_41494.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41494.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41494_sum.json", function(xhttp) {
+    progress0[41494] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41494();
   setInterval(load41494, 10000);
@@ -237,22 +272,42 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41495() {
    var elm = document.getElementById("41495");
-   loadURL(elm,"graph_41495.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41495.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41495_sum.json", function(xhttp) {
+    progress0[41495] = JSON.parse(xhttp.responseText);
+    updateProgress0();
+   });
   }
   load41495();
   setInterval(load41495, 10000);
  </script>
-<script>
-	document.getElementById("stat0").innerHTML = "Progress: 100%, CPU Time: 85d 16:36:24, Node Time: 35d 14:59:48";
+<h2>Termination of Programs <span id=stat1 class=stats></span></h2>
+ <script>
+  var progress1 = [];
+  function updateProgress1() {
+   var sum = progress1.reduce(function(a,b){return {done: a.done + b.done, cpu: a.cpu + b.cpu, time: a.time + b.time, togo: a.togo + b.togo}});
+   document.getElementById("stat1").innerHTML =
+    "Progress: " + Math.floor(1000 * sum.done / (sum.done + sum.togo))/10 +
+    "%, CPU Time: " + seconds2str(sum.cpu) + ", Node Time: "+ seconds2str(sum.time);
+  }
 </script>
-<h2>Termination of Programs<span id=stat1 class=stats></span></h2>
  <span id=41518 class=category></span>
  <script>
   function load41518() {
    var elm = document.getElementById("41518");
-   loadURL(elm,"graph_41518.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41518.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41518_sum.json", function(xhttp) {
+    progress1[41518] = JSON.parse(xhttp.responseText);
+    updateProgress1();
+   });
   }
   load41518();
   setInterval(load41518, 10000);
@@ -261,8 +316,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41519() {
    var elm = document.getElementById("41519");
-   loadURL(elm,"graph_41519.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41519.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41519_sum.json", function(xhttp) {
+    progress1[41519] = JSON.parse(xhttp.responseText);
+    updateProgress1();
+   });
   }
   load41519();
   setInterval(load41519, 10000);
@@ -271,8 +333,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41496() {
    var elm = document.getElementById("41496");
-   loadURL(elm,"graph_41496.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41496.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41496_sum.json", function(xhttp) {
+    progress1[41496] = JSON.parse(xhttp.responseText);
+    updateProgress1();
+   });
   }
   load41496();
   setInterval(load41496, 10000);
@@ -281,8 +350,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41497() {
    var elm = document.getElementById("41497");
-   loadURL(elm,"graph_41497.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41497.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41497_sum.json", function(xhttp) {
+    progress1[41497] = JSON.parse(xhttp.responseText);
+    updateProgress1();
+   });
   }
   load41497();
   setInterval(load41497, 10000);
@@ -291,22 +367,42 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41498() {
    var elm = document.getElementById("41498");
-   loadURL(elm,"graph_41498.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41498.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41498_sum.json", function(xhttp) {
+    progress1[41498] = JSON.parse(xhttp.responseText);
+    updateProgress1();
+   });
   }
   load41498();
   setInterval(load41498, 10000);
  </script>
-<script>
-	document.getElementById("stat1").innerHTML = "Progress: 100%, CPU Time: 5d 04:44:28, Node Time: 3d 20:58:14";
+<h2>Complexity Analysis <span id=stat2 class=stats></span></h2>
+ <script>
+  var progress2 = [];
+  function updateProgress2() {
+   var sum = progress2.reduce(function(a,b){return {done: a.done + b.done, cpu: a.cpu + b.cpu, time: a.time + b.time, togo: a.togo + b.togo}});
+   document.getElementById("stat2").innerHTML =
+    "Progress: " + Math.floor(1000 * sum.done / (sum.done + sum.togo))/10 +
+    "%, CPU Time: " + seconds2str(sum.cpu) + ", Node Time: "+ seconds2str(sum.time);
+  }
 </script>
-<h2>Complexity Analysis<span id=stat2 class=stats></span></h2>
  <span id=41499 class=category></span>
  <script>
   function load41499() {
    var elm = document.getElementById("41499");
-   loadURL(elm,"graph_41499.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41499.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41499_sum.json", function(xhttp) {
+    progress2[41499] = JSON.parse(xhttp.responseText);
+    updateProgress2();
+   });
   }
   load41499();
   setInterval(load41499, 10000);
@@ -315,8 +411,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41500() {
    var elm = document.getElementById("41500");
-   loadURL(elm,"graph_41500.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41500.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41500_sum.json", function(xhttp) {
+    progress2[41500] = JSON.parse(xhttp.responseText);
+    updateProgress2();
+   });
   }
   load41500();
   setInterval(load41500, 10000);
@@ -325,8 +428,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41508() {
    var elm = document.getElementById("41508");
-   loadURL(elm,"graph_41508.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41508.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41508_sum.json", function(xhttp) {
+    progress2[41508] = JSON.parse(xhttp.responseText);
+    updateProgress2();
+   });
   }
   load41508();
   setInterval(load41508, 10000);
@@ -335,8 +445,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41507() {
    var elm = document.getElementById("41507");
-   loadURL(elm,"graph_41507.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41507.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41507_sum.json", function(xhttp) {
+    progress2[41507] = JSON.parse(xhttp.responseText);
+    updateProgress2();
+   });
   }
   load41507();
   setInterval(load41507, 10000);
@@ -345,22 +462,42 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41509() {
    var elm = document.getElementById("41509");
-   loadURL(elm,"graph_41509.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41509.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41509_sum.json", function(xhttp) {
+    progress2[41509] = JSON.parse(xhttp.responseText);
+    updateProgress2();
+   });
   }
   load41509();
   setInterval(load41509, 10000);
  </script>
-<script>
-	document.getElementById("stat2").innerHTML = "Progress: 100%, CPU Time: 90d 06:33:02, Node Time: 31d 18:05:24";
+<h2>Demonstrations <span id=stat3 class=stats></span></h2>
+ <script>
+  var progress3 = [];
+  function updateProgress3() {
+   var sum = progress3.reduce(function(a,b){return {done: a.done + b.done, cpu: a.cpu + b.cpu, time: a.time + b.time, togo: a.togo + b.togo}});
+   document.getElementById("stat3").innerHTML =
+    "Progress: " + Math.floor(1000 * sum.done / (sum.done + sum.togo))/10 +
+    "%, CPU Time: " + seconds2str(sum.cpu) + ", Node Time: "+ seconds2str(sum.time);
+  }
 </script>
-<h2>Demonstrations<span id=stat3 class=stats></span></h2>
  <span id=41564 class=category></span>
  <script>
   function load41564() {
    var elm = document.getElementById("41564");
-   loadURL(elm,"graph_41564.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41564.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41564_sum.json", function(xhttp) {
+    progress3[41564] = JSON.parse(xhttp.responseText);
+    updateProgress3();
+   });
   }
   load41564();
   setInterval(load41564, 10000);
@@ -369,8 +506,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41524() {
    var elm = document.getElementById("41524");
-   loadURL(elm,"graph_41524.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41524.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41524_sum.json", function(xhttp) {
+    progress3[41524] = JSON.parse(xhttp.responseText);
+    updateProgress3();
+   });
   }
   load41524();
   setInterval(load41524, 10000);
@@ -379,8 +523,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41565() {
    var elm = document.getElementById("41565");
-   loadURL(elm,"graph_41565.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41565.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41565_sum.json", function(xhttp) {
+    progress3[41565] = JSON.parse(xhttp.responseText);
+    updateProgress3();
+   });
   }
   load41565();
   setInterval(load41565, 10000);
@@ -389,8 +540,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41566() {
    var elm = document.getElementById("41566");
-   loadURL(elm,"graph_41566.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41566.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41566_sum.json", function(xhttp) {
+    progress3[41566] = JSON.parse(xhttp.responseText);
+    updateProgress3();
+   });
   }
   load41566();
   setInterval(load41566, 10000);
@@ -399,8 +557,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41527() {
    var elm = document.getElementById("41527");
-   loadURL(elm,"graph_41527.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41527.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41527_sum.json", function(xhttp) {
+    progress3[41527] = JSON.parse(xhttp.responseText);
+    updateProgress3();
+   });
   }
   load41527();
   setInterval(load41527, 10000);
@@ -409,8 +574,15 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41528() {
    var elm = document.getElementById("41528");
-   loadURL(elm,"graph_41528.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41528.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41528_sum.json", function(xhttp) {
+    progress3[41528] = JSON.parse(xhttp.responseText);
+    updateProgress3();
+   });
   }
   load41528();
   setInterval(load41528, 10000);
@@ -419,15 +591,19 @@ The initial result is <a href=\"https://termcomp.github.io/Y2020-1/\">here</a>.
  <script>
   function load41529() {
    var elm = document.getElementById("41529");
-   loadURL(elm,"graph_41529.html");
-   scoreToggler.apply(elm);
+   loadURL("graph_41529.html", function(xhttp) {
+    elm.innerHTML = xhttp.responseText;
+    scoreToggler.apply(elm);
+    configToggler.apply(elm);
+   });
+   loadURL("caches/Job41529_sum.json", function(xhttp) {
+    progress3[41529] = JSON.parse(xhttp.responseText);
+    updateProgress3();
+   });
   }
   load41529();
   setInterval(load41529, 10000);
  </script>
-<script>
-	document.getElementById("stat3").innerHTML = "Progress: 100%, CPU Time: 35d 18:15:39, Node Time: 11d 22:48:18";
-</script>
 
 </body>
 </html>

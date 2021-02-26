@@ -4,89 +4,24 @@
  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
  <meta http-equiv="Cache-Control" content="no-cache">
  <link rel="stylesheet" type="text/css" href="master.css">
-<script>
-var get_args = {};
-if( 1 < window.location.search.length ) {
-	var pairs = window.location.search.substring(1).split('&');
-	for( var i in pairs ) {
-		var ler = pairs[i];
-		var e = ler.indexOf('=');
-		var key = decodeURIComponent(ler.substring(0,e));
-		var val = decodeURIComponent(ler.substr(e+1));
-		get_args[key] = val;
-	}
-}
-function loadURL(obj,url) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      obj.innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", url, false);
-  xhttp.send();
-}
-function FilteredTable(table) {
-	var ret = {};
-	ret.table = table;
-	ret.filters = [];
-	ret.refresh = function () {
-		var trs = ret.table.getElementsByTagName("tr");
-		var i;
-		for(i = 0; i < trs.length; i++) {
-			if( trs[i].classList.contains("head") ) {// row of class "head" won't be filtered
-				continue;
-			}
-			var tds = trs[i].getElementsByTagName("td");
-			var test = true;
-			var j;
-			for(j = 0; j < ret.filters.length; j++) {
-				var td = tds[j];
-				var text = td == null ? "" : (td.textContent || td.innerText);
-				var id = ret.filters[j];
-				if( id != null && text.indexOf(document.getElementById(id).value) < 0) {
-					test = false;
-					break;
-				}
-			}
-			trs[i].style.display = test ? "" : "none";
-		}
-	}
-	ret.register = function(column,id) {
-		ret.filters[column] = id;
-	}
-	return ret;
-}
-function StyleToggler(button, select, options) {
-	var ret = {};
-	ret.button = button;
-	ret.select = select;
-	ret.options = options;
-	ret.index = 0;
-	ret.apply = function(elm) {
-		var option = ret.options[ret.index];
-		ret.button.innerHTML = option.text;
-		var targets = elm.querySelectorAll(select);
-		for( var i = 0; i < targets.length; i++ ) {
-			for( var key in option.assign ) {
-				targets[i].style[key] = option.assign[key];
-			}
-		}
-	}
-	ret.toggle = function() {
-		ret.index = (ret.index + 1) % ret.options.length;
-		ret.apply(document);
-	}
-	ret.apply(document);
-	ret.button.onclick = ret.toggle;
-	return ret;
-}
-</script>
+
+<script src="definitions.js"></script>
  <title>TermComp 2020: TRS Equational</title>
 </head>
 <body>
-<h1><a href=".">TermComp 2020</a>: TRS Equational<a class=starexecid href="https://www.starexec.org/starexec/secure/details/job.jsp?id=41490">41490</a></h1>
-<a href="fromStarExec/Job41490/Job41490_info.csv">Job info CSV</a>
+<h1><a href=".">TermComp 2020</a>: TRS Equational
+ <a class=starexecid href="https://www.starexec.org/starexec/secure/details/job.jsp?id=41490">41490</a>
+ <a class=csv href="fromStarExec/Job41490/Job41490_info.csv">Job info CSV</a>
+ <span class="headerFollower">Showing
+  <select id="resultsFilter" type="text" placeholder="Filter..." oninput="filteredTable.refresh()">
+   <option value="">all</option>
+   <option value="i">interesting</option>
+   <option value="c">conflicting</option>
+   <option value="u">unsolved</option>
+   <option value="s">solo</option>
+  </select> results.
+ </span>
+</h1>
 <table id="theTable">
 <script>
 var filteredTable = FilteredTable(document.getElementById("theTable"));
@@ -95,18 +30,10 @@ var filteredTable = FilteredTable(document.getElementById("theTable"));
   <th>benchmark
    <input id="filter0" type="text" placeholder="Filter..." onkeyup="filteredTable.refresh()">
    <script>filteredTable.register(0,"filter0");</script>
+  <th style="display:none">
+   <script>filteredTable.register(1,"resultsFilter");</script>
   <th><a href="https://www.starexec.org/starexec/secure/details/solver.jsp?id=9061">muterm 5.18</a>
    <a class=config href="https://www.starexec.org/starexec/secure/details/configuration.jsp?id=163986">default</a>
-   <select id="filter1" oninput="filteredTable.refresh()">
-    <option value="">--</option>
-    <option value="YES">YES</option>
-    <option value="NO">NO</option>
-    <option value="MAYBE">MAYBE</option>
-    <option value="timeout">timeout</option>
-   </select>
-   <script>filteredTable.register(1,"filter1");</script>
-  <th><a href="https://www.starexec.org/starexec/secure/details/solver.jsp?id=27947">NaTT v.1.6c</a>
-   <a class=config href="https://www.starexec.org/starexec/secure/details/configuration.jsp?id=350520">Default</a>
    <select id="filter2" oninput="filteredTable.refresh()">
     <option value="">--</option>
     <option value="YES">YES</option>
@@ -115,8 +42,8 @@ var filteredTable = FilteredTable(document.getElementById("theTable"));
     <option value="timeout">timeout</option>
    </select>
    <script>filteredTable.register(2,"filter2");</script>
-  <th><a href="https://www.starexec.org/starexec/secure/details/solver.jsp?id=29458">AProVE</a>
-   <a class=config href="https://www.starexec.org/starexec/secure/details/configuration.jsp?id=360174">standard</a>
+  <th><a href="https://www.starexec.org/starexec/secure/details/solver.jsp?id=27947">NaTT v.1.6c</a>
+   <a class=config href="https://www.starexec.org/starexec/secure/details/configuration.jsp?id=350520">Default</a>
    <select id="filter3" oninput="filteredTable.refresh()">
     <option value="">--</option>
     <option value="YES">YES</option>
@@ -125,926 +52,803 @@ var filteredTable = FilteredTable(document.getElementById("theTable"));
     <option value="timeout">timeout</option>
    </select>
    <script>filteredTable.register(3,"filter3");</script>
+  <th><a href="https://www.starexec.org/starexec/secure/details/solver.jsp?id=29458">AProVE</a>
+   <a class=config href="https://www.starexec.org/starexec/secure/details/configuration.jsp?id=360174">standard</a>
+   <select id="filter4" oninput="filteredTable.refresh()">
+    <option value="">--</option>
+    <option value="YES">YES</option>
+    <option value="NO">NO</option>
+    <option value="MAYBE">MAYBE</option>
+    <option value="timeout">timeout</option>
+   </select>
+   <script>filteredTable.register(4,"filter4");</script>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768779/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC01.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768779">11768779</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523119/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523119">
-    <span class=time>0.18/0.23</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523120/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523120">
-    <span class=time>0.03/0.07</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523121/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523121">
-    <span class=time>3.18/1.51</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768799/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC02.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768799">11768799</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523179/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523179">
-    <span class=time>0.20/0.25</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523180/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523180">
-    <span class=time>0.03/0.06</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523181/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523181">
-    <span class=time>3.35/1.67</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768791/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC03.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768791">11768791</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523155/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523155">
-    <span class=time>1.21/1.49</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523156/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523156">
-    <span class=time>0.07/0.11</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523157/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523157">
-    <span class=time>3.45/1.74</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768792/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC04.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768792">11768792</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523158/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523158">
-    <span class=time>1.24/2.07</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523159/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523159">
-    <span class=time>0.08/0.11</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523160/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523160">
-    <span class=time>6.16/2.59</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768798/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC05.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768798">11768798</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523176/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523176">
-    <span class=time>1.37/1.57</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523177/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523177">
-    <span class=time>0.09/0.45</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523178/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523178">
-    <span class=time>5.81/3.16</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768780/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC06.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768780">11768780</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523122/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523122">
-    <span class=time>3.45/3.69</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523123/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523123">
-    <span class=time>0.13/0.11</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523124/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523124">
-    <span class=time>3.17/1.54</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768787/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC07.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768787">11768787</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523143/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523143">
-    <span class=time>1.31/1.39</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523144/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523144">
-    <span class=time>0.10/0.13</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523145/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523145">
-    <span class=time>4.79/2.26</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768788/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC09.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768788">11768788</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523146/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523146">
-    <span class=time>6.99/8.01</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523147/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523147">
-    <span class=time>0.08/0.12</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523148/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523148">
-    <span class=time>3.29/1.53</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768773/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC10.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768773">11768773</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523101/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523101">
-    <span class=time>4.30/4.58</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523102/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523102">
-    <span class=time>0.08/0.11</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523103/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523103">
-    <span class=time>3.24/1.64</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768785/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC11.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768785">11768785</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523137/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523137">
-    <span class=time>0.18/0.22</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523138/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523138">
-    <span class=time>0.03/0.07</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523139/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523139">
-    <span class=time>3.53/1.62</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768797/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC12.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768797">11768797</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523173/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523173">
-    <span class=time>0.18/0.21</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523174/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523174">
-    <span class=time>0.08/0.07</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523175/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523175">
-    <span class=time>3.27/1.51</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768800/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC13.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768800">11768800</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523182/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523182">
-    <span class=time>6.58/7.37</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523183/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523183">
-    <span class=time>0.14/0.11</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523184/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523184">
-    <span class=time>3.27/1.62</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768801/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC14.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768801">11768801</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523185/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523185">
-    <span class=time>4.26/4.63</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523186/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523186">
-    <span class=time>0.08/0.09</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523187/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523187">
-    <span class=time>3.14/1.58</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768796/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC15.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768796">11768796</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523170/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523170">
-    <span class=time>0.09/0.12</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523171/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523171">
-    <span class=time>0.02/0.02</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523172/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523172">
-    <span class=time>3.27/1.55</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768786/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC16.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768786">11768786</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523140/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523140">
-    <span class=time>0.27/0.27</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523141/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523141">
-    <span class=time>0.02/0.05</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523142/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523142">
-    <span class=time>3.36/1.57</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768772/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC17.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC17.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC17.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768772">11768772</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523098/stdout/1?limit=-1">YES</a>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523098/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523098">
     <span class=time>4.88/5.89</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523099/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523099/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523099">
     <span class=time>0.10/0.13</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523100/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523100/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523100">
     <span class=time>5.75/2.53</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768784/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC18.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768784">11768784</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523134/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523134">
-    <span class=time>7.53/8.09</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523135/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523135">
-    <span class=time>0.19/0.20</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC10.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC10.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768773">11768773</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523101/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523101">
+    <span class=time>4.30/4.58</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523136/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523136">
-    <span class=time>11.67/5.44</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523102/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523102">
+    <span class=time>0.08/0.11</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523103/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523103">
+    <span class=time>3.24/1.64</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768774/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC19.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC19.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC19.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768774">11768774</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523104/stdout/1?limit=-1">YES</a>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523104/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523104">
     <span class=time>0.21/0.22</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523105/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523105/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523105">
     <span class=time>0.04/0.06</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523106/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523106/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523106">
     <span class=time>3.52/1.85</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768794/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC20.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768794">11768794</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523164/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523164">
-    <span class=time>1.23/1.50</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523165/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523165">
-    <span class=time>0.08/0.12</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523166/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523166">
-    <span class=time>6.83/3.27</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768805/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC21.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768805">11768805</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523197/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523197">
-    <span class=time>8.40/8.95</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523198/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523198">
-    <span class=time>0.25/0.23</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523199/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523199">
-    <span class=time>15.08/5.46</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768776/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC22.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768776">11768776</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523110/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523110">
-    <span class=time>42.85/45.23</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523111/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523111">
-    <span class=time>0.36/0.31</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523112/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523112">
-    <span class=time>8.61/4.06</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768781/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC23.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768781">11768781</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523125/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523125">
-    <span class=time>13.81/14.51</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523126/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523126">
-    <span class=time>0.20/0.17</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523127/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523127">
-    <span class=time>3.99/1.79</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768782/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC24.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768782">11768782</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523128/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523128">
-    <span class=time>2.14/2.32</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523129/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523129">
-    <span class=time>0.11/0.08</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523130/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523130">
-    <span class=time>3.86/5.71</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768806/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC26.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768806">11768806</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523200/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523200">
-    <span class=time>4.61/13.27</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523201/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523201">
-    <span class=time>0.10/0.12</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523202/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523202">
-    <span class=time>3.07/1.68</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768793/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC27.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768793">11768793</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523161/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523161">
-    <span class=time>18.02/20.18</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523162/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523162">
-    <span class=time>0.33/0.70</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523163/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523163">
-    <span class=time>3.36/1.62</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768802/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC28.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768802">11768802</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523188/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523188">
-    <span class=time>30.42/30.47</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523189/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523189">
-    <span class=time>0.03/0.07</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523190/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523190">
-    <span class=time>14.49/5.64</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768778/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC41.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768778">11768778</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523116/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523116">
-    <span class=time>0.33/0.44</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523117/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523117">
-    <span class=time>0.04/0.11</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523118/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523118">
-    <span class=time>4.78/2.18</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768777/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC48.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768777">11768777</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523113/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523113">
-    <span class=time>1.39/1.70</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523114/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523114">
-    <span class=time>0.06/0.12</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523115/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523115">
-    <span class=time>3.28/1.71</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768790/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC49.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768790">11768790</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523152/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523152">
-    <span class=time>0.37/0.39</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523153/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523153">
-    <span class=time>0.08/0.11</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523154/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523154">
-    <span class=time>6.98/2.89</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768775/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC50.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC50.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC50.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768775">11768775</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523107/stdout/1?limit=-1">YES</a>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523107/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523107">
     <span class=time>1.01/1.26</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523108/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523108/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523108">
     <span class=time>0.07/0.13</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523109/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523109/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523109">
     <span class=time>7.06/2.87</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768783/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC51.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768783">11768783</a></td>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC22.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC22.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768776">11768776</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523110/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523110">
+    <span class=time>42.85/45.23</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523111/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523111">
+    <span class=time>0.36/0.31</span>
+   </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523131/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523112/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523112">
+    <span class=time>8.61/4.06</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC48.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC48.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768777">11768777</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523113/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523113">
+    <span class=time>1.39/1.70</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523114/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523114">
+    <span class=time>0.06/0.12</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523115/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523115">
+    <span class=time>3.28/1.71</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC41.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC41.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768778">11768778</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523116/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523116">
+    <span class=time>0.33/0.44</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523117/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523117">
+    <span class=time>0.04/0.11</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523118/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523118">
+    <span class=time>4.78/2.18</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC01.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC01.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768779">11768779</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523119/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523119">
+    <span class=time>0.18/0.23</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523120/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523120">
+    <span class=time>0.03/0.07</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523121/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523121">
+    <span class=time>3.18/1.51</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC06.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC06.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768780">11768780</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523122/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523122">
+    <span class=time>3.45/3.69</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523123/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523123">
+    <span class=time>0.13/0.11</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523124/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523124">
+    <span class=time>3.17/1.54</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC23.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC23.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768781">11768781</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523125/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523125">
+    <span class=time>13.81/14.51</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523126/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523126">
+    <span class=time>0.20/0.17</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523127/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523127">
+    <span class=time>3.99/1.79</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC24.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC24.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768782">11768782</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523128/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523128">
+    <span class=time>2.14/2.32</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523129/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523129">
+    <span class=time>0.11/0.08</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523130/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523130">
+    <span class=time>3.86/5.71</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC51.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC51.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768783">11768783</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523131/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523131">
     <span class=time>0.59/0.69</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523132/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523132/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523132">
     <span class=time>0.03/0.07</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523133/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523133/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523133">
     <span class=time>4.14/3.13</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768795/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC52.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768795">11768795</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523167/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523167">
-    <span class=time>1.87/1.96</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC18.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC18.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768784">11768784</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523134/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523134">
+    <span class=time>7.53/8.09</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523135/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523135">
+    <span class=time>0.19/0.20</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523168/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523168">
-    <span class=time>0.49/0.39</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523169/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523169">
-    <span class=time>6.34/2.50</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768804/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC53.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768804">11768804</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523194/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523194">
-    <span class=time>0.13/0.19</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523195/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523195">
-    <span class=time>0.03/0.05</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523196/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523196">
-    <span class=time>4.79/2.05</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523136/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523136">
+    <span class=time>11.67/5.44</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768803/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>AC54.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768803">11768803</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523191/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523191">
-    <span class=time>0.57/0.65</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC11.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC11.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768785">11768785</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523137/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523137">
+    <span class=time>0.18/0.22</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523192/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523192">
-    <span class=time>0.08/0.11</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523138/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523138">
+    <span class=time>0.03/0.07</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523193/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523193">
-    <span class=time>7.33/2.86</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523139/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523139">
+    <span class=time>3.53/1.62</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768789/contents?limit=-1">AProVE_<wbr>AC_<wbr>04/<wbr>IJCAR_<wbr>AC1.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC16.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC16.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768786">11768786</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523140/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523140">
+    <span class=time>0.27/0.27</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523141/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523141">
+    <span class=time>0.02/0.05</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523142/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523142">
+    <span class=time>3.36/1.57</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC07.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC07.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768787">11768787</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523143/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523143">
+    <span class=time>1.31/1.39</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523144/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523144">
+    <span class=time>0.10/0.13</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523145/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523145">
+    <span class=time>4.79/2.26</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC09.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC09.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768788">11768788</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523146/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523146">
+    <span class=time>6.99/8.01</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523147/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523147">
+    <span class=time>0.08/0.12</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523148/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523148">
+    <span class=time>3.29/1.53</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FIJCAR_AC1.xml">AProVE_<wbr>AC_<wbr>04/<wbr>IJCAR_<wbr>AC1.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768789">11768789</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523149/stdout/1?limit=-1">YES</a>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523149/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523149">
     <span class=time>1.53/1.78</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523150/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523150/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523150">
     <span class=time>0.10/0.14</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523151/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523151/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523151">
     <span class=time>5.93/3.39</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768745/contents?limit=-1">Mixed_<wbr>AC/<wbr>bag-sum-prod-bin.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768745">11768745</a></td>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC49.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC49.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768790">11768790</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523152/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523152">
+    <span class=time>0.37/0.39</span>
+   </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523209/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523209">
-    <span class=time>2.93/3.04</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523153/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523153">
+    <span class=time>0.08/0.11</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523154/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523154">
+    <span class=time>6.98/2.89</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC03.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC03.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768791">11768791</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523155/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523155">
+    <span class=time>1.21/1.49</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523156/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523156">
+    <span class=time>0.07/0.11</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523157/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523157">
+    <span class=time>3.45/1.74</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC04.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC04.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768792">11768792</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523158/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523158">
+    <span class=time>1.24/2.07</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523159/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523159">
+    <span class=time>0.08/0.11</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523160/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523160">
+    <span class=time>6.16/2.59</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC27.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC27.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768793">11768793</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523161/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523161">
+    <span class=time>18.02/20.18</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523162/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523162">
+    <span class=time>0.33/0.70</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523163/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523163">
+    <span class=time>3.36/1.62</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC20.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC20.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768794">11768794</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523164/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523164">
+    <span class=time>1.23/1.50</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523165/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523165">
+    <span class=time>0.08/0.12</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523166/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523166">
+    <span class=time>6.83/3.27</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC52.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC52.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768795">11768795</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523167/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523167">
+    <span class=time>1.87/1.96</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523168/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523168">
+    <span class=time>0.49/0.39</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523169/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523169">
+    <span class=time>6.34/2.50</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC15.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC15.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768796">11768796</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523170/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523170">
+    <span class=time>0.09/0.12</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523171/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523171">
+    <span class=time>0.02/0.02</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523172/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523172">
+    <span class=time>3.27/1.55</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC12.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC12.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768797">11768797</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523173/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523173">
+    <span class=time>0.18/0.21</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523174/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523174">
+    <span class=time>0.08/0.07</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523175/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523175">
+    <span class=time>3.27/1.51</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC05.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC05.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768798">11768798</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523176/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523176">
+    <span class=time>1.37/1.57</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523177/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523177">
+    <span class=time>0.09/0.45</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523178/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523178">
+    <span class=time>5.81/3.16</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC02.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC02.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768799">11768799</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523179/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523179">
+    <span class=time>0.20/0.25</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523180/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523180">
+    <span class=time>0.03/0.06</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523181/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523181">
+    <span class=time>3.35/1.67</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC13.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC13.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768800">11768800</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523182/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523182">
+    <span class=time>6.58/7.37</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523183/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523183">
+    <span class=time>0.14/0.11</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523184/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523184">
+    <span class=time>3.27/1.62</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC14.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC14.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768801">11768801</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523185/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523185">
+    <span class=time>4.26/4.63</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523186/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523186">
+    <span class=time>0.08/0.09</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523187/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523187">
+    <span class=time>3.14/1.58</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC28.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC28.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768802">11768802</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523188/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523188">
+    <span class=time>30.42/30.47</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523189/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523189">
+    <span class=time>0.03/0.07</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523190/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523190">
+    <span class=time>14.49/5.64</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC54.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC54.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768803">11768803</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523191/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523191">
+    <span class=time>0.57/0.65</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523192/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523192">
+    <span class=time>0.08/0.11</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523193/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523193">
+    <span class=time>7.33/2.86</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC53.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC53.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768804">11768804</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523194/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523194">
+    <span class=time>0.13/0.19</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523195/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523195">
+    <span class=time>0.03/0.05</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523196/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523196">
+    <span class=time>4.79/2.05</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC21.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC21.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768805">11768805</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523197/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523197">
+    <span class=time>8.40/8.95</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523210/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523210">
-    <span class=time>0.12/0.09</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523198/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523198">
+    <span class=time>0.25/0.23</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523211/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523211">
-    <span class=time>4.37/1.93</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523199/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523199">
+    <span class=time>15.08/5.46</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768748/contents?limit=-1">Mixed_<wbr>AC/<wbr>bag-sum-prod-distr.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768748">11768748</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523218/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523218">
-    <span class=time>16.88/18.34</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523219/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523219">
-    <span class=time>0.14/0.14</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FAProVE_AC_04%2FAC26.xml">AProVE_<wbr>AC_<wbr>04/<wbr>AC26.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768806">11768806</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523200/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523200">
+    <span class=time>4.61/13.27</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523220/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523220">
-    <span class=time>4.28/1.94</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523201/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523201">
+    <span class=time>0.10/0.12</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523202/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523202">
+    <span class=time>3.07/1.68</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768750/contents?limit=-1">Mixed_<wbr>AC/<wbr>bag-sum-prod.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768750">11768750</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523224/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523224">
-    <span class=time>1.61/1.74</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FYWHM14_1.xml">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>1.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768743">11768743</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523203/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523203">
+    <span class=time>0.05/0.11</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523225/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523225">
-    <span class=time>0.09/0.13</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523204/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523204">
+    <span class=time>0.02/0.07</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523226/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523226">
-    <span class=time>3.25/1.61</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523205/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523205">
+    <span class=time>3.34/1.61</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768757/contents?limit=-1">Mixed_<wbr>AC/<wbr>BAG_<wbr>complete-noand.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768757">11768757</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523245/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523245">
-    <span class=time>27.08/27.90</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523246/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523246">
-    <span class=time>13.49/13.19</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523247/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523247">
-    <span class=time>63.87/48.55</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768763/contents?limit=-1">Mixed_<wbr>AC/<wbr>BAG_<wbr>complete.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768763">11768763</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523263/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523263">
-    <span class=time>19.58/20.16</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523264/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523264">
-    <span class=time>1.49/1.30</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523265/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523265">
-    <span class=time>144.36/121.46</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768760/contents?limit=-1">Mixed_<wbr>AC/<wbr>BAG_<wbr>nokinds-noand.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768760">11768760</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523254/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523254">
-    <span class=time>6.54/7.34</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523255/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523255">
-    <span class=time>0.82/0.69</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523256/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523256">
-    <span class=time>15.62/5.80</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768755/contents?limit=-1">Mixed_<wbr>AC/<wbr>BAG_<wbr>nokinds.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768755">11768755</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523239/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523239">
-    <span class=time>4.25/4.47</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523240/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523240">
-    <span class=time>0.61/0.53</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523241/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523241">
-    <span class=time>20.78/7.67</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768762/contents?limit=-1">Mixed_<wbr>AC/<wbr>BAG_<wbr>nosorts-noand.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768762">11768762</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523260/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523260">
-    <span class=time>2.52/2.82</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523261/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523261">
-    <span class=time>0.37/0.33</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523262/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523262">
-    <span class=time>6.02/2.53</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768767/contents?limit=-1">Mixed_<wbr>AC/<wbr>BAG_<wbr>nosorts.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768767">11768767</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523275/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523275">
-    <span class=time>2.71/2.84</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523276/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523276">
-    <span class=time>0.13/0.15</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523277/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523277">
-    <span class=time>4.25/1.92</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768756/contents?limit=-1">Mixed_<wbr>AC/<wbr>boolean_<wbr>rings.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768756">11768756</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523242/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523242">
-    <span class=time>3.62/4.66</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523243/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523243">
-    <span class=time>0.09/0.10</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523244/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523244">
-    <span class=time>3.43/1.64</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768754/contents?limit=-1">Mixed_<wbr>AC/<wbr>differ.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768754">11768754</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523236/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523236">
-    <span class=time>0.34/0.39</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523237/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523237">
-    <span class=time>0.06/0.10</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523238/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523238">
-    <span class=time>3.34/1.56</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768744/contents?limit=-1">Mixed_<wbr>AC/<wbr>intersect.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2Fintersect.xml">Mixed_<wbr>AC/<wbr>intersect.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768744">11768744</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523206/stdout/1?limit=-1">YES</a>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523206/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523206">
     <span class=time>3.47/3.83</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523207/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523207/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523207">
     <span class=time>0.14/0.17</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523208/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523208/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523208">
     <span class=time>3.23/1.60</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768766/contents?limit=-1">Mixed_<wbr>AC/<wbr>kusakari1.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768766">11768766</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523272/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523272">
-    <span class=time>0.29/0.33</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2Fbag-sum-prod-bin.xml">Mixed_<wbr>AC/<wbr>bag-sum-prod-bin.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768745">11768745</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523209/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523209">
+    <span class=time>2.93/3.04</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523210/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523210">
+    <span class=time>0.12/0.09</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523273/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523273">
-    <span class=time>0.03/0.04</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523274/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523274">
-    <span class=time>6.29/2.72</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523211/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523211">
+    <span class=time>4.37/1.93</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768749/contents?limit=-1">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>complete-noand.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2Fsequent_modulo.xml">Mixed_<wbr>AC/<wbr>sequent_<wbr>modulo.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768746">11768746</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523212/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523212">
+    <span class=time>114.12/114.96</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523213/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523213">
+    <span class=time>14.22/10.51</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523214/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523214">
+    <span class=time>24.72/10.56</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FRENAMED-BOOL_nosorts-noand.xml">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>nosorts-noand.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768747">11768747</a></td>
+  <td style="display:none">is  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523215/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523215">
+    <span class=time>10.15/10.84</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523216/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523216">
+    <span class=time>0.32/0.26</span>
+   </a>
+  <td class=NO>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523217/stdout/1?limit=-1">NO</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523217">
+    <span class=time>28.47/14.74</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2Fbag-sum-prod-distr.xml">Mixed_<wbr>AC/<wbr>bag-sum-prod-distr.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768748">11768748</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523218/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523218">
+    <span class=time>16.88/18.34</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523219/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523219">
+    <span class=time>0.14/0.14</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523220/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523220">
+    <span class=time>4.28/1.94</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FRENAMED-BOOL_complete-noand.xml">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>complete-noand.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768749">11768749</a></td>
-  <td class=timeout>
+  <td style="display:none">u  <td class=timeout>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523221">timeout (wallclock)</a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523222/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523222/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523222">
     <span class=time>83.08/82.75</span>
    </a>
@@ -1052,12 +856,69 @@ var filteredTable = FilteredTable(document.getElementById("theTable"));
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523223">timeout (wallclock)</a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768753/contents?limit=-1">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>complete.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2Fbag-sum-prod.xml">Mixed_<wbr>AC/<wbr>bag-sum-prod.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768750">11768750</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523224/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523224">
+    <span class=time>1.61/1.74</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523225/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523225">
+    <span class=time>0.09/0.13</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523226/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523226">
+    <span class=time>3.25/1.61</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FRENAMED-BOOL_nokinds.xml">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>nokinds.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768751">11768751</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523227/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523227">
+    <span class=time>18.65/19.65</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523228/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523228">
+    <span class=time>1.25/1.21</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523229/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523229">
+    <span class=time>26.80/19.95</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FRENAMED-BOOL_nokinds-noand.xml">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>nokinds-noand.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768752">11768752</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523230/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523230">
+    <span class=time>18.01/18.92</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523231/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523231">
+    <span class=time>1.00/0.90</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523232/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523232">
+    <span class=time>19.70/7.52</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FRENAMED-BOOL_complete.xml">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>complete.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768753">11768753</a></td>
-  <td class=timeout>
+  <td style="display:none">u  <td class=timeout>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523233">timeout (wallclock)</a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523234/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523234/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523234">
     <span class=time>0.99/0.81</span>
    </a>
@@ -1065,392 +926,392 @@ var filteredTable = FilteredTable(document.getElementById("theTable"));
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523235">timeout (wallclock)</a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768752/contents?limit=-1">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>nokinds-noand.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768752">11768752</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523230/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523230">
-    <span class=time>18.01/18.92</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523231/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523231">
-    <span class=time>1.00/0.90</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2Fdiffer.xml">Mixed_<wbr>AC/<wbr>differ.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768754">11768754</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523236/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523236">
+    <span class=time>0.34/0.39</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523232/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523232">
-    <span class=time>19.70/7.52</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523237/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523237">
+    <span class=time>0.06/0.10</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523238/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523238">
+    <span class=time>3.34/1.56</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768751/contents?limit=-1">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>nokinds.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768751">11768751</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523227/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523227">
-    <span class=time>18.65/19.65</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FBAG_nokinds.xml">Mixed_<wbr>AC/<wbr>BAG_<wbr>nokinds.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768755">11768755</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523239/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523239">
+    <span class=time>4.25/4.47</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523228/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523228">
-    <span class=time>1.25/1.21</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523240/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523240">
+    <span class=time>0.61/0.53</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523229/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523229">
-    <span class=time>26.80/19.95</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523241/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523241">
+    <span class=time>20.78/7.67</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768747/contents?limit=-1">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>nosorts-noand.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768747">11768747</a></td>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523215/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523215">
-    <span class=time>10.15/10.84</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2Fboolean_rings.xml">Mixed_<wbr>AC/<wbr>boolean_<wbr>rings.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768756">11768756</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523242/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523242">
+    <span class=time>3.62/4.66</span>
    </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523216/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523216">
-    <span class=time>0.32/0.26</span>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523243/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523243">
+    <span class=time>0.09/0.10</span>
    </a>
-  <td class=NO>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523217/stdout/1?limit=-1">NO</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523217">
-    <span class=time>28.47/14.74</span>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523244/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523244">
+    <span class=time>3.43/1.64</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768758/contents?limit=-1">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>nosorts.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FBAG_complete-noand.xml">Mixed_<wbr>AC/<wbr>BAG_<wbr>complete-noand.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768757">11768757</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523245/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523245">
+    <span class=time>27.08/27.90</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523246/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523246">
+    <span class=time>13.49/13.19</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523247/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523247">
+    <span class=time>63.87/48.55</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FRENAMED-BOOL_nosorts.xml">Mixed_<wbr>AC/<wbr>RENAMED-BOOL_<wbr>nosorts.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768758">11768758</a></td>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523248/stdout/1?limit=-1">MAYBE</a>
+  <td style="display:none">i  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523248/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523248">
     <span class=time>254.35/260.47</span>
    </a>
   <td class=NO>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523249/stdout/1?limit=-1">NO</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523249/stdout/1?limit=-1">NO</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523249">
     <span class=time>0.27/0.22</span>
    </a>
   <td class=NO>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523250/stdout/1?limit=-1">NO</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523250/stdout/1?limit=-1">NO</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523250">
     <span class=time>14.68/6.07</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768746/contents?limit=-1">Mixed_<wbr>AC/<wbr>sequent_<wbr>modulo.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768746">11768746</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523212/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523212">
-    <span class=time>114.12/114.96</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523213/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523213">
-    <span class=time>14.22/10.51</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523214/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523214">
-    <span class=time>24.72/10.56</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768743/contents?limit=-1">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>1.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768743">11768743</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523203/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523203">
-    <span class=time>0.05/0.11</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523204/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523204">
-    <span class=time>0.02/0.07</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523205/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523205">
-    <span class=time>3.34/1.61</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768765/contents?limit=-1">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>2.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768765">11768765</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523269/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523269">
-    <span class=time>0.11/0.15</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523270/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523270">
-    <span class=time>0.05/0.05</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523271/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523271">
-    <span class=time>4.20/1.83</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768759/contents?limit=-1">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>3.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FYWHM14_3.xml">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>3.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768759">11768759</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523251/stdout/1?limit=-1">YES</a>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523251/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523251">
     <span class=time>0.29/0.38</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523252/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523252/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523252">
     <span class=time>0.05/0.05</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523253/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523253/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523253">
     <span class=time>4.41/2.01</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768761/contents?limit=-1">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>4.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768761">11768761</a></td>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FBAG_nokinds-noand.xml">Mixed_<wbr>AC/<wbr>BAG_<wbr>nokinds-noand.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768760">11768760</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523254/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523254">
+    <span class=time>6.54/7.34</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523255/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523255">
+    <span class=time>0.82/0.69</span>
+   </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523257/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523256/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523256">
+    <span class=time>15.62/5.80</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FYWHM14_4.xml">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>4.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768761">11768761</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523257/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523257">
     <span class=time>0.41/0.49</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523258/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523258/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523258">
     <span class=time>0.04/0.06</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523259/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523259/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523259">
     <span class=time>4.10/1.94</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768764/contents?limit=-1">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>5.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768764">11768764</a></td>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FBAG_nosorts-noand.xml">Mixed_<wbr>AC/<wbr>BAG_<wbr>nosorts-noand.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768762">11768762</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523260/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523260">
+    <span class=time>2.52/2.82</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523261/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523261">
+    <span class=time>0.37/0.33</span>
+   </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523266/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523262/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523262">
+    <span class=time>6.02/2.53</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FBAG_complete.xml">Mixed_<wbr>AC/<wbr>BAG_<wbr>complete.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768763">11768763</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523263/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523263">
+    <span class=time>19.58/20.16</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523264/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523264">
+    <span class=time>1.49/1.30</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523265/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523265">
+    <span class=time>144.36/121.46</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FYWHM14_5.xml">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>5.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768764">11768764</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523266/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523266">
     <span class=time>0.05/0.11</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523267/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523267/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523267">
     <span class=time>0.03/0.08</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523268/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523268/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523268">
     <span class=time>3.70/1.75</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768769/contents?limit=-1">Mixed_<wbr>AC_<wbr>and_<wbr>C/<wbr>AC08.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768769">11768769</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523281/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523281">
-    <span class=time>3.23/3.80</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FYWHM14_2.xml">Mixed_<wbr>AC/<wbr>YWHM14_<wbr>2.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768765">11768765</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523269/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523269">
+    <span class=time>0.11/0.15</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523282/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523282">
-    <span class=time>0.08/0.08</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523270/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523270">
+    <span class=time>0.05/0.05</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523283/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523283">
-    <span class=time>3.22/1.56</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523271/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523271">
+    <span class=time>4.20/1.83</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768768/contents?limit=-1">Mixed_<wbr>AC_<wbr>and_<wbr>C/<wbr>AC29.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768768">11768768</a></td>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2Fkusakari1.xml">Mixed_<wbr>AC/<wbr>kusakari1.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768766">11768766</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523272/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523272">
+    <span class=time>0.29/0.33</span>
+   </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523278/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523273/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523273">
+    <span class=time>0.03/0.04</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523274/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523274">
+    <span class=time>6.29/2.72</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC%2FBAG_nosorts.xml">Mixed_<wbr>AC/<wbr>BAG_<wbr>nosorts.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768767">11768767</a></td>
+  <td style="display:none">i  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523275/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523275">
+    <span class=time>2.71/2.84</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523276/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523276">
+    <span class=time>0.13/0.15</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523277/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523277">
+    <span class=time>4.25/1.92</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC_and_C%2FAC29.xml">Mixed_<wbr>AC_<wbr>and_<wbr>C/<wbr>AC29.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768768">11768768</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523278/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523278">
     <span class=time>0.37/0.34</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523279/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523279/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523279">
     <span class=time>0.04/0.03</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523280/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523280/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523280">
     <span class=time>3.35/1.58</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768770/contents?limit=-1">Mixed_<wbr>AC_<wbr>and_<wbr>C/<wbr>AC47.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768770">11768770</a></td>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC_and_C%2FAC08.xml">Mixed_<wbr>AC_<wbr>and_<wbr>C/<wbr>AC08.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768769">11768769</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523281/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523281">
+    <span class=time>3.23/3.80</span>
+   </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523284/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523282/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523282">
+    <span class=time>0.08/0.08</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523283/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523283">
+    <span class=time>3.22/1.56</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC_and_C%2FAC47.xml">Mixed_<wbr>AC_<wbr>and_<wbr>C/<wbr>AC47.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768770">11768770</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523284/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523284">
     <span class=time>0.52/0.63</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523285/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523285/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523285">
     <span class=time>0.07/0.09</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523286/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523286/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523286">
     <span class=time>7.17/2.91</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768771/contents?limit=-1">Mixed_<wbr>AC_<wbr>and_<wbr>C/<wbr>rationals.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_AC_and_C%2Frationals.xml">Mixed_<wbr>AC_<wbr>and_<wbr>C/<wbr>rationals.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768771">11768771</a></td>
-  <td class=timeout>
+  <td style="display:none">u  <td class=timeout>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523287">timeout (wallclock)</a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523288/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523288/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523288">
     <span class=time>0.27/0.22</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523289/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523289/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523289">
     <span class=time>39.75/25.05</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768731/contents?limit=-1">Mixed_<wbr>C/<wbr>AC42.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FAC42.xml">Mixed_<wbr>C/<wbr>AC42.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768731">11768731</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523290/stdout/1?limit=-1">YES</a>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523290/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523290">
     <span class=time>0.26/0.32</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523291/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523291/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523291">
     <span class=time>0.05/0.05</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523292/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523292/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523292">
     <span class=time>4.32/2.12</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768736/contents?limit=-1">Mixed_<wbr>C/<wbr>AC43.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768736">11768736</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523305/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523305">
-    <span class=time>0.24/0.34</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523306/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523306">
-    <span class=time>0.05/0.04</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523307/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523307">
-    <span class=time>4.48/2.04</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768734/contents?limit=-1">Mixed_<wbr>C/<wbr>AC44.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768734">11768734</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523299/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523299">
-    <span class=time>0.33/0.39</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523300/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523300">
-    <span class=time>0.08/0.12</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523301/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523301">
-    <span class=time>4.72/2.12</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768732/contents?limit=-1">Mixed_<wbr>C/<wbr>AC45.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FAC45.xml">Mixed_<wbr>C/<wbr>AC45.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768732">11768732</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523293/stdout/1?limit=-1">YES</a>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523293/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523293">
     <span class=time>0.24/0.32</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523294/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523294/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523294">
     <span class=time>0.06/0.10</span>
    </a>
   <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523295/stdout/1?limit=-1">YES</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523295/stdout/1?limit=-1">YES</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523295">
     <span class=time>4.56/2.07</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768740/contents?limit=-1">Mixed_<wbr>C/<wbr>AC46.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768740">11768740</a></td>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523317/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523317">
-    <span class=time>0.83/0.94</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523318/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523318">
-    <span class=time>0.15/0.16</span>
-   </a>
-  <td class=YES>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523319/stdout/1?limit=-1">YES</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523319">
-    <span class=time>6.40/2.73</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768738/contents?limit=-1">Mixed_<wbr>C/<wbr>maude2.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768738">11768738</a></td>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523311/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523311">
-    <span class=time>3.24/3.49</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523312/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523312">
-    <span class=time>0.38/0.35</span>
-   </a>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523313/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523313">
-    <span class=time>6.11/2.70</span>
-   </a>
- <tr>
-  <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768733/contents?limit=-1">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>complete-noand.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FPEANO-NAT_complete-noand.xml">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>complete-noand.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768733">11768733</a></td>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523296/stdout/1?limit=-1">MAYBE</a>
+  <td style="display:none">u  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523296/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523296">
     <span class=time>48.98/50.54</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523297/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523297/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523297">
     <span class=time>15.79/15.39</span>
    </a>
@@ -1458,98 +1319,174 @@ var filteredTable = FilteredTable(document.getElementById("theTable"));
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523298">timeout (wallclock)</a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768737/contents?limit=-1">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>complete.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768737">11768737</a></td>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FAC44.xml">Mixed_<wbr>C/<wbr>AC44.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768734">11768734</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523299/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523299">
+    <span class=time>0.33/0.39</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523300/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523300">
+    <span class=time>0.08/0.12</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523301/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523301">
+    <span class=time>4.72/2.12</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FPEANO-NAT_nosorts.xml">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>nosorts.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768735">11768735</a></td>
+  <td style="display:none">u  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523302/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523302">
+    <span class=time>1.57/1.78</span>
+   </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523308/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523303/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523303">
+    <span class=time>0.31/0.29</span>
+   </a>
+  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523304/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523304">
+    <span class=time>10.86/5.43</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FAC43.xml">Mixed_<wbr>C/<wbr>AC43.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768736">11768736</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523305/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523305">
+    <span class=time>0.24/0.34</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523306/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523306">
+    <span class=time>0.05/0.04</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523307/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523307">
+    <span class=time>4.48/2.04</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FPEANO-NAT_complete.xml">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>complete.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768737">11768737</a></td>
+  <td style="display:none">u  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523308/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523308">
     <span class=time>20.94/21.62</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523309/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523309/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523309">
     <span class=time>2.16/1.90</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523310/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523310/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523310">
     <span class=time>198.76/179.97</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768742/contents?limit=-1">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>nokinds-noand.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768742">11768742</a></td>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523323/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523323">
-    <span class=time>8.46/9.12</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2Fmaude2.xml">Mixed_<wbr>C/<wbr>maude2.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768738">11768738</a></td>
+  <td style="display:none">u  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523311/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523311">
+    <span class=time>3.24/3.49</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523324/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523324">
-    <span class=time>1.74/1.61</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523312/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523312">
+    <span class=time>0.38/0.35</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523325/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523325">
-    <span class=time>16.71/7.57</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523313/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523313">
+    <span class=time>6.11/2.70</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768739/contents?limit=-1">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>nokinds.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FPEANO-NAT_nokinds.xml">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>nokinds.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768739">11768739</a></td>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523314/stdout/1?limit=-1">MAYBE</a>
+  <td style="display:none">u  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523314/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523314">
     <span class=time>4.58/4.71</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523315/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523315/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523315">
     <span class=time>0.93/0.83</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523316/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523316/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523316">
     <span class=time>18.21/12.12</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768741/contents?limit=-1">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>nosorts-noand.xml</a>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FAC46.xml">Mixed_<wbr>C/<wbr>AC46.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768740">11768740</a></td>
+  <td style="display:none">  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523317/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523317">
+    <span class=time>0.83/0.94</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523318/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523318">
+    <span class=time>0.15/0.16</span>
+   </a>
+  <td class=YES>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523319/stdout/1?limit=-1">YES</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523319">
+    <span class=time>6.40/2.73</span>
+   </a>
+ <tr>
+  <td class=benchmark>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FPEANO-NAT_nosorts-noand.xml">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>nosorts-noand.xml</a>
    <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768741">11768741</a></td>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523320/stdout/1?limit=-1">MAYBE</a>
+  <td style="display:none">u  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523320/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523320">
     <span class=time>3.42/3.80</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523321/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523321/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523321">
     <span class=time>0.50/0.47</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523322/stdout/1?limit=-1">MAYBE</a>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523322/stdout/1?limit=-1">MAYBE</a>
    <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523322">
     <span class=time>10.63/5.62</span>
    </a>
  <tr>
   <td class=benchmark>
-   <a href="https://www.starexec.org/starexec/services/benchmarks/11768735/contents?limit=-1">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>nosorts.xml</a>
-   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768735">11768735</a></td>
-  <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523302/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523302">
-    <span class=time>1.57/1.78</span>
+   <a href="https://termcomp.github.io/tpdb.html?ver=11.1&path=TRS_Equational%2FMixed_C%2FPEANO-NAT_nokinds-noand.xml">Mixed_<wbr>C/<wbr>PEANO-NAT_<wbr>nokinds-noand.xml</a>
+   <a class=starexecid href="https://www.starexec.org/starexec/secure/details/benchmark.jsp?id=11768742">11768742</a></td>
+  <td style="display:none">u  <td class=maybe>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523323/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523323">
+    <span class=time>8.46/9.12</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523303/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523303">
-    <span class=time>0.31/0.29</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523324/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523324">
+    <span class=time>1.74/1.61</span>
    </a>
   <td class=maybe>
-   <a href="https://www.starexec.org/starexec/services/jobs/pairs/487523304/stdout/1?limit=-1">MAYBE</a>
-   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523304">
-    <span class=time>10.86/5.43</span>
+   <a href="show.php?url=https://www.starexec.org/starexec/services/jobs/pairs/487523325/stdout/1?limit=-1">MAYBE</a>
+   <a href="https://www.starexec.org/starexec/secure/details/pair.jsp?id=487523325">
+    <span class=time>16.71/7.57</span>
    </a>
  <tr><th>
   <th>64  <th>48  <th>66</table>
