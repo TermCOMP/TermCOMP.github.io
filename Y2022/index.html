@@ -36,8 +36,158 @@ var columnToggler = StyleToggler(
 		{ text: "Many column", assign: { display: "block" } },
 	]
 );
-function updateScores(catname,participants) {}
+var teamCategoryScores = [[],[],[],[],[],[],[],[],[],[],[],];
+var teamScores = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],];
+const solver_id2team_id = {
+	"551423": "0",
+	"552179": "0",
+	"551423": "0",
+	"552179": "0",
+	"551423": "0",
+	"552179": "0",
+	"551423": "0",
+	"552179": "0",
+	"551423": "0",
+	"552179": "0",
+	"551423": "0",
+	"551423": "0",
+	"551423": "0",
+	"552179": "0",
+	"551423": "0",
+	"552179": "0",
+	"671179": "0",
+	"671179": "0",
+	"551398": "0",
+	"551423": "0",
+	"551421": "0",
+	"551421": "0",
+	"551428": "0",
+	"551428": "0",
+	"552179": "0",
+	"551423": "0",
+	"551423": "0",
+	"551423": "0",
+	"551423": "0",
+	"551423": "0",
+	"551423": "0",
+	"671123": "0",
+	"671224": "0",
+	"671239": "0",
+	"360226": "1",
+	"360226": "1",
+	"671247": "2",
+	"671248": "2",
+	"326595": "3",
+	"326595": "3",
+	"163986": "3",
+	"671245": "3",
+	"163986": "3",
+	"326595": "3",
+	"671244": "3",
+	"671271": "4",
+	"671271": "4",
+	"671548": "5",
+	"552278": "5",
+	"671548": "5",
+	"552278": "5",
+	"671548": "5",
+	"671548": "5",
+	"671548": "5",
+	"549724": "6",
+	"671372": "6",
+	"671696": "7",
+	"552234": "8",
+	"552235": "8",
+	"552234": "8",
+	"552235": "8",
+	"552234": "8",
+	"552235": "8",
+	"552234": "8",
+	"552235": "8",
+	"360388": "8",
+	"360387": "8",
+	"360385": "8",
+	"360391": "8",
+	"360390": "8",
+	"360389": "8",
+	"360386": "8",
+	"360384": "8",
+	"671700": "9",
+	"671700": "9",
+	"359682": "10",
+};
+const score_exponent = 2;// Ln norm. 2 means Euclidean
+
+function updateScores(catname,participants) {
+	// first clear scores for the teams of this category
+	for( let solver_id in participants ) {
+		teamCategoryScores[solver_id2team_id[solver_id]][catname] = [0,0];
+	}
+	// then add up scores of the team, in case it participates in certified category. We don't support two tools from one team in the same category!
+	for( let solver_id in participants ) {
+		let x = { it: teamCategoryScores[solver_id2team_id[solver_id]][catname] };
+		x.it[0] += Math.pow(participants[solver_id].normalized,score_exponent);
+		x.it[1] += participants[solver_id].news;
+	}
+	// updating the team scores
+	for( let i in teamScores ) {
+		let score_sum = Object.values(teamCategoryScores[i]).reduce(
+			(x,y) => { return [ x[0] + y[0], x[1] + y[1] ]; }, [0,0]
+		);
+		teamScores[i] = [ Math.pow(score_sum[0],1/score_exponent).toFixed(4), score_sum[1] ];
+	}
+	// sorting the team ranking. For smooth display, do not apply sorting directly on the dom objects.
+	for( var k = 0; k < 2; k++ ) {
+		let ranking = Object.keys(teamScores).sort(
+			(i,j) => { return teamScores[j][k] - teamScores[i][k]; }
+		);
+		// refreshing the display. For smooth display, do not move elements if they don't have to.
+		let div = document.getElementById( "team_ranking" + k );
+		var cur = div.firstElementChild;
+		for( var i = 0; i < ranking.length; i++ ) {
+			let span = document.getElementById("team"+ranking[i]+"_"+k);
+			let score = teamScores[ranking[i]][k];
+			let elt = span.querySelector(".score");
+			if( elt.innerHTML != score.toString() ) {// don't touch unless necessary
+				elt.innerHTML = score;
+			}
+			if( span == cur ) {
+				cur = cur.nextSibling;
+			} else {
+				div.insertBefore(span,cur);
+			}
+		}
+	}
+}
 </script>
+ <h3>Competition-Wide Ranking</h3>
+ <div id="team_ranking0">
+  <span id="team0_0" class="team">AProVE+LoAT<span class="score"></span></span>
+  <span id="team1_0" class="team">iRankFinder<span class="score"></span></span>
+  <span id="team2_0" class="team">Matchbox<span class="score"></span></span>
+  <span id="team3_0" class="team">MU-TERM<span class="score"></span></span>
+  <span id="team4_0" class="team">MultumNonMulta<span class="score"></span></span>
+  <span id="team5_0" class="team">NaTT<span class="score"></span></span>
+  <span id="team6_0" class="team">NTI+cTI<span class="score"></span></span>
+  <span id="team7_0" class="team">SOL<span class="score"></span></span>
+  <span id="team8_0" class="team">TTT2+TcT<span class="score"></span></span>
+  <span id="team9_0" class="team">Ultimate<span class="score"></span></span>
+  <span id="team10_0" class="team">Wanda<span class="score"></span></span>
+ </div>
+ <h3>Advancing-the-State-of-the-Art Ranking</h3>
+ <div id="team_ranking1">
+  <span id="team0_1" class="team">AProVE+LoAT<span class="score"></span></span>
+  <span id="team1_1" class="team">iRankFinder<span class="score"></span></span>
+  <span id="team2_1" class="team">Matchbox<span class="score"></span></span>
+  <span id="team3_1" class="team">MU-TERM<span class="score"></span></span>
+  <span id="team4_1" class="team">MultumNonMulta<span class="score"></span></span>
+  <span id="team5_1" class="team">NaTT<span class="score"></span></span>
+  <span id="team6_1" class="team">NTI+cTI<span class="score"></span></span>
+  <span id="team7_1" class="team">SOL<span class="score"></span></span>
+  <span id="team8_1" class="team">TTT2+TcT<span class="score"></span></span>
+  <span id="team9_1" class="team">Ultimate<span class="score"></span></span>
+  <span id="team10_1" class="team">Wanda<span class="score"></span></span>
+ </div>
 <h2>Termination of Rewriting <span id=stat0 class=stats></span></h2>
  <script>
   function summer(a,b){
