@@ -1,6 +1,6 @@
 <?php
-$title = 'Termination Competition 2016';
-$shortname = 'TermCOMP 2016';
+$title = 'Termination Competition 2017';
+$shortname = 'TermCOMP 2017';
 $showconfig = true;
 $showscore = true;
 $note = '';
