@@ -1,0 +1,393 @@
+YES
+We consider the system 3aOey.
+
+  Alphabet:
+
+    O : [] --> a 
+    ascending!6220sort : [b] --> b 
+    cons : [a * b] --> b 
+    descending!6220sort : [b] --> b 
+    insert : [a -> a -> a * a -> a -> a * b * a] --> b 
+    isort : [a -> a -> a * a -> a -> a * b] --> b 
+    max : [] --> a -> a -> a 
+    min : [] --> a -> a -> a 
+    nil : [] --> b 
+    s : [a] --> a 
+
+  Rules:
+
+    max O X => X 
+    max X O => X 
+    max s(X) s(Y) => max X Y 
+    min O X => O 
+    min X O => O 
+    min s(X) s(Y) => min X Y 
+    insert(F, G, nil, X) => cons(X, nil) 
+    insert(F, G, cons(X, Y), Z) => cons(F Z X, insert(F, G, Y, G Z X)) 
+    isort(F, G, nil) => nil 
+    isort(F, G, cons(X, Y)) => insert(F, G, isort(F, G, Y), X) 
+    ascending!6220sort(X) => isort(min, max, X) 
+    descending!6220sort(X) => isort(max, min, X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  max O X >? X 
+  max X O >? X 
+  max s(X) s(Y) >? max X Y 
+  min O X >? O 
+  min X O >? O 
+  min s(X) s(Y) >? min X Y 
+  insert(F, G, nil, X) >? cons(X, nil) 
+  insert(F, G, cons(X, Y), Z) >? cons(F Z X, insert(F, G, Y, G Z X)) 
+  isort(F, G, nil) >? nil 
+  isort(F, G, cons(X, Y)) >? insert(F, G, isort(F, G, Y), X) 
+  ascending!6220sort(X) >? isort(min, max, X) 
+  descending!6220sort(X) >? isort(max, min, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[insert(x_1, x_2, x_3, x_4)]] = insert(x_3, x_4, x_2, x_1) 
+  [[nil]] = _|_ 
+
+We choose Lex = {insert} and Mul = {@_{o -> o -> o}, @_{o -> o}, ascending!6220sort, cons, descending!6220sort, isort, max, min, s}, and the following precedence: ascending!6220sort > descending!6220sort > isort > insert > @_{o -> o -> o} > cons > @_{o -> o} > max > min > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(@_{o -> o -> o}(max, _|_), X) >= X 
+  @_{o -> o}(@_{o -> o -> o}(max, X), _|_) >= X 
+  @_{o -> o}(@_{o -> o -> o}(max, s(X)), s(Y)) >= @_{o -> o}(@_{o -> o -> o}(max, X), Y) 
+  @_{o -> o}(@_{o -> o -> o}(min, _|_), X) > _|_ 
+  @_{o -> o}(@_{o -> o -> o}(min, X), _|_) >= _|_ 
+  @_{o -> o}(@_{o -> o -> o}(min, s(X)), s(Y)) >= @_{o -> o}(@_{o -> o -> o}(min, X), Y) 
+  insert(F, G, _|_, X) >= cons(X, _|_) 
+  insert(F, G, cons(X, Y), Z) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Z), X), insert(F, G, Y, @_{o -> o}(@_{o -> o -> o}(G, Z), X))) 
+  isort(F, G, _|_) >= _|_ 
+  isort(F, G, cons(X, Y)) >= insert(F, G, isort(F, G, Y), X) 
+  ascending!6220sort(X) >= isort(min, max, X) 
+  descending!6220sort(X) >= isort(max, min, X) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(@_{o -> o -> o}(max, _|_), X) >= X  because [2], by (Star) 
+  2] @_{o -> o}*(@_{o -> o -> o}(max, _|_), X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] @_{o -> o}(@_{o -> o -> o}(max, X), _|_) >= X  because [5], by (Star) 
+  5] @_{o -> o}*(@_{o -> o -> o}(max, X), _|_) >= X  because [6], by (Select) 
+  6] @_{o -> o -> o}(max, X) @_{o -> o}*(@_{o -> o -> o}(max, X), _|_) >= X  because [7] 
+  7] @_{o -> o -> o}*(max, X, @_{o -> o}*(@_{o -> o -> o}(max, X), _|_)) >= X  because [8], by (Select) 
+  8] X >= X  by (Meta) 
+
+  9] @_{o -> o}(@_{o -> o -> o}(max, s(X)), s(Y)) >= @_{o -> o}(@_{o -> o -> o}(max, X), Y)  because @_{o -> o} in Mul, [10] and [15], by (Fun) 
+  10] @_{o -> o -> o}(max, s(X)) >= @_{o -> o -> o}(max, X)  because @_{o -> o -> o} in Mul, [11] and [12], by (Fun) 
+  11] max >= max  by (Fun) 
+  12] s(X) >= X  because [13], by (Star) 
+  13] s*(X) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+  15] s(Y) >= Y  because [16], by (Star) 
+  16] s*(Y) >= Y  because [17], by (Select) 
+  17] Y >= Y  by (Meta) 
+
+  18] @_{o -> o}(@_{o -> o -> o}(min, _|_), X) > _|_  because [19], by definition 
+  19] @_{o -> o}*(@_{o -> o -> o}(min, _|_), X) >= _|_  by (Bot) 
+
+  20] @_{o -> o}(@_{o -> o -> o}(min, X), _|_) >= _|_  by (Bot) 
+
+  21] @_{o -> o}(@_{o -> o -> o}(min, s(X)), s(Y)) >= @_{o -> o}(@_{o -> o -> o}(min, X), Y)  because @_{o -> o} in Mul, [22] and [27], by (Fun) 
+  22] @_{o -> o -> o}(min, s(X)) >= @_{o -> o -> o}(min, X)  because @_{o -> o -> o} in Mul, [23] and [24], by (Fun) 
+  23] min >= min  by (Fun) 
+  24] s(X) >= X  because [25], by (Star) 
+  25] s*(X) >= X  because [26], by (Select) 
+  26] X >= X  by (Meta) 
+  27] s(Y) >= Y  because [28], by (Star) 
+  28] s*(Y) >= Y  because [29], by (Select) 
+  29] Y >= Y  by (Meta) 
+
+  30] insert(F, G, _|_, X) >= cons(X, _|_)  because [31], by (Star) 
+  31] insert*(F, G, _|_, X) >= cons(X, _|_)  because insert > cons, [32] and [34], by (Copy) 
+  32] insert*(F, G, _|_, X) >= X  because [33], by (Select) 
+  33] X >= X  by (Meta) 
+  34] insert*(F, G, _|_, X) >= _|_  by (Bot) 
+
+  35] insert(F, G, cons(X, Y), Z) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Z), X), insert(F, G, Y, @_{o -> o}(@_{o -> o -> o}(G, Z), X)))  because [36], by (Star) 
+  36] insert*(F, G, cons(X, Y), Z) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Z), X), insert(F, G, Y, @_{o -> o}(@_{o -> o -> o}(G, Z), X)))  because insert > cons, [37] and [47], by (Copy) 
+  37] insert*(F, G, cons(X, Y), Z) >= @_{o -> o}(@_{o -> o -> o}(F, Z), X)  because insert > @_{o -> o}, [38] and [43], by (Copy) 
+  38] insert*(F, G, cons(X, Y), Z) >= @_{o -> o -> o}(F, Z)  because insert > @_{o -> o -> o}, [39] and [41], by (Copy) 
+  39] insert*(F, G, cons(X, Y), Z) >= F  because [40], by (Select) 
+  40] F >= F  by (Meta) 
+  41] insert*(F, G, cons(X, Y), Z) >= Z  because [42], by (Select) 
+  42] Z >= Z  by (Meta) 
+  43] insert*(F, G, cons(X, Y), Z) >= X  because [44], by (Select) 
+  44] cons(X, Y) >= X  because [45], by (Star) 
+  45] cons*(X, Y) >= X  because [46], by (Select) 
+  46] X >= X  by (Meta) 
+  47] insert*(F, G, cons(X, Y), Z) >= insert(F, G, Y, @_{o -> o}(@_{o -> o -> o}(G, Z), X))  because insert in Lex, [48], [39], [51], [53] and [55], by (Stat) 
+  48] cons(X, Y) > Y  because [49], by definition 
+  49] cons*(X, Y) >= Y  because [50], by (Select) 
+  50] Y >= Y  by (Meta) 
+  51] insert*(F, G, cons(X, Y), Z) >= G  because [52], by (Select) 
+  52] G >= G  by (Meta) 
+  53] insert*(F, G, cons(X, Y), Z) >= Y  because [54], by (Select) 
+  54] cons(X, Y) >= Y  because [49], by (Star) 
+  55] insert*(F, G, cons(X, Y), Z) >= @_{o -> o}(@_{o -> o -> o}(G, Z), X)  because insert > @_{o -> o}, [56] and [43], by (Copy) 
+  56] insert*(F, G, cons(X, Y), Z) >= @_{o -> o -> o}(G, Z)  because insert > @_{o -> o -> o}, [51] and [41], by (Copy) 
+
+  57] isort(F, G, _|_) >= _|_  by (Bot) 
+
+  58] isort(F, G, cons(X, Y)) >= insert(F, G, isort(F, G, Y), X)  because [59], by (Star) 
+  59] isort*(F, G, cons(X, Y)) >= insert(F, G, isort(F, G, Y), X)  because isort > insert, [60], [62], [64] and [70], by (Copy) 
+  60] isort*(F, G, cons(X, Y)) >= F  because [61], by (Select) 
+  61] F >= F  by (Meta) 
+  62] isort*(F, G, cons(X, Y)) >= G  because [63], by (Select) 
+  63] G >= G  by (Meta) 
+  64] isort*(F, G, cons(X, Y)) >= isort(F, G, Y)  because isort in Mul, [65], [66] and [67], by (Stat) 
+  65] F >= F  by (Meta) 
+  66] G >= G  by (Meta) 
+  67] cons(X, Y) > Y  because [68], by definition 
+  68] cons*(X, Y) >= Y  because [69], by (Select) 
+  69] Y >= Y  by (Meta) 
+  70] isort*(F, G, cons(X, Y)) >= X  because [71], by (Select) 
+  71] cons(X, Y) >= X  because [72], by (Star) 
+  72] cons*(X, Y) >= X  because [73], by (Select) 
+  73] X >= X  by (Meta) 
+
+  74] ascending!6220sort(X) >= isort(min, max, X)  because [75], by (Star) 
+  75] ascending!6220sort*(X) >= isort(min, max, X)  because ascending!6220sort > isort, [76], [77] and [78], by (Copy) 
+  76] ascending!6220sort*(X) >= min  because ascending!6220sort > min, by (Copy) 
+  77] ascending!6220sort*(X) >= max  because ascending!6220sort > max, by (Copy) 
+  78] ascending!6220sort*(X) >= X  because [79], by (Select) 
+  79] X >= X  by (Meta) 
+
+  80] descending!6220sort(X) >= isort(max, min, X)  because [81], by (Star) 
+  81] descending!6220sort*(X) >= isort(max, min, X)  because descending!6220sort > isort, [82], [83] and [84], by (Copy) 
+  82] descending!6220sort*(X) >= max  because descending!6220sort > max, by (Copy) 
+  83] descending!6220sort*(X) >= min  because descending!6220sort > min, by (Copy) 
+  84] descending!6220sort*(X) >= X  because [85], by (Select) 
+  85] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  min O X => O 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  max O X >? X 
+  max X O >? X 
+  max s(X) s(Y) >? max X Y 
+  min X O >? O 
+  min s(X) s(Y) >? min X Y 
+  insert(F, G, nil, X) >? cons(X, nil) 
+  insert(F, G, cons(X, Y), Z) >? cons(F Z X, insert(F, G, Y, G Z X)) 
+  isort(F, G, nil) >? nil 
+  isort(F, G, cons(X, Y)) >? insert(F, G, isort(F, G, Y), X) 
+  ascending!6220sort(X) >? isort(min, max, X) 
+  descending!6220sort(X) >? isort(max, min, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[insert(x_1, x_2, x_3, x_4)]] = insert(x_1, x_3, x_4, x_2) 
+  [[nil]] = _|_ 
+
+We choose Lex = {insert} and Mul = {@_{o -> o -> o}, @_{o -> o}, ascending!6220sort, cons, descending!6220sort, isort, max, min, s}, and the following precedence: ascending!6220sort > descending!6220sort > isort > insert > @_{o -> o -> o} > @_{o -> o} > cons > max > min > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(@_{o -> o -> o}(max, _|_), X) > X 
+  @_{o -> o}(@_{o -> o -> o}(max, X), _|_) > X 
+  @_{o -> o}(@_{o -> o -> o}(max, s(X)), s(Y)) >= @_{o -> o}(@_{o -> o -> o}(max, X), Y) 
+  @_{o -> o}(@_{o -> o -> o}(min, X), _|_) >= _|_ 
+  @_{o -> o}(@_{o -> o -> o}(min, s(X)), s(Y)) >= @_{o -> o}(@_{o -> o -> o}(min, X), Y) 
+  insert(F, G, _|_, X) >= cons(X, _|_) 
+  insert(F, G, cons(X, Y), Z) > cons(@_{o -> o}(@_{o -> o -> o}(F, Z), X), insert(F, G, Y, @_{o -> o}(@_{o -> o -> o}(G, Z), X))) 
+  isort(F, G, _|_) >= _|_ 
+  isort(F, G, cons(X, Y)) > insert(F, G, isort(F, G, Y), X) 
+  ascending!6220sort(X) >= isort(min, max, X) 
+  descending!6220sort(X) >= isort(max, min, X) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(@_{o -> o -> o}(max, _|_), X) > X  because [2], by definition 
+  2] @_{o -> o}*(@_{o -> o -> o}(max, _|_), X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] @_{o -> o}(@_{o -> o -> o}(max, X), _|_) > X  because [5], by definition 
+  5] @_{o -> o}*(@_{o -> o -> o}(max, X), _|_) >= X  because [6], by (Select) 
+  6] @_{o -> o -> o}(max, X) @_{o -> o}*(@_{o -> o -> o}(max, X), _|_) >= X  because [7] 
+  7] @_{o -> o -> o}*(max, X, @_{o -> o}*(@_{o -> o -> o}(max, X), _|_)) >= X  because [8], by (Select) 
+  8] X >= X  by (Meta) 
+
+  9] @_{o -> o}(@_{o -> o -> o}(max, s(X)), s(Y)) >= @_{o -> o}(@_{o -> o -> o}(max, X), Y)  because @_{o -> o} in Mul, [10] and [15], by (Fun) 
+  10] @_{o -> o -> o}(max, s(X)) >= @_{o -> o -> o}(max, X)  because @_{o -> o -> o} in Mul, [11] and [12], by (Fun) 
+  11] max >= max  by (Fun) 
+  12] s(X) >= X  because [13], by (Star) 
+  13] s*(X) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+  15] s(Y) >= Y  because [16], by (Star) 
+  16] s*(Y) >= Y  because [17], by (Select) 
+  17] Y >= Y  by (Meta) 
+
+  18] @_{o -> o}(@_{o -> o -> o}(min, X), _|_) >= _|_  by (Bot) 
+
+  19] @_{o -> o}(@_{o -> o -> o}(min, s(X)), s(Y)) >= @_{o -> o}(@_{o -> o -> o}(min, X), Y)  because @_{o -> o} in Mul, [20] and [25], by (Fun) 
+  20] @_{o -> o -> o}(min, s(X)) >= @_{o -> o -> o}(min, X)  because @_{o -> o -> o} in Mul, [21] and [22], by (Fun) 
+  21] min >= min  by (Fun) 
+  22] s(X) >= X  because [23], by (Star) 
+  23] s*(X) >= X  because [24], by (Select) 
+  24] X >= X  by (Meta) 
+  25] s(Y) >= Y  because [26], by (Star) 
+  26] s*(Y) >= Y  because [27], by (Select) 
+  27] Y >= Y  by (Meta) 
+
+  28] insert(F, G, _|_, X) >= cons(X, _|_)  because [29], by (Star) 
+  29] insert*(F, G, _|_, X) >= cons(X, _|_)  because insert > cons, [30] and [32], by (Copy) 
+  30] insert*(F, G, _|_, X) >= X  because [31], by (Select) 
+  31] X >= X  by (Meta) 
+  32] insert*(F, G, _|_, X) >= _|_  by (Bot) 
+
+  33] insert(F, G, cons(X, Y), Z) > cons(@_{o -> o}(@_{o -> o -> o}(F, Z), X), insert(F, G, Y, @_{o -> o}(@_{o -> o -> o}(G, Z), X)))  because [34], by definition 
+  34] insert*(F, G, cons(X, Y), Z) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Z), X), insert(F, G, Y, @_{o -> o}(@_{o -> o -> o}(G, Z), X)))  because insert > cons, [35] and [45], by (Copy) 
+  35] insert*(F, G, cons(X, Y), Z) >= @_{o -> o}(@_{o -> o -> o}(F, Z), X)  because insert > @_{o -> o}, [36] and [41], by (Copy) 
+  36] insert*(F, G, cons(X, Y), Z) >= @_{o -> o -> o}(F, Z)  because insert > @_{o -> o -> o}, [37] and [39], by (Copy) 
+  37] insert*(F, G, cons(X, Y), Z) >= F  because [38], by (Select) 
+  38] F >= F  by (Meta) 
+  39] insert*(F, G, cons(X, Y), Z) >= Z  because [40], by (Select) 
+  40] Z >= Z  by (Meta) 
+  41] insert*(F, G, cons(X, Y), Z) >= X  because [42], by (Select) 
+  42] cons(X, Y) >= X  because [43], by (Star) 
+  43] cons*(X, Y) >= X  because [44], by (Select) 
+  44] X >= X  by (Meta) 
+  45] insert*(F, G, cons(X, Y), Z) >= insert(F, G, Y, @_{o -> o}(@_{o -> o -> o}(G, Z), X))  because insert in Lex, [46], [47], [37], [50], [52] and [54], by (Stat) 
+  46] F >= F  by (Meta) 
+  47] cons(X, Y) > Y  because [48], by definition 
+  48] cons*(X, Y) >= Y  because [49], by (Select) 
+  49] Y >= Y  by (Meta) 
+  50] insert*(F, G, cons(X, Y), Z) >= G  because [51], by (Select) 
+  51] G >= G  by (Meta) 
+  52] insert*(F, G, cons(X, Y), Z) >= Y  because [53], by (Select) 
+  53] cons(X, Y) >= Y  because [48], by (Star) 
+  54] insert*(F, G, cons(X, Y), Z) >= @_{o -> o}(@_{o -> o -> o}(G, Z), X)  because insert > @_{o -> o}, [55] and [41], by (Copy) 
+  55] insert*(F, G, cons(X, Y), Z) >= @_{o -> o -> o}(G, Z)  because insert > @_{o -> o -> o}, [50] and [39], by (Copy) 
+
+  56] isort(F, G, _|_) >= _|_  by (Bot) 
+
+  57] isort(F, G, cons(X, Y)) > insert(F, G, isort(F, G, Y), X)  because [58], by definition 
+  58] isort*(F, G, cons(X, Y)) >= insert(F, G, isort(F, G, Y), X)  because isort > insert, [59], [61], [63] and [69], by (Copy) 
+  59] isort*(F, G, cons(X, Y)) >= F  because [60], by (Select) 
+  60] F >= F  by (Meta) 
+  61] isort*(F, G, cons(X, Y)) >= G  because [62], by (Select) 
+  62] G >= G  by (Meta) 
+  63] isort*(F, G, cons(X, Y)) >= isort(F, G, Y)  because isort in Mul, [64], [65] and [66], by (Stat) 
+  64] F >= F  by (Meta) 
+  65] G >= G  by (Meta) 
+  66] cons(X, Y) > Y  because [67], by definition 
+  67] cons*(X, Y) >= Y  because [68], by (Select) 
+  68] Y >= Y  by (Meta) 
+  69] isort*(F, G, cons(X, Y)) >= X  because [70], by (Select) 
+  70] cons(X, Y) >= X  because [71], by (Star) 
+  71] cons*(X, Y) >= X  because [72], by (Select) 
+  72] X >= X  by (Meta) 
+
+  73] ascending!6220sort(X) >= isort(min, max, X)  because [74], by (Star) 
+  74] ascending!6220sort*(X) >= isort(min, max, X)  because ascending!6220sort > isort, [75], [76] and [77], by (Copy) 
+  75] ascending!6220sort*(X) >= min  because ascending!6220sort > min, by (Copy) 
+  76] ascending!6220sort*(X) >= max  because ascending!6220sort > max, by (Copy) 
+  77] ascending!6220sort*(X) >= X  because [78], by (Select) 
+  78] X >= X  by (Meta) 
+
+  79] descending!6220sort(X) >= isort(max, min, X)  because [80], by (Star) 
+  80] descending!6220sort*(X) >= isort(max, min, X)  because descending!6220sort > isort, [81], [82] and [83], by (Copy) 
+  81] descending!6220sort*(X) >= max  because descending!6220sort > max, by (Copy) 
+  82] descending!6220sort*(X) >= min  because descending!6220sort > min, by (Copy) 
+  83] descending!6220sort*(X) >= X  because [84], by (Select) 
+  84] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  max O X => X 
+  max X O => X 
+  insert(F, G, cons(X, Y), Z) => cons(F Z X, insert(F, G, Y, G Z X)) 
+  isort(F, G, cons(X, Y)) => insert(F, G, isort(F, G, Y), X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  max s(X) s(Y) >? max X Y 
+  min X O >? O 
+  min s(X) s(Y) >? min X Y 
+  insert(F, G, nil, X) >? cons(X, nil) 
+  isort(F, G, nil) >? nil 
+  ascending!6220sort(X) >? isort(min, max, X) 
+  descending!6220sort(X) >? isort(max, min, X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  ascending!6220sort = Lam[y0].3 + 3*y0 
+  cons = Lam[y0;y1].y0 + y1 
+  descending!6220sort = Lam[y0].3 + 3*y0 
+  insert = Lam[G0;G1;y2;y3].3 + 3*y2 + 3*y3 + G0(0,0) + G1(0,0) 
+  isort = Lam[G0;G1;y2].2 + y2 + G0(0,0) + G1(0,0) 
+  max = Lam[y0;y1].0 
+  min = Lam[y0;y1].0 
+  nil = 0 
+  s = Lam[y0].3 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[max s(_x0) s(_x1)]] = 6 + 3*x0 + 3*x1 > x0 + x1 = [[max _x0 _x1]] 
+  [[min _x0 O]] = 3 + x0 >= 3 = [[O]] 
+  [[min s(_x0) s(_x1)]] = 6 + 3*x0 + 3*x1 > x0 + x1 = [[min _x0 _x1]] 
+  [[insert(_F0, _F1, nil, _x2)]] = 3 + 3*x2 + F0(0,0) + F1(0,0) > x2 = [[cons(_x2, nil)]] 
+  [[isort(_F0, _F1, nil)]] = 2 + F0(0,0) + F1(0,0) > 0 = [[nil]] 
+  [[ascending!6220sort(_x0)]] = 3 + 3*x0 > 2 + x0 = [[isort(min, max, _x0)]] 
+  [[descending!6220sort(_x0)]] = 3 + 3*x0 > 2 + x0 = [[isort(max, min, _x0)]] 
+
+We can thus remove the following rules:
+
+  max s(X) s(Y) => max X Y 
+  min s(X) s(Y) => min X Y 
+  insert(F, G, nil, X) => cons(X, nil) 
+  isort(F, G, nil) => nil 
+  ascending!6220sort(X) => isort(min, max, X) 
+  descending!6220sort(X) => isort(max, min, X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  min(X, O) >? O 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  min = Lam[y0;y1].3 + y0 + 3*y1 
+
+Using this interpretation, the requirements translate to:
+
+  [[min(_x0, O)]] = 3 + x0 > 0 = [[O]] 
+
+We can thus remove the following rules:
+
+  min(X, O) => O 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

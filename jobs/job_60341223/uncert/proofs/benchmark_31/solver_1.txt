@@ -1,0 +1,199 @@
+YES
+We consider the system Awgbq.
+
+  Alphabet:
+
+    add : [] --> c -> a -> c 
+    cons : [a * b] --> b 
+    fold : [c -> a -> c * b * c] --> c 
+    mul : [] --> c -> a -> c 
+    nil : [] --> b 
+    one : [] --> c 
+    prod : [b] --> c 
+    sum : [b] --> c 
+    xap : [c -> a -> c * c] --> a -> c 
+    yap : [a -> c * a] --> c 
+    zero : [] --> c 
+
+  Rules:
+
+    fold(/\x./\y.yap(xap(F, x), y), nil, X) => X 
+    fold(/\x./\y.yap(xap(F, x), y), cons(X, Y), Z) => fold(/\z./\u.yap(xap(F, z), u), Y, yap(xap(F, Z), X)) 
+    sum(X) => fold(/\x./\y.yap(xap(add, x), y), X, zero) 
+    fold(mul, X, one) => prod(X) 
+    xap(F, X) => F X 
+    yap(F, X) => F X 
+
+Symbol xap is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    add : [c] --> a -> c 
+    cons : [a * b] --> b 
+    fold : [c -> a -> c * b * c] --> c 
+    mul : [] --> c -> a -> c 
+    nil : [] --> b 
+    one : [] --> c 
+    prod : [b] --> c 
+    sum : [b] --> c 
+    yap : [a -> c * a] --> c 
+    zero : [] --> c 
+
+  Rules:
+
+    fold(/\x./\y.yap(F[x], y), nil, X) => X 
+    fold(/\x./\y.yap(F[x], y), cons(X, Y), Z) => fold(/\z./\u.yap(F[z], u), Y, yap(F[Z], X)) 
+    sum(X) => fold(/\x./\y.yap(add(x), y), X, zero) 
+    fold(mul, X, one) => prod(X) 
+    yap(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  fold(/\x./\y.yap(F[x], y), nil, X) >? X 
+  fold(/\x./\y.yap(F[x], y), cons(X, Y), Z) >? fold(/\z./\u.yap(F[z], u), Y, yap(F[Z], X)) 
+  sum(X) >? fold(/\x./\y.yap(add(x), y), X, zero) 
+  fold(mul, X, one) >? prod(X) 
+  yap(F, X) >? F X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[fold(x_1, x_2, x_3)]] = fold(x_2, x_1, x_3) 
+  [[prod(x_1)]] = x_1 
+  [[zero]] = _|_ 
+
+We choose Lex = {fold} and Mul = {@_{o -> o}, add, cons, mul, nil, one, sum, yap}, and the following precedence: mul > nil > one > sum > add > fold > yap > @_{o -> o} > cons
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  fold(/\x./\y.yap(F[x], y), nil, X) >= X 
+  fold(/\x./\y.yap(F[x], y), cons(X, Y), Z) > fold(/\x./\y.yap(F[x], y), Y, yap(F[Z], X)) 
+  sum(X) >= fold(/\x./\y.yap(add(x), y), X, _|_) 
+  fold(mul, X, one) > X 
+  yap(F, X) >= @_{o -> o}(F, X) 
+
+With these choices, we have:
+
+  1] fold(/\x./\y.yap(F[x], y), nil, X) >= X  because [2], by (Star) 
+  2] fold*(/\x./\y.yap(F[x], y), nil, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] fold(/\x./\y.yap(F[x], y), cons(X, Y), Z) > fold(/\x./\y.yap(F[x], y), Y, yap(F[Z], X))  because [5], by definition 
+  5] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z) >= fold(/\x./\y.yap(F[x], y), Y, yap(F[Z], X))  because [6], by (Select) 
+  6] yap(F[fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z)], fold*(/\z./\u.yap(F[z], u), cons(X, Y), Z)) >= fold(/\x./\y.yap(F[x], y), Y, yap(F[Z], X))  because [7], by (Star) 
+  7] yap*(F[fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z)], fold*(/\z./\u.yap(F[z], u), cons(X, Y), Z)) >= fold(/\x./\y.yap(F[x], y), Y, yap(F[Z], X))  because [8], by (Select) 
+  8] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z) >= fold(/\x./\y.yap(F[x], y), Y, yap(F[Z], X))  because fold in Lex, [9], [12], [20] and [22], by (Stat) 
+  9] cons(X, Y) > Y  because [10], by definition 
+  10] cons*(X, Y) >= Y  because [11], by (Select) 
+  11] Y >= Y  by (Meta) 
+  12] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z) >= /\x./\y.yap(F[x], y)  because [13], by (F-Abs) 
+  13] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z, z) >= /\x.yap(F[z], x)  because [14], by (Select) 
+  14] /\x.yap(F[fold*(/\y./\v.yap(F[y], v), cons(X, Y), Z, z)], x) >= /\x.yap(F[z], x)  because [15], by (Abs) 
+  15] yap(F[fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z, z)], u) >= yap(F[z], u)  because yap in Mul, [16] and [19], by (Fun) 
+  16] F[fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z, z)] >= F[z]  because [17], by (Meta) 
+  17] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z, z) >= z  because [18], by (Select) 
+  18] z >= z  by (Var) 
+  19] u >= u  by (Var) 
+  20] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z) >= Y  because [21], by (Select) 
+  21] cons(X, Y) >= Y  because [10], by (Star) 
+  22] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z) >= yap(F[Z], X)  because fold > yap, [23] and [28], by (Copy) 
+  23] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z) >= F[Z]  because [24], by (Select) 
+  24] /\x.yap(F[fold*(/\y./\v.yap(F[y], v), cons(X, Y), Z)], x) >= F[Z]  because [25], by (Eta)[Kop13:2] 
+  25] F[fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z)] >= F[Z]  because [26], by (Meta) 
+  26] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z) >= Z  because [27], by (Select) 
+  27] Z >= Z  by (Meta) 
+  28] fold*(/\x./\y.yap(F[x], y), cons(X, Y), Z) >= X  because [29], by (Select) 
+  29] cons(X, Y) >= X  because [30], by (Star) 
+  30] cons*(X, Y) >= X  because [31], by (Select) 
+  31] X >= X  by (Meta) 
+
+  32] sum(X) >= fold(/\x./\y.yap(add(x), y), X, _|_)  because [33], by (Star) 
+  33] sum*(X) >= fold(/\x./\y.yap(add(x), y), X, _|_)  because sum > fold, [34], [42] and [44], by (Copy) 
+  34] sum*(X) >= /\y./\z.yap(add(y), z)  because [35], by (F-Abs) 
+  35] sum*(X, x) >= /\z.yap(add(x), z)  because [36], by (F-Abs) 
+  36] sum*(X, x, y) >= yap(add(x), y)  because sum > yap, [37] and [40], by (Copy) 
+  37] sum*(X, x, y) >= add(x)  because sum > add and [38], by (Copy) 
+  38] sum*(X, x, y) >= x  because [39], by (Select) 
+  39] x >= x  by (Var) 
+  40] sum*(X, x, y) >= y  because [41], by (Select) 
+  41] y >= y  by (Var) 
+  42] sum*(X) >= X  because [43], by (Select) 
+  43] X >= X  by (Meta) 
+  44] sum*(X) >= _|_  by (Bot) 
+
+  45] fold(mul, X, one) > X  because [46], by definition 
+  46] fold*(mul, X, one) >= X  because [47], by (Select) 
+  47] X >= X  by (Meta) 
+
+  48] yap(F, X) >= @_{o -> o}(F, X)  because [49], by (Star) 
+  49] yap*(F, X) >= @_{o -> o}(F, X)  because yap > @_{o -> o}, [50] and [52], by (Copy) 
+  50] yap*(F, X) >= F  because [51], by (Select) 
+  51] F >= F  by (Meta) 
+  52] yap*(F, X) >= X  because [53], by (Select) 
+  53] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  fold(/\x./\y.yap(F[x], y), cons(X, Y), Z) => fold(/\z./\u.yap(F[z], u), Y, yap(F[Z], X)) 
+  fold(mul, X, one) => prod(X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  fold(/\x./\y.yap(F[x], y), nil, X) >? X 
+  sum(X) >? fold(/\x./\y.yap(add(x), y), X, zero) 
+  yap(F, X) >? F X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  add = Lam[y0;y1].y0 
+  fold = Lam[G0;y1;y2].y1 + y2 + G0(0,0) 
+  nil = 3 
+  sum = Lam[y0].3 + 3*y0 
+  yap = Lam[G0;y1].y1 + G0(y1) 
+  zero = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[fold(/\x./\y.yap(_F0[x], y), nil, _x1)]] = 3 + x1 + F0(0,0) > x1 = [[_x1]] 
+  [[sum(_x0)]] = 3 + 3*x0 > x0 = [[fold(/\x./\y.yap(add(x), y), _x0, zero)]] 
+  [[yap(_F0, _x1)]] = x1 + F0(x1) >= x1 + F0(x1) = [[_F0 _x1]] 
+
+We can thus remove the following rules:
+
+  fold(/\x./\y.yap(F[x], y), nil, X) => X 
+  sum(X) => fold(/\x./\y.yap(add(x), y), X, zero) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  yap(F, X) >? F X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  yap = Lam[G0;y1].1 + y1 + G0(y1) 
+
+Using this interpretation, the requirements translate to:
+
+  [[yap(_F0, _x1)]] = 1 + x1 + F0(x1) > x1 + F0(x1) = [[_F0 _x1]] 
+
+We can thus remove the following rules:
+
+  yap(F, X) => F X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[Kop13:2]  C. Kop.  StarHorpo with an Eta-Rule.  Unpublished manuscript, http://cl-informatik.uibk.ac.at/users/kop/etahorpo.pdf, 2013.

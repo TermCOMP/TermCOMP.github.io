@@ -1,0 +1,83 @@
+YES
+We consider the system k8phq.
+
+  Alphabet:
+
+    !2801 : [u -> a * u] --> a 
+    !2802 : [u -> b * u] --> b 
+    !2803 : [u -> u * u] --> u 
+    casea : [u * a -> a * b -> a] --> a 
+    caseb : [u * a -> b * b -> b] --> b 
+    caseu : [u * a -> u * b -> u] --> u 
+    inl : [a] --> u 
+    inr : [b] --> u 
+
+  Rules:
+
+    casea(inl(X), F, G) => F X 
+    casea(inr(X), F, G) => G X 
+    casea(X, /\x.!2801(F, inl(x)), /\y.!2801(F, inr(y))) => F X 
+    caseb(inl(X), F, G) => F X 
+    caseb(inr(X), F, G) => G X 
+    caseb(X, /\x.!2802(F, inl(x)), /\y.!2802(F, inr(y))) => F X 
+    caseu(inl(X), F, G) => F X 
+    caseu(inr(X), F, G) => G X 
+    caseu(X, /\x.!2803(F, inl(x)), /\y.!2803(F, inr(y))) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  casea(inl(X), F, G) >? F X 
+  casea(inr(X), F, G) >? G X 
+  casea(X, /\x.!2801(F, inl(x)), /\y.!2801(F, inr(y))) >? F X 
+  caseb(inl(X), F, G) >? F X 
+  caseb(inr(X), F, G) >? G X 
+  caseb(X, /\x.!2802(F, inl(x)), /\y.!2802(F, inr(y))) >? F X 
+  caseu(inl(X), F, G) >? F X 
+  caseu(inr(X), F, G) >? G X 
+  caseu(X, /\x.!2803(F, inl(x)), /\y.!2803(F, inr(y))) >? F X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  !2801 = Lam[G0;y1].3 + y1 + G0(y1) 
+  !2802 = Lam[G0;y1].3 + y1 + G0(y1) 
+  !2803 = Lam[G0;y1].3 + y1 + G0(y1) 
+  casea = Lam[y0;G1;G2].3 + y0 + G1(y0) + G2(y0) 
+  caseb = Lam[y0;G1;G2].3 + y0 + G1(y0) + G2(y0) 
+  caseu = Lam[y0;G1;G2].3 + y0 + G1(y0) + G2(y0) 
+  inl = Lam[y0].3 + y0 
+  inr = Lam[y0].3 + y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[casea(inl(_x0), _F1, _F2)]] = 6 + x0 + F1(3 + x0) + F2(3 + x0) > x0 + F1(x0) = [[_F1 _x0]] 
+  [[casea(inr(_x0), _F1, _F2)]] = 6 + x0 + F1(3 + x0) + F2(3 + x0) > x0 + F2(x0) = [[_F2 _x0]] 
+  [[casea(_x0, /\x.!2801(_F1, inl(x)), /\y.!2801(_F1, inr(y)))]] = 15 + 3*x0 + 2*F1(3 + x0) > x0 + F1(x0) = [[_F1 _x0]] 
+  [[caseb(inl(_x0), _F1, _F2)]] = 6 + x0 + F1(3 + x0) + F2(3 + x0) > x0 + F1(x0) = [[_F1 _x0]] 
+  [[caseb(inr(_x0), _F1, _F2)]] = 6 + x0 + F1(3 + x0) + F2(3 + x0) > x0 + F2(x0) = [[_F2 _x0]] 
+  [[caseb(_x0, /\x.!2802(_F1, inl(x)), /\y.!2802(_F1, inr(y)))]] = 15 + 3*x0 + 2*F1(3 + x0) > x0 + F1(x0) = [[_F1 _x0]] 
+  [[caseu(inl(_x0), _F1, _F2)]] = 6 + x0 + F1(3 + x0) + F2(3 + x0) > x0 + F1(x0) = [[_F1 _x0]] 
+  [[caseu(inr(_x0), _F1, _F2)]] = 6 + x0 + F1(3 + x0) + F2(3 + x0) > x0 + F2(x0) = [[_F2 _x0]] 
+  [[caseu(_x0, /\x.!2803(_F1, inl(x)), /\y.!2803(_F1, inr(y)))]] = 15 + 3*x0 + 2*F1(3 + x0) > x0 + F1(x0) = [[_F1 _x0]] 
+
+We can thus remove the following rules:
+
+  casea(inl(X), F, G) => F X 
+  casea(inr(X), F, G) => G X 
+  casea(X, /\x.!2801(F, inl(x)), /\y.!2801(F, inr(y))) => F X 
+  caseb(inl(X), F, G) => F X 
+  caseb(inr(X), F, G) => G X 
+  caseb(X, /\x.!2802(F, inl(x)), /\y.!2802(F, inr(y))) => F X 
+  caseu(inl(X), F, G) => F X 
+  caseu(inr(X), F, G) => G X 
+  caseu(X, /\x.!2803(F, inl(x)), /\y.!2803(F, inr(y))) => F X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

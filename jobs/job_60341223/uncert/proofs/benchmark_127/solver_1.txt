@@ -1,0 +1,106 @@
+YES
+We consider the system Ok8EH.
+
+  Alphabet:
+
+    A : [term * term] --> term 
+    L : [term -> term] --> term 
+    V : [term] --> term 
+    noabs : [term] --> term 
+
+  Rules:
+
+    noabs(A(X, Y)) => A(noabs(X), noabs(Y)) 
+    noabs(V(X)) => V(X) 
+    A(L(F), X) => F noabs(X) 
+
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with dynamic dependency pairs.
+
+After applying [Kop12, Thm. 7.22] to denote collapsing dependency pairs in an extended form, we thus obtain the following dependency pair problem (P_0, R_0, minimal, formative):
+
+  Dependency Pairs P_0:
+
+    0] noabs#(A(X, Y)) =#> A#(noabs(X), noabs(Y))   
+    1] noabs#(A(X, Y)) =#> noabs#(X)   
+    2] noabs#(A(X, Y)) =#> noabs#(Y)   
+    3] A#(L(F), X) =#> F[noabs(X)]   
+    4] A#(L(F), X) =#> noabs#(X)   
+
+  Rules R_0:
+
+    noabs(A(X, Y)) => A(noabs(X), noabs(Y)) 
+    noabs(V(X)) => V(X) 
+    A(L(F), X) => F noabs(X) 
+
+Thus, the original system is terminating if (P_0, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, minimal, formative).
+
+The formative rules of (P_0, R_0) are R_1 ::=
+
+  noabs(A(X, Y)) => A(noabs(X), noabs(Y)) 
+  A(L(F), X) => F noabs(X) 
+
+By [Kop12, Thm. 7.17], we may replace the dependency pair problem (P_0, R_0, minimal, formative) by (P_0, R_1, minimal, formative).
+
+Thus, the original system is terminating if (P_0, R_1, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_1, minimal, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  As the system is abstraction-simple and the formative flag is set, it suffices to find a tagged reduction pair [Kop12, Def. 6.70].  Thus, we must orient:
+
+  noabs#(A(X, Y)) >? A#(noabs(X), noabs(Y)) 
+  noabs#(A(X, Y)) >? noabs#(X) 
+  noabs#(A(X, Y)) >? noabs#(Y) 
+  A#(L(F), X) >? F[noabs(X)] 
+  A#(L(F), X) >? noabs#(X) 
+  noabs(A(X, Y)) >= A(noabs(X), noabs(Y)) 
+  A(L(F), X) >= F noabs(X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  A = Lam[y0;y1].3*y0 
+  A# = Lam[y0;y1].2*y0 + 2*y1 
+  L = Lam[G0].3 + G0(0) 
+  noabs = Lam[y0].0 
+  noabs# = Lam[y0].2 
+
+Using this interpretation, the requirements translate to:
+
+  [[noabs#(A(_x0, _x1))]] = 2 > 0 = [[A#(noabs(_x0), noabs(_x1))]] 
+  [[noabs#(A(_x0, _x1))]] = 2 >= 2 = [[noabs#(_x0)]] 
+  [[noabs#(A(_x0, _x1))]] = 2 >= 2 = [[noabs#(_x1)]] 
+  [[A#(L(_F0), _x1)]] = 6 + 2*x1 + 2*F0(0) > F0(0) = [[_F0[noabs(_x1)]]] 
+  [[A#(L(_F0), _x1)]] = 6 + 2*x1 + 2*F0(0) > 2 = [[noabs#(_x1)]] 
+  [[noabs(A(_x0, _x1))]] = 0 >= 0 = [[A(noabs(_x0), noabs(_x1))]] 
+  [[A(L(_F0), _x1)]] = 9 + 3*F0(0) >= F0(0) = [[_F0 noabs(_x1)]] 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace the dependency pair problem (P_0, R_1, minimal, formative) by (P_1, R_1, minimal, formative), where P_1 consists of:
+
+  noabs#(A(X, Y)) =#> noabs#(X)   
+  noabs#(A(X, Y)) =#> noabs#(Y)   
+
+Thus, the original system is terminating if (P_1, R_1, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_1, minimal, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(noabs#) = 1 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(noabs#(A(X, Y))) = A(X, Y) |> X = nu(noabs#(X)) 
+  nu(noabs#(A(X, Y))) = A(X, Y) |> Y = nu(noabs#(Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_1, minimal, f) by ({}, R_1, minimal, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

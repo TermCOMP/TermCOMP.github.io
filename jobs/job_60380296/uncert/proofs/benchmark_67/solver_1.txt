@@ -1,0 +1,185 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/YGqSq.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 81 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) TRUE
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+/**
+ * A set of functions over lists of integers.
+ *
+ * All calls terminate.
+ *
+ * Julia + BinTerm prove that all calls terminate
+ *
+ * Note that cyclicity is introduced by the statement
+ * <tt>l1.tail.tail = l1</tt>. However, this is not enough to induce
+ * non-termination in the program. If you instead uncomment the line
+ * <tt>l0.tail.tail = l0</tt>, most of the calls cannot be proved to terminate
+ * anymore.
+ *
+ * @author <A HREF="mailto:fausto.spoto@univr.it">Fausto Spoto</A>
+ */
+
+public class ListInt {
+    private int head;
+    private ListInt tail;
+
+    public static void main(String[] args) {
+	ListInt l0 = new ListInt(5,new ListInt(6,null));
+	ListInt l1 = new ListInt(1,new ListInt(3,null));
+	l0.merge(l1);
+	l1.tail.tail = l1;
+	//l0.tail.tail = l0;
+	l0.append(l1);
+	l0.iter();
+	l0.reverseAcc(null);
+	l0.reverse();
+    }
+
+    public ListInt(int head, ListInt tail) {
+	this.head = head;
+	this.tail = tail;
+    }
+
+    private void iter() {
+	if (tail != null) tail.iter();
+    }
+
+    private ListInt append(ListInt other) {
+	if (tail == null) return new ListInt(head,other);
+	else return new ListInt(head,tail.append(other));
+    }
+
+    private ListInt reverseAcc(ListInt acc) {
+	if (tail == null) return new ListInt(head,acc);
+	else return tail.reverseAcc(new ListInt(head,acc));
+    }
+
+    private ListInt reverse() {
+	if (tail == null) return this;
+	else return tail.reverse().append(new ListInt(head,null));
+    }
+
+    private ListInt merge(ListInt other) {
+	if (other == null) return this;
+	else if (head <= other.head)
+	    if (tail != null) return new ListInt(head,tail.merge(other));
+	    else return new ListInt(head,other);
+	else return new ListInt(other.head,merge(other.tail));
+    }
+}
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+/**
+ * A set of functions over lists of integers.
+ *
+ * All calls terminate.
+ *
+ * Julia + BinTerm prove that all calls terminate
+ *
+ * Note that cyclicity is introduced by the statement
+ * <tt>l1.tail.tail = l1</tt>. However, this is not enough to induce
+ * non-termination in the program. If you instead uncomment the line
+ * <tt>l0.tail.tail = l0</tt>, most of the calls cannot be proved to terminate
+ * anymore.
+ *
+ * @author <A HREF="mailto:fausto.spoto@univr.it">Fausto Spoto</A>
+ */
+
+public class ListInt {
+    private int head;
+    private ListInt tail;
+
+    public static void main(String[] args) {
+	ListInt l0 = new ListInt(5,new ListInt(6,null));
+	ListInt l1 = new ListInt(1,new ListInt(3,null));
+	l0.merge(l1);
+	l1.tail.tail = l1;
+	//l0.tail.tail = l0;
+	l0.append(l1);
+	l0.iter();
+	l0.reverseAcc(null);
+	l0.reverse();
+    }
+
+    public ListInt(int head, ListInt tail) {
+	this.head = head;
+	this.tail = tail;
+    }
+
+    private void iter() {
+	if (tail != null) tail.iter();
+    }
+
+    private ListInt append(ListInt other) {
+	if (tail == null) return new ListInt(head,other);
+	else return new ListInt(head,tail.append(other));
+    }
+
+    private ListInt reverseAcc(ListInt acc) {
+	if (tail == null) return new ListInt(head,acc);
+	else return tail.reverseAcc(new ListInt(head,acc));
+    }
+
+    private ListInt reverse() {
+	if (tail == null) return this;
+	else return tail.reverse().append(new ListInt(head,null));
+    }
+
+    private ListInt merge(ListInt other) {
+	if (other == null) return this;
+	else if (head <= other.head)
+	    if (tail != null) return new ListInt(head,tail.merge(other));
+	    else return new ListInt(head,other);
+	else return new ListInt(other.head,merge(other.tail));
+    }
+}
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+ListInt.main([Ljava/lang/String;)V: Graph of 275 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Proven termination by absence of SCCs
+----------------------------------------
+
+(6)
+TRUE

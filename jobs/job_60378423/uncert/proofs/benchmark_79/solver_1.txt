@@ -1,0 +1,503 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/HHkq9.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 139 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 44 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 22 ms]
+        (13) AND
+            (14) IRSwT
+                (15) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+                (16) IRSwT
+                (17) TempFilterProof [SOUND, 3 ms]
+                (18) IntTRS
+                (19) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+                (20) YES
+            (21) IRSwT
+                (22) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+                (23) IRSwT
+                (24) TempFilterProof [SOUND, 4 ms]
+                (25) IntTRS
+                (26) RankingReductionPairProof [EQUIVALENT, 0 ms]
+                (27) YES
+    (28) JBCTerminationSCC
+        (29) SCCToIRSProof [SOUND, 29 ms]
+        (30) IRSwT
+        (31) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (32) IRSwT
+        (33) IRSwTTerminationDigraphProof [EQUIVALENT, 5 ms]
+        (34) IRSwT
+        (35) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (36) IRSwT
+        (37) TempFilterProof [SOUND, 16 ms]
+        (38) IntTRS
+        (39) PolynomialOrderProcessor [EQUIVALENT, 6 ms]
+        (40) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+/**
+ * This class represents a list. The function get(n) can be used to access
+ * the n-th element. 
+ * @author Marc Brockschmidt
+ */
+public class CyclicList {
+	/**
+	 * A reference to the next list element.
+	 */
+	private CyclicList next;
+	
+	public static void main(String[] args) {
+		CyclicList list = CyclicList.create(args.length);
+		list.get(args[0].length());
+	}
+	
+	/**
+	 * Create a new list element.
+	 * @param n a reference to the next element.
+	 */
+	public CyclicList(final CyclicList n) {
+		this.next = n;
+	}
+	
+	/**
+	 * Create a new cyclical list of a length l.
+	 * @param l some length
+	 * @return cyclical list of length max(1, l)
+	 */
+	public static CyclicList create(int x) {
+		CyclicList last, current;
+		last = current = new CyclicList(null);
+		while (--x > 0)
+			current = new CyclicList(current);
+		return last.next = current;
+	}
+
+	public CyclicList get(int n) {
+		CyclicList cur = this;
+		while (--n > 0) {
+			cur = cur.next;
+		}
+		return cur;
+	}	
+}
+
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+/**
+ * This class represents a list. The function get(n) can be used to access
+ * the n-th element. 
+ * @author Marc Brockschmidt
+ */
+public class CyclicList {
+	/**
+	 * A reference to the next list element.
+	 */
+	private CyclicList next;
+	
+	public static void main(String[] args) {
+		CyclicList list = CyclicList.create(args.length);
+		list.get(args[0].length());
+	}
+	
+	/**
+	 * Create a new list element.
+	 * @param n a reference to the next element.
+	 */
+	public CyclicList(final CyclicList n) {
+		this.next = n;
+	}
+	
+	/**
+	 * Create a new cyclical list of a length l.
+	 * @param l some length
+	 * @return cyclical list of length max(1, l)
+	 */
+	public static CyclicList create(int x) {
+		CyclicList last, current;
+		last = current = new CyclicList(null);
+		while (--x > 0)
+			current = new CyclicList(current);
+		return last.next = current;
+	}
+
+	public CyclicList get(int n) {
+		CyclicList cur = this;
+		while (--n > 0) {
+			cur = cur.next;
+		}
+		return cur;
+	}	
+}
+
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+CyclicList.main([Ljava/lang/String;)V: Graph of 131 nodes with 2 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: CyclicList.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*CyclicList: [next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 16 IRulesP rules:
+f1373_0_get_Load(EOS(STATIC_1373), i211, o29[CyclicList.next]o29) -> f1381_0_get_LE(EOS(STATIC_1381), i211, i211, o29[CyclicList.next]o29) :|: TRUE
+f1381_0_get_LE(EOS(STATIC_1381), i213, i213, o29[CyclicList.next]o29) -> f1391_0_get_LE(EOS(STATIC_1391), i213, i213, o29[CyclicList.next]o29) :|: TRUE
+f1391_0_get_LE(EOS(STATIC_1391), i213, i213, o29[CyclicList.next]o29) -> f1400_0_get_Load(EOS(STATIC_1400), i213, o29[CyclicList.next]o29) :|: i213 > 0
+f1400_0_get_Load(EOS(STATIC_1400), i213, o29[CyclicList.next]o29) -> f1411_0_get_FieldAccess(EOS(STATIC_1411), i213, o29[CyclicList.next]o29) :|: TRUE
+f1411_0_get_FieldAccess(EOS(STATIC_1411), i213, o103[CyclicList.next]o103) -> f1434_0_get_FieldAccess(EOS(STATIC_1434), i213, o104[CyclicList.next]o103) :|: o104[CyclicList.next]o103 < o103[CyclicList.next]o103 && o103[CyclicList.next]o103 >= 0
+f1434_0_get_FieldAccess(EOS(STATIC_1434), i213, o104[CyclicList.next]o103) -> f1454_0_get_FieldAccess(EOS(STATIC_1454), i213, o104[CyclicList.next]o103) :|: o104[CyclicList.next]o103 > 0
+f1434_0_get_FieldAccess(EOS(STATIC_1434), i213, o104[CyclicList.next]o107) -> f1455_0_get_FieldAccess(EOS(STATIC_1455), i213) :|: TRUE
+f1454_0_get_FieldAccess(EOS(STATIC_1454), i213, o104[CyclicList.next]o103) -> f1459_0_get_Store(EOS(STATIC_1459), i213, o104[CyclicList.next]o104) :|: o104[CyclicList.next]o104 > o104[CyclicList.next]o103 && o104[CyclicList.next]o103 >= 0
+f1459_0_get_Store(EOS(STATIC_1459), i213, o104[CyclicList.next]o104) -> f1463_0_get_JMP(EOS(STATIC_1463), i213, o104[CyclicList.next]o104) :|: TRUE
+f1463_0_get_JMP(EOS(STATIC_1463), i213, o104[CyclicList.next]o104) -> f1475_0_get_Inc(EOS(STATIC_1475), i213, o104[CyclicList.next]o104) :|: TRUE
+f1475_0_get_Inc(EOS(STATIC_1475), i213, o104[CyclicList.next]o104) -> f1370_0_get_Inc(EOS(STATIC_1370), i213, o104[CyclicList.next]o104) :|: TRUE
+f1370_0_get_Inc(EOS(STATIC_1370), i200, o29[CyclicList.next]o29) -> f1373_0_get_Load(EOS(STATIC_1373), i200 + -1, o29[CyclicList.next]o29) :|: TRUE
+f1455_0_get_FieldAccess(EOS(STATIC_1455), i213) -> f1460_0_get_Store(EOS(STATIC_1460), i213) :|: TRUE
+f1460_0_get_Store(EOS(STATIC_1460), i213) -> f1464_0_get_JMP(EOS(STATIC_1464), i213) :|: TRUE
+f1464_0_get_JMP(EOS(STATIC_1464), i213) -> f1484_0_get_Inc(EOS(STATIC_1484), i213) :|: TRUE
+f1484_0_get_Inc(EOS(STATIC_1484), i213) -> f1370_0_get_Inc(EOS(STATIC_1370), i213, o107[CyclicList.next]o107) :|: o107[CyclicList.next]o107 = 1
+Combined rules. Obtained 2 IRulesP rules:
+f1373_0_get_Load(EOS(STATIC_1373), i211:0, o29[CyclicList.next]o29:0) -> f1373_0_get_Load(EOS(STATIC_1373), i211:0 - 1, o104[CyclicList.next]o104:0) :|: o104[CyclicList.next]o103:0 > 0 && i211:0 > 0 && o29[CyclicList.next]o29:0 > -1 && o104[CyclicList.next]o104:0 > o104[CyclicList.next]o103:0 && o29[CyclicList.next]o29:0 > o104[CyclicList.next]o103:0
+f1373_0_get_Load(EOS(STATIC_1373), i211:0, o29[CyclicList.next]o29:0) -> f1373_0_get_Load(EOS(STATIC_1373), i211:0 - 1, 1) :|: i211:0 > 0 && o29[CyclicList.next]o29:0 > o104[CyclicList.next]o103:0 && o29[CyclicList.next]o29:0 > -1
+Filtered constant ground arguments:
+   f1373_0_get_Load(x1, x2, x3) -> f1373_0_get_Load(x2, x3)
+   EOS(x1) -> EOS
+Finished conversion. Obtained 2 rules.P rules:
+f1373_0_get_Load(i211:0, o29[CyclicList.next]o29:0) -> f1373_0_get_Load(i211:0 - 1, o104[CyclicList.next]o104:0) :|: i211:0 > 0 && o104[CyclicList.next]o103:0 > 0 && o29[CyclicList.next]o29:0 > -1 && o29[CyclicList.next]o29:0 > o104[CyclicList.next]o103:0 && o104[CyclicList.next]o104:0 > o104[CyclicList.next]o103:0
+f1373_0_get_Load(i211:0, o29[CyclicList.next]o29:0) -> f1373_0_get_Load(i211:0 - 1, 1) :|: o29[CyclicList.next]o29:0 > o104[CyclicList.next]o103:0 && o29[CyclicList.next]o29:0 > -1 && i211:0 > 0
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f1373_0_get_Load(i211:0, o29[CyclicList.next]o29:0) -> f1373_0_get_Load(i211:0 - 1, o104[CyclicList.next]o104:0) :|: i211:0 > 0 && o104[CyclicList.next]o103:0 > 0 && o29[CyclicList.next]o29:0 > -1 && o29[CyclicList.next]o29:0 > o104[CyclicList.next]o103:0 && o104[CyclicList.next]o104:0 > o104[CyclicList.next]o103:0
+f1373_0_get_Load(x, x1) -> f1373_0_get_Load(x - 1, 1) :|: x1 > x2 && x1 > -1 && x > 0
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f1373_0_get_Load(i211:0, o29[CyclicList.next]o29:0) -> f1373_0_get_Load(arith, o104[CyclicList.next]o104:0) :|: i211:0 > 0 && o104[CyclicList.next]o103:0 > 0 && o29[CyclicList.next]o29:0 > -1 && o29[CyclicList.next]o29:0 > o104[CyclicList.next]o103:0 && o104[CyclicList.next]o104:0 > o104[CyclicList.next]o103:0 && arith = i211:0 - 1
+f1373_0_get_Load(x3, x4) -> f1373_0_get_Load(x5, 1) :|: x4 > x6 && x4 > -1 && x3 > 0 && x5 = x3 - 1
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f1373_0_get_Load(i211:0, o29[CyclicList.next]o29:0) -> f1373_0_get_Load(arith, o104[CyclicList.next]o104:0) :|: i211:0 > 0 && o104[CyclicList.next]o103:0 > 0 && o29[CyclicList.next]o29:0 > -1 && o29[CyclicList.next]o29:0 > o104[CyclicList.next]o103:0 && o104[CyclicList.next]o104:0 > o104[CyclicList.next]o103:0 && arith = i211:0 - 1
+(2) f1373_0_get_Load(x3, x4) -> f1373_0_get_Load(x5, 1) :|: x4 > x6 && x4 > -1 && x3 > 0 && x5 = x3 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(14)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f1373_0_get_Load(i211:0, o29[CyclicList.next]o29:0) -> f1373_0_get_Load(arith, o104[CyclicList.next]o104:0) :|: i211:0 > 0 && o104[CyclicList.next]o103:0 > 0 && o29[CyclicList.next]o29:0 > -1 && o29[CyclicList.next]o29:0 > o104[CyclicList.next]o103:0 && o104[CyclicList.next]o104:0 > o104[CyclicList.next]o103:0 && arith = i211:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(15) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f1373_0_get_Load(i211:0:0, o29[CyclicList.next]o29:0:0) -> f1373_0_get_Load(i211:0:0 - 1, o104[CyclicList.next]o104:0:0) :|: o29[CyclicList.next]o29:0:0 > o104[CyclicList.next]o103:0:0 && o104[CyclicList.next]o104:0:0 > o104[CyclicList.next]o103:0:0 && o29[CyclicList.next]o29:0:0 > -1 && o104[CyclicList.next]o103:0:0 > 0 && i211:0:0 > 0
+
+----------------------------------------
+
+(17) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f1373_0_get_Load(INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(18)
+Obligation:
+Rules:
+f1373_0_get_Load(i211:0:0, o29[CyclicList.next]o29:0:0) -> f1373_0_get_Load(c, o104[CyclicList.next]o104:0:0) :|: c = i211:0:0 - 1 && (o29[CyclicList.next]o29:0:0 > o104[CyclicList.next]o103:0:0 && o104[CyclicList.next]o104:0:0 > o104[CyclicList.next]o103:0:0 && o29[CyclicList.next]o29:0:0 > -1 && o104[CyclicList.next]o103:0:0 > 0 && i211:0:0 > 0)
+
+----------------------------------------
+
+(19) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f1373_0_get_Load(x, x1)] = x
+
+The following rules are decreasing:
+f1373_0_get_Load(i211:0:0, o29[CyclicList.next]o29:0:0) -> f1373_0_get_Load(c, o104[CyclicList.next]o104:0:0) :|: c = i211:0:0 - 1 && (o29[CyclicList.next]o29:0:0 > o104[CyclicList.next]o103:0:0 && o104[CyclicList.next]o104:0:0 > o104[CyclicList.next]o103:0:0 && o29[CyclicList.next]o29:0:0 > -1 && o104[CyclicList.next]o103:0:0 > 0 && i211:0:0 > 0)
+The following rules are bounded:
+f1373_0_get_Load(i211:0:0, o29[CyclicList.next]o29:0:0) -> f1373_0_get_Load(c, o104[CyclicList.next]o104:0:0) :|: c = i211:0:0 - 1 && (o29[CyclicList.next]o29:0:0 > o104[CyclicList.next]o103:0:0 && o104[CyclicList.next]o104:0:0 > o104[CyclicList.next]o103:0:0 && o29[CyclicList.next]o29:0:0 > -1 && o104[CyclicList.next]o103:0:0 > 0 && i211:0:0 > 0)
+
+----------------------------------------
+
+(20)
+YES
+
+----------------------------------------
+
+(21)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f1373_0_get_Load(x3, x4) -> f1373_0_get_Load(x5, 1) :|: x4 > x6 && x4 > -1 && x3 > 0 && x5 = x3 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(22) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(23)
+Obligation:
+Rules:
+f1373_0_get_Load(x3:0, x4:0) -> f1373_0_get_Load(x3:0 - 1, 1) :|: x6:0 < x4:0 && x4:0 > -1 && x3:0 > 0
+
+----------------------------------------
+
+(24) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f1373_0_get_Load(INTEGER, VARIABLE)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(25)
+Obligation:
+Rules:
+f1373_0_get_Load(x3:0, x4:0) -> f1373_0_get_Load(c, c1) :|: c1 = 1 && c = x3:0 - 1 && (x6:0 < x4:0 && x4:0 > -1 && x3:0 > 0)
+
+----------------------------------------
+
+(26) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f1373_0_get_Load ] = f1373_0_get_Load_1
+
+The following rules are decreasing:
+f1373_0_get_Load(x3:0, x4:0) -> f1373_0_get_Load(c, c1) :|: c1 = 1 && c = x3:0 - 1 && (x6:0 < x4:0 && x4:0 > -1 && x3:0 > 0)
+
+The following rules are bounded:
+f1373_0_get_Load(x3:0, x4:0) -> f1373_0_get_Load(c, c1) :|: c1 = 1 && c = x3:0 - 1 && (x6:0 < x4:0 && x4:0 > -1 && x3:0 > 0)
+
+
+----------------------------------------
+
+(27)
+YES
+
+----------------------------------------
+
+(28)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: CyclicList.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(29) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 17 IRulesP rules:
+f737_0_create_Load(EOS(STATIC_737), i111, o29[CyclicList.next]o28) -> f740_0_create_LE(EOS(STATIC_740), i111, i111, o29[CyclicList.next]o28) :|: TRUE
+f740_0_create_LE(EOS(STATIC_740), i113, i113, o29[CyclicList.next]o28) -> f747_0_create_LE(EOS(STATIC_747), i113, i113, o29[CyclicList.next]o28) :|: TRUE
+f747_0_create_LE(EOS(STATIC_747), i113, i113, o29[CyclicList.next]o28) -> f751_0_create_New(EOS(STATIC_751), i113, o29[CyclicList.next]o28) :|: i113 > 0
+f751_0_create_New(EOS(STATIC_751), i113, o29[CyclicList.next]o28) -> f753_0_create_Duplicate(EOS(STATIC_753), i113, o29[CyclicList.next]o28) :|: TRUE
+f753_0_create_Duplicate(EOS(STATIC_753), i113, o29[CyclicList.next]o28) -> f756_0_create_Load(EOS(STATIC_756), i113, o29[CyclicList.next]o28) :|: TRUE
+f756_0_create_Load(EOS(STATIC_756), i113, o29[CyclicList.next]o28) -> f759_0_create_InvokeMethod(EOS(STATIC_759), i113, o29[CyclicList.next]o28) :|: TRUE
+f759_0_create_InvokeMethod(EOS(STATIC_759), i113, o29[CyclicList.next]o28) -> f896_0__init__Load(EOS(STATIC_896), i113, o29[CyclicList.next]o28) :|: TRUE
+f896_0__init__Load(EOS(STATIC_896), i113, o29[CyclicList.next]o28) -> f934_0__init__InvokeMethod(EOS(STATIC_934), i113, o29[CyclicList.next]o28) :|: TRUE
+f934_0__init__InvokeMethod(EOS(STATIC_934), i113, o29[CyclicList.next]o28) -> f943_0__init__Load(EOS(STATIC_943), i113, o29[CyclicList.next]o28) :|: TRUE
+f943_0__init__Load(EOS(STATIC_943), i113, o29[CyclicList.next]o28) -> f984_0__init__Load(EOS(STATIC_984), i113, o29[CyclicList.next]o28) :|: TRUE
+f984_0__init__Load(EOS(STATIC_984), i113, o29[CyclicList.next]o28) -> f989_0__init__FieldAccess(EOS(STATIC_989), i113, o29[CyclicList.next]o28) :|: TRUE
+f989_0__init__FieldAccess(EOS(STATIC_989), i113, o29[CyclicList.next]o28) -> f1012_0__init__Return(EOS(STATIC_1012), i113, o29[CyclicList.next]o28) :|: TRUE
+f1012_0__init__Return(EOS(STATIC_1012), i113, o29[CyclicList.next]o28) -> f1021_0_create_Store(EOS(STATIC_1021), i113, o29[CyclicList.next]o28) :|: TRUE
+f1021_0_create_Store(EOS(STATIC_1021), i113, o29[CyclicList.next]o28) -> f1028_0_create_JMP(EOS(STATIC_1028), i113, o29[CyclicList.next]o28) :|: TRUE
+f1028_0_create_JMP(EOS(STATIC_1028), i113, o29[CyclicList.next]o28) -> f1276_0_create_Inc(EOS(STATIC_1276), i113, o29[CyclicList.next]o28) :|: TRUE
+f1276_0_create_Inc(EOS(STATIC_1276), i113, o29[CyclicList.next]o28) -> f726_0_create_Inc(EOS(STATIC_726), i113, o62[CyclicList.next]o28) :|: TRUE
+f726_0_create_Inc(EOS(STATIC_726), i22, o29[CyclicList.next]o28) -> f737_0_create_Load(EOS(STATIC_737), i22 + -1, o29[CyclicList.next]o28) :|: TRUE
+Combined rules. Obtained 1 IRulesP rules:
+f737_0_create_Load(EOS(STATIC_737), i111:0, o29[CyclicList.next]o28:0) -> f737_0_create_Load(EOS(STATIC_737), i111:0 - 1, o62[CyclicList.next]o28:0) :|: i111:0 > 0
+Filtered constant ground arguments:
+   f737_0_create_Load(x1, x2, x3) -> f737_0_create_Load(x2, x3)
+   EOS(x1) -> EOS
+Filtered unneeded arguments:
+   f737_0_create_Load(x1, x2) -> f737_0_create_Load(x1)
+Finished conversion. Obtained 1 rules.P rules:
+f737_0_create_Load(i111:0) -> f737_0_create_Load(i111:0 - 1) :|: i111:0 > 0
+
+----------------------------------------
+
+(30)
+Obligation:
+Rules:
+f737_0_create_Load(i111:0) -> f737_0_create_Load(i111:0 - 1) :|: i111:0 > 0
+
+----------------------------------------
+
+(31) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(32)
+Obligation:
+Rules:
+f737_0_create_Load(i111:0) -> f737_0_create_Load(arith) :|: i111:0 > 0 && arith = i111:0 - 1
+
+----------------------------------------
+
+(33) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f737_0_create_Load(i111:0) -> f737_0_create_Load(arith) :|: i111:0 > 0 && arith = i111:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(34)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f737_0_create_Load(i111:0) -> f737_0_create_Load(arith) :|: i111:0 > 0 && arith = i111:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(35) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(36)
+Obligation:
+Rules:
+f737_0_create_Load(i111:0:0) -> f737_0_create_Load(i111:0:0 - 1) :|: i111:0:0 > 0
+
+----------------------------------------
+
+(37) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f737_0_create_Load(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(38)
+Obligation:
+Rules:
+f737_0_create_Load(i111:0:0) -> f737_0_create_Load(c) :|: c = i111:0:0 - 1 && i111:0:0 > 0
+
+----------------------------------------
+
+(39) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f737_0_create_Load(x)] = x
+
+The following rules are decreasing:
+f737_0_create_Load(i111:0:0) -> f737_0_create_Load(c) :|: c = i111:0:0 - 1 && i111:0:0 > 0
+The following rules are bounded:
+f737_0_create_Load(i111:0:0) -> f737_0_create_Load(c) :|: c = i111:0:0 - 1 && i111:0:0 > 0
+
+----------------------------------------
+
+(40)
+YES

@@ -1,0 +1,537 @@
+YES
+We consider the system 9wPf2.
+
+  Alphabet:
+
+    and : [a * a] --> a 
+    cons : [c * d] --> d 
+    false : [] --> b 
+    filter : [c -> b * d] --> d 
+    filter2 : [b * c -> b * c * d] --> d 
+    map : [c -> c * d] --> d 
+    nil : [] --> d 
+    not : [a] --> a 
+    or : [a * a] --> a 
+    true : [] --> b 
+
+  Rules:
+
+    not(not(X)) => X 
+    not(or(X, Y)) => and(not(X), not(Y)) 
+    not(and(X, Y)) => or(not(X), not(Y)) 
+    and(X, or(Y, Z)) => or(and(X, Y), and(X, Z)) 
+    and(or(X, Y), Z) => or(and(Z, X), and(Z, Y)) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  not(not(X)) >? X 
+  not(or(X, Y)) >? and(not(X), not(Y)) 
+  not(and(X, Y)) >? or(not(X), not(Y)) 
+  and(X, or(Y, Z)) >? or(and(X, Y), and(X, Z)) 
+  and(or(X, Y), Z) >? or(and(Z, X), and(Z, Y)) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >? filter(F, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[filter(x_1, x_2)]] = filter(x_2, x_1) 
+  [[filter2(x_1, x_2, x_3, x_4)]] = filter2(x_4, x_2, x_1, x_3) 
+  [[nil]] = _|_ 
+
+We choose Lex = {filter, filter2} and Mul = {@_{o -> o}, and, cons, false, map, not, or, true}, and the following precedence: false > filter = filter2 > not > and > or > map > @_{o -> o} > cons > true
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  not(not(X)) >= X 
+  not(or(X, Y)) > and(not(X), not(Y)) 
+  not(and(X, Y)) >= or(not(X), not(Y)) 
+  and(X, or(Y, Z)) >= or(and(X, Y), and(X, Z)) 
+  and(or(X, Y), Z) >= or(and(Z, X), and(Z, Y)) 
+  map(F, _|_) >= _|_ 
+  map(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y)) 
+  filter(F, _|_) >= _|_ 
+  filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y) 
+  filter2(true, F, X, Y) >= cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >= filter(F, Y) 
+
+With these choices, we have:
+
+  1] not(not(X)) >= X  because [2], by (Star) 
+  2] not*(not(X)) >= X  because [3], by (Select) 
+  3] not(X) >= X  because [4], by (Star) 
+  4] not*(X) >= X  because [5], by (Select) 
+  5] X >= X  by (Meta) 
+
+  6] not(or(X, Y)) > and(not(X), not(Y))  because [7], by definition 
+  7] not*(or(X, Y)) >= and(not(X), not(Y))  because not > and, [8] and [12], by (Copy) 
+  8] not*(or(X, Y)) >= not(X)  because not in Mul and [9], by (Stat) 
+  9] or(X, Y) > X  because [10], by definition 
+  10] or*(X, Y) >= X  because [11], by (Select) 
+  11] X >= X  by (Meta) 
+  12] not*(or(X, Y)) >= not(Y)  because not in Mul and [13], by (Stat) 
+  13] or(X, Y) > Y  because [14], by definition 
+  14] or*(X, Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+
+  16] not(and(X, Y)) >= or(not(X), not(Y))  because [17], by (Star) 
+  17] not*(and(X, Y)) >= or(not(X), not(Y))  because not > or, [18] and [22], by (Copy) 
+  18] not*(and(X, Y)) >= not(X)  because not in Mul and [19], by (Stat) 
+  19] and(X, Y) > X  because [20], by definition 
+  20] and*(X, Y) >= X  because [21], by (Select) 
+  21] X >= X  by (Meta) 
+  22] not*(and(X, Y)) >= not(Y)  because not in Mul and [23], by (Stat) 
+  23] and(X, Y) > Y  because [24], by definition 
+  24] and*(X, Y) >= Y  because [25], by (Select) 
+  25] Y >= Y  by (Meta) 
+
+  26] and(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because [27], by (Star) 
+  27] and*(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because and > or, [28] and [33], by (Copy) 
+  28] and*(X, or(Y, Z)) >= and(X, Y)  because and in Mul, [29] and [30], by (Stat) 
+  29] X >= X  by (Meta) 
+  30] or(Y, Z) > Y  because [31], by definition 
+  31] or*(Y, Z) >= Y  because [32], by (Select) 
+  32] Y >= Y  by (Meta) 
+  33] and*(X, or(Y, Z)) >= and(X, Z)  because and in Mul, [29] and [34], by (Stat) 
+  34] or(Y, Z) > Z  because [35], by definition 
+  35] or*(Y, Z) >= Z  because [36], by (Select) 
+  36] Z >= Z  by (Meta) 
+
+  37] and(or(X, Y), Z) >= or(and(Z, X), and(Z, Y))  because [38], by (Star) 
+  38] and*(or(X, Y), Z) >= or(and(Z, X), and(Z, Y))  because and > or, [39] and [44], by (Copy) 
+  39] and*(or(X, Y), Z) >= and(Z, X)  because and in Mul, [40] and [43], by (Stat) 
+  40] or(X, Y) > X  because [41], by definition 
+  41] or*(X, Y) >= X  because [42], by (Select) 
+  42] X >= X  by (Meta) 
+  43] Z >= Z  by (Meta) 
+  44] and*(or(X, Y), Z) >= and(Z, Y)  because and in Mul, [45] and [43], by (Stat) 
+  45] or(X, Y) > Y  because [46], by definition 
+  46] or*(X, Y) >= Y  because [47], by (Select) 
+  47] Y >= Y  by (Meta) 
+
+  48] map(F, _|_) >= _|_  by (Bot) 
+
+  49] map(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because [50], by (Star) 
+  50] map*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because map > cons, [51] and [58], by (Copy) 
+  51] map*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because map > @_{o -> o}, [52] and [54], by (Copy) 
+  52] map*(F, cons(X, Y)) >= F  because [53], by (Select) 
+  53] F >= F  by (Meta) 
+  54] map*(F, cons(X, Y)) >= X  because [55], by (Select) 
+  55] cons(X, Y) >= X  because [56], by (Star) 
+  56] cons*(X, Y) >= X  because [57], by (Select) 
+  57] X >= X  by (Meta) 
+  58] map*(F, cons(X, Y)) >= map(F, Y)  because map in Mul, [59] and [60], by (Stat) 
+  59] F >= F  by (Meta) 
+  60] cons(X, Y) > Y  because [61], by definition 
+  61] cons*(X, Y) >= Y  because [62], by (Select) 
+  62] Y >= Y  by (Meta) 
+
+  63] filter(F, _|_) >= _|_  by (Bot) 
+
+  64] filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because [65], by (Star) 
+  65] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter = filter2, filter in Lex, [66], [69], [70], [72] and [76], by (Stat) 
+  66] cons(X, Y) > Y  because [67], by definition 
+  67] cons*(X, Y) >= Y  because [68], by (Select) 
+  68] Y >= Y  by (Meta) 
+  69] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [70] and [72], by (Copy) 
+  70] filter*(F, cons(X, Y)) >= F  because [71], by (Select) 
+  71] F >= F  by (Meta) 
+  72] filter*(F, cons(X, Y)) >= X  because [73], by (Select) 
+  73] cons(X, Y) >= X  because [74], by (Star) 
+  74] cons*(X, Y) >= X  because [75], by (Select) 
+  75] X >= X  by (Meta) 
+  76] filter*(F, cons(X, Y)) >= Y  because [77], by (Select) 
+  77] cons(X, Y) >= Y  because [67], by (Star) 
+
+  78] filter2(true, F, X, Y) >= cons(X, filter(F, Y))  because [79], by (Star) 
+  79] filter2*(true, F, X, Y) >= cons(X, filter(F, Y))  because filter2 > cons, [80] and [82], by (Copy) 
+  80] filter2*(true, F, X, Y) >= X  because [81], by (Select) 
+  81] X >= X  by (Meta) 
+  82] filter2*(true, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [83], [84], [85] and [86], by (Stat) 
+  83] F >= F  by (Meta) 
+  84] Y >= Y  by (Meta) 
+  85] filter2*(true, F, X, Y) >= F  because [83], by (Select) 
+  86] filter2*(true, F, X, Y) >= Y  because [84], by (Select) 
+
+  87] filter2(false, F, X, Y) >= filter(F, Y)  because [88], by (Star) 
+  88] filter2*(false, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [89], [90], [91] and [92], by (Stat) 
+  89] F >= F  by (Meta) 
+  90] Y >= Y  by (Meta) 
+  91] filter2*(false, F, X, Y) >= F  because [89], by (Select) 
+  92] filter2*(false, F, X, Y) >= Y  because [90], by (Select) 
+
+We can thus remove the following rules:
+
+  not(or(X, Y)) => and(not(X), not(Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  not(not(X)) >? X 
+  not(and(X, Y)) >? or(not(X), not(Y)) 
+  and(X, or(Y, Z)) >? or(and(X, Y), and(X, Z)) 
+  and(or(X, Y), Z) >? or(and(Z, X), and(Z, Y)) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >? filter(F, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[filter(x_1, x_2)]] = filter(x_2, x_1) 
+  [[filter2(x_1, x_2, x_3, x_4)]] = filter2(x_4, x_2, x_1, x_3) 
+  [[nil]] = _|_ 
+
+We choose Lex = {filter, filter2} and Mul = {@_{o -> o}, and, cons, false, map, not, or, true}, and the following precedence: and = not > or > map > filter = filter2 > cons > true > false > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  not(not(X)) > X 
+  not(and(X, Y)) >= or(not(X), not(Y)) 
+  and(X, or(Y, Z)) >= or(and(X, Y), and(X, Z)) 
+  and(or(X, Y), Z) > or(and(Z, X), and(Z, Y)) 
+  map(F, _|_) >= _|_ 
+  map(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map(F, Y)) 
+  filter(F, _|_) >= _|_ 
+  filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y) 
+  filter2(true, F, X, Y) > cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >= filter(F, Y) 
+
+With these choices, we have:
+
+  1] not(not(X)) > X  because [2], by definition 
+  2] not*(not(X)) >= X  because [3], by (Select) 
+  3] not(X) >= X  because [4], by (Star) 
+  4] not*(X) >= X  because [5], by (Select) 
+  5] X >= X  by (Meta) 
+
+  6] not(and(X, Y)) >= or(not(X), not(Y))  because [7], by (Star) 
+  7] not*(and(X, Y)) >= or(not(X), not(Y))  because not > or, [8] and [12], by (Copy) 
+  8] not*(and(X, Y)) >= not(X)  because [9], by (Select) 
+  9] and(X, Y) >= not(X)  because [10], by (Star) 
+  10] and*(X, Y) >= not(X)  because and = not, and in Mul and [11], by (Stat) 
+  11] X >= X  by (Meta) 
+  12] not*(and(X, Y)) >= not(Y)  because [13], by (Select) 
+  13] and(X, Y) >= not(Y)  because [14], by (Star) 
+  14] and*(X, Y) >= not(Y)  because and = not, and in Mul and [15], by (Stat) 
+  15] Y >= Y  by (Meta) 
+
+  16] and(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because [17], by (Star) 
+  17] and*(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because and > or, [18] and [23], by (Copy) 
+  18] and*(X, or(Y, Z)) >= and(X, Y)  because and in Mul, [19] and [20], by (Stat) 
+  19] X >= X  by (Meta) 
+  20] or(Y, Z) > Y  because [21], by definition 
+  21] or*(Y, Z) >= Y  because [22], by (Select) 
+  22] Y >= Y  by (Meta) 
+  23] and*(X, or(Y, Z)) >= and(X, Z)  because and in Mul, [19] and [24], by (Stat) 
+  24] or(Y, Z) > Z  because [25], by definition 
+  25] or*(Y, Z) >= Z  because [26], by (Select) 
+  26] Z >= Z  by (Meta) 
+
+  27] and(or(X, Y), Z) > or(and(Z, X), and(Z, Y))  because [28], by definition 
+  28] and*(or(X, Y), Z) >= or(and(Z, X), and(Z, Y))  because and > or, [29] and [34], by (Copy) 
+  29] and*(or(X, Y), Z) >= and(Z, X)  because and in Mul, [30] and [33], by (Stat) 
+  30] or(X, Y) > X  because [31], by definition 
+  31] or*(X, Y) >= X  because [32], by (Select) 
+  32] X >= X  by (Meta) 
+  33] Z >= Z  by (Meta) 
+  34] and*(or(X, Y), Z) >= and(Z, Y)  because and in Mul, [35] and [33], by (Stat) 
+  35] or(X, Y) > Y  because [36], by definition 
+  36] or*(X, Y) >= Y  because [37], by (Select) 
+  37] Y >= Y  by (Meta) 
+
+  38] map(F, _|_) >= _|_  by (Bot) 
+
+  39] map(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map(F, Y))  because [40], by definition 
+  40] map*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because map > cons, [41] and [48], by (Copy) 
+  41] map*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because map > @_{o -> o}, [42] and [44], by (Copy) 
+  42] map*(F, cons(X, Y)) >= F  because [43], by (Select) 
+  43] F >= F  by (Meta) 
+  44] map*(F, cons(X, Y)) >= X  because [45], by (Select) 
+  45] cons(X, Y) >= X  because [46], by (Star) 
+  46] cons*(X, Y) >= X  because [47], by (Select) 
+  47] X >= X  by (Meta) 
+  48] map*(F, cons(X, Y)) >= map(F, Y)  because map in Mul, [49] and [50], by (Stat) 
+  49] F >= F  by (Meta) 
+  50] cons(X, Y) > Y  because [51], by definition 
+  51] cons*(X, Y) >= Y  because [52], by (Select) 
+  52] Y >= Y  by (Meta) 
+
+  53] filter(F, _|_) >= _|_  by (Bot) 
+
+  54] filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because [55], by (Star) 
+  55] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter = filter2, filter in Lex, [56], [59], [60], [62] and [66], by (Stat) 
+  56] cons(X, Y) > Y  because [57], by definition 
+  57] cons*(X, Y) >= Y  because [58], by (Select) 
+  58] Y >= Y  by (Meta) 
+  59] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [60] and [62], by (Copy) 
+  60] filter*(F, cons(X, Y)) >= F  because [61], by (Select) 
+  61] F >= F  by (Meta) 
+  62] filter*(F, cons(X, Y)) >= X  because [63], by (Select) 
+  63] cons(X, Y) >= X  because [64], by (Star) 
+  64] cons*(X, Y) >= X  because [65], by (Select) 
+  65] X >= X  by (Meta) 
+  66] filter*(F, cons(X, Y)) >= Y  because [67], by (Select) 
+  67] cons(X, Y) >= Y  because [57], by (Star) 
+
+  68] filter2(true, F, X, Y) > cons(X, filter(F, Y))  because [69], by definition 
+  69] filter2*(true, F, X, Y) >= cons(X, filter(F, Y))  because filter2 > cons, [70] and [72], by (Copy) 
+  70] filter2*(true, F, X, Y) >= X  because [71], by (Select) 
+  71] X >= X  by (Meta) 
+  72] filter2*(true, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [73], [74], [75] and [76], by (Stat) 
+  73] F >= F  by (Meta) 
+  74] Y >= Y  by (Meta) 
+  75] filter2*(true, F, X, Y) >= F  because [73], by (Select) 
+  76] filter2*(true, F, X, Y) >= Y  because [74], by (Select) 
+
+  77] filter2(false, F, X, Y) >= filter(F, Y)  because [78], by (Star) 
+  78] filter2*(false, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [79], [80], [81] and [82], by (Stat) 
+  79] F >= F  by (Meta) 
+  80] Y >= Y  by (Meta) 
+  81] filter2*(false, F, X, Y) >= F  because [79], by (Select) 
+  82] filter2*(false, F, X, Y) >= Y  because [80], by (Select) 
+
+We can thus remove the following rules:
+
+  not(not(X)) => X 
+  and(or(X, Y), Z) => or(and(Z, X), and(Z, Y)) 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  not(and(X, Y)) >? or(not(X), not(Y)) 
+  and(X, or(Y, Z)) >? or(and(X, Y), and(X, Z)) 
+  map(F, nil) >? nil 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(false, F, X, Y) >? filter(F, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[filter(x_1, x_2)]] = filter(x_2, x_1) 
+  [[filter2(x_1, x_2, x_3, x_4)]] = filter2(x_4, x_2, x_3, x_1) 
+  [[not(x_1)]] = x_1 
+
+We choose Lex = {filter, filter2} and Mul = {@_{o -> o}, and, cons, false, map, nil, or}, and the following precedence: filter = filter2 > nil > false > map > and > or > cons > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  and(X, Y) >= or(X, Y) 
+  and(X, or(Y, Z)) >= or(and(X, Y), and(X, Z)) 
+  map(F, nil) > nil 
+  filter(F, nil) > nil 
+  filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y) 
+  filter2(false, F, X, Y) > filter(F, Y) 
+
+With these choices, we have:
+
+  1] and(X, Y) >= or(X, Y)  because [2], by (Star) 
+  2] and*(X, Y) >= or(X, Y)  because and > or, [3] and [5], by (Copy) 
+  3] and*(X, Y) >= X  because [4], by (Select) 
+  4] X >= X  by (Meta) 
+  5] and*(X, Y) >= Y  because [6], by (Select) 
+  6] Y >= Y  by (Meta) 
+
+  7] and(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because [8], by (Star) 
+  8] and*(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because and > or, [9] and [14], by (Copy) 
+  9] and*(X, or(Y, Z)) >= and(X, Y)  because and in Mul, [10] and [11], by (Stat) 
+  10] X >= X  by (Meta) 
+  11] or(Y, Z) > Y  because [12], by definition 
+  12] or*(Y, Z) >= Y  because [13], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] and*(X, or(Y, Z)) >= and(X, Z)  because and in Mul, [10] and [15], by (Stat) 
+  15] or(Y, Z) > Z  because [16], by definition 
+  16] or*(Y, Z) >= Z  because [17], by (Select) 
+  17] Z >= Z  by (Meta) 
+
+  18] map(F, nil) > nil  because [19], by definition 
+  19] map*(F, nil) >= nil  because [20], by (Select) 
+  20] nil >= nil  by (Fun) 
+
+  21] filter(F, nil) > nil  because [22], by definition 
+  22] filter*(F, nil) >= nil  because filter > nil, by (Copy) 
+
+  23] filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because [24], by (Star) 
+  24] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter = filter2, filter in Lex, [25], [28], [29], [31] and [35], by (Stat) 
+  25] cons(X, Y) > Y  because [26], by definition 
+  26] cons*(X, Y) >= Y  because [27], by (Select) 
+  27] Y >= Y  by (Meta) 
+  28] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [29] and [31], by (Copy) 
+  29] filter*(F, cons(X, Y)) >= F  because [30], by (Select) 
+  30] F >= F  by (Meta) 
+  31] filter*(F, cons(X, Y)) >= X  because [32], by (Select) 
+  32] cons(X, Y) >= X  because [33], by (Star) 
+  33] cons*(X, Y) >= X  because [34], by (Select) 
+  34] X >= X  by (Meta) 
+  35] filter*(F, cons(X, Y)) >= Y  because [36], by (Select) 
+  36] cons(X, Y) >= Y  because [26], by (Star) 
+
+  37] filter2(false, F, X, Y) > filter(F, Y)  because [38], by definition 
+  38] filter2*(false, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [39], [40], [41] and [42], by (Stat) 
+  39] F >= F  by (Meta) 
+  40] Y >= Y  by (Meta) 
+  41] filter2*(false, F, X, Y) >= F  because [39], by (Select) 
+  42] filter2*(false, F, X, Y) >= Y  because [40], by (Select) 
+
+We can thus remove the following rules:
+
+  map(F, nil) => nil 
+  filter(F, nil) => nil 
+  filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  not(and(X, Y)) >? or(not(X), not(Y)) 
+  and(X, or(Y, Z)) >? or(and(X, Y), and(X, Z)) 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o}, and, cons, filter, filter2, not, or}, and the following precedence: and > not > or > filter > cons > filter2 > @_{o -> o}
+
+With these choices, we have:
+
+  1] not(and(X, Y)) > or(not(X), not(Y))  because [2], by definition 
+  2] not*(and(X, Y)) >= or(not(X), not(Y))  because not > or, [3] and [7], by (Copy) 
+  3] not*(and(X, Y)) >= not(X)  because not in Mul and [4], by (Stat) 
+  4] and(X, Y) > X  because [5], by definition 
+  5] and*(X, Y) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+  7] not*(and(X, Y)) >= not(Y)  because [8], by (Select) 
+  8] and(X, Y) >= not(Y)  because [9], by (Star) 
+  9] and*(X, Y) >= not(Y)  because and > not and [10], by (Copy) 
+  10] and*(X, Y) >= Y  because [11], by (Select) 
+  11] Y >= Y  by (Meta) 
+
+  12] and(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because [13], by (Star) 
+  13] and*(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because and > or, [14] and [19], by (Copy) 
+  14] and*(X, or(Y, Z)) >= and(X, Y)  because and in Mul, [15] and [16], by (Stat) 
+  15] X >= X  by (Meta) 
+  16] or(Y, Z) > Y  because [17], by definition 
+  17] or*(Y, Z) >= Y  because [18], by (Select) 
+  18] Y >= Y  by (Meta) 
+  19] and*(X, or(Y, Z)) >= and(X, Z)  because and in Mul, [15] and [20], by (Stat) 
+  20] or(Y, Z) > Z  because [21], by definition 
+  21] or*(Y, Z) >= Z  because [22], by (Select) 
+  22] Z >= Z  by (Meta) 
+
+  23] filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because [24], by (Star) 
+  24] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter > filter2, [25], [26], [28] and [32], by (Copy) 
+  25] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [26] and [28], by (Copy) 
+  26] filter*(F, cons(X, Y)) >= F  because [27], by (Select) 
+  27] F >= F  by (Meta) 
+  28] filter*(F, cons(X, Y)) >= X  because [29], by (Select) 
+  29] cons(X, Y) >= X  because [30], by (Star) 
+  30] cons*(X, Y) >= X  because [31], by (Select) 
+  31] X >= X  by (Meta) 
+  32] filter*(F, cons(X, Y)) >= Y  because [33], by (Select) 
+  33] cons(X, Y) >= Y  because [34], by (Star) 
+  34] cons*(X, Y) >= Y  because [35], by (Select) 
+  35] Y >= Y  by (Meta) 
+
+We can thus remove the following rules:
+
+  not(and(X, Y)) => or(not(X), not(Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  and(X, or(Y, Z)) >? or(and(X, Y), and(X, Z)) 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o}, and, cons, filter, filter2, or}, and the following precedence: and > cons > filter > filter2 > @_{o -> o} > or
+
+With these choices, we have:
+
+  1] and(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because [2], by (Star) 
+  2] and*(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because and > or, [3] and [8], by (Copy) 
+  3] and*(X, or(Y, Z)) >= and(X, Y)  because and in Mul, [4] and [5], by (Stat) 
+  4] X >= X  by (Meta) 
+  5] or(Y, Z) > Y  because [6], by definition 
+  6] or*(Y, Z) >= Y  because [7], by (Select) 
+  7] Y >= Y  by (Meta) 
+  8] and*(X, or(Y, Z)) >= and(X, Z)  because and in Mul, [4] and [9], by (Stat) 
+  9] or(Y, Z) > Z  because [10], by definition 
+  10] or*(Y, Z) >= Z  because [11], by (Select) 
+  11] Z >= Z  by (Meta) 
+
+  12] filter(F, cons(X, Y)) > filter2(@_{o -> o}(F, X), F, X, Y)  because [13], by definition 
+  13] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter > filter2, [14], [15], [17] and [21], by (Copy) 
+  14] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [15] and [17], by (Copy) 
+  15] filter*(F, cons(X, Y)) >= F  because [16], by (Select) 
+  16] F >= F  by (Meta) 
+  17] filter*(F, cons(X, Y)) >= X  because [18], by (Select) 
+  18] cons(X, Y) >= X  because [19], by (Star) 
+  19] cons*(X, Y) >= X  because [20], by (Select) 
+  20] X >= X  by (Meta) 
+  21] filter*(F, cons(X, Y)) >= Y  because [22], by (Select) 
+  22] cons(X, Y) >= Y  because [23], by (Star) 
+  23] cons*(X, Y) >= Y  because [24], by (Select) 
+  24] Y >= Y  by (Meta) 
+
+We can thus remove the following rules:
+
+  filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  and(X, or(Y, Z)) >? or(and(X, Y), and(X, Z)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {and, or}, and the following precedence: and > or
+
+With these choices, we have:
+
+  1] and(X, or(Y, Z)) > or(and(X, Y), and(X, Z))  because [2], by definition 
+  2] and*(X, or(Y, Z)) >= or(and(X, Y), and(X, Z))  because and > or, [3] and [8], by (Copy) 
+  3] and*(X, or(Y, Z)) >= and(X, Y)  because and in Mul, [4] and [5], by (Stat) 
+  4] X >= X  by (Meta) 
+  5] or(Y, Z) > Y  because [6], by definition 
+  6] or*(Y, Z) >= Y  because [7], by (Select) 
+  7] Y >= Y  by (Meta) 
+  8] and*(X, or(Y, Z)) >= and(X, Z)  because and in Mul, [4] and [9], by (Stat) 
+  9] or(Y, Z) > Z  because [10], by definition 
+  10] or*(Y, Z) >= Z  because [11], by (Select) 
+  11] Z >= Z  by (Meta) 
+
+We can thus remove the following rules:
+
+  and(X, or(Y, Z)) => or(and(X, Y), and(X, Z)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

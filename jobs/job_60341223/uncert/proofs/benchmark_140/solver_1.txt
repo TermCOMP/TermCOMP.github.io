@@ -1,0 +1,203 @@
+YES
+We consider the system ocOMW.
+
+  Alphabet:
+
+    O : [] --> nat 
+    cons : [nat * list] --> list 
+    false : [] --> bool 
+    gcd : [nat * nat] --> nat 
+    gcdlists : [list * list] --> list 
+    if : [bool * nat * nat] --> nat 
+    le : [nat * nat] --> bool 
+    minus : [nat * nat] --> nat 
+    nil : [] --> list 
+    s : [nat] --> nat 
+    true : [] --> bool 
+    zipWith : [nat -> nat -> nat * list * list] --> list 
+
+  Rules:
+
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    minus(X, O) => X 
+    minus(s(X), s(Y)) => minus(X, Y) 
+    gcd(O, X) => O 
+    gcd(s(X), O) => O 
+    gcd(s(X), s(Y)) => if(le(Y, X), s(X), s(Y)) 
+    if(true, s(X), s(Y)) => gcd(minus(X, Y), s(Y)) 
+    if(false, s(X), s(Y)) => gcd(minus(Y, X), s(X)) 
+    zipWith(F, X, nil) => nil 
+    zipWith(F, nil, X) => nil 
+    zipWith(F, cons(X, Y), cons(Z, U)) => cons(F X Z, zipWith(F, Y, U)) 
+    gcdlists(X, Y) => zipWith(/\x./\y.gcd(x, y), X, Y) 
+
+We observe that the rules contain a first-order subset:
+
+  le(O, X) => true 
+  le(s(X), O) => false 
+  le(s(X), s(Y)) => le(X, Y) 
+  minus(X, O) => X 
+  minus(s(X), s(Y)) => minus(X, Y) 
+  gcd(O, X) => O 
+  gcd(s(X), O) => O 
+  gcd(s(X), s(Y)) => if(le(Y, X), s(X), s(Y)) 
+  if(true, s(X), s(Y)) => gcd(minus(X, Y), s(Y)) 
+  if(false, s(X), s(Y)) => gcd(minus(Y, X), s(X)) 
+
+Moreover, the system is finitely branching.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is Ce-terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed Ce-terminating:
+
+ || Input TRS:
+ ||     1: le(O(),PeRCenTX) -> true()
+ ||     2: le(s(PeRCenTX),O()) -> false()
+ ||     3: le(s(PeRCenTX),s(PeRCenTY)) -> le(PeRCenTX,PeRCenTY)
+ ||     4: minus(PeRCenTX,O()) -> PeRCenTX
+ ||     5: minus(s(PeRCenTX),s(PeRCenTY)) -> minus(PeRCenTX,PeRCenTY)
+ ||     6: gcd(O(),PeRCenTX) -> O()
+ ||     7: gcd(s(PeRCenTX),O()) -> O()
+ ||     8: gcd(s(PeRCenTX),s(PeRCenTY)) -> if(le(PeRCenTY,PeRCenTX),s(PeRCenTX),s(PeRCenTY))
+ ||     9: if(true(),s(PeRCenTX),s(PeRCenTY)) -> gcd(minus(PeRCenTX,PeRCenTY),s(PeRCenTY))
+ ||     10: if(false(),s(PeRCenTX),s(PeRCenTY)) -> gcd(minus(PeRCenTY,PeRCenTX),s(PeRCenTX))
+ ||     11: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     12: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 12
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #if(true(),s(PeRCenTX),s(PeRCenTY)) -> #gcd(minus(PeRCenTX,PeRCenTY),s(PeRCenTY))
+ ||    #2: #if(true(),s(PeRCenTX),s(PeRCenTY)) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #3: #if(false(),s(PeRCenTX),s(PeRCenTY)) -> #gcd(minus(PeRCenTY,PeRCenTX),s(PeRCenTX))
+ ||    #4: #if(false(),s(PeRCenTX),s(PeRCenTY)) -> #minus(PeRCenTY,PeRCenTX)
+ ||    #5: #minus(s(PeRCenTX),s(PeRCenTY)) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #6: #le(s(PeRCenTX),s(PeRCenTY)) -> #le(PeRCenTX,PeRCenTY)
+ ||    #7: #gcd(s(PeRCenTX),s(PeRCenTY)) -> #if(le(PeRCenTY,PeRCenTX),s(PeRCenTX),s(PeRCenTY))
+ ||    #8: #gcd(s(PeRCenTX),s(PeRCenTY)) -> #le(PeRCenTY,PeRCenTX)
+ || Number of SCCs: 3, DPs: 5
+ ||   SCC { #6 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       TIlDePAIR	w: 0
+ ||       s 	w: x1 + 1
+ ||       #le	w: x1
+ ||       minus	w: 0
+ ||       gcd	w: 0
+ ||       false	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       if	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #minus	w: 0
+ ||       #if	w: 0
+ ||       #gcd	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #6
+ || Number of SCCs: 2, DPs: 4
+ ||   SCC { #5 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       TIlDePAIR	w: 0
+ ||       s 	w: x1 + 1
+ ||       #le	w: 0
+ ||       minus	w: 0
+ ||       gcd	w: 0
+ ||       false	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       if	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #minus	w: x1
+ ||       #if	w: 0
+ ||       #gcd	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #5
+ || Number of SCCs: 1, DPs: 3
+ ||   SCC { #1 #3 #7 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: x1 + x2 + 1
+ ||       TIlDePAIR	w: 0
+ ||       s 	w: x1 + 3
+ ||       #le	w: 0
+ ||       minus	w: x1 + 1
+ ||       gcd	w: 0
+ ||       false	w: 6
+ ||       O 	w: 1
+ ||       true	w: 3
+ ||       if	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #minus	w: 0
+ ||       #if	w: x2 + x3
+ ||       #gcd	w: x1 + x2 + 1
+ ||     USABLE RULES: { 4 5 }
+ ||     Removed DPs: #1 #3 #7
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] zipWith#(F, cons(X, Y), cons(Z, U)) =#> zipWith#(F, Y, U)   
+    1] gcdlists#(X, Y) =#> zipWith#(/\x./\y.gcd(x, y), X, Y)   
+    2] gcdlists#(X, Y) =#> gcd#(Z, U)   
+
+  Rules R_0:
+
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    minus(X, O) => X 
+    minus(s(X), s(Y)) => minus(X, Y) 
+    gcd(O, X) => O 
+    gcd(s(X), O) => O 
+    gcd(s(X), s(Y)) => if(le(Y, X), s(X), s(Y)) 
+    if(true, s(X), s(Y)) => gcd(minus(X, Y), s(Y)) 
+    if(false, s(X), s(Y)) => gcd(minus(Y, X), s(X)) 
+    zipWith(F, X, nil) => nil 
+    zipWith(F, nil, X) => nil 
+    zipWith(F, cons(X, Y), cons(Z, U)) => cons(F X Z, zipWith(F, Y, U)) 
+    gcdlists(X, Y) => zipWith(/\x./\y.gcd(x, y), X, Y) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0 
+    * 1 : 0 
+    * 2 :  
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    zipWith#(F, cons(X, Y), cons(Z, U)) =#> zipWith#(F, Y, U)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(zipWith#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(zipWith#(F, cons(X, Y), cons(Z, U))) = cons(X, Y) |> Y = nu(zipWith#(F, Y, U)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

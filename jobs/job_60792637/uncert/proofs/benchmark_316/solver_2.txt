@@ -1,0 +1,1620 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/p4uJB.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+mergesort(g,a)
+
+w.r.t. the given Prolog program could successfully be proven:
+
+(0) Prolog
+(1) PrologToPiTRSProof [SOUND, 0 ms]
+(2) PiTRS
+(3) DependencyPairsProof [EQUIVALENT, 0 ms]
+(4) PiDP
+(5) DependencyGraphProof [EQUIVALENT, 0 ms]
+(6) AND
+    (7) PiDP
+        (8) UsableRulesProof [EQUIVALENT, 0 ms]
+        (9) PiDP
+        (10) PiDPToQDPProof [EQUIVALENT, 0 ms]
+        (11) QDP
+        (12) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (13) YES
+    (14) PiDP
+        (15) UsableRulesProof [EQUIVALENT, 0 ms]
+        (16) PiDP
+        (17) PiDPToQDPProof [EQUIVALENT, 0 ms]
+        (18) QDP
+        (19) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (20) YES
+    (21) PiDP
+        (22) UsableRulesProof [EQUIVALENT, 0 ms]
+        (23) PiDP
+        (24) PiDPToQDPProof [SOUND, 0 ms]
+        (25) QDP
+        (26) QDPOrderProof [EQUIVALENT, 14 ms]
+        (27) QDP
+        (28) PisEmptyProof [EQUIVALENT, 0 ms]
+        (29) YES
+    (30) PiDP
+        (31) UsableRulesProof [EQUIVALENT, 0 ms]
+        (32) PiDP
+        (33) PiDPToQDPProof [SOUND, 0 ms]
+        (34) QDP
+        (35) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (36) YES
+    (37) PiDP
+        (38) UsableRulesProof [EQUIVALENT, 0 ms]
+        (39) PiDP
+        (40) PiDPToQDPProof [SOUND, 0 ms]
+        (41) QDP
+        (42) QDPQMonotonicMRRProof [EQUIVALENT, 37 ms]
+        (43) QDP
+        (44) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (45) TRUE
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+mergesort([], []).
+mergesort(.(E, []), .(E, [])).
+mergesort(.(E, .(F, U)), V) :- ','(split(U, L2, L1), ','(mergesort(.(E, L2), X), ','(mergesort(.(F, L1), Z), merge(X, Z, V)))).
+merge(X, [], X).
+merge([], X, X).
+merge(.(A, X), .(B, Y), .(A, Z)) :- ','(le(A, B), merge(X, .(B, Y), Z)).
+merge(.(A, X), .(B, Y), .(B, Z)) :- ','(gt(A, B), merge(.(A, X), Y, Z)).
+split([], [], []).
+split(.(E, U), .(E, V), W) :- split(U, W, V).
+gt(s(X), s(Y)) :- gt(X, Y).
+gt(s(X), 0).
+le(s(X), s(Y)) :- le(X, Y).
+le(0, s(Y)).
+le(0, 0).
+
+
+Query: mergesort(g,a)
+----------------------------------------
+
+(1) PrologToPiTRSProof (SOUND)
+We use the technique of [TOCL09]. With regard to the inferred argument filtering the predicates were used in the following modes:
+
+mergesort_in_2: (b,f)
+
+split_in_3: (b,f,f)
+
+merge_in_3: (b,b,f)
+
+le_in_2: (b,b)
+
+gt_in_2: (b,b)
+
+Transforming Prolog into the following Term Rewriting System:
+
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   mergesort_in_ga([], []) -> mergesort_out_ga([], [])
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+
+
+
+
+Infinitary Constructor Rewriting Termination of PiTRS implies Termination of Prolog
+
+
+
+----------------------------------------
+
+(2)
+Obligation:
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   mergesort_in_ga([], []) -> mergesort_out_ga([], [])
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+
+
+----------------------------------------
+
+(3) DependencyPairsProof (EQUIVALENT)
+Using Dependency Pairs [AG00,LOPSTR] we result in the following initial DP problem:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   MERGESORT_IN_GA(.(E, .(F, U)), V) -> U1_GA(E, F, U, V, split_in_gaa(U, L2, L1))
+   MERGESORT_IN_GA(.(E, .(F, U)), V) -> SPLIT_IN_GAA(U, L2, L1)
+   SPLIT_IN_GAA(.(E, U), .(E, V), W) -> U9_GAA(E, U, V, W, split_in_gaa(U, W, V))
+   SPLIT_IN_GAA(.(E, U), .(E, V), W) -> SPLIT_IN_GAA(U, W, V)
+   U1_GA(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_GA(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U1_GA(E, F, U, V, split_out_gaa(U, L2, L1)) -> MERGESORT_IN_GA(.(E, L2), X)
+   U2_GA(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_GA(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U2_GA(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> MERGESORT_IN_GA(.(F, L1), Z)
+   U3_GA(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_GA(E, F, U, V, merge_in_gga(X, Z, V))
+   U3_GA(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> MERGE_IN_GGA(X, Z, V)
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(A, Z)) -> U5_GGA(A, X, B, Y, Z, le_in_gg(A, B))
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(A, Z)) -> LE_IN_GG(A, B)
+   LE_IN_GG(s(X), s(Y)) -> U11_GG(X, Y, le_in_gg(X, Y))
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+   U5_GGA(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_GGA(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   U5_GGA(A, X, B, Y, Z, le_out_gg(A, B)) -> MERGE_IN_GGA(X, .(B, Y), Z)
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(B, Z)) -> U7_GGA(A, X, B, Y, Z, gt_in_gg(A, B))
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(B, Z)) -> GT_IN_GG(A, B)
+   GT_IN_GG(s(X), s(Y)) -> U10_GG(X, Y, gt_in_gg(X, Y))
+   GT_IN_GG(s(X), s(Y)) -> GT_IN_GG(X, Y)
+   U7_GGA(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_GGA(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U7_GGA(A, X, B, Y, Z, gt_out_gg(A, B)) -> MERGE_IN_GGA(.(A, X), Y, Z)
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga([], []) -> mergesort_out_ga([], [])
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+MERGESORT_IN_GA(x1, x2)  =  MERGESORT_IN_GA(x1)
+
+U1_GA(x1, x2, x3, x4, x5)  =  U1_GA(x1, x2, x5)
+
+SPLIT_IN_GAA(x1, x2, x3)  =  SPLIT_IN_GAA(x1)
+
+U9_GAA(x1, x2, x3, x4, x5)  =  U9_GAA(x1, x5)
+
+U2_GA(x1, x2, x3, x4, x5, x6)  =  U2_GA(x2, x5, x6)
+
+U3_GA(x1, x2, x3, x4, x5, x6)  =  U3_GA(x5, x6)
+
+U4_GA(x1, x2, x3, x4, x5)  =  U4_GA(x5)
+
+MERGE_IN_GGA(x1, x2, x3)  =  MERGE_IN_GGA(x1, x2)
+
+U5_GGA(x1, x2, x3, x4, x5, x6)  =  U5_GGA(x1, x2, x3, x4, x6)
+
+LE_IN_GG(x1, x2)  =  LE_IN_GG(x1, x2)
+
+U11_GG(x1, x2, x3)  =  U11_GG(x3)
+
+U6_GGA(x1, x2, x3, x4, x5, x6)  =  U6_GGA(x1, x6)
+
+U7_GGA(x1, x2, x3, x4, x5, x6)  =  U7_GGA(x1, x2, x3, x4, x6)
+
+GT_IN_GG(x1, x2)  =  GT_IN_GG(x1, x2)
+
+U10_GG(x1, x2, x3)  =  U10_GG(x3)
+
+U8_GGA(x1, x2, x3, x4, x5, x6)  =  U8_GGA(x3, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(4)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   MERGESORT_IN_GA(.(E, .(F, U)), V) -> U1_GA(E, F, U, V, split_in_gaa(U, L2, L1))
+   MERGESORT_IN_GA(.(E, .(F, U)), V) -> SPLIT_IN_GAA(U, L2, L1)
+   SPLIT_IN_GAA(.(E, U), .(E, V), W) -> U9_GAA(E, U, V, W, split_in_gaa(U, W, V))
+   SPLIT_IN_GAA(.(E, U), .(E, V), W) -> SPLIT_IN_GAA(U, W, V)
+   U1_GA(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_GA(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U1_GA(E, F, U, V, split_out_gaa(U, L2, L1)) -> MERGESORT_IN_GA(.(E, L2), X)
+   U2_GA(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_GA(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U2_GA(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> MERGESORT_IN_GA(.(F, L1), Z)
+   U3_GA(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_GA(E, F, U, V, merge_in_gga(X, Z, V))
+   U3_GA(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> MERGE_IN_GGA(X, Z, V)
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(A, Z)) -> U5_GGA(A, X, B, Y, Z, le_in_gg(A, B))
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(A, Z)) -> LE_IN_GG(A, B)
+   LE_IN_GG(s(X), s(Y)) -> U11_GG(X, Y, le_in_gg(X, Y))
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+   U5_GGA(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_GGA(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   U5_GGA(A, X, B, Y, Z, le_out_gg(A, B)) -> MERGE_IN_GGA(X, .(B, Y), Z)
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(B, Z)) -> U7_GGA(A, X, B, Y, Z, gt_in_gg(A, B))
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(B, Z)) -> GT_IN_GG(A, B)
+   GT_IN_GG(s(X), s(Y)) -> U10_GG(X, Y, gt_in_gg(X, Y))
+   GT_IN_GG(s(X), s(Y)) -> GT_IN_GG(X, Y)
+   U7_GGA(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_GGA(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U7_GGA(A, X, B, Y, Z, gt_out_gg(A, B)) -> MERGE_IN_GGA(.(A, X), Y, Z)
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga([], []) -> mergesort_out_ga([], [])
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+MERGESORT_IN_GA(x1, x2)  =  MERGESORT_IN_GA(x1)
+
+U1_GA(x1, x2, x3, x4, x5)  =  U1_GA(x1, x2, x5)
+
+SPLIT_IN_GAA(x1, x2, x3)  =  SPLIT_IN_GAA(x1)
+
+U9_GAA(x1, x2, x3, x4, x5)  =  U9_GAA(x1, x5)
+
+U2_GA(x1, x2, x3, x4, x5, x6)  =  U2_GA(x2, x5, x6)
+
+U3_GA(x1, x2, x3, x4, x5, x6)  =  U3_GA(x5, x6)
+
+U4_GA(x1, x2, x3, x4, x5)  =  U4_GA(x5)
+
+MERGE_IN_GGA(x1, x2, x3)  =  MERGE_IN_GGA(x1, x2)
+
+U5_GGA(x1, x2, x3, x4, x5, x6)  =  U5_GGA(x1, x2, x3, x4, x6)
+
+LE_IN_GG(x1, x2)  =  LE_IN_GG(x1, x2)
+
+U11_GG(x1, x2, x3)  =  U11_GG(x3)
+
+U6_GGA(x1, x2, x3, x4, x5, x6)  =  U6_GGA(x1, x6)
+
+U7_GGA(x1, x2, x3, x4, x5, x6)  =  U7_GGA(x1, x2, x3, x4, x6)
+
+GT_IN_GG(x1, x2)  =  GT_IN_GG(x1, x2)
+
+U10_GG(x1, x2, x3)  =  U10_GG(x3)
+
+U8_GGA(x1, x2, x3, x4, x5, x6)  =  U8_GGA(x3, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(5) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LOPSTR] contains 5 SCCs with 11 less nodes.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   GT_IN_GG(s(X), s(Y)) -> GT_IN_GG(X, Y)
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga([], []) -> mergesort_out_ga([], [])
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+GT_IN_GG(x1, x2)  =  GT_IN_GG(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(8) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(9)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   GT_IN_GG(s(X), s(Y)) -> GT_IN_GG(X, Y)
+
+R is empty.
+Pi is empty.
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(10) PiDPToQDPProof (EQUIVALENT)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   GT_IN_GG(s(X), s(Y)) -> GT_IN_GG(X, Y)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(12) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*GT_IN_GG(s(X), s(Y)) -> GT_IN_GG(X, Y)
+The graph contains the following edges 1 > 1, 2 > 2
+
+
+----------------------------------------
+
+(13)
+YES
+
+----------------------------------------
+
+(14)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga([], []) -> mergesort_out_ga([], [])
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+LE_IN_GG(x1, x2)  =  LE_IN_GG(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(15) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(16)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+
+R is empty.
+Pi is empty.
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(17) PiDPToQDPProof (EQUIVALENT)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(18)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(19) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+The graph contains the following edges 1 > 1, 2 > 2
+
+
+----------------------------------------
+
+(20)
+YES
+
+----------------------------------------
+
+(21)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U5_GGA(A, X, B, Y, Z, le_out_gg(A, B)) -> MERGE_IN_GGA(X, .(B, Y), Z)
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(A, Z)) -> U5_GGA(A, X, B, Y, Z, le_in_gg(A, B))
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(B, Z)) -> U7_GGA(A, X, B, Y, Z, gt_in_gg(A, B))
+   U7_GGA(A, X, B, Y, Z, gt_out_gg(A, B)) -> MERGE_IN_GGA(.(A, X), Y, Z)
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga([], []) -> mergesort_out_ga([], [])
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+MERGE_IN_GGA(x1, x2, x3)  =  MERGE_IN_GGA(x1, x2)
+
+U5_GGA(x1, x2, x3, x4, x5, x6)  =  U5_GGA(x1, x2, x3, x4, x6)
+
+U7_GGA(x1, x2, x3, x4, x5, x6)  =  U7_GGA(x1, x2, x3, x4, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(22) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(23)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U5_GGA(A, X, B, Y, Z, le_out_gg(A, B)) -> MERGE_IN_GGA(X, .(B, Y), Z)
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(A, Z)) -> U5_GGA(A, X, B, Y, Z, le_in_gg(A, B))
+   MERGE_IN_GGA(.(A, X), .(B, Y), .(B, Z)) -> U7_GGA(A, X, B, Y, Z, gt_in_gg(A, B))
+   U7_GGA(A, X, B, Y, Z, gt_out_gg(A, B)) -> MERGE_IN_GGA(.(A, X), Y, Z)
+
+The TRS R consists of the following rules:
+
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+MERGE_IN_GGA(x1, x2, x3)  =  MERGE_IN_GGA(x1, x2)
+
+U5_GGA(x1, x2, x3, x4, x5, x6)  =  U5_GGA(x1, x2, x3, x4, x6)
+
+U7_GGA(x1, x2, x3, x4, x5, x6)  =  U7_GGA(x1, x2, x3, x4, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(24) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(25)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U5_GGA(A, X, B, Y, le_out_gg) -> MERGE_IN_GGA(X, .(B, Y))
+   MERGE_IN_GGA(.(A, X), .(B, Y)) -> U5_GGA(A, X, B, Y, le_in_gg(A, B))
+   MERGE_IN_GGA(.(A, X), .(B, Y)) -> U7_GGA(A, X, B, Y, gt_in_gg(A, B))
+   U7_GGA(A, X, B, Y, gt_out_gg) -> MERGE_IN_GGA(.(A, X), Y)
+
+The TRS R consists of the following rules:
+
+   le_in_gg(s(X), s(Y)) -> U11_gg(le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg
+   le_in_gg(0, 0) -> le_out_gg
+   gt_in_gg(s(X), s(Y)) -> U10_gg(gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg
+   U11_gg(le_out_gg) -> le_out_gg
+   U10_gg(gt_out_gg) -> gt_out_gg
+
+The set Q consists of the following terms:
+
+   le_in_gg(x0, x1)
+   gt_in_gg(x0, x1)
+   U11_gg(x0)
+   U10_gg(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(26) QDPOrderProof (EQUIVALENT)
+We use the reduction pair processor [LPAR04,JAR06].
+
+
+The following pairs can be oriented strictly and are deleted.
+
+   U5_GGA(A, X, B, Y, le_out_gg) -> MERGE_IN_GGA(X, .(B, Y))
+   MERGE_IN_GGA(.(A, X), .(B, Y)) -> U5_GGA(A, X, B, Y, le_in_gg(A, B))
+   MERGE_IN_GGA(.(A, X), .(B, Y)) -> U7_GGA(A, X, B, Y, gt_in_gg(A, B))
+   U7_GGA(A, X, B, Y, gt_out_gg) -> MERGE_IN_GGA(.(A, X), Y)
+The remaining pairs can at least be oriented weakly.
+Used ordering:  Polynomial Order [NEGPOLO,POLO] with Interpretation:
+
+POL( U5_GGA_5(x_1, ..., x_5) ) = 2x_2 + x_4 + 2x_5 + 2
+POL( le_in_gg_2(x_1, x_2) ) = 2
+POL( s_1(x_1) ) = 0
+POL( U11_gg_1(x_1) ) = x_1
+POL( 0 ) = 0
+POL( le_out_gg ) = 2
+POL( U7_GGA_5(x_1, ..., x_5) ) = 2x_2 + x_4 + 2x_5 + 2
+POL( gt_in_gg_2(x_1, x_2) ) = 2
+POL( U10_gg_1(x_1) ) = max{0, 2x_1 - 2}
+POL( gt_out_gg ) = 2
+POL( MERGE_IN_GGA_2(x_1, x_2) ) = 2x_1 + x_2 + 1
+POL( ._2(x_1, x_2) ) = x_2 + 2
+
+The following usable rules [FROCOS05] with respect to the argument filtering of the ordering [JAR06] were oriented:
+
+   le_in_gg(s(X), s(Y)) -> U11_gg(le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg
+   le_in_gg(0, 0) -> le_out_gg
+   gt_in_gg(s(X), s(Y)) -> U10_gg(gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg
+   U11_gg(le_out_gg) -> le_out_gg
+   U10_gg(gt_out_gg) -> gt_out_gg
+
+
+----------------------------------------
+
+(27)
+Obligation:
+Q DP problem:
+P is empty.
+The TRS R consists of the following rules:
+
+   le_in_gg(s(X), s(Y)) -> U11_gg(le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg
+   le_in_gg(0, 0) -> le_out_gg
+   gt_in_gg(s(X), s(Y)) -> U10_gg(gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg
+   U11_gg(le_out_gg) -> le_out_gg
+   U10_gg(gt_out_gg) -> gt_out_gg
+
+The set Q consists of the following terms:
+
+   le_in_gg(x0, x1)
+   gt_in_gg(x0, x1)
+   U11_gg(x0)
+   U10_gg(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(28) PisEmptyProof (EQUIVALENT)
+The TRS P is empty. Hence, there is no (P,Q,R) chain.
+----------------------------------------
+
+(29)
+YES
+
+----------------------------------------
+
+(30)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   SPLIT_IN_GAA(.(E, U), .(E, V), W) -> SPLIT_IN_GAA(U, W, V)
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga([], []) -> mergesort_out_ga([], [])
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+SPLIT_IN_GAA(x1, x2, x3)  =  SPLIT_IN_GAA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(31) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(32)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   SPLIT_IN_GAA(.(E, U), .(E, V), W) -> SPLIT_IN_GAA(U, W, V)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+SPLIT_IN_GAA(x1, x2, x3)  =  SPLIT_IN_GAA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(33) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(34)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   SPLIT_IN_GAA(.(E, U)) -> SPLIT_IN_GAA(U)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(35) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*SPLIT_IN_GAA(.(E, U)) -> SPLIT_IN_GAA(U)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(36)
+YES
+
+----------------------------------------
+
+(37)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U1_GA(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_GA(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_GA(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> MERGESORT_IN_GA(.(F, L1), Z)
+   MERGESORT_IN_GA(.(E, .(F, U)), V) -> U1_GA(E, F, U, V, split_in_gaa(U, L2, L1))
+   U1_GA(E, F, U, V, split_out_gaa(U, L2, L1)) -> MERGESORT_IN_GA(.(E, L2), X)
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga([], []) -> mergesort_out_ga([], [])
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+MERGESORT_IN_GA(x1, x2)  =  MERGESORT_IN_GA(x1)
+
+U1_GA(x1, x2, x3, x4, x5)  =  U1_GA(x1, x2, x5)
+
+U2_GA(x1, x2, x3, x4, x5, x6)  =  U2_GA(x2, x5, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(38) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(39)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U1_GA(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_GA(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U2_GA(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> MERGESORT_IN_GA(.(F, L1), Z)
+   MERGESORT_IN_GA(.(E, .(F, U)), V) -> U1_GA(E, F, U, V, split_in_gaa(U, L2, L1))
+   U1_GA(E, F, U, V, split_out_gaa(U, L2, L1)) -> MERGESORT_IN_GA(.(E, L2), X)
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga(.(E, []), .(E, [])) -> mergesort_out_ga(.(E, []), .(E, []))
+   mergesort_in_ga(.(E, .(F, U)), V) -> U1_ga(E, F, U, V, split_in_gaa(U, L2, L1))
+   split_in_gaa([], [], []) -> split_out_gaa([], [], [])
+   split_in_gaa(.(E, U), .(E, V), W) -> U9_gaa(E, U, V, W, split_in_gaa(U, W, V))
+   U1_ga(E, F, U, V, split_out_gaa(U, L2, L1)) -> U2_ga(E, F, U, V, L1, mergesort_in_ga(.(E, L2), X))
+   U9_gaa(E, U, V, W, split_out_gaa(U, W, V)) -> split_out_gaa(.(E, U), .(E, V), W)
+   U2_ga(E, F, U, V, L1, mergesort_out_ga(.(E, L2), X)) -> U3_ga(E, F, U, V, X, mergesort_in_ga(.(F, L1), Z))
+   U3_ga(E, F, U, V, X, mergesort_out_ga(.(F, L1), Z)) -> U4_ga(E, F, U, V, merge_in_gga(X, Z, V))
+   U4_ga(E, F, U, V, merge_out_gga(X, Z, V)) -> mergesort_out_ga(.(E, .(F, U)), V)
+   merge_in_gga(X, [], X) -> merge_out_gga(X, [], X)
+   merge_in_gga([], X, X) -> merge_out_gga([], X, X)
+   merge_in_gga(.(A, X), .(B, Y), .(A, Z)) -> U5_gga(A, X, B, Y, Z, le_in_gg(A, B))
+   merge_in_gga(.(A, X), .(B, Y), .(B, Z)) -> U7_gga(A, X, B, Y, Z, gt_in_gg(A, B))
+   U5_gga(A, X, B, Y, Z, le_out_gg(A, B)) -> U6_gga(A, X, B, Y, Z, merge_in_gga(X, .(B, Y), Z))
+   U7_gga(A, X, B, Y, Z, gt_out_gg(A, B)) -> U8_gga(A, X, B, Y, Z, merge_in_gga(.(A, X), Y, Z))
+   le_in_gg(s(X), s(Y)) -> U11_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg(0, s(Y))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U6_gga(A, X, B, Y, Z, merge_out_gga(X, .(B, Y), Z)) -> merge_out_gga(.(A, X), .(B, Y), .(A, Z))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(X, Y, gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg(s(X), 0)
+   U8_gga(A, X, B, Y, Z, merge_out_gga(.(A, X), Y, Z)) -> merge_out_gga(.(A, X), .(B, Y), .(B, Z))
+   U11_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U10_gg(X, Y, gt_out_gg(X, Y)) -> gt_out_gg(s(X), s(Y))
+
+The argument filtering Pi contains the following mapping:
+mergesort_in_ga(x1, x2)  =  mergesort_in_ga(x1)
+
+[]  =  []
+
+mergesort_out_ga(x1, x2)  =  mergesort_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4, x5)  =  U1_ga(x1, x2, x5)
+
+split_in_gaa(x1, x2, x3)  =  split_in_gaa(x1)
+
+split_out_gaa(x1, x2, x3)  =  split_out_gaa(x2, x3)
+
+U9_gaa(x1, x2, x3, x4, x5)  =  U9_gaa(x1, x5)
+
+U2_ga(x1, x2, x3, x4, x5, x6)  =  U2_ga(x2, x5, x6)
+
+U3_ga(x1, x2, x3, x4, x5, x6)  =  U3_ga(x5, x6)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x5)
+
+merge_in_gga(x1, x2, x3)  =  merge_in_gga(x1, x2)
+
+merge_out_gga(x1, x2, x3)  =  merge_out_gga(x3)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U11_gg(x1, x2, x3)  =  U11_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U6_gga(x1, x2, x3, x4, x5, x6)  =  U6_gga(x1, x6)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+gt_in_gg(x1, x2)  =  gt_in_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x3)
+
+gt_out_gg(x1, x2)  =  gt_out_gg
+
+U8_gga(x1, x2, x3, x4, x5, x6)  =  U8_gga(x3, x6)
+
+MERGESORT_IN_GA(x1, x2)  =  MERGESORT_IN_GA(x1)
+
+U1_GA(x1, x2, x3, x4, x5)  =  U1_GA(x1, x2, x5)
+
+U2_GA(x1, x2, x3, x4, x5, x6)  =  U2_GA(x2, x5, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(40) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(41)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U1_GA(E, F, split_out_gaa(L2, L1)) -> U2_GA(F, L1, mergesort_in_ga(.(E, L2)))
+   U2_GA(F, L1, mergesort_out_ga(X)) -> MERGESORT_IN_GA(.(F, L1))
+   MERGESORT_IN_GA(.(E, .(F, U))) -> U1_GA(E, F, split_in_gaa(U))
+   U1_GA(E, F, split_out_gaa(L2, L1)) -> MERGESORT_IN_GA(.(E, L2))
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga(.(E, [])) -> mergesort_out_ga(.(E, []))
+   mergesort_in_ga(.(E, .(F, U))) -> U1_ga(E, F, split_in_gaa(U))
+   split_in_gaa([]) -> split_out_gaa([], [])
+   split_in_gaa(.(E, U)) -> U9_gaa(E, split_in_gaa(U))
+   U1_ga(E, F, split_out_gaa(L2, L1)) -> U2_ga(F, L1, mergesort_in_ga(.(E, L2)))
+   U9_gaa(E, split_out_gaa(W, V)) -> split_out_gaa(.(E, V), W)
+   U2_ga(F, L1, mergesort_out_ga(X)) -> U3_ga(X, mergesort_in_ga(.(F, L1)))
+   U3_ga(X, mergesort_out_ga(Z)) -> U4_ga(merge_in_gga(X, Z))
+   U4_ga(merge_out_gga(V)) -> mergesort_out_ga(V)
+   merge_in_gga(X, []) -> merge_out_gga(X)
+   merge_in_gga([], X) -> merge_out_gga(X)
+   merge_in_gga(.(A, X), .(B, Y)) -> U5_gga(A, X, B, Y, le_in_gg(A, B))
+   merge_in_gga(.(A, X), .(B, Y)) -> U7_gga(A, X, B, Y, gt_in_gg(A, B))
+   U5_gga(A, X, B, Y, le_out_gg) -> U6_gga(A, merge_in_gga(X, .(B, Y)))
+   U7_gga(A, X, B, Y, gt_out_gg) -> U8_gga(B, merge_in_gga(.(A, X), Y))
+   le_in_gg(s(X), s(Y)) -> U11_gg(le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg
+   le_in_gg(0, 0) -> le_out_gg
+   U6_gga(A, merge_out_gga(Z)) -> merge_out_gga(.(A, Z))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg
+   U8_gga(B, merge_out_gga(Z)) -> merge_out_gga(.(B, Z))
+   U11_gg(le_out_gg) -> le_out_gg
+   U10_gg(gt_out_gg) -> gt_out_gg
+
+The set Q consists of the following terms:
+
+   mergesort_in_ga(x0)
+   split_in_gaa(x0)
+   U1_ga(x0, x1, x2)
+   U9_gaa(x0, x1)
+   U2_ga(x0, x1, x2)
+   U3_ga(x0, x1)
+   U4_ga(x0)
+   merge_in_gga(x0, x1)
+   U5_gga(x0, x1, x2, x3, x4)
+   U7_gga(x0, x1, x2, x3, x4)
+   le_in_gg(x0, x1)
+   U6_gga(x0, x1)
+   gt_in_gg(x0, x1)
+   U8_gga(x0, x1)
+   U11_gg(x0)
+   U10_gg(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(42) QDPQMonotonicMRRProof (EQUIVALENT)
+By using the Q-monotonic rule removal processor with the following ordering, at least one Dependency Pair or term rewrite system rule of this QDP problem can be strictly oriented such that it always occurs at a strongly monotonic position in a (P,Q,R)-chain.
+
+Strictly oriented dependency pairs:
+
+   U1_GA(E, F, split_out_gaa(L2, L1)) -> U2_GA(F, L1, mergesort_in_ga(.(E, L2)))
+   MERGESORT_IN_GA(.(E, .(F, U))) -> U1_GA(E, F, split_in_gaa(U))
+   U1_GA(E, F, split_out_gaa(L2, L1)) -> MERGESORT_IN_GA(.(E, L2))
+
+
+Used ordering: Polynomial interpretation [POLO]:
+
+   POL(.(x_1, x_2)) = 2 + 2*x_2
+   POL(0) = 0
+   POL(MERGESORT_IN_GA(x_1)) = x_1
+   POL(U10_gg(x_1)) = 2
+   POL(U11_gg(x_1)) = 1
+   POL(U1_GA(x_1, x_2, x_3)) = 1 + x_3
+   POL(U1_ga(x_1, x_2, x_3)) = 0
+   POL(U2_GA(x_1, x_2, x_3)) = 2 + 2*x_2
+   POL(U2_ga(x_1, x_2, x_3)) = 0
+   POL(U3_ga(x_1, x_2)) = 0
+   POL(U4_ga(x_1)) = 0
+   POL(U5_gga(x_1, x_2, x_3, x_4, x_5)) = 0
+   POL(U6_gga(x_1, x_2)) = 0
+   POL(U7_gga(x_1, x_2, x_3, x_4, x_5)) = 0
+   POL(U8_gga(x_1, x_2)) = 0
+   POL(U9_gaa(x_1, x_2)) = 2 + 2*x_2
+   POL([]) = 0
+   POL(gt_in_gg(x_1, x_2)) = 2 + 2*x_1
+   POL(gt_out_gg) = 0
+   POL(le_in_gg(x_1, x_2)) = 2*x_2
+   POL(le_out_gg) = 0
+   POL(merge_in_gga(x_1, x_2)) = 2
+   POL(merge_out_gga(x_1)) = 0
+   POL(mergesort_in_ga(x_1)) = 0
+   POL(mergesort_out_ga(x_1)) = 0
+   POL(s(x_1)) = 1
+   POL(split_in_gaa(x_1)) = 2 + 2*x_1
+   POL(split_out_gaa(x_1, x_2)) = 2 + 2*x_1 + 2*x_2
+
+
+----------------------------------------
+
+(43)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U2_GA(F, L1, mergesort_out_ga(X)) -> MERGESORT_IN_GA(.(F, L1))
+
+The TRS R consists of the following rules:
+
+   mergesort_in_ga(.(E, [])) -> mergesort_out_ga(.(E, []))
+   mergesort_in_ga(.(E, .(F, U))) -> U1_ga(E, F, split_in_gaa(U))
+   split_in_gaa([]) -> split_out_gaa([], [])
+   split_in_gaa(.(E, U)) -> U9_gaa(E, split_in_gaa(U))
+   U1_ga(E, F, split_out_gaa(L2, L1)) -> U2_ga(F, L1, mergesort_in_ga(.(E, L2)))
+   U9_gaa(E, split_out_gaa(W, V)) -> split_out_gaa(.(E, V), W)
+   U2_ga(F, L1, mergesort_out_ga(X)) -> U3_ga(X, mergesort_in_ga(.(F, L1)))
+   U3_ga(X, mergesort_out_ga(Z)) -> U4_ga(merge_in_gga(X, Z))
+   U4_ga(merge_out_gga(V)) -> mergesort_out_ga(V)
+   merge_in_gga(X, []) -> merge_out_gga(X)
+   merge_in_gga([], X) -> merge_out_gga(X)
+   merge_in_gga(.(A, X), .(B, Y)) -> U5_gga(A, X, B, Y, le_in_gg(A, B))
+   merge_in_gga(.(A, X), .(B, Y)) -> U7_gga(A, X, B, Y, gt_in_gg(A, B))
+   U5_gga(A, X, B, Y, le_out_gg) -> U6_gga(A, merge_in_gga(X, .(B, Y)))
+   U7_gga(A, X, B, Y, gt_out_gg) -> U8_gga(B, merge_in_gga(.(A, X), Y))
+   le_in_gg(s(X), s(Y)) -> U11_gg(le_in_gg(X, Y))
+   le_in_gg(0, s(Y)) -> le_out_gg
+   le_in_gg(0, 0) -> le_out_gg
+   U6_gga(A, merge_out_gga(Z)) -> merge_out_gga(.(A, Z))
+   gt_in_gg(s(X), s(Y)) -> U10_gg(gt_in_gg(X, Y))
+   gt_in_gg(s(X), 0) -> gt_out_gg
+   U8_gga(B, merge_out_gga(Z)) -> merge_out_gga(.(B, Z))
+   U11_gg(le_out_gg) -> le_out_gg
+   U10_gg(gt_out_gg) -> gt_out_gg
+
+The set Q consists of the following terms:
+
+   mergesort_in_ga(x0)
+   split_in_gaa(x0)
+   U1_ga(x0, x1, x2)
+   U9_gaa(x0, x1)
+   U2_ga(x0, x1, x2)
+   U3_ga(x0, x1)
+   U4_ga(x0)
+   merge_in_gga(x0, x1)
+   U5_gga(x0, x1, x2, x3, x4)
+   U7_gga(x0, x1, x2, x3, x4)
+   le_in_gg(x0, x1)
+   U6_gga(x0, x1)
+   gt_in_gg(x0, x1)
+   U8_gga(x0, x1)
+   U11_gg(x0)
+   U10_gg(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(44) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 0 SCCs with 1 less node.
+----------------------------------------
+
+(45)
+TRUE

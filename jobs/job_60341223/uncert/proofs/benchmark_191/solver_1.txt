@@ -1,0 +1,56 @@
+NO
+We consider the system BbeqR.
+
+  Alphabet:
+
+    O : [] --> b 
+    cons : [b * c] --> c 
+    eq : [b * b] --> a 
+    false : [] --> a 
+    hamming : [] --> c 
+    if : [a * c * c] --> c 
+    list1 : [] --> c 
+    list2 : [] --> c 
+    list3 : [] --> c 
+    lt : [b * b] --> a 
+    map : [b -> b * c] --> c 
+    merge : [c * c] --> c 
+    mult : [b] --> b -> b 
+    nil : [] --> c 
+    plus : [b * b] --> b 
+    s : [b] --> b 
+    true : [] --> a 
+
+  Rules:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    lt(s(X), s(Y)) => lt(X, Y) 
+    lt(O, s(X)) => true 
+    lt(X, O) => false 
+    eq(X, X) => true 
+    eq(s(X), O) => false 
+    eq(O, s(X)) => false 
+    merge(X, nil) => X 
+    merge(nil, X) => X 
+    merge(cons(X, Y), cons(Z, U)) => if(lt(X, Z), cons(X, merge(Y, cons(Z, U))), if(eq(X, Z), cons(X, merge(Y, U)), cons(Z, merge(cons(X, Y), U)))) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    mult(O) X => O 
+    mult(s(X)) Y => plus(Y, mult(X) Y) 
+    plus(O, X) => O 
+    plus(s(X), Y) => s(plus(X, Y)) 
+    list1 => map(mult(s(s(O))), hamming) 
+    list2 => map(mult(s(s(s(O)))), hamming) 
+    list3 => map(mult(s(s(s(s(s(O)))))), hamming) 
+    hamming => cons(s(O), merge(list1, merge(list2, list3))) 
+
+It is easy to see that this system is non-terminating:
+
+  list1 
+    => map(mult(s(s(O))), hamming) 
+    => map(mult(s(s(O))), cons(s(O), merge(list1, merge(list2, list3)))) 
+    |> list1 
+
+That is, a term s reduces to a term t which has a subterm that is an instance of the original term.
+

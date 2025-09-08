@@ -1,0 +1,306 @@
+YES
+We consider the system uQJ1n.
+
+  Alphabet:
+
+    O : [] --> a 
+    comp : [b -> b * b -> b] --> b -> b 
+    plus : [a * a] --> a 
+    s : [a] --> a 
+    times : [a * a] --> a 
+    twice : [b -> b] --> b -> b 
+
+  Rules:
+
+    plus(O, X) => X 
+    plus(s(X), Y) => s(plus(X, Y)) 
+    times(O, X) => O 
+    times(s(X), Y) => plus(times(X, Y), Y) 
+    comp(F, G) X => F (G X) 
+    twice(F) => comp(F, F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O, X) >? X 
+  plus(s(X), Y) >? s(plus(X, Y)) 
+  times(O, X) >? O 
+  times(s(X), Y) >? plus(times(X, Y), Y) 
+  comp(F, G) X >? F (G X) 
+  twice(F) >? comp(F, F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, comp, plus, s, times, twice}, and the following precedence: twice > comp > @_{o -> o} > times > plus > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  plus(_|_, X) > X 
+  plus(s(X), Y) >= s(plus(X, Y)) 
+  times(_|_, X) >= _|_ 
+  times(s(X), Y) >= plus(times(X, Y), Y) 
+  @_{o -> o}(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X)) 
+  twice(F) >= comp(F, F) 
+
+With these choices, we have:
+
+  1] plus(_|_, X) > X  because [2], by definition 
+  2] plus*(_|_, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] plus(s(X), Y) >= s(plus(X, Y))  because [5], by (Star) 
+  5] plus*(s(X), Y) >= s(plus(X, Y))  because plus > s and [6], by (Copy) 
+  6] plus*(s(X), Y) >= plus(X, Y)  because plus in Mul, [7] and [10], by (Stat) 
+  7] s(X) > X  because [8], by definition 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] Y >= Y  by (Meta) 
+
+  11] times(_|_, X) >= _|_  by (Bot) 
+
+  12] times(s(X), Y) >= plus(times(X, Y), Y)  because [13], by (Star) 
+  13] times*(s(X), Y) >= plus(times(X, Y), Y)  because times > plus, [14] and [19], by (Copy) 
+  14] times*(s(X), Y) >= times(X, Y)  because times in Mul, [15] and [18], by (Stat) 
+  15] s(X) > X  because [16], by definition 
+  16] s*(X) >= X  because [17], by (Select) 
+  17] X >= X  by (Meta) 
+  18] Y >= Y  by (Meta) 
+  19] times*(s(X), Y) >= Y  because [18], by (Select) 
+
+  20] @_{o -> o}(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [21], by (Star) 
+  21] @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [22], by (Select) 
+  22] comp(F, G) @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [23] 
+  23] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(F, @_{o -> o}(G, X))  because comp > @_{o -> o}, [24] and [26], by (Copy) 
+  24] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= F  because [25], by (Select) 
+  25] F >= F  by (Meta) 
+  26] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(G, X)  because [27], by (Select) 
+  27] @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(G, X)  because @_{o -> o} in Mul, [28] and [31], by (Stat) 
+  28] comp(F, G) > G  because [29], by definition 
+  29] comp*(F, G) >= G  because [30], by (Select) 
+  30] G >= G  by (Meta) 
+  31] X >= X  by (Meta) 
+
+  32] twice(F) >= comp(F, F)  because [33], by (Star) 
+  33] twice*(F) >= comp(F, F)  because twice > comp, [34] and [34], by (Copy) 
+  34] twice*(F) >= F  because [35], by (Select) 
+  35] F >= F  by (Meta) 
+
+We can thus remove the following rules:
+
+  plus(O, X) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(s(X), Y) >? s(plus(X, Y)) 
+  times(O, X) >? O 
+  times(s(X), Y) >? plus(times(X, Y), Y) 
+  comp(F, G) X >? F (G X) 
+  twice(F) >? comp(F, F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, comp, plus, s, times, twice}, and the following precedence: times > plus > s > twice > comp > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  plus(s(X), Y) > s(plus(X, Y)) 
+  times(_|_, X) >= _|_ 
+  times(s(X), Y) >= plus(times(X, Y), Y) 
+  @_{o -> o}(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X)) 
+  twice(F) >= comp(F, F) 
+
+With these choices, we have:
+
+  1] plus(s(X), Y) > s(plus(X, Y))  because [2], by definition 
+  2] plus*(s(X), Y) >= s(plus(X, Y))  because plus > s and [3], by (Copy) 
+  3] plus*(s(X), Y) >= plus(X, Y)  because plus in Mul, [4] and [7], by (Stat) 
+  4] s(X) > X  because [5], by definition 
+  5] s*(X) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+  7] Y >= Y  by (Meta) 
+
+  8] times(_|_, X) >= _|_  by (Bot) 
+
+  9] times(s(X), Y) >= plus(times(X, Y), Y)  because [10], by (Star) 
+  10] times*(s(X), Y) >= plus(times(X, Y), Y)  because times > plus, [11] and [16], by (Copy) 
+  11] times*(s(X), Y) >= times(X, Y)  because times in Mul, [12] and [15], by (Stat) 
+  12] s(X) > X  because [13], by definition 
+  13] s*(X) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+  15] Y >= Y  by (Meta) 
+  16] times*(s(X), Y) >= Y  because [15], by (Select) 
+
+  17] @_{o -> o}(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [18], by (Star) 
+  18] @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [19], by (Select) 
+  19] comp(F, G) @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [20] 
+  20] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(F, @_{o -> o}(G, X))  because comp > @_{o -> o}, [21] and [23], by (Copy) 
+  21] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= F  because [22], by (Select) 
+  22] F >= F  by (Meta) 
+  23] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(G, X)  because comp > @_{o -> o}, [24] and [26], by (Copy) 
+  24] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= G  because [25], by (Select) 
+  25] G >= G  by (Meta) 
+  26] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= X  because [27], by (Select) 
+  27] @_{o -> o}*(comp(F, G), X) >= X  because [28], by (Select) 
+  28] comp(F, G) @_{o -> o}*(comp(F, G), X) >= X  because [29] 
+  29] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= X  because [30], by (Select) 
+  30] @_{o -> o}*(comp(F, G), X) >= X  because [31], by (Select) 
+  31] X >= X  by (Meta) 
+
+  32] twice(F) >= comp(F, F)  because [33], by (Star) 
+  33] twice*(F) >= comp(F, F)  because twice > comp, [34] and [34], by (Copy) 
+  34] twice*(F) >= F  because [35], by (Select) 
+  35] F >= F  by (Meta) 
+
+We can thus remove the following rules:
+
+  plus(s(X), Y) => s(plus(X, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  times(O, X) >? O 
+  times(s(X), Y) >? plus(times(X, Y), Y) 
+  comp(F, G) X >? F (G X) 
+  twice(F) >? comp(F, F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, comp, plus, s, times, twice}, and the following precedence: s > times > plus > twice > comp > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  times(_|_, X) >= _|_ 
+  times(s(X), Y) > plus(times(X, Y), Y) 
+  @_{o -> o}(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X)) 
+  twice(F) >= comp(F, F) 
+
+With these choices, we have:
+
+  1] times(_|_, X) >= _|_  by (Bot) 
+
+  2] times(s(X), Y) > plus(times(X, Y), Y)  because [3], by definition 
+  3] times*(s(X), Y) >= plus(times(X, Y), Y)  because times > plus, [4] and [9], by (Copy) 
+  4] times*(s(X), Y) >= times(X, Y)  because times in Mul, [5] and [8], by (Stat) 
+  5] s(X) > X  because [6], by definition 
+  6] s*(X) >= X  because [7], by (Select) 
+  7] X >= X  by (Meta) 
+  8] Y >= Y  by (Meta) 
+  9] times*(s(X), Y) >= Y  because [8], by (Select) 
+
+  10] @_{o -> o}(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [11], by (Star) 
+  11] @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [12], by (Select) 
+  12] comp(F, G) @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [13] 
+  13] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(F, @_{o -> o}(G, X))  because comp > @_{o -> o}, [14] and [16], by (Copy) 
+  14] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= F  because [15], by (Select) 
+  15] F >= F  by (Meta) 
+  16] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(G, X)  because comp > @_{o -> o}, [17] and [19], by (Copy) 
+  17] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= G  because [18], by (Select) 
+  18] G >= G  by (Meta) 
+  19] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= X  because [20], by (Select) 
+  20] @_{o -> o}*(comp(F, G), X) >= X  because [21], by (Select) 
+  21] comp(F, G) @_{o -> o}*(comp(F, G), X) >= X  because [22] 
+  22] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= X  because [23], by (Select) 
+  23] @_{o -> o}*(comp(F, G), X) >= X  because [24], by (Select) 
+  24] X >= X  by (Meta) 
+
+  25] twice(F) >= comp(F, F)  because [26], by (Star) 
+  26] twice*(F) >= comp(F, F)  because twice > comp, [27] and [27], by (Copy) 
+  27] twice*(F) >= F  because [28], by (Select) 
+  28] F >= F  by (Meta) 
+
+We can thus remove the following rules:
+
+  times(s(X), Y) => plus(times(X, Y), Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  times(O, X) >? O 
+  comp(F, G) X >? F (G X) 
+  twice(F) >? comp(F, F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, comp, times, twice}, and the following precedence: twice > comp > @_{o -> o} > times
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  times(_|_, X) >= _|_ 
+  @_{o -> o}(comp(F, G), X) > @_{o -> o}(F, @_{o -> o}(G, X)) 
+  twice(F) > comp(F, F) 
+
+With these choices, we have:
+
+  1] times(_|_, X) >= _|_  by (Bot) 
+
+  2] @_{o -> o}(comp(F, G), X) > @_{o -> o}(F, @_{o -> o}(G, X))  because [3], by definition 
+  3] @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [4], by (Select) 
+  4] comp(F, G) @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [5] 
+  5] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(F, @_{o -> o}(G, X))  because comp > @_{o -> o}, [6] and [8], by (Copy) 
+  6] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= F  because [7], by (Select) 
+  7] F >= F  by (Meta) 
+  8] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(G, X)  because comp > @_{o -> o}, [9] and [11], by (Copy) 
+  9] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= G  because [10], by (Select) 
+  10] G >= G  by (Meta) 
+  11] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= X  because [12], by (Select) 
+  12] @_{o -> o}*(comp(F, G), X) >= X  because [13], by (Select) 
+  13] X >= X  by (Meta) 
+
+  14] twice(F) > comp(F, F)  because [15], by definition 
+  15] twice*(F) >= comp(F, F)  because twice > comp, [16] and [16], by (Copy) 
+  16] twice*(F) >= F  because [17], by (Select) 
+  17] F >= F  by (Meta) 
+
+We can thus remove the following rules:
+
+  comp(F, G) X => F (G X) 
+  twice(F) => comp(F, F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  times(O, X) >? O 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  times = Lam[y0;y1].3 + y1 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[times(O, _x0)]] = 3 + x0 > 0 = [[O]] 
+
+We can thus remove the following rules:
+
+  times(O, X) => O 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

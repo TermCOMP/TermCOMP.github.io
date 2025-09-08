@@ -1,0 +1,953 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/Lov0C.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+qsort(g,a)
+
+w.r.t. the given Prolog program could successfully be proven:
+
+(0) Prolog
+(1) CutEliminatorProof [SOUND, 0 ms]
+(2) Prolog
+(3) UndefinedPredicateHandlerProof [SOUND, 0 ms]
+(4) Prolog
+(5) PrologToPiTRSProof [SOUND, 0 ms]
+(6) PiTRS
+(7) DependencyPairsProof [EQUIVALENT, 8 ms]
+(8) PiDP
+(9) DependencyGraphProof [EQUIVALENT, 0 ms]
+(10) AND
+    (11) PiDP
+        (12) UsableRulesProof [EQUIVALENT, 0 ms]
+        (13) PiDP
+        (14) PiDPToQDPProof [SOUND, 0 ms]
+        (15) QDP
+        (16) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (17) YES
+    (18) PiDP
+        (19) UsableRulesProof [EQUIVALENT, 0 ms]
+        (20) PiDP
+        (21) PiDPToQDPProof [SOUND, 0 ms]
+        (22) QDP
+        (23) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (24) YES
+    (25) PiDP
+        (26) PiDPToQDPProof [SOUND, 0 ms]
+        (27) QDP
+        (28) QDPQMonotonicMRRProof [EQUIVALENT, 35 ms]
+        (29) QDP
+        (30) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (31) TRUE
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+qsort(.(X, L), R) :- ','(partition(L, X, L1, L2), ','(qsort(L2, R2), ','(qsort(L1, R1), append(R1, .(X, R2), R)))).
+qsort([], []).
+partition([], X1, [], []).
+partition(.(E, R), C, .(E, Left1), Right) :- ','(<(E, C), ','(!, partition(R, C, Left1, Right))).
+partition(.(E, R), C, Left, .(E, Right1)) :- partition(R, C, Left, Right1).
+append([], X, X).
+append(.(H, X), Y, .(H, Z)) :- append(X, Y, Z).
+
+
+Query: qsort(g,a)
+----------------------------------------
+
+(1) CutEliminatorProof (SOUND)
+Eliminated all cuts by simply ignoring them[PROLOG].
+----------------------------------------
+
+(2)
+Obligation:
+Clauses:
+
+qsort(.(X, L), R) :- ','(partition(L, X, L1, L2), ','(qsort(L2, R2), ','(qsort(L1, R1), append(R1, .(X, R2), R)))).
+qsort([], []).
+partition([], X1, [], []).
+partition(.(E, R), C, .(E, Left1), Right) :- ','(<(E, C), partition(R, C, Left1, Right)).
+partition(.(E, R), C, Left, .(E, Right1)) :- partition(R, C, Left, Right1).
+append([], X, X).
+append(.(H, X), Y, .(H, Z)) :- append(X, Y, Z).
+
+
+Query: qsort(g,a)
+----------------------------------------
+
+(3) UndefinedPredicateHandlerProof (SOUND)
+Added facts for all undefined predicates [PROLOG].
+----------------------------------------
+
+(4)
+Obligation:
+Clauses:
+
+qsort(.(X, L), R) :- ','(partition(L, X, L1, L2), ','(qsort(L2, R2), ','(qsort(L1, R1), append(R1, .(X, R2), R)))).
+qsort([], []).
+partition([], X1, [], []).
+partition(.(E, R), C, .(E, Left1), Right) :- ','(<(E, C), partition(R, C, Left1, Right)).
+partition(.(E, R), C, Left, .(E, Right1)) :- partition(R, C, Left, Right1).
+append([], X, X).
+append(.(H, X), Y, .(H, Z)) :- append(X, Y, Z).
+<(X0, X1).
+
+
+Query: qsort(g,a)
+----------------------------------------
+
+(5) PrologToPiTRSProof (SOUND)
+We use the technique of [TOCL09]. With regard to the inferred argument filtering the predicates were used in the following modes:
+
+qsort_in_2: (b,f)
+
+partition_in_4: (b,b,f,f)
+
+append_in_3: (b,b,f)
+
+Transforming Prolog into the following Term Rewriting System:
+
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   qsort_in_ga(.(X, L), R) -> U1_ga(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   partition_in_ggaa([], X1, [], []) -> partition_out_ggaa([], X1, [], [])
+   partition_in_ggaa(.(E, R), C, .(E, Left1), Right) -> U5_ggaa(E, R, C, Left1, Right, <_in_gg(E, C))
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+   U5_ggaa(E, R, C, Left1, Right, <_out_gg(E, C)) -> U6_ggaa(E, R, C, Left1, Right, partition_in_ggaa(R, C, Left1, Right))
+   partition_in_ggaa(.(E, R), C, Left, .(E, Right1)) -> U7_ggaa(E, R, C, Left, Right1, partition_in_ggaa(R, C, Left, Right1))
+   U7_ggaa(E, R, C, Left, Right1, partition_out_ggaa(R, C, Left, Right1)) -> partition_out_ggaa(.(E, R), C, Left, .(E, Right1))
+   U6_ggaa(E, R, C, Left1, Right, partition_out_ggaa(R, C, Left1, Right)) -> partition_out_ggaa(.(E, R), C, .(E, Left1), Right)
+   U1_ga(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_ga(X, L, R, L1, qsort_in_ga(L2, R2))
+   qsort_in_ga([], []) -> qsort_out_ga([], [])
+   U2_ga(X, L, R, L1, qsort_out_ga(L2, R2)) -> U3_ga(X, L, R, R2, qsort_in_ga(L1, R1))
+   U3_ga(X, L, R, R2, qsort_out_ga(L1, R1)) -> U4_ga(X, L, R, append_in_gga(R1, .(X, R2), R))
+   append_in_gga([], X, X) -> append_out_gga([], X, X)
+   append_in_gga(.(H, X), Y, .(H, Z)) -> U8_gga(H, X, Y, Z, append_in_gga(X, Y, Z))
+   U8_gga(H, X, Y, Z, append_out_gga(X, Y, Z)) -> append_out_gga(.(H, X), Y, .(H, Z))
+   U4_ga(X, L, R, append_out_gga(R1, .(X, R2), R)) -> qsort_out_ga(.(X, L), R)
+
+The argument filtering Pi contains the following mapping:
+qsort_in_ga(x1, x2)  =  qsort_in_ga(x1)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4)  =  U1_ga(x1, x2, x4)
+
+partition_in_ggaa(x1, x2, x3, x4)  =  partition_in_ggaa(x1, x2)
+
+[]  =  []
+
+partition_out_ggaa(x1, x2, x3, x4)  =  partition_out_ggaa(x1, x2, x3, x4)
+
+U5_ggaa(x1, x2, x3, x4, x5, x6)  =  U5_ggaa(x1, x2, x3, x6)
+
+<_in_gg(x1, x2)  =  <_in_gg(x1, x2)
+
+<_out_gg(x1, x2)  =  <_out_gg(x1, x2)
+
+U6_ggaa(x1, x2, x3, x4, x5, x6)  =  U6_ggaa(x1, x2, x3, x6)
+
+U7_ggaa(x1, x2, x3, x4, x5, x6)  =  U7_ggaa(x1, x2, x3, x6)
+
+U2_ga(x1, x2, x3, x4, x5)  =  U2_ga(x1, x2, x4, x5)
+
+qsort_out_ga(x1, x2)  =  qsort_out_ga(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x1, x2, x4, x5)
+
+U4_ga(x1, x2, x3, x4)  =  U4_ga(x1, x2, x4)
+
+append_in_gga(x1, x2, x3)  =  append_in_gga(x1, x2)
+
+append_out_gga(x1, x2, x3)  =  append_out_gga(x1, x2, x3)
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+
+
+
+
+Infinitary Constructor Rewriting Termination of PiTRS implies Termination of Prolog
+
+
+
+----------------------------------------
+
+(6)
+Obligation:
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   qsort_in_ga(.(X, L), R) -> U1_ga(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   partition_in_ggaa([], X1, [], []) -> partition_out_ggaa([], X1, [], [])
+   partition_in_ggaa(.(E, R), C, .(E, Left1), Right) -> U5_ggaa(E, R, C, Left1, Right, <_in_gg(E, C))
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+   U5_ggaa(E, R, C, Left1, Right, <_out_gg(E, C)) -> U6_ggaa(E, R, C, Left1, Right, partition_in_ggaa(R, C, Left1, Right))
+   partition_in_ggaa(.(E, R), C, Left, .(E, Right1)) -> U7_ggaa(E, R, C, Left, Right1, partition_in_ggaa(R, C, Left, Right1))
+   U7_ggaa(E, R, C, Left, Right1, partition_out_ggaa(R, C, Left, Right1)) -> partition_out_ggaa(.(E, R), C, Left, .(E, Right1))
+   U6_ggaa(E, R, C, Left1, Right, partition_out_ggaa(R, C, Left1, Right)) -> partition_out_ggaa(.(E, R), C, .(E, Left1), Right)
+   U1_ga(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_ga(X, L, R, L1, qsort_in_ga(L2, R2))
+   qsort_in_ga([], []) -> qsort_out_ga([], [])
+   U2_ga(X, L, R, L1, qsort_out_ga(L2, R2)) -> U3_ga(X, L, R, R2, qsort_in_ga(L1, R1))
+   U3_ga(X, L, R, R2, qsort_out_ga(L1, R1)) -> U4_ga(X, L, R, append_in_gga(R1, .(X, R2), R))
+   append_in_gga([], X, X) -> append_out_gga([], X, X)
+   append_in_gga(.(H, X), Y, .(H, Z)) -> U8_gga(H, X, Y, Z, append_in_gga(X, Y, Z))
+   U8_gga(H, X, Y, Z, append_out_gga(X, Y, Z)) -> append_out_gga(.(H, X), Y, .(H, Z))
+   U4_ga(X, L, R, append_out_gga(R1, .(X, R2), R)) -> qsort_out_ga(.(X, L), R)
+
+The argument filtering Pi contains the following mapping:
+qsort_in_ga(x1, x2)  =  qsort_in_ga(x1)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4)  =  U1_ga(x1, x2, x4)
+
+partition_in_ggaa(x1, x2, x3, x4)  =  partition_in_ggaa(x1, x2)
+
+[]  =  []
+
+partition_out_ggaa(x1, x2, x3, x4)  =  partition_out_ggaa(x1, x2, x3, x4)
+
+U5_ggaa(x1, x2, x3, x4, x5, x6)  =  U5_ggaa(x1, x2, x3, x6)
+
+<_in_gg(x1, x2)  =  <_in_gg(x1, x2)
+
+<_out_gg(x1, x2)  =  <_out_gg(x1, x2)
+
+U6_ggaa(x1, x2, x3, x4, x5, x6)  =  U6_ggaa(x1, x2, x3, x6)
+
+U7_ggaa(x1, x2, x3, x4, x5, x6)  =  U7_ggaa(x1, x2, x3, x6)
+
+U2_ga(x1, x2, x3, x4, x5)  =  U2_ga(x1, x2, x4, x5)
+
+qsort_out_ga(x1, x2)  =  qsort_out_ga(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x1, x2, x4, x5)
+
+U4_ga(x1, x2, x3, x4)  =  U4_ga(x1, x2, x4)
+
+append_in_gga(x1, x2, x3)  =  append_in_gga(x1, x2)
+
+append_out_gga(x1, x2, x3)  =  append_out_gga(x1, x2, x3)
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+
+
+----------------------------------------
+
+(7) DependencyPairsProof (EQUIVALENT)
+Using Dependency Pairs [AG00,LOPSTR] we result in the following initial DP problem:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   QSORT_IN_GA(.(X, L), R) -> U1_GA(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   QSORT_IN_GA(.(X, L), R) -> PARTITION_IN_GGAA(L, X, L1, L2)
+   PARTITION_IN_GGAA(.(E, R), C, .(E, Left1), Right) -> U5_GGAA(E, R, C, Left1, Right, <_in_gg(E, C))
+   PARTITION_IN_GGAA(.(E, R), C, .(E, Left1), Right) -> <_IN_GG(E, C)
+   U5_GGAA(E, R, C, Left1, Right, <_out_gg(E, C)) -> U6_GGAA(E, R, C, Left1, Right, partition_in_ggaa(R, C, Left1, Right))
+   U5_GGAA(E, R, C, Left1, Right, <_out_gg(E, C)) -> PARTITION_IN_GGAA(R, C, Left1, Right)
+   PARTITION_IN_GGAA(.(E, R), C, Left, .(E, Right1)) -> U7_GGAA(E, R, C, Left, Right1, partition_in_ggaa(R, C, Left, Right1))
+   PARTITION_IN_GGAA(.(E, R), C, Left, .(E, Right1)) -> PARTITION_IN_GGAA(R, C, Left, Right1)
+   U1_GA(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_GA(X, L, R, L1, qsort_in_ga(L2, R2))
+   U1_GA(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> QSORT_IN_GA(L2, R2)
+   U2_GA(X, L, R, L1, qsort_out_ga(L2, R2)) -> U3_GA(X, L, R, R2, qsort_in_ga(L1, R1))
+   U2_GA(X, L, R, L1, qsort_out_ga(L2, R2)) -> QSORT_IN_GA(L1, R1)
+   U3_GA(X, L, R, R2, qsort_out_ga(L1, R1)) -> U4_GA(X, L, R, append_in_gga(R1, .(X, R2), R))
+   U3_GA(X, L, R, R2, qsort_out_ga(L1, R1)) -> APPEND_IN_GGA(R1, .(X, R2), R)
+   APPEND_IN_GGA(.(H, X), Y, .(H, Z)) -> U8_GGA(H, X, Y, Z, append_in_gga(X, Y, Z))
+   APPEND_IN_GGA(.(H, X), Y, .(H, Z)) -> APPEND_IN_GGA(X, Y, Z)
+
+The TRS R consists of the following rules:
+
+   qsort_in_ga(.(X, L), R) -> U1_ga(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   partition_in_ggaa([], X1, [], []) -> partition_out_ggaa([], X1, [], [])
+   partition_in_ggaa(.(E, R), C, .(E, Left1), Right) -> U5_ggaa(E, R, C, Left1, Right, <_in_gg(E, C))
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+   U5_ggaa(E, R, C, Left1, Right, <_out_gg(E, C)) -> U6_ggaa(E, R, C, Left1, Right, partition_in_ggaa(R, C, Left1, Right))
+   partition_in_ggaa(.(E, R), C, Left, .(E, Right1)) -> U7_ggaa(E, R, C, Left, Right1, partition_in_ggaa(R, C, Left, Right1))
+   U7_ggaa(E, R, C, Left, Right1, partition_out_ggaa(R, C, Left, Right1)) -> partition_out_ggaa(.(E, R), C, Left, .(E, Right1))
+   U6_ggaa(E, R, C, Left1, Right, partition_out_ggaa(R, C, Left1, Right)) -> partition_out_ggaa(.(E, R), C, .(E, Left1), Right)
+   U1_ga(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_ga(X, L, R, L1, qsort_in_ga(L2, R2))
+   qsort_in_ga([], []) -> qsort_out_ga([], [])
+   U2_ga(X, L, R, L1, qsort_out_ga(L2, R2)) -> U3_ga(X, L, R, R2, qsort_in_ga(L1, R1))
+   U3_ga(X, L, R, R2, qsort_out_ga(L1, R1)) -> U4_ga(X, L, R, append_in_gga(R1, .(X, R2), R))
+   append_in_gga([], X, X) -> append_out_gga([], X, X)
+   append_in_gga(.(H, X), Y, .(H, Z)) -> U8_gga(H, X, Y, Z, append_in_gga(X, Y, Z))
+   U8_gga(H, X, Y, Z, append_out_gga(X, Y, Z)) -> append_out_gga(.(H, X), Y, .(H, Z))
+   U4_ga(X, L, R, append_out_gga(R1, .(X, R2), R)) -> qsort_out_ga(.(X, L), R)
+
+The argument filtering Pi contains the following mapping:
+qsort_in_ga(x1, x2)  =  qsort_in_ga(x1)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4)  =  U1_ga(x1, x2, x4)
+
+partition_in_ggaa(x1, x2, x3, x4)  =  partition_in_ggaa(x1, x2)
+
+[]  =  []
+
+partition_out_ggaa(x1, x2, x3, x4)  =  partition_out_ggaa(x1, x2, x3, x4)
+
+U5_ggaa(x1, x2, x3, x4, x5, x6)  =  U5_ggaa(x1, x2, x3, x6)
+
+<_in_gg(x1, x2)  =  <_in_gg(x1, x2)
+
+<_out_gg(x1, x2)  =  <_out_gg(x1, x2)
+
+U6_ggaa(x1, x2, x3, x4, x5, x6)  =  U6_ggaa(x1, x2, x3, x6)
+
+U7_ggaa(x1, x2, x3, x4, x5, x6)  =  U7_ggaa(x1, x2, x3, x6)
+
+U2_ga(x1, x2, x3, x4, x5)  =  U2_ga(x1, x2, x4, x5)
+
+qsort_out_ga(x1, x2)  =  qsort_out_ga(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x1, x2, x4, x5)
+
+U4_ga(x1, x2, x3, x4)  =  U4_ga(x1, x2, x4)
+
+append_in_gga(x1, x2, x3)  =  append_in_gga(x1, x2)
+
+append_out_gga(x1, x2, x3)  =  append_out_gga(x1, x2, x3)
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+QSORT_IN_GA(x1, x2)  =  QSORT_IN_GA(x1)
+
+U1_GA(x1, x2, x3, x4)  =  U1_GA(x1, x2, x4)
+
+PARTITION_IN_GGAA(x1, x2, x3, x4)  =  PARTITION_IN_GGAA(x1, x2)
+
+U5_GGAA(x1, x2, x3, x4, x5, x6)  =  U5_GGAA(x1, x2, x3, x6)
+
+<_IN_GG(x1, x2)  =  <_IN_GG(x1, x2)
+
+U6_GGAA(x1, x2, x3, x4, x5, x6)  =  U6_GGAA(x1, x2, x3, x6)
+
+U7_GGAA(x1, x2, x3, x4, x5, x6)  =  U7_GGAA(x1, x2, x3, x6)
+
+U2_GA(x1, x2, x3, x4, x5)  =  U2_GA(x1, x2, x4, x5)
+
+U3_GA(x1, x2, x3, x4, x5)  =  U3_GA(x1, x2, x4, x5)
+
+U4_GA(x1, x2, x3, x4)  =  U4_GA(x1, x2, x4)
+
+APPEND_IN_GGA(x1, x2, x3)  =  APPEND_IN_GGA(x1, x2)
+
+U8_GGA(x1, x2, x3, x4, x5)  =  U8_GGA(x1, x2, x3, x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(8)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   QSORT_IN_GA(.(X, L), R) -> U1_GA(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   QSORT_IN_GA(.(X, L), R) -> PARTITION_IN_GGAA(L, X, L1, L2)
+   PARTITION_IN_GGAA(.(E, R), C, .(E, Left1), Right) -> U5_GGAA(E, R, C, Left1, Right, <_in_gg(E, C))
+   PARTITION_IN_GGAA(.(E, R), C, .(E, Left1), Right) -> <_IN_GG(E, C)
+   U5_GGAA(E, R, C, Left1, Right, <_out_gg(E, C)) -> U6_GGAA(E, R, C, Left1, Right, partition_in_ggaa(R, C, Left1, Right))
+   U5_GGAA(E, R, C, Left1, Right, <_out_gg(E, C)) -> PARTITION_IN_GGAA(R, C, Left1, Right)
+   PARTITION_IN_GGAA(.(E, R), C, Left, .(E, Right1)) -> U7_GGAA(E, R, C, Left, Right1, partition_in_ggaa(R, C, Left, Right1))
+   PARTITION_IN_GGAA(.(E, R), C, Left, .(E, Right1)) -> PARTITION_IN_GGAA(R, C, Left, Right1)
+   U1_GA(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_GA(X, L, R, L1, qsort_in_ga(L2, R2))
+   U1_GA(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> QSORT_IN_GA(L2, R2)
+   U2_GA(X, L, R, L1, qsort_out_ga(L2, R2)) -> U3_GA(X, L, R, R2, qsort_in_ga(L1, R1))
+   U2_GA(X, L, R, L1, qsort_out_ga(L2, R2)) -> QSORT_IN_GA(L1, R1)
+   U3_GA(X, L, R, R2, qsort_out_ga(L1, R1)) -> U4_GA(X, L, R, append_in_gga(R1, .(X, R2), R))
+   U3_GA(X, L, R, R2, qsort_out_ga(L1, R1)) -> APPEND_IN_GGA(R1, .(X, R2), R)
+   APPEND_IN_GGA(.(H, X), Y, .(H, Z)) -> U8_GGA(H, X, Y, Z, append_in_gga(X, Y, Z))
+   APPEND_IN_GGA(.(H, X), Y, .(H, Z)) -> APPEND_IN_GGA(X, Y, Z)
+
+The TRS R consists of the following rules:
+
+   qsort_in_ga(.(X, L), R) -> U1_ga(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   partition_in_ggaa([], X1, [], []) -> partition_out_ggaa([], X1, [], [])
+   partition_in_ggaa(.(E, R), C, .(E, Left1), Right) -> U5_ggaa(E, R, C, Left1, Right, <_in_gg(E, C))
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+   U5_ggaa(E, R, C, Left1, Right, <_out_gg(E, C)) -> U6_ggaa(E, R, C, Left1, Right, partition_in_ggaa(R, C, Left1, Right))
+   partition_in_ggaa(.(E, R), C, Left, .(E, Right1)) -> U7_ggaa(E, R, C, Left, Right1, partition_in_ggaa(R, C, Left, Right1))
+   U7_ggaa(E, R, C, Left, Right1, partition_out_ggaa(R, C, Left, Right1)) -> partition_out_ggaa(.(E, R), C, Left, .(E, Right1))
+   U6_ggaa(E, R, C, Left1, Right, partition_out_ggaa(R, C, Left1, Right)) -> partition_out_ggaa(.(E, R), C, .(E, Left1), Right)
+   U1_ga(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_ga(X, L, R, L1, qsort_in_ga(L2, R2))
+   qsort_in_ga([], []) -> qsort_out_ga([], [])
+   U2_ga(X, L, R, L1, qsort_out_ga(L2, R2)) -> U3_ga(X, L, R, R2, qsort_in_ga(L1, R1))
+   U3_ga(X, L, R, R2, qsort_out_ga(L1, R1)) -> U4_ga(X, L, R, append_in_gga(R1, .(X, R2), R))
+   append_in_gga([], X, X) -> append_out_gga([], X, X)
+   append_in_gga(.(H, X), Y, .(H, Z)) -> U8_gga(H, X, Y, Z, append_in_gga(X, Y, Z))
+   U8_gga(H, X, Y, Z, append_out_gga(X, Y, Z)) -> append_out_gga(.(H, X), Y, .(H, Z))
+   U4_ga(X, L, R, append_out_gga(R1, .(X, R2), R)) -> qsort_out_ga(.(X, L), R)
+
+The argument filtering Pi contains the following mapping:
+qsort_in_ga(x1, x2)  =  qsort_in_ga(x1)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4)  =  U1_ga(x1, x2, x4)
+
+partition_in_ggaa(x1, x2, x3, x4)  =  partition_in_ggaa(x1, x2)
+
+[]  =  []
+
+partition_out_ggaa(x1, x2, x3, x4)  =  partition_out_ggaa(x1, x2, x3, x4)
+
+U5_ggaa(x1, x2, x3, x4, x5, x6)  =  U5_ggaa(x1, x2, x3, x6)
+
+<_in_gg(x1, x2)  =  <_in_gg(x1, x2)
+
+<_out_gg(x1, x2)  =  <_out_gg(x1, x2)
+
+U6_ggaa(x1, x2, x3, x4, x5, x6)  =  U6_ggaa(x1, x2, x3, x6)
+
+U7_ggaa(x1, x2, x3, x4, x5, x6)  =  U7_ggaa(x1, x2, x3, x6)
+
+U2_ga(x1, x2, x3, x4, x5)  =  U2_ga(x1, x2, x4, x5)
+
+qsort_out_ga(x1, x2)  =  qsort_out_ga(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x1, x2, x4, x5)
+
+U4_ga(x1, x2, x3, x4)  =  U4_ga(x1, x2, x4)
+
+append_in_gga(x1, x2, x3)  =  append_in_gga(x1, x2)
+
+append_out_gga(x1, x2, x3)  =  append_out_gga(x1, x2, x3)
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+QSORT_IN_GA(x1, x2)  =  QSORT_IN_GA(x1)
+
+U1_GA(x1, x2, x3, x4)  =  U1_GA(x1, x2, x4)
+
+PARTITION_IN_GGAA(x1, x2, x3, x4)  =  PARTITION_IN_GGAA(x1, x2)
+
+U5_GGAA(x1, x2, x3, x4, x5, x6)  =  U5_GGAA(x1, x2, x3, x6)
+
+<_IN_GG(x1, x2)  =  <_IN_GG(x1, x2)
+
+U6_GGAA(x1, x2, x3, x4, x5, x6)  =  U6_GGAA(x1, x2, x3, x6)
+
+U7_GGAA(x1, x2, x3, x4, x5, x6)  =  U7_GGAA(x1, x2, x3, x6)
+
+U2_GA(x1, x2, x3, x4, x5)  =  U2_GA(x1, x2, x4, x5)
+
+U3_GA(x1, x2, x3, x4, x5)  =  U3_GA(x1, x2, x4, x5)
+
+U4_GA(x1, x2, x3, x4)  =  U4_GA(x1, x2, x4)
+
+APPEND_IN_GGA(x1, x2, x3)  =  APPEND_IN_GGA(x1, x2)
+
+U8_GGA(x1, x2, x3, x4, x5)  =  U8_GGA(x1, x2, x3, x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(9) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LOPSTR] contains 3 SCCs with 8 less nodes.
+----------------------------------------
+
+(10)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(11)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   APPEND_IN_GGA(.(H, X), Y, .(H, Z)) -> APPEND_IN_GGA(X, Y, Z)
+
+The TRS R consists of the following rules:
+
+   qsort_in_ga(.(X, L), R) -> U1_ga(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   partition_in_ggaa([], X1, [], []) -> partition_out_ggaa([], X1, [], [])
+   partition_in_ggaa(.(E, R), C, .(E, Left1), Right) -> U5_ggaa(E, R, C, Left1, Right, <_in_gg(E, C))
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+   U5_ggaa(E, R, C, Left1, Right, <_out_gg(E, C)) -> U6_ggaa(E, R, C, Left1, Right, partition_in_ggaa(R, C, Left1, Right))
+   partition_in_ggaa(.(E, R), C, Left, .(E, Right1)) -> U7_ggaa(E, R, C, Left, Right1, partition_in_ggaa(R, C, Left, Right1))
+   U7_ggaa(E, R, C, Left, Right1, partition_out_ggaa(R, C, Left, Right1)) -> partition_out_ggaa(.(E, R), C, Left, .(E, Right1))
+   U6_ggaa(E, R, C, Left1, Right, partition_out_ggaa(R, C, Left1, Right)) -> partition_out_ggaa(.(E, R), C, .(E, Left1), Right)
+   U1_ga(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_ga(X, L, R, L1, qsort_in_ga(L2, R2))
+   qsort_in_ga([], []) -> qsort_out_ga([], [])
+   U2_ga(X, L, R, L1, qsort_out_ga(L2, R2)) -> U3_ga(X, L, R, R2, qsort_in_ga(L1, R1))
+   U3_ga(X, L, R, R2, qsort_out_ga(L1, R1)) -> U4_ga(X, L, R, append_in_gga(R1, .(X, R2), R))
+   append_in_gga([], X, X) -> append_out_gga([], X, X)
+   append_in_gga(.(H, X), Y, .(H, Z)) -> U8_gga(H, X, Y, Z, append_in_gga(X, Y, Z))
+   U8_gga(H, X, Y, Z, append_out_gga(X, Y, Z)) -> append_out_gga(.(H, X), Y, .(H, Z))
+   U4_ga(X, L, R, append_out_gga(R1, .(X, R2), R)) -> qsort_out_ga(.(X, L), R)
+
+The argument filtering Pi contains the following mapping:
+qsort_in_ga(x1, x2)  =  qsort_in_ga(x1)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4)  =  U1_ga(x1, x2, x4)
+
+partition_in_ggaa(x1, x2, x3, x4)  =  partition_in_ggaa(x1, x2)
+
+[]  =  []
+
+partition_out_ggaa(x1, x2, x3, x4)  =  partition_out_ggaa(x1, x2, x3, x4)
+
+U5_ggaa(x1, x2, x3, x4, x5, x6)  =  U5_ggaa(x1, x2, x3, x6)
+
+<_in_gg(x1, x2)  =  <_in_gg(x1, x2)
+
+<_out_gg(x1, x2)  =  <_out_gg(x1, x2)
+
+U6_ggaa(x1, x2, x3, x4, x5, x6)  =  U6_ggaa(x1, x2, x3, x6)
+
+U7_ggaa(x1, x2, x3, x4, x5, x6)  =  U7_ggaa(x1, x2, x3, x6)
+
+U2_ga(x1, x2, x3, x4, x5)  =  U2_ga(x1, x2, x4, x5)
+
+qsort_out_ga(x1, x2)  =  qsort_out_ga(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x1, x2, x4, x5)
+
+U4_ga(x1, x2, x3, x4)  =  U4_ga(x1, x2, x4)
+
+append_in_gga(x1, x2, x3)  =  append_in_gga(x1, x2)
+
+append_out_gga(x1, x2, x3)  =  append_out_gga(x1, x2, x3)
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+APPEND_IN_GGA(x1, x2, x3)  =  APPEND_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(12) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(13)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   APPEND_IN_GGA(.(H, X), Y, .(H, Z)) -> APPEND_IN_GGA(X, Y, Z)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+APPEND_IN_GGA(x1, x2, x3)  =  APPEND_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(14) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(15)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   APPEND_IN_GGA(.(H, X), Y) -> APPEND_IN_GGA(X, Y)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(16) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*APPEND_IN_GGA(.(H, X), Y) -> APPEND_IN_GGA(X, Y)
+The graph contains the following edges 1 > 1, 2 >= 2
+
+
+----------------------------------------
+
+(17)
+YES
+
+----------------------------------------
+
+(18)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U5_GGAA(E, R, C, Left1, Right, <_out_gg(E, C)) -> PARTITION_IN_GGAA(R, C, Left1, Right)
+   PARTITION_IN_GGAA(.(E, R), C, .(E, Left1), Right) -> U5_GGAA(E, R, C, Left1, Right, <_in_gg(E, C))
+   PARTITION_IN_GGAA(.(E, R), C, Left, .(E, Right1)) -> PARTITION_IN_GGAA(R, C, Left, Right1)
+
+The TRS R consists of the following rules:
+
+   qsort_in_ga(.(X, L), R) -> U1_ga(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   partition_in_ggaa([], X1, [], []) -> partition_out_ggaa([], X1, [], [])
+   partition_in_ggaa(.(E, R), C, .(E, Left1), Right) -> U5_ggaa(E, R, C, Left1, Right, <_in_gg(E, C))
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+   U5_ggaa(E, R, C, Left1, Right, <_out_gg(E, C)) -> U6_ggaa(E, R, C, Left1, Right, partition_in_ggaa(R, C, Left1, Right))
+   partition_in_ggaa(.(E, R), C, Left, .(E, Right1)) -> U7_ggaa(E, R, C, Left, Right1, partition_in_ggaa(R, C, Left, Right1))
+   U7_ggaa(E, R, C, Left, Right1, partition_out_ggaa(R, C, Left, Right1)) -> partition_out_ggaa(.(E, R), C, Left, .(E, Right1))
+   U6_ggaa(E, R, C, Left1, Right, partition_out_ggaa(R, C, Left1, Right)) -> partition_out_ggaa(.(E, R), C, .(E, Left1), Right)
+   U1_ga(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_ga(X, L, R, L1, qsort_in_ga(L2, R2))
+   qsort_in_ga([], []) -> qsort_out_ga([], [])
+   U2_ga(X, L, R, L1, qsort_out_ga(L2, R2)) -> U3_ga(X, L, R, R2, qsort_in_ga(L1, R1))
+   U3_ga(X, L, R, R2, qsort_out_ga(L1, R1)) -> U4_ga(X, L, R, append_in_gga(R1, .(X, R2), R))
+   append_in_gga([], X, X) -> append_out_gga([], X, X)
+   append_in_gga(.(H, X), Y, .(H, Z)) -> U8_gga(H, X, Y, Z, append_in_gga(X, Y, Z))
+   U8_gga(H, X, Y, Z, append_out_gga(X, Y, Z)) -> append_out_gga(.(H, X), Y, .(H, Z))
+   U4_ga(X, L, R, append_out_gga(R1, .(X, R2), R)) -> qsort_out_ga(.(X, L), R)
+
+The argument filtering Pi contains the following mapping:
+qsort_in_ga(x1, x2)  =  qsort_in_ga(x1)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4)  =  U1_ga(x1, x2, x4)
+
+partition_in_ggaa(x1, x2, x3, x4)  =  partition_in_ggaa(x1, x2)
+
+[]  =  []
+
+partition_out_ggaa(x1, x2, x3, x4)  =  partition_out_ggaa(x1, x2, x3, x4)
+
+U5_ggaa(x1, x2, x3, x4, x5, x6)  =  U5_ggaa(x1, x2, x3, x6)
+
+<_in_gg(x1, x2)  =  <_in_gg(x1, x2)
+
+<_out_gg(x1, x2)  =  <_out_gg(x1, x2)
+
+U6_ggaa(x1, x2, x3, x4, x5, x6)  =  U6_ggaa(x1, x2, x3, x6)
+
+U7_ggaa(x1, x2, x3, x4, x5, x6)  =  U7_ggaa(x1, x2, x3, x6)
+
+U2_ga(x1, x2, x3, x4, x5)  =  U2_ga(x1, x2, x4, x5)
+
+qsort_out_ga(x1, x2)  =  qsort_out_ga(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x1, x2, x4, x5)
+
+U4_ga(x1, x2, x3, x4)  =  U4_ga(x1, x2, x4)
+
+append_in_gga(x1, x2, x3)  =  append_in_gga(x1, x2)
+
+append_out_gga(x1, x2, x3)  =  append_out_gga(x1, x2, x3)
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+PARTITION_IN_GGAA(x1, x2, x3, x4)  =  PARTITION_IN_GGAA(x1, x2)
+
+U5_GGAA(x1, x2, x3, x4, x5, x6)  =  U5_GGAA(x1, x2, x3, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(19) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(20)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U5_GGAA(E, R, C, Left1, Right, <_out_gg(E, C)) -> PARTITION_IN_GGAA(R, C, Left1, Right)
+   PARTITION_IN_GGAA(.(E, R), C, .(E, Left1), Right) -> U5_GGAA(E, R, C, Left1, Right, <_in_gg(E, C))
+   PARTITION_IN_GGAA(.(E, R), C, Left, .(E, Right1)) -> PARTITION_IN_GGAA(R, C, Left, Right1)
+
+The TRS R consists of the following rules:
+
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+<_in_gg(x1, x2)  =  <_in_gg(x1, x2)
+
+<_out_gg(x1, x2)  =  <_out_gg(x1, x2)
+
+PARTITION_IN_GGAA(x1, x2, x3, x4)  =  PARTITION_IN_GGAA(x1, x2)
+
+U5_GGAA(x1, x2, x3, x4, x5, x6)  =  U5_GGAA(x1, x2, x3, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(21) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(22)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U5_GGAA(E, R, C, <_out_gg(E, C)) -> PARTITION_IN_GGAA(R, C)
+   PARTITION_IN_GGAA(.(E, R), C) -> U5_GGAA(E, R, C, <_in_gg(E, C))
+   PARTITION_IN_GGAA(.(E, R), C) -> PARTITION_IN_GGAA(R, C)
+
+The TRS R consists of the following rules:
+
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+
+The set Q consists of the following terms:
+
+   <_in_gg(x0, x1)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(23) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*PARTITION_IN_GGAA(.(E, R), C) -> U5_GGAA(E, R, C, <_in_gg(E, C))
+The graph contains the following edges 1 > 1, 1 > 2, 2 >= 3
+
+
+*PARTITION_IN_GGAA(.(E, R), C) -> PARTITION_IN_GGAA(R, C)
+The graph contains the following edges 1 > 1, 2 >= 2
+
+
+*U5_GGAA(E, R, C, <_out_gg(E, C)) -> PARTITION_IN_GGAA(R, C)
+The graph contains the following edges 2 >= 1, 3 >= 2, 4 > 2
+
+
+----------------------------------------
+
+(24)
+YES
+
+----------------------------------------
+
+(25)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U1_GA(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_GA(X, L, R, L1, qsort_in_ga(L2, R2))
+   U2_GA(X, L, R, L1, qsort_out_ga(L2, R2)) -> QSORT_IN_GA(L1, R1)
+   QSORT_IN_GA(.(X, L), R) -> U1_GA(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   U1_GA(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> QSORT_IN_GA(L2, R2)
+
+The TRS R consists of the following rules:
+
+   qsort_in_ga(.(X, L), R) -> U1_ga(X, L, R, partition_in_ggaa(L, X, L1, L2))
+   partition_in_ggaa([], X1, [], []) -> partition_out_ggaa([], X1, [], [])
+   partition_in_ggaa(.(E, R), C, .(E, Left1), Right) -> U5_ggaa(E, R, C, Left1, Right, <_in_gg(E, C))
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+   U5_ggaa(E, R, C, Left1, Right, <_out_gg(E, C)) -> U6_ggaa(E, R, C, Left1, Right, partition_in_ggaa(R, C, Left1, Right))
+   partition_in_ggaa(.(E, R), C, Left, .(E, Right1)) -> U7_ggaa(E, R, C, Left, Right1, partition_in_ggaa(R, C, Left, Right1))
+   U7_ggaa(E, R, C, Left, Right1, partition_out_ggaa(R, C, Left, Right1)) -> partition_out_ggaa(.(E, R), C, Left, .(E, Right1))
+   U6_ggaa(E, R, C, Left1, Right, partition_out_ggaa(R, C, Left1, Right)) -> partition_out_ggaa(.(E, R), C, .(E, Left1), Right)
+   U1_ga(X, L, R, partition_out_ggaa(L, X, L1, L2)) -> U2_ga(X, L, R, L1, qsort_in_ga(L2, R2))
+   qsort_in_ga([], []) -> qsort_out_ga([], [])
+   U2_ga(X, L, R, L1, qsort_out_ga(L2, R2)) -> U3_ga(X, L, R, R2, qsort_in_ga(L1, R1))
+   U3_ga(X, L, R, R2, qsort_out_ga(L1, R1)) -> U4_ga(X, L, R, append_in_gga(R1, .(X, R2), R))
+   append_in_gga([], X, X) -> append_out_gga([], X, X)
+   append_in_gga(.(H, X), Y, .(H, Z)) -> U8_gga(H, X, Y, Z, append_in_gga(X, Y, Z))
+   U8_gga(H, X, Y, Z, append_out_gga(X, Y, Z)) -> append_out_gga(.(H, X), Y, .(H, Z))
+   U4_ga(X, L, R, append_out_gga(R1, .(X, R2), R)) -> qsort_out_ga(.(X, L), R)
+
+The argument filtering Pi contains the following mapping:
+qsort_in_ga(x1, x2)  =  qsort_in_ga(x1)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_ga(x1, x2, x3, x4)  =  U1_ga(x1, x2, x4)
+
+partition_in_ggaa(x1, x2, x3, x4)  =  partition_in_ggaa(x1, x2)
+
+[]  =  []
+
+partition_out_ggaa(x1, x2, x3, x4)  =  partition_out_ggaa(x1, x2, x3, x4)
+
+U5_ggaa(x1, x2, x3, x4, x5, x6)  =  U5_ggaa(x1, x2, x3, x6)
+
+<_in_gg(x1, x2)  =  <_in_gg(x1, x2)
+
+<_out_gg(x1, x2)  =  <_out_gg(x1, x2)
+
+U6_ggaa(x1, x2, x3, x4, x5, x6)  =  U6_ggaa(x1, x2, x3, x6)
+
+U7_ggaa(x1, x2, x3, x4, x5, x6)  =  U7_ggaa(x1, x2, x3, x6)
+
+U2_ga(x1, x2, x3, x4, x5)  =  U2_ga(x1, x2, x4, x5)
+
+qsort_out_ga(x1, x2)  =  qsort_out_ga(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x1, x2, x4, x5)
+
+U4_ga(x1, x2, x3, x4)  =  U4_ga(x1, x2, x4)
+
+append_in_gga(x1, x2, x3)  =  append_in_gga(x1, x2)
+
+append_out_gga(x1, x2, x3)  =  append_out_gga(x1, x2, x3)
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+QSORT_IN_GA(x1, x2)  =  QSORT_IN_GA(x1)
+
+U1_GA(x1, x2, x3, x4)  =  U1_GA(x1, x2, x4)
+
+U2_GA(x1, x2, x3, x4, x5)  =  U2_GA(x1, x2, x4, x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(26) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(27)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U1_GA(X, L, partition_out_ggaa(L, X, L1, L2)) -> U2_GA(X, L, L1, qsort_in_ga(L2))
+   U2_GA(X, L, L1, qsort_out_ga(L2, R2)) -> QSORT_IN_GA(L1)
+   QSORT_IN_GA(.(X, L)) -> U1_GA(X, L, partition_in_ggaa(L, X))
+   U1_GA(X, L, partition_out_ggaa(L, X, L1, L2)) -> QSORT_IN_GA(L2)
+
+The TRS R consists of the following rules:
+
+   qsort_in_ga(.(X, L)) -> U1_ga(X, L, partition_in_ggaa(L, X))
+   partition_in_ggaa([], X1) -> partition_out_ggaa([], X1, [], [])
+   partition_in_ggaa(.(E, R), C) -> U5_ggaa(E, R, C, <_in_gg(E, C))
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+   U5_ggaa(E, R, C, <_out_gg(E, C)) -> U6_ggaa(E, R, C, partition_in_ggaa(R, C))
+   partition_in_ggaa(.(E, R), C) -> U7_ggaa(E, R, C, partition_in_ggaa(R, C))
+   U7_ggaa(E, R, C, partition_out_ggaa(R, C, Left, Right1)) -> partition_out_ggaa(.(E, R), C, Left, .(E, Right1))
+   U6_ggaa(E, R, C, partition_out_ggaa(R, C, Left1, Right)) -> partition_out_ggaa(.(E, R), C, .(E, Left1), Right)
+   U1_ga(X, L, partition_out_ggaa(L, X, L1, L2)) -> U2_ga(X, L, L1, qsort_in_ga(L2))
+   qsort_in_ga([]) -> qsort_out_ga([], [])
+   U2_ga(X, L, L1, qsort_out_ga(L2, R2)) -> U3_ga(X, L, R2, qsort_in_ga(L1))
+   U3_ga(X, L, R2, qsort_out_ga(L1, R1)) -> U4_ga(X, L, append_in_gga(R1, .(X, R2)))
+   append_in_gga([], X) -> append_out_gga([], X, X)
+   append_in_gga(.(H, X), Y) -> U8_gga(H, X, Y, append_in_gga(X, Y))
+   U8_gga(H, X, Y, append_out_gga(X, Y, Z)) -> append_out_gga(.(H, X), Y, .(H, Z))
+   U4_ga(X, L, append_out_gga(R1, .(X, R2), R)) -> qsort_out_ga(.(X, L), R)
+
+The set Q consists of the following terms:
+
+   qsort_in_ga(x0)
+   partition_in_ggaa(x0, x1)
+   <_in_gg(x0, x1)
+   U5_ggaa(x0, x1, x2, x3)
+   U7_ggaa(x0, x1, x2, x3)
+   U6_ggaa(x0, x1, x2, x3)
+   U1_ga(x0, x1, x2)
+   U2_ga(x0, x1, x2, x3)
+   U3_ga(x0, x1, x2, x3)
+   append_in_gga(x0, x1)
+   U8_gga(x0, x1, x2, x3)
+   U4_ga(x0, x1, x2)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(28) QDPQMonotonicMRRProof (EQUIVALENT)
+By using the Q-monotonic rule removal processor with the following ordering, at least one Dependency Pair or term rewrite system rule of this QDP problem can be strictly oriented such that it always occurs at a strongly monotonic position in a (P,Q,R)-chain.
+
+Strictly oriented dependency pairs:
+
+   U1_GA(X, L, partition_out_ggaa(L, X, L1, L2)) -> U2_GA(X, L, L1, qsort_in_ga(L2))
+   U2_GA(X, L, L1, qsort_out_ga(L2, R2)) -> QSORT_IN_GA(L1)
+   U1_GA(X, L, partition_out_ggaa(L, X, L1, L2)) -> QSORT_IN_GA(L2)
+
+
+Used ordering: Polynomial interpretation [POLO]:
+
+   POL(.(x_1, x_2)) = 2 + x_1 + x_2
+   POL(<_in_gg(x_1, x_2)) = 1
+   POL(<_out_gg(x_1, x_2)) = 1
+   POL(QSORT_IN_GA(x_1)) = 2*x_1
+   POL(U1_GA(x_1, x_2, x_3)) = 2 + 2*x_3
+   POL(U1_ga(x_1, x_2, x_3)) = 0
+   POL(U2_GA(x_1, x_2, x_3, x_4)) = 1 + 2*x_3
+   POL(U2_ga(x_1, x_2, x_3, x_4)) = 0
+   POL(U3_ga(x_1, x_2, x_3, x_4)) = 0
+   POL(U4_ga(x_1, x_2, x_3)) = 0
+   POL(U5_ggaa(x_1, x_2, x_3, x_4)) = 1 + x_1 + x_2 + 2*x_4
+   POL(U6_ggaa(x_1, x_2, x_3, x_4)) = 2 + x_1 + x_4
+   POL(U7_ggaa(x_1, x_2, x_3, x_4)) = 2 + x_1 + x_4
+   POL(U8_gga(x_1, x_2, x_3, x_4)) = 0
+   POL([]) = 1
+   POL(append_in_gga(x_1, x_2)) = 0
+   POL(append_out_gga(x_1, x_2, x_3)) = 0
+   POL(partition_in_ggaa(x_1, x_2)) = 1 + x_1
+   POL(partition_out_ggaa(x_1, x_2, x_3, x_4)) = x_3 + x_4
+   POL(qsort_in_ga(x_1)) = x_1
+   POL(qsort_out_ga(x_1, x_2)) = 0
+
+
+----------------------------------------
+
+(29)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   QSORT_IN_GA(.(X, L)) -> U1_GA(X, L, partition_in_ggaa(L, X))
+
+The TRS R consists of the following rules:
+
+   qsort_in_ga(.(X, L)) -> U1_ga(X, L, partition_in_ggaa(L, X))
+   partition_in_ggaa([], X1) -> partition_out_ggaa([], X1, [], [])
+   partition_in_ggaa(.(E, R), C) -> U5_ggaa(E, R, C, <_in_gg(E, C))
+   <_in_gg(X0, X1) -> <_out_gg(X0, X1)
+   U5_ggaa(E, R, C, <_out_gg(E, C)) -> U6_ggaa(E, R, C, partition_in_ggaa(R, C))
+   partition_in_ggaa(.(E, R), C) -> U7_ggaa(E, R, C, partition_in_ggaa(R, C))
+   U7_ggaa(E, R, C, partition_out_ggaa(R, C, Left, Right1)) -> partition_out_ggaa(.(E, R), C, Left, .(E, Right1))
+   U6_ggaa(E, R, C, partition_out_ggaa(R, C, Left1, Right)) -> partition_out_ggaa(.(E, R), C, .(E, Left1), Right)
+   U1_ga(X, L, partition_out_ggaa(L, X, L1, L2)) -> U2_ga(X, L, L1, qsort_in_ga(L2))
+   qsort_in_ga([]) -> qsort_out_ga([], [])
+   U2_ga(X, L, L1, qsort_out_ga(L2, R2)) -> U3_ga(X, L, R2, qsort_in_ga(L1))
+   U3_ga(X, L, R2, qsort_out_ga(L1, R1)) -> U4_ga(X, L, append_in_gga(R1, .(X, R2)))
+   append_in_gga([], X) -> append_out_gga([], X, X)
+   append_in_gga(.(H, X), Y) -> U8_gga(H, X, Y, append_in_gga(X, Y))
+   U8_gga(H, X, Y, append_out_gga(X, Y, Z)) -> append_out_gga(.(H, X), Y, .(H, Z))
+   U4_ga(X, L, append_out_gga(R1, .(X, R2), R)) -> qsort_out_ga(.(X, L), R)
+
+The set Q consists of the following terms:
+
+   qsort_in_ga(x0)
+   partition_in_ggaa(x0, x1)
+   <_in_gg(x0, x1)
+   U5_ggaa(x0, x1, x2, x3)
+   U7_ggaa(x0, x1, x2, x3)
+   U6_ggaa(x0, x1, x2, x3)
+   U1_ga(x0, x1, x2)
+   U2_ga(x0, x1, x2, x3)
+   U3_ga(x0, x1, x2, x3)
+   append_in_gga(x0, x1)
+   U8_gga(x0, x1, x2, x3)
+   U4_ga(x0, x1, x2)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(30) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 0 SCCs with 1 less node.
+----------------------------------------
+
+(31)
+TRUE

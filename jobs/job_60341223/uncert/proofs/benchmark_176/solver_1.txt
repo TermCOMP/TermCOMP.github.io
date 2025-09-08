@@ -1,0 +1,156 @@
+YES
+We consider the system j203o.
+
+  Alphabet:
+
+    O : [] --> a 
+    eq : [a * a] --> c 
+    false : [] --> c 
+    fork : [b * a * b] --> b 
+    if : [c * c * c] --> c 
+    lt : [a * a] --> c 
+    member : [a * b] --> c 
+    null : [] --> b 
+    s : [a] --> a 
+    true : [] --> c 
+
+  Rules:
+
+    lt(s(X), s(Y)) => lt(X, Y) 
+    lt(O, s(X)) => true 
+    lt(X, O) => false 
+    eq(X, X) => true 
+    eq(s(X), O) => false 
+    eq(O, s(X)) => false 
+    member(X, null) => false 
+    member(X, fork(Y, Z, U)) => if(lt(X, Z), member(X, Y), if(eq(X, Z), true, member(X, U))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  lt(s(X), s(Y)) >? lt(X, Y) 
+  lt(O, s(X)) >? true 
+  lt(X, O) >? false 
+  eq(X, X) >? true 
+  eq(s(X), O) >? false 
+  eq(O, s(X)) >? false 
+  member(X, null) >? false 
+  member(X, fork(Y, Z, U)) >? if(lt(X, Z), member(X, Y), if(eq(X, Z), true, member(X, U))) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[false]] = _|_ 
+  [[true]] = _|_ 
+
+We choose Lex = {} and Mul = {O, eq, fork, if, lt, member, null, s}, and the following precedence: fork > null > s > eq = lt = member > O > if
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  lt(s(X), s(Y)) >= lt(X, Y) 
+  lt(O, s(X)) >= _|_ 
+  lt(X, O) >= _|_ 
+  eq(X, X) > _|_ 
+  eq(s(X), O) >= _|_ 
+  eq(O, s(X)) >= _|_ 
+  member(X, null) >= _|_ 
+  member(X, fork(Y, Z, U)) > if(lt(X, Z), member(X, Y), if(eq(X, Z), _|_, member(X, U))) 
+
+With these choices, we have:
+
+  1] lt(s(X), s(Y)) >= lt(X, Y)  because [2], by (Star) 
+  2] lt*(s(X), s(Y)) >= lt(X, Y)  because lt in Mul, [3] and [6], by (Stat) 
+  3] s(X) >= X  because [4], by (Star) 
+  4] s*(X) >= X  because [5], by (Select) 
+  5] X >= X  by (Meta) 
+  6] s(Y) > Y  because [7], by definition 
+  7] s*(Y) >= Y  because [8], by (Select) 
+  8] Y >= Y  by (Meta) 
+
+  9] lt(O, s(X)) >= _|_  by (Bot) 
+
+  10] lt(X, O) >= _|_  by (Bot) 
+
+  11] eq(X, X) > _|_  because [12], by definition 
+  12] eq*(X, X) >= _|_  by (Bot) 
+
+  13] eq(s(X), O) >= _|_  by (Bot) 
+
+  14] eq(O, s(X)) >= _|_  by (Bot) 
+
+  15] member(X, null) >= _|_  by (Bot) 
+
+  16] member(X, fork(Y, Z, U)) > if(lt(X, Z), member(X, Y), if(eq(X, Z), _|_, member(X, U)))  because [17], by definition 
+  17] member*(X, fork(Y, Z, U)) >= if(lt(X, Z), member(X, Y), if(eq(X, Z), _|_, member(X, U)))  because member > if, [18], [23] and [27], by (Copy) 
+  18] member*(X, fork(Y, Z, U)) >= lt(X, Z)  because member = lt, member in Mul, [19] and [20], by (Stat) 
+  19] X >= X  by (Meta) 
+  20] fork(Y, Z, U) > Z  because [21], by definition 
+  21] fork*(Y, Z, U) >= Z  because [22], by (Select) 
+  22] Z >= Z  by (Meta) 
+  23] member*(X, fork(Y, Z, U)) >= member(X, Y)  because member in Mul, [19] and [24], by (Stat) 
+  24] fork(Y, Z, U) > Y  because [25], by definition 
+  25] fork*(Y, Z, U) >= Y  because [26], by (Select) 
+  26] Y >= Y  by (Meta) 
+  27] member*(X, fork(Y, Z, U)) >= if(eq(X, Z), _|_, member(X, U))  because member > if, [28], [29] and [30], by (Copy) 
+  28] member*(X, fork(Y, Z, U)) >= eq(X, Z)  because member = eq, member in Mul, [19] and [20], by (Stat) 
+  29] member*(X, fork(Y, Z, U)) >= _|_  by (Bot) 
+  30] member*(X, fork(Y, Z, U)) >= member(X, U)  because member in Mul, [19] and [31], by (Stat) 
+  31] fork(Y, Z, U) > U  because [32], by definition 
+  32] fork*(Y, Z, U) >= U  because [33], by (Select) 
+  33] U >= U  by (Meta) 
+
+We can thus remove the following rules:
+
+  eq(X, X) => true 
+  member(X, fork(Y, Z, U)) => if(lt(X, Z), member(X, Y), if(eq(X, Z), true, member(X, U))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  lt(s(X), s(Y)) >? lt(X, Y) 
+  lt(O, s(X)) >? true 
+  lt(X, O) >? false 
+  eq(s(X), O) >? false 
+  eq(O, s(X)) >? false 
+  member(X, null) >? false 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  eq = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  false = 0 
+  lt = Lam[y0;y1].3 + y0 + y1 
+  member = Lam[y0;y1].3 + y0 + 3*y1 
+  null = 3 
+  s = Lam[y0].3 + 3*y0 
+  true = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[lt(s(_x0), s(_x1))]] = 9 + 3*x0 + 3*x1 > 3 + x0 + x1 = [[lt(_x0, _x1)]] 
+  [[lt(O, s(_x0))]] = 9 + 3*x0 > 0 = [[true]] 
+  [[lt(_x0, O)]] = 6 + x0 > 0 = [[false]] 
+  [[eq(s(_x0), O)]] = 21 + 9*x0 > 0 = [[false]] 
+  [[eq(O, s(_x0))]] = 21 + 9*x0 > 0 = [[false]] 
+  [[member(_x0, null)]] = 12 + x0 > 0 = [[false]] 
+
+We can thus remove the following rules:
+
+  lt(s(X), s(Y)) => lt(X, Y) 
+  lt(O, s(X)) => true 
+  lt(X, O) => false 
+  eq(s(X), O) => false 
+  eq(O, s(X)) => false 
+  member(X, null) => false 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

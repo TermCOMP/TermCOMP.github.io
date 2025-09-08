@@ -1,0 +1,259 @@
+WORST_CASE(Omega(n^1),O(n^2))
+
+# LoAT Proof:
+WORST_CASE(Omega(n^1),?)
+
+WORST_CASE(Omega(n^1),?)
+
+# KoAT Proof:
+WORST_CASE(?, O(n^2))
+
+
+Initial Problem
+  Start:  l0
+  Program_Vars:  X₀, X₁, X₂, X₃, X₄
+  Temp_Vars:  
+  Locations:  l0, l1, l2
+  Return Locations:  
+  Transitions:
+  t₀: l0(X₀, X₁, X₂, X₃, X₄) → l1(X₀, X₁, X₂, X₃, X₄) :|: 1 ≤ X₀ ∧ 1 ≤ X₄
+  t₁: l1(X₀, X₁, X₂, X₃, X₄) → l1(X₀-1, 3⋅X₁+2⋅X₂, -5⋅X₁-3⋅X₂, (X₀)²+X₃, X₄) :|: 1 ≤ X₀
+  t₂: l1(X₀, X₁, X₂, X₃, X₄) → l2(X₀, X₁, X₂, X₃, X₄)
+  t₄: l2(X₀, X₁, X₂, X₃, X₄) → l1(X₄, 2⋅X₄, 3⋅X₄, X₀, X₄-1) :|: 1 ≤ X₄
+  t₃: l2(X₀, X₁, X₂, X₃, X₄) → l2(X₀, X₁-1, X₂, X₃, X₄) :|: 1 ≤ X₁
+
+
+Preprocessing
+  Eliminate variables [X₃] that do not contribute to the problem
+
+
+  Found invariant 0 ≤ X₃ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₀ for location l1
+
+
+  Found invariant 0 ≤ X₃ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₀ for location l2
+
+
+Problem after Preprocessing
+  Start:  l0
+  Program_Vars:  X₀, X₁, X₂, X₃
+  Temp_Vars:  
+  Locations:  l0, l1, l2
+  Return Locations:  
+  Transitions:
+  t₅: l0(X₀, X₁, X₂, X₃) → l1(X₀, X₁, X₂, X₃) :|: 1 ≤ X₀ ∧ 1 ≤ X₃
+  t₆: l1(X₀, X₁, X₂, X₃) → l1(X₀-1, 3⋅X₁+2⋅X₂, -5⋅X₁-3⋅X₂, X₃) :|: 1 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃
+  t₇: l1(X₀, X₁, X₂, X₃) → l2(X₀, X₁, X₂, X₃) :|: 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃
+  t₈: l2(X₀, X₁, X₂, X₃) → l1(X₃, 2⋅X₃, 3⋅X₃, X₃-1) :|: 1 ≤ X₃ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃
+  t₉: l2(X₀, X₁, X₂, X₃) → l2(X₀, X₁-1, X₂, X₃) :|: 1 ≤ X₁ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃
+
+
+MPRF for transition t₇: l1(X₀, X₁, X₂, X₃) → l2(X₀, X₁, X₂, X₃) :|: 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃ of depth 1:
+  new bound:
+    X₃+1 {O(n)}
+
+  MPRF:
+    • l1: [1+X₃]
+    • l2: [X₃]
+
+
+
+
+MPRF for transition t₈: l2(X₀, X₁, X₂, X₃) → l1(X₃, 2⋅X₃, 3⋅X₃, X₃-1) :|: 1 ≤ X₃ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃ of depth 1:
+  new bound:
+    X₃+1 {O(n)}
+
+  MPRF:
+    • l1: [1+X₃]
+    • l2: [1+X₃]
+
+
+
+
+TWN: t₆: l1→l1
+
+
+  cycle: [t₆: l1→l1]
+  original loop: (1 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃,(X₀,X₃) -> (X₀-1,X₃))
+  transformed loop: (1 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃,(X₀,X₃) -> (X₀-1,X₃))
+  loop: (1 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃,(X₀,X₃) -> (X₀-1,X₃))
+  order: [X₃; X₀]
+closed-form:  X₃: X₃
+  X₀: X₀ + [[n != 0]]⋅-1⋅n^1
+
+  Termination: true
+  Formula: 
+    0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀ ≤ 0 ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 1 ≤ X₀+X₃ ∧ 2 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 2 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 2 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀+X₃ ∧ 2 ≤ X₀ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀+X₃ ∧ 2 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀ ≤ 0 ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀ ≤ 0 ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 1 ≤ 0 ∧ 0 ≤ X₃
+
+
+
+Stabilization-Threshold for: 0 ≤ X₀+X₃
+  alphas_abs: 1+X₀+X₃
+  M: 0
+  N: 1
+  Bound: 2⋅X₀+2⋅X₃+4 {O(n)}
+
+Stabilization-Threshold for: 0 ≤ X₀
+  alphas_abs: 1+X₀
+  M: 0
+  N: 1
+  Bound: 2⋅X₀+4 {O(n)}
+
+Stabilization-Threshold for: 1 ≤ X₀
+  alphas_abs: X₀
+  M: 0
+  N: 1
+  Bound: 2⋅X₀+2 {O(n)}
+
+  original loop: (1 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃,(X₀,X₃) -> (X₀-1,X₃))
+  transformed loop: (1 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃,(X₀,X₃) -> (X₀-1,X₃))
+  loop: (1 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃,(X₀,X₃) -> (X₀-1,X₃))
+  order: [X₃; X₀]
+closed-form:  X₃: X₃
+  X₀: X₀ + [[n != 0]]⋅-1⋅n^1
+
+  Termination: true
+  Formula: 
+    0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀ ≤ 0 ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ X₀ ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 1 ≤ X₀+X₃ ∧ 2 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 2 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 2 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀+X₃ ∧ 2 ≤ X₀ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀+X₃ ∧ 2 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 1 ≤ X₀+X₃ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀ ≤ 0 ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ X₀ ≤ 0 ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 0 ≤ X₀ ∧ X₀ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 0 ≤ 1 ∧ 1 ≤ 0 ∧ 0 ≤ X₀+X₃ ∧ X₀+X₃ ≤ 0 ∧ 0 ≤ X₃
+     ∨ 1 ≤ 0 ∧ 0 ≤ X₃
+
+
+
+Stabilization-Threshold for: 0 ≤ X₀+X₃
+  alphas_abs: 1+X₀+X₃
+  M: 0
+  N: 1
+  Bound: 2⋅X₀+2⋅X₃+4 {O(n)}
+
+Stabilization-Threshold for: 0 ≤ X₀
+  alphas_abs: 1+X₀
+  M: 0
+  N: 1
+  Bound: 2⋅X₀+4 {O(n)}
+
+Stabilization-Threshold for: 1 ≤ X₀
+  alphas_abs: X₀
+  M: 0
+  N: 1
+  Bound: 2⋅X₀+2 {O(n)}
+
+TWN - Lifting for [6: l1->l1] of 2⋅X₃+6⋅X₀+12 {O(n)}
+relevant size-bounds w.r.t. t₅: l0→l1:
+X₀: X₀ {O(n)}
+X₃: X₃ {O(n)}
+Runtime-bound of t₅: 1 {O(1)}
+Results in: 2⋅X₃+6⋅X₀+12 {O(n)}
+TWN - Lifting for [6: l1->l1] of 2⋅X₃+6⋅X₀+12 {O(n)}
+relevant size-bounds w.r.t. t₈: l2→l1:
+X₀: 2⋅X₃ {O(n)}
+X₃: X₃ {O(n)}
+Runtime-bound of t₈: X₃+1 {O(n)}
+Results in: 14⋅X₃^2+26⋅X₃+12 {O(n^2)}
+MPRF for transition t₉: l2(X₀, X₁, X₂, X₃) → l2(X₀, X₁-1, X₂, X₃) :|: 1 ≤ X₁ ∧ 0 ≤ X₀ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₃ of depth 1:
+  new bound:
+    14⋅X₂⋅X₃+176⋅X₃^2+23⋅X₁⋅X₃+14⋅X₂+176⋅X₃+23⋅X₁ {O(n^2)}
+
+  MPRF:
+    • l1: [0]
+    • l2: [X₁]
+
+
+
+
+  Found invariant 0 ≤ X₃ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₀ for location l2
+
+
+  Found invariant 0 ≤ X₃ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₀ for location l1_v1
+
+
+  Found invariant 0 ≤ X₃ ∧ 0 ≤ X₁+X₃ ∧ 0 ≤ X₀+X₃ ∧ 0 ≤ X₁ ∧ 0 ≤ X₀+X₁ ∧ 0 ≤ X₀ for location l2_v1
+
+
+  Found invariant 0 ≤ X₃ ∧ 1 ≤ X₀+X₃ ∧ 1 ≤ X₀ for location l1
+
+
+All Bounds
+Timebounds
+  Overall timebound:14⋅X₂⋅X₃+190⋅X₃^2+23⋅X₁⋅X₃+14⋅X₂+206⋅X₃+23⋅X₁+6⋅X₀+27 {O(n^2)}
+    t₅: 1 {O(1)}
+    t₆: 14⋅X₃^2+28⋅X₃+6⋅X₀+24 {O(n^2)}
+    t₇: X₃+1 {O(n)}
+    t₈: X₃+1 {O(n)}
+    t₉: 14⋅X₂⋅X₃+176⋅X₃^2+23⋅X₁⋅X₃+14⋅X₂+176⋅X₃+23⋅X₁ {O(n^2)}
+
+
+Costbounds
+  Overall costbound: 14⋅X₂⋅X₃+190⋅X₃^2+23⋅X₁⋅X₃+14⋅X₂+206⋅X₃+23⋅X₁+6⋅X₀+27 {O(n^2)}
+    t₅: 1 {O(1)}
+    t₆: 14⋅X₃^2+28⋅X₃+6⋅X₀+24 {O(n^2)}
+    t₇: X₃+1 {O(n)}
+    t₈: X₃+1 {O(n)}
+    t₉: 14⋅X₂⋅X₃+176⋅X₃^2+23⋅X₁⋅X₃+14⋅X₂+176⋅X₃+23⋅X₁ {O(n^2)}
+
+
+Sizebounds
+    t₅, X₀: X₀ {O(n)}
+    t₅, X₁: X₁ {O(n)}
+    t₅, X₂: X₂ {O(n)}
+    t₅, X₃: X₃ {O(n)}
+    t₆, X₀: 2⋅X₃+X₀ {O(n)}
+    t₆, X₁: 14⋅X₂+172⋅X₃+22⋅X₁ {O(n)}
+    t₆, X₂: 24⋅X₂+296⋅X₃+38⋅X₁ {O(n)}
+    t₆, X₃: X₃ {O(n)}
+    t₇, X₀: 2⋅X₀+4⋅X₃ {O(n)}
+    t₇, X₁: 14⋅X₂+176⋅X₃+23⋅X₁ {O(n)}
+    t₇, X₂: 25⋅X₂+302⋅X₃+38⋅X₁ {O(n)}
+    t₇, X₃: X₃ {O(n)}
+    t₈, X₀: 2⋅X₃ {O(n)}
+    t₈, X₁: 4⋅X₃ {O(n)}
+    t₈, X₂: 6⋅X₃ {O(n)}
+    t₈, X₃: X₃ {O(n)}
+    t₉, X₀: 2⋅X₀+4⋅X₃ {O(n)}
+    t₉, X₁: 14⋅X₂+176⋅X₃+23⋅X₁ {O(n)}
+    t₉, X₂: 25⋅X₂+302⋅X₃+38⋅X₁ {O(n)}
+    t₉, X₃: X₃ {O(n)}
+

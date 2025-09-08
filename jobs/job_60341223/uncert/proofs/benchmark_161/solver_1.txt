@@ -1,0 +1,162 @@
+YES
+We consider the system Joern.
+
+  Alphabet:
+
+    cons : [a * c] --> c 
+    false : [] --> b 
+    filter : [a -> b * c] --> c 
+    if : [b * c * c] --> c 
+    nil : [] --> c 
+    true : [] --> b 
+
+  Rules:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  if(true, X, Y) >? X 
+  if(false, X, Y) >? Y 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[nil]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, cons, false, filter, if, true}, and the following precedence: false > filter > @_{o -> o} > cons > if > true
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  if(true, X, Y) >= X 
+  if(false, X, Y) >= Y 
+  filter(F, _|_) > _|_ 
+  filter(F, cons(X, Y)) >= if(@_{o -> o}(F, X), cons(X, filter(F, Y)), filter(F, Y)) 
+
+With these choices, we have:
+
+  1] if(true, X, Y) >= X  because [2], by (Star) 
+  2] if*(true, X, Y) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] if(false, X, Y) >= Y  because [5], by (Star) 
+  5] if*(false, X, Y) >= Y  because [6], by (Select) 
+  6] Y >= Y  by (Meta) 
+
+  7] filter(F, _|_) > _|_  because [8], by definition 
+  8] filter*(F, _|_) >= _|_  by (Bot) 
+
+  9] filter(F, cons(X, Y)) >= if(@_{o -> o}(F, X), cons(X, filter(F, Y)), filter(F, Y))  because [10], by (Star) 
+  10] filter*(F, cons(X, Y)) >= if(@_{o -> o}(F, X), cons(X, filter(F, Y)), filter(F, Y))  because filter > if, [11], [18] and [19], by (Copy) 
+  11] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [12] and [14], by (Copy) 
+  12] filter*(F, cons(X, Y)) >= F  because [13], by (Select) 
+  13] F >= F  by (Meta) 
+  14] filter*(F, cons(X, Y)) >= X  because [15], by (Select) 
+  15] cons(X, Y) >= X  because [16], by (Star) 
+  16] cons*(X, Y) >= X  because [17], by (Select) 
+  17] X >= X  by (Meta) 
+  18] filter*(F, cons(X, Y)) >= cons(X, filter(F, Y))  because filter > cons, [14] and [19], by (Copy) 
+  19] filter*(F, cons(X, Y)) >= filter(F, Y)  because filter in Mul, [20] and [21], by (Stat) 
+  20] F >= F  by (Meta) 
+  21] cons(X, Y) > Y  because [22], by definition 
+  22] cons*(X, Y) >= Y  because [23], by (Select) 
+  23] Y >= Y  by (Meta) 
+
+We can thus remove the following rules:
+
+  filter(F, nil) => nil 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  if(true, X, Y) >? X 
+  if(false, X, Y) >? Y 
+  filter(F, cons(X, Y)) >? if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o}, cons, false, filter, if, true}, and the following precedence: false > filter > @_{o -> o} > if > cons > true
+
+With these choices, we have:
+
+  1] if(true, X, Y) >= X  because [2], by (Star) 
+  2] if*(true, X, Y) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] if(false, X, Y) > Y  because [5], by definition 
+  5] if*(false, X, Y) >= Y  because [6], by (Select) 
+  6] Y >= Y  by (Meta) 
+
+  7] filter(F, cons(X, Y)) >= if(@_{o -> o}(F, X), cons(X, filter(F, Y)), filter(F, Y))  because [8], by (Star) 
+  8] filter*(F, cons(X, Y)) >= if(@_{o -> o}(F, X), cons(X, filter(F, Y)), filter(F, Y))  because filter > if, [9], [16] and [17], by (Copy) 
+  9] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [10] and [12], by (Copy) 
+  10] filter*(F, cons(X, Y)) >= F  because [11], by (Select) 
+  11] F >= F  by (Meta) 
+  12] filter*(F, cons(X, Y)) >= X  because [13], by (Select) 
+  13] cons(X, Y) >= X  because [14], by (Star) 
+  14] cons*(X, Y) >= X  because [15], by (Select) 
+  15] X >= X  by (Meta) 
+  16] filter*(F, cons(X, Y)) >= cons(X, filter(F, Y))  because filter > cons, [12] and [17], by (Copy) 
+  17] filter*(F, cons(X, Y)) >= filter(F, Y)  because filter in Mul, [18] and [19], by (Stat) 
+  18] F >= F  by (Meta) 
+  19] cons(X, Y) > Y  because [20], by definition 
+  20] cons*(X, Y) >= Y  because [21], by (Select) 
+  21] Y >= Y  by (Meta) 
+
+We can thus remove the following rules:
+
+  if(false, X, Y) => Y 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  if(true, X, Y) >? X 
+  filter(F, cons(X, Y)) >? if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o}, cons, filter, if, true}, and the following precedence: filter > @_{o -> o} > if > cons > true
+
+With these choices, we have:
+
+  1] if(true, X, Y) > X  because [2], by definition 
+  2] if*(true, X, Y) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] filter(F, cons(X, Y)) > if(@_{o -> o}(F, X), cons(X, filter(F, Y)), filter(F, Y))  because [5], by definition 
+  5] filter*(F, cons(X, Y)) >= if(@_{o -> o}(F, X), cons(X, filter(F, Y)), filter(F, Y))  because filter > if, [6], [13] and [14], by (Copy) 
+  6] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [7] and [9], by (Copy) 
+  7] filter*(F, cons(X, Y)) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] filter*(F, cons(X, Y)) >= X  because [10], by (Select) 
+  10] cons(X, Y) >= X  because [11], by (Star) 
+  11] cons*(X, Y) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+  13] filter*(F, cons(X, Y)) >= cons(X, filter(F, Y))  because filter > cons, [9] and [14], by (Copy) 
+  14] filter*(F, cons(X, Y)) >= filter(F, Y)  because filter in Mul, [15] and [16], by (Stat) 
+  15] F >= F  by (Meta) 
+  16] cons(X, Y) > Y  because [17], by definition 
+  17] cons*(X, Y) >= Y  because [18], by (Select) 
+  18] Y >= Y  by (Meta) 
+
+We can thus remove the following rules:
+
+  if(true, X, Y) => X 
+  filter(F, cons(X, Y)) => if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

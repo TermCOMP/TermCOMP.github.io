@@ -1,0 +1,457 @@
+YES
+We consider the system s41aZ.
+
+  Alphabet:
+
+    O : [] --> nat 
+    app : [list * list] --> list 
+    cons : [nat * list] --> list 
+    false : [] --> bool 
+    filter : [nat -> bool * list] --> list 
+    gr : [nat * nat] --> bool 
+    if : [bool * list * list] --> list 
+    le : [nat * nat] --> bool 
+    nil : [] --> list 
+    qsort : [list] --> list 
+    s : [nat] --> nat 
+    true : [] --> bool 
+
+  Rules:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    app(nil, X) => X 
+    app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    gr(O, X) => false 
+    gr(s(X), O) => true 
+    gr(s(X), s(Y)) => gr(X, Y) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+    qsort(nil) => nil 
+    qsort(cons(X, Y)) => app(qsort(filter(/\x.le(x, X), Y)), app(cons(X, nil), qsort(filter(/\y.gr(y, X), Y)))) 
+
+We observe that the rules contain a first-order subset:
+
+  if(true, X, Y) => X 
+  if(false, X, Y) => Y 
+  app(nil, X) => X 
+  app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+  le(O, X) => true 
+  le(s(X), O) => false 
+  le(s(X), s(Y)) => le(X, Y) 
+  gr(O, X) => false 
+  gr(s(X), O) => true 
+  gr(s(X), s(Y)) => gr(X, Y) 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: if(true(),PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     2: if(false(),PeRCenTX,PeRCenTY) -> PeRCenTY
+ ||     3: app(nil(),PeRCenTX) -> PeRCenTX
+ ||     4: app(cons(PeRCenTX,PeRCenTY),PeRCenTZ) -> cons(PeRCenTX,app(PeRCenTY,PeRCenTZ))
+ ||     5: le(O(),PeRCenTX) -> true()
+ ||     6: le(s(PeRCenTX),O()) -> false()
+ ||     7: le(s(PeRCenTX),s(PeRCenTY)) -> le(PeRCenTX,PeRCenTY)
+ ||     8: gr(O(),PeRCenTX) -> false()
+ ||     9: gr(s(PeRCenTX),O()) -> true()
+ ||     10: gr(s(PeRCenTX),s(PeRCenTY)) -> gr(PeRCenTX,PeRCenTY)
+ || Number of strict rules: 10
+ || Direct POLO(bPol) ... removes: 4 8 1 3 5 10 7 9 6 2
+ ||       le	w: 2 * x1 + 2 * x2
+ ||       s 	w: 2 * x1 + 1
+ ||       false	w: 1
+ ||       O 	w: 1
+ ||       true	w: 1
+ ||       if	w: 2 * x1 + 2 * x2 + 2 * x3
+ ||       nil	w: 1
+ ||       cons	w: x1 + x2 + 1
+ ||       gr	w: 2 * x1 + x2
+ ||       app	w: 2 * x1 + 2 * x2 + 1
+ || Number of strict rules: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] filter#(F, cons(X, Y)) =#> if#(F X, cons(X, filter(F, Y)), filter(F, Y))   
+    1] filter#(F, cons(X, Y)) =#> filter#(F, Y)   
+    2] filter#(F, cons(X, Y)) =#> filter#(F, Y)   
+    3] qsort#(cons(X, Y)) =#> app#(qsort(filter(/\x.le(x, X), Y)), app(cons(X, nil), qsort(filter(/\y.gr(y, X), Y))))   
+    4] qsort#(cons(X, Y)) =#> qsort#(filter(/\x.le(x, X), Y))   
+    5] qsort#(cons(X, Y)) =#> filter#(/\x.le(x, X), Y)   
+    6] qsort#(cons(X, Y)) =#> le#(Z, X)   
+    7] qsort#(cons(X, Y)) =#> app#(cons(X, nil), qsort(filter(/\x.gr(x, X), Y)))   
+    8] qsort#(cons(X, Y)) =#> qsort#(filter(/\x.gr(x, X), Y))   
+    9] qsort#(cons(X, Y)) =#> filter#(/\x.gr(x, X), Y)   
+    10] qsort#(cons(X, Y)) =#> gr#(Z, X)   
+
+  Rules R_0:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    app(nil, X) => X 
+    app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    gr(O, X) => false 
+    gr(s(X), O) => true 
+    gr(s(X), s(Y)) => gr(X, Y) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+    qsort(nil) => nil 
+    qsort(cons(X, Y)) => app(qsort(filter(/\x.le(x, X), Y)), app(cons(X, nil), qsort(filter(/\y.gr(y, X), Y)))) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+    * 1 : 0, 1, 2 
+    * 2 : 0, 1, 2 
+    * 3 :  
+    * 4 : 3, 4, 5, 6, 7, 8, 9, 10 
+    * 5 : 0, 1, 2 
+    * 6 :  
+    * 7 :  
+    * 8 : 3, 4, 5, 6, 7, 8, 9, 10 
+    * 9 : 0, 1, 2 
+    * 10 :  
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    filter#(F, cons(X, Y)) =#> filter#(F, Y)   
+    filter#(F, cons(X, Y)) =#> filter#(F, Y)   
+
+  P_2:
+
+    qsort#(cons(X, Y)) =#> qsort#(filter(/\x.le(x, X), Y))   
+    qsort#(cons(X, Y)) =#> qsort#(filter(/\x.gr(x, X), Y))   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f) and (P_2, R_0, m, f).
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_2, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_0, computable, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  It suffices to find a standard reduction pair [Kop12, Def. 6.69].  Thus, we must orient:
+
+  qsort#(cons(X, Y)) >? qsort#(filter(/\x.le(x, X), Y)) 
+  qsort#(cons(X, Y)) >? qsort#(filter(/\x.gr(x, X), Y)) 
+  if(true, X, Y) >= X 
+  if(false, X, Y) >= Y 
+  app(nil, X) >= X 
+  app(cons(X, Y), Z) >= cons(X, app(Y, Z)) 
+  le(O, X) >= true 
+  le(s(X), O) >= false 
+  le(s(X), s(Y)) >= le(X, Y) 
+  gr(O, X) >= false 
+  gr(s(X), O) >= true 
+  gr(s(X), s(Y)) >= gr(X, Y) 
+  filter(F, nil) >= nil 
+  filter(F, cons(X, Y)) >= if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+  qsort(nil) >= nil 
+  qsort(cons(X, Y)) >= app(qsort(filter(/\x.le(x, X), Y)), app(cons(X, nil), qsort(filter(/\y.gr(y, X), Y)))) 
+
+Since this representation is not advantageous for the higher-order recursive path ordering, we present the strict requirements in their unextended form, which is not problematic since for any F, s and substituion gamma: (F s)gamma beta-reduces to F(s)gamma.)
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[false]] = _|_ 
+  [[filter(x_1, x_2)]] = filter(x_2) 
+  [[if(x_1, x_2, x_3)]] = if(x_2, x_3) 
+  [[le(x_1, x_2)]] = x_2 
+  [[nil]] = _|_ 
+  [[true]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, O, app, cons, filter, gr, if, qsort, qsort#, s}, and the following precedence: @_{o -> o} > O > qsort > app > cons = filter > gr > if > qsort# > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  qsort#(cons(X, Y)) >= qsort#(filter(Y)) 
+  qsort#(cons(X, Y)) > qsort#(filter(Y)) 
+  if(X, Y) >= X 
+  if(X, Y) >= Y 
+  app(_|_, X) >= X 
+  app(cons(X, Y), Z) >= cons(X, app(Y, Z)) 
+  X >= _|_ 
+  O >= _|_ 
+  s(X) >= X 
+  gr(O, X) >= _|_ 
+  gr(s(X), O) >= _|_ 
+  gr(s(X), s(Y)) >= gr(X, Y) 
+  filter(_|_) >= _|_ 
+  filter(cons(X, Y)) >= if(cons(X, filter(Y)), filter(Y)) 
+  qsort(_|_) >= _|_ 
+  qsort(cons(X, Y)) >= app(qsort(filter(Y)), app(cons(X, _|_), qsort(filter(Y)))) 
+
+With these choices, we have:
+
+  1] qsort#(cons(X, Y)) >= qsort#(filter(Y))  because [2], by (Star) 
+  2] qsort#*(cons(X, Y)) >= qsort#(filter(Y))  because qsort# in Mul and [3], by (Stat) 
+  3] cons(X, Y) > filter(Y)  because [4], by definition 
+  4] cons*(X, Y) >= filter(Y)  because cons = filter, cons in Mul and [5], by (Stat) 
+  5] Y >= Y  by (Meta) 
+
+  6] qsort#(cons(X, Y)) > qsort#(filter(Y))  because [7], by definition 
+  7] qsort#*(cons(X, Y)) >= qsort#(filter(Y))  because qsort# in Mul and [8], by (Stat) 
+  8] cons(X, Y) > filter(Y)  because [9], by definition 
+  9] cons*(X, Y) >= filter(Y)  because cons = filter, cons in Mul and [5], by (Stat) 
+
+  10] if(X, Y) >= X  because [11], by (Star) 
+  11] if*(X, Y) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+
+  13] if(X, Y) >= Y  because [14], by (Star) 
+  14] if*(X, Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+
+  16] app(_|_, X) >= X  because [17], by (Star) 
+  17] app*(_|_, X) >= X  because [18], by (Select) 
+  18] X >= X  by (Meta) 
+
+  19] app(cons(X, Y), Z) >= cons(X, app(Y, Z))  because [20], by (Star) 
+  20] app*(cons(X, Y), Z) >= cons(X, app(Y, Z))  because app > cons, [21] and [25], by (Copy) 
+  21] app*(cons(X, Y), Z) >= X  because [22], by (Select) 
+  22] cons(X, Y) >= X  because [23], by (Star) 
+  23] cons*(X, Y) >= X  because [24], by (Select) 
+  24] X >= X  by (Meta) 
+  25] app*(cons(X, Y), Z) >= app(Y, Z)  because app in Mul, [26] and [29], by (Stat) 
+  26] cons(X, Y) > Y  because [27], by definition 
+  27] cons*(X, Y) >= Y  because [28], by (Select) 
+  28] Y >= Y  by (Meta) 
+  29] Z >= Z  by (Meta) 
+
+  30] X >= _|_  by (Bot) 
+
+  31] O >= _|_  by (Bot) 
+
+  32] s(X) >= X  because [33], by (Star) 
+  33] s*(X) >= X  because [34], by (Select) 
+  34] X >= X  by (Meta) 
+
+  35] gr(O, X) >= _|_  by (Bot) 
+
+  36] gr(s(X), O) >= _|_  by (Bot) 
+
+  37] gr(s(X), s(Y)) >= gr(X, Y)  because [38], by (Star) 
+  38] gr*(s(X), s(Y)) >= gr(X, Y)  because gr in Mul, [39] and [42], by (Stat) 
+  39] s(X) >= X  because [40], by (Star) 
+  40] s*(X) >= X  because [41], by (Select) 
+  41] X >= X  by (Meta) 
+  42] s(Y) > Y  because [43], by definition 
+  43] s*(Y) >= Y  because [44], by (Select) 
+  44] Y >= Y  by (Meta) 
+
+  45] filter(_|_) >= _|_  by (Bot) 
+
+  46] filter(cons(X, Y)) >= if(cons(X, filter(Y)), filter(Y))  because [47], by (Star) 
+  47] filter*(cons(X, Y)) >= if(cons(X, filter(Y)), filter(Y))  because filter > if, [48] and [55], by (Copy) 
+  48] filter*(cons(X, Y)) >= cons(X, filter(Y))  because filter = cons, filter in Mul, [49] and [52], by (Stat) 
+  49] cons(X, Y) > X  because [50], by definition 
+  50] cons*(X, Y) >= X  because [51], by (Select) 
+  51] X >= X  by (Meta) 
+  52] cons(X, Y) > filter(Y)  because [53], by definition 
+  53] cons*(X, Y) >= filter(Y)  because cons = filter, cons in Mul and [54], by (Stat) 
+  54] Y >= Y  by (Meta) 
+  55] filter*(cons(X, Y)) >= filter(Y)  because filter in Mul and [56], by (Stat) 
+  56] cons(X, Y) > Y  because [57], by definition 
+  57] cons*(X, Y) >= Y  because [54], by (Select) 
+
+  58] qsort(_|_) >= _|_  by (Bot) 
+
+  59] qsort(cons(X, Y)) >= app(qsort(filter(Y)), app(cons(X, _|_), qsort(filter(Y))))  because [60], by (Star) 
+  60] qsort*(cons(X, Y)) >= app(qsort(filter(Y)), app(cons(X, _|_), qsort(filter(Y))))  because qsort > app, [61] and [62], by (Copy) 
+  61] qsort*(cons(X, Y)) >= qsort(filter(Y))  because qsort in Mul and [3], by (Stat) 
+  62] qsort*(cons(X, Y)) >= app(cons(X, _|_), qsort(filter(Y)))  because qsort > app, [63] and [69], by (Copy) 
+  63] qsort*(cons(X, Y)) >= cons(X, _|_)  because qsort > cons, [64] and [68], by (Copy) 
+  64] qsort*(cons(X, Y)) >= X  because [65], by (Select) 
+  65] cons(X, Y) >= X  because [66], by (Star) 
+  66] cons*(X, Y) >= X  because [67], by (Select) 
+  67] X >= X  by (Meta) 
+  68] qsort*(cons(X, Y)) >= _|_  by (Bot) 
+  69] qsort*(cons(X, Y)) >= qsort(filter(Y))  because qsort in Mul and [8], by (Stat) 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace the dependency pair problem (P_2, R_0, computable, formative) by (P_3, R_0, computable, formative), where P_3 consists of:
+
+  qsort#(cons(X, Y)) =#> qsort#(filter(/\x.le(x, X), Y))   
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_3, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_3, R_0, computable, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  It suffices to find a standard reduction pair [Kop12, Def. 6.69].  Thus, we must orient:
+
+  qsort#(cons(X, Y)) >? qsort#(filter(/\x.le(x, X), Y)) 
+  if(true, X, Y) >= X 
+  if(false, X, Y) >= Y 
+  app(nil, X) >= X 
+  app(cons(X, Y), Z) >= cons(X, app(Y, Z)) 
+  le(O, X) >= true 
+  le(s(X), O) >= false 
+  le(s(X), s(Y)) >= le(X, Y) 
+  gr(O, X) >= false 
+  gr(s(X), O) >= true 
+  gr(s(X), s(Y)) >= gr(X, Y) 
+  filter(F, nil) >= nil 
+  filter(F, cons(X, Y)) >= if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+  qsort(nil) >= nil 
+  qsort(cons(X, Y)) >= app(qsort(filter(/\x.le(x, X), Y)), app(cons(X, nil), qsort(filter(/\y.gr(y, X), Y)))) 
+
+Since this representation is not advantageous for the higher-order recursive path ordering, we present the strict requirements in their unextended form, which is not problematic since for any F, s and substituion gamma: (F s)gamma beta-reduces to F(s)gamma.)
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[false]] = _|_ 
+  [[filter(x_1, x_2)]] = filter(x_2) 
+  [[gr(x_1, x_2)]] = gr(x_1) 
+  [[if(x_1, x_2, x_3)]] = if(x_2, x_3) 
+  [[nil]] = _|_ 
+  [[true]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, O, app, cons, filter, gr, if, le, qsort, qsort#, s}, and the following precedence: @_{o -> o} > O > le > qsort > app > cons = filter > if > qsort# > gr > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  qsort#(cons(X, Y)) > qsort#(filter(Y)) 
+  if(X, Y) >= X 
+  if(X, Y) >= Y 
+  app(_|_, X) >= X 
+  app(cons(X, Y), Z) >= cons(X, app(Y, Z)) 
+  le(O, X) >= _|_ 
+  le(s(X), O) >= _|_ 
+  le(s(X), s(Y)) >= le(X, Y) 
+  gr(O) >= _|_ 
+  gr(s(X)) >= _|_ 
+  gr(s(X)) >= gr(X) 
+  filter(_|_) >= _|_ 
+  filter(cons(X, Y)) >= if(cons(X, filter(Y)), filter(Y)) 
+  qsort(_|_) >= _|_ 
+  qsort(cons(X, Y)) >= app(qsort(filter(Y)), app(cons(X, _|_), qsort(filter(Y)))) 
+
+With these choices, we have:
+
+  1] qsort#(cons(X, Y)) > qsort#(filter(Y))  because [2], by definition 
+  2] qsort#*(cons(X, Y)) >= qsort#(filter(Y))  because [3], by (Select) 
+  3] cons(X, Y) >= qsort#(filter(Y))  because [4], by (Star) 
+  4] cons*(X, Y) >= qsort#(filter(Y))  because cons > qsort# and [5], by (Copy) 
+  5] cons*(X, Y) >= filter(Y)  because cons = filter, cons in Mul and [6], by (Stat) 
+  6] Y >= Y  by (Meta) 
+
+  7] if(X, Y) >= X  because [8], by (Star) 
+  8] if*(X, Y) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+
+  10] if(X, Y) >= Y  because [11], by (Star) 
+  11] if*(X, Y) >= Y  because [12], by (Select) 
+  12] Y >= Y  by (Meta) 
+
+  13] app(_|_, X) >= X  because [14], by (Star) 
+  14] app*(_|_, X) >= X  because [15], by (Select) 
+  15] X >= X  by (Meta) 
+
+  16] app(cons(X, Y), Z) >= cons(X, app(Y, Z))  because [17], by (Star) 
+  17] app*(cons(X, Y), Z) >= cons(X, app(Y, Z))  because app > cons, [18] and [22], by (Copy) 
+  18] app*(cons(X, Y), Z) >= X  because [19], by (Select) 
+  19] cons(X, Y) >= X  because [20], by (Star) 
+  20] cons*(X, Y) >= X  because [21], by (Select) 
+  21] X >= X  by (Meta) 
+  22] app*(cons(X, Y), Z) >= app(Y, Z)  because app in Mul, [23] and [26], by (Stat) 
+  23] cons(X, Y) > Y  because [24], by definition 
+  24] cons*(X, Y) >= Y  because [25], by (Select) 
+  25] Y >= Y  by (Meta) 
+  26] Z >= Z  by (Meta) 
+
+  27] le(O, X) >= _|_  by (Bot) 
+
+  28] le(s(X), O) >= _|_  by (Bot) 
+
+  29] le(s(X), s(Y)) >= le(X, Y)  because [30], by (Star) 
+  30] le*(s(X), s(Y)) >= le(X, Y)  because le in Mul, [31] and [34], by (Stat) 
+  31] s(X) >= X  because [32], by (Star) 
+  32] s*(X) >= X  because [33], by (Select) 
+  33] X >= X  by (Meta) 
+  34] s(Y) > Y  because [35], by definition 
+  35] s*(Y) >= Y  because [36], by (Select) 
+  36] Y >= Y  by (Meta) 
+
+  37] gr(O) >= _|_  by (Bot) 
+
+  38] gr(s(X)) >= _|_  by (Bot) 
+
+  39] gr(s(X)) >= gr(X)  because gr in Mul and [40], by (Fun) 
+  40] s(X) >= X  because [41], by (Star) 
+  41] s*(X) >= X  because [42], by (Select) 
+  42] X >= X  by (Meta) 
+
+  43] filter(_|_) >= _|_  by (Bot) 
+
+  44] filter(cons(X, Y)) >= if(cons(X, filter(Y)), filter(Y))  because [45], by (Star) 
+  45] filter*(cons(X, Y)) >= if(cons(X, filter(Y)), filter(Y))  because filter > if, [46] and [53], by (Copy) 
+  46] filter*(cons(X, Y)) >= cons(X, filter(Y))  because filter = cons, filter in Mul, [47] and [50], by (Stat) 
+  47] cons(X, Y) > X  because [48], by definition 
+  48] cons*(X, Y) >= X  because [49], by (Select) 
+  49] X >= X  by (Meta) 
+  50] cons(X, Y) > filter(Y)  because [51], by definition 
+  51] cons*(X, Y) >= filter(Y)  because cons = filter, cons in Mul and [52], by (Stat) 
+  52] Y >= Y  by (Meta) 
+  53] filter*(cons(X, Y)) >= filter(Y)  because filter in Mul and [54], by (Stat) 
+  54] cons(X, Y) > Y  because [55], by definition 
+  55] cons*(X, Y) >= Y  because [52], by (Select) 
+
+  56] qsort(_|_) >= _|_  by (Bot) 
+
+  57] qsort(cons(X, Y)) >= app(qsort(filter(Y)), app(cons(X, _|_), qsort(filter(Y))))  because [58], by (Star) 
+  58] qsort*(cons(X, Y)) >= app(qsort(filter(Y)), app(cons(X, _|_), qsort(filter(Y))))  because qsort > app, [59] and [61], by (Copy) 
+  59] qsort*(cons(X, Y)) >= qsort(filter(Y))  because qsort in Mul and [60], by (Stat) 
+  60] cons(X, Y) > filter(Y)  because [5], by definition 
+  61] qsort*(cons(X, Y)) >= app(cons(X, _|_), qsort(filter(Y)))  because qsort > app, [62] and [66], by (Copy) 
+  62] qsort*(cons(X, Y)) >= cons(X, _|_)  because [63], by (Select) 
+  63] cons(X, Y) >= cons(X, _|_)  because cons in Mul, [64] and [65], by (Fun) 
+  64] X >= X  by (Meta) 
+  65] Y >= _|_  by (Bot) 
+  66] qsort*(cons(X, Y)) >= qsort(filter(Y))  because qsort in Mul and [67], by (Stat) 
+  67] cons(X, Y) > filter(Y)  because [68], by definition 
+  68] cons*(X, Y) >= filter(Y)  because cons = filter, cons in Mul and [6], by (Stat) 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace a dependency pair problem (P_3, R_0) by ({}, R_0).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(filter#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(filter#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(filter#(F, Y)) 
+  nu(filter#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(filter#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

@@ -1,0 +1,106 @@
+YES
+We consider the system uNLDT.
+
+  Alphabet:
+
+    !280 : [data -> proc * data] --> proc 
+    !plus : [proc * proc] --> proc 
+    !times : [proc * proc] --> proc 
+    delta : [] --> proc 
+    sigma : [data -> proc] --> proc 
+
+  Rules:
+
+    !plus(X, X) => X 
+    !times(!plus(X, Y), Z) => !plus(!times(X, Z), !times(Y, Z)) 
+    !times(!times(X, Y), Z) => !times(X, !times(Y, Z)) 
+    !plus(X, delta) => X 
+    !times(delta, X) => delta 
+    sigma(/\x.X) => X 
+    !plus(sigma(/\x.!280(F, x)), !280(F, X)) => sigma(/\y.!280(F, y)) 
+    sigma(/\x.!plus(!280(F, x), !280(G, x))) => !plus(sigma(/\y.!280(F, y)), sigma(/\z.!280(G, z))) 
+    !times(sigma(/\x.!280(F, x)), X) => sigma(/\y.!times(!280(F, y), X)) 
+
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with dynamic dependency pairs.
+
+We thus obtain the following dependency pair problem (P_0, R_0, minimal, all):
+
+  Dependency Pairs P_0:
+
+    0] !times#(!plus(X, Y), Z) =#> !plus#(!times(X, Z), !times(Y, Z))   
+    1] !times#(!plus(X, Y), Z) =#> !times#(X, Z)   
+    2] !times#(!plus(X, Y), Z) =#> !times#(Y, Z)   
+    3] !times#(!times(X, Y), Z) =#> !times#(X, !times(Y, Z))   
+    4] !times#(!times(X, Y), Z) =#> !times#(Y, Z)   
+    5] !plus#(sigma(/\x.!280(F, x)), !280(F, X)) =#> sigma#(/\y.!280(F, y))   
+    6] sigma#(/\x.!plus(!280(F, x), !280(G, x))) =#> !plus#(sigma(/\y.!280(F, y)), sigma(/\z.!280(G, z)))   
+    7] sigma#(/\x.!plus(!280(F, x), !280(G, x))) =#> sigma#(/\y.!280(F, y))   
+    8] sigma#(/\x.!plus(!280(F, x), !280(G, x))) =#> sigma#(/\y.!280(G, y))   
+    9] !times#(sigma(/\x.!280(F, x)), X) =#> sigma#(/\y.!times(!280(F, y), X))   
+    10] !times#(sigma(/\x.!280(F, x)), X) =#> !times#(!280(F, y), X)   
+
+  Rules R_0:
+
+    !plus(X, X) => X 
+    !times(!plus(X, Y), Z) => !plus(!times(X, Z), !times(Y, Z)) 
+    !times(!times(X, Y), Z) => !times(X, !times(Y, Z)) 
+    !plus(X, delta) => X 
+    !times(delta, X) => delta 
+    sigma(/\x.X) => X 
+    !plus(sigma(/\x.!280(F, x)), !280(F, X)) => sigma(/\y.!280(F, y)) 
+    sigma(/\x.!plus(!280(F, x), !280(G, x))) => !plus(sigma(/\y.!280(F, y)), sigma(/\z.!280(G, z))) 
+    !times(sigma(/\x.!280(F, x)), X) => sigma(/\y.!times(!280(F, y), X)) 
+
+Thus, the original system is terminating if (P_0, R_0, minimal, all) is finite.
+
+We consider the dependency pair problem (P_0, R_0, minimal, all).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 5 
+    * 1 : 0, 1, 2, 3, 4, 9, 10 
+    * 2 : 0, 1, 2, 3, 4, 9, 10 
+    * 3 : 0, 1, 2, 3, 4, 9, 10 
+    * 4 : 0, 1, 2, 3, 4, 9, 10 
+    * 5 :  
+    * 6 : 5 
+    * 7 :  
+    * 8 :  
+    * 9 : 6, 7, 8 
+    * 10 :  
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    !times#(!plus(X, Y), Z) =#> !times#(X, Z)   
+    !times#(!plus(X, Y), Z) =#> !times#(Y, Z)   
+    !times#(!times(X, Y), Z) =#> !times#(X, !times(Y, Z))   
+    !times#(!times(X, Y), Z) =#> !times#(Y, Z)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, minimal, all) is finite.
+
+We consider the dependency pair problem (P_1, R_0, minimal, all).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(!times#) = 1 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(!times#(!plus(X, Y), Z)) = !plus(X, Y) |> X = nu(!times#(X, Z)) 
+  nu(!times#(!plus(X, Y), Z)) = !plus(X, Y) |> Y = nu(!times#(Y, Z)) 
+  nu(!times#(!times(X, Y), Z)) = !times(X, Y) |> X = nu(!times#(X, !times(Y, Z))) 
+  nu(!times#(!times(X, Y), Z)) = !times(X, Y) |> Y = nu(!times#(Y, Z)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, minimal, f) by ({}, R_0, minimal, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

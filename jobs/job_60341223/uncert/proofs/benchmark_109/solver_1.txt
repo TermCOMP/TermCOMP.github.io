@@ -1,0 +1,127 @@
+YES
+We consider the system rDeiq.
+
+  Alphabet:
+
+    dom : [N * N * N] --> N 
+    eval : [N * N] --> N 
+    func : [N -> N * N * N] --> N 
+    o : [] --> N 
+    s : [N] --> N 
+
+  Rules:
+
+    eval(func(F, X, Y), Z) => F dom(X, Y, Z) 
+    dom(s(X), s(Y), s(Z)) => s(dom(X, Y, Z)) 
+    dom(o, s(X), s(Y)) => s(dom(o, X, Y)) 
+    dom(X, Y, o) => X 
+    dom(o, o, X) => o 
+
+We observe that the rules contain a first-order subset:
+
+  dom(s(X), s(Y), s(Z)) => s(dom(X, Y, Z)) 
+  dom(o, s(X), s(Y)) => s(dom(o, X, Y)) 
+  dom(X, Y, o) => X 
+  dom(o, o, X) => o 
+
+Moreover, the system is finitely branching.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is Ce-terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed Ce-terminating:
+
+ || Input TRS:
+ ||     1: dom(s(PeRCenTX),s(PeRCenTY),s(PeRCenTZ)) -> s(dom(PeRCenTX,PeRCenTY,PeRCenTZ))
+ ||     2: dom(o(),s(PeRCenTX),s(PeRCenTY)) -> s(dom(o(),PeRCenTX,PeRCenTY))
+ ||     3: dom(PeRCenTX,PeRCenTY,o()) -> PeRCenTX
+ ||     4: dom(o(),o(),PeRCenTX) -> o()
+ ||     5: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     6: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 6
+ || Direct POLO(bPol) ... removes: 4 1 3 5 6 2
+ ||       TIlDePAIR	w: 2 * x1 + 2 * x2 + 1
+ ||       s 	w: 2 * x1 + 4
+ ||       o 	w: 3
+ ||       dom	w: 2 * x1 + 2 * x2 + 2 * x3 + 3
+ || Number of strict rules: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with dynamic dependency pairs.
+
+After applying [Kop12, Thm. 7.22] to denote collapsing dependency pairs in an extended form, we thus obtain the following dependency pair problem (P_0, R_0, minimal, formative):
+
+  Dependency Pairs P_0:
+
+    0] eval#(func(F, X, Y), Z) =#> F[dom(X, Y, Z)]   
+    1] eval#(func(F, X, Y), Z) =#> dom#(X, Y, Z)   
+
+  Rules R_0:
+
+    eval(func(F, X, Y), Z) => F dom(X, Y, Z) 
+    dom(s(X), s(Y), s(Z)) => s(dom(X, Y, Z)) 
+    dom(o, s(X), s(Y)) => s(dom(o, X, Y)) 
+    dom(X, Y, o) => X 
+    dom(o, o, X) => o 
+
+Thus, the original system is terminating if (P_0, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, minimal, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0, 1 
+    * 1 :  
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    eval#(func(F, X, Y), Z) =#> F[dom(X, Y, Z)]   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, minimal, formative).
+
+The formative rules of (P_1, R_0) are R_1 ::=
+
+  eval(func(F, X, Y), Z) => F dom(X, Y, Z) 
+  dom(X, Y, o) => X 
+  dom(o, o, X) => o 
+
+By [Kop12, Thm. 7.17], we may replace the dependency pair problem (P_1, R_0, minimal, formative) by (P_1, R_1, minimal, formative).
+
+Thus, the original system is terminating if (P_1, R_1, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_1, minimal, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  As the system is abstraction-simple and the formative flag is set, it suffices to find a tagged reduction pair [Kop12, Def. 6.70].  Thus, we must orient:
+
+  eval#(func(F, X, Y), Z) >? F[dom(X, Y, Z)] 
+  eval(func(F, X, Y), Z) >= F dom(X, Y, Z) 
+  dom(X, Y, o) >= X 
+  dom(o, o, X) >= o 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  dom = Lam[y0;y1;y2].y0 
+  eval = Lam[y0;y1].3 + 3*y0 
+  eval# = Lam[y0;y1].3 + y0 
+  func = Lam[G0;y1;y2].3 + y1 + G0(y1) 
+  o = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[eval#(func(_F0, _x1, _x2), _x3)]] = 6 + x1 + F0(x1) > F0(x1) = [[_F0[dom(_x1, _x2, _x3)]]] 
+  [[eval(func(_F0, _x1, _x2), _x3)]] = 12 + 3*x1 + 3*F0(x1) >= max(x1, F0(x1)) = [[_F0 dom(_x1, _x2, _x3)]] 
+  [[dom(_x0, _x1, o)]] = x0 >= x0 = [[_x0]] 
+  [[dom(o, o, _x0)]] = 0 >= 0 = [[o]] 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace a dependency pair problem (P_1, R_1) by ({}, R_1).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

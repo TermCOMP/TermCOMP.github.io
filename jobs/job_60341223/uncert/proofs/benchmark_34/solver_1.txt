@@ -1,0 +1,192 @@
+YES
+We consider the system cA5K9.
+
+  Alphabet:
+
+    O : [] --> nat 
+    cons : [nat * natlist] --> natlist 
+    foldl : [nat -> nat -> nat * nat * natlist] --> nat 
+    nil : [] --> natlist 
+    plus : [nat * nat] --> nat 
+    sum : [natlist] --> nat 
+
+  Rules:
+
+    foldl(F, X, nil) => X 
+    foldl(F, X, cons(Y, Z)) => foldl(F, F X Y, Z) 
+    sum(X) => foldl(/\x./\y.plus(x, y), O, X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldl(F, X, nil) >? X 
+  foldl(F, X, cons(Y, Z)) >? foldl(F, F X Y, Z) 
+  sum(X) >? foldl(/\x./\y.plus(x, y), O, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[foldl(x_1, x_2, x_3)]] = foldl(x_3, x_1, x_2) 
+
+We choose Lex = {foldl} and Mul = {@_{o -> o -> o}, @_{o -> o}, cons, nil, plus, sum}, and the following precedence: cons > nil > sum > foldl > @_{o -> o -> o} = @_{o -> o} > plus
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldl(F, X, nil) > X 
+  foldl(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z) 
+  sum(X) >= foldl(/\x./\y.plus(x, y), _|_, X) 
+
+With these choices, we have:
+
+  1] foldl(F, X, nil) > X  because [2], by definition 
+  2] foldl*(F, X, nil) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] foldl(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because [5], by (Star) 
+  5] foldl*(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because foldl in Lex, [6], [9], [11] and [19], by (Stat) 
+  6] cons(Y, Z) > Z  because [7], by definition 
+  7] cons*(Y, Z) >= Z  because [8], by (Select) 
+  8] Z >= Z  by (Meta) 
+  9] foldl*(F, X, cons(Y, Z)) >= F  because [10], by (Select) 
+  10] F >= F  by (Meta) 
+  11] foldl*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, X), Y)  because foldl > @_{o -> o}, [12] and [15], by (Copy) 
+  12] foldl*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, X)  because foldl > @_{o -> o -> o}, [9] and [13], by (Copy) 
+  13] foldl*(F, X, cons(Y, Z)) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+  15] foldl*(F, X, cons(Y, Z)) >= Y  because [16], by (Select) 
+  16] cons(Y, Z) >= Y  because [17], by (Star) 
+  17] cons*(Y, Z) >= Y  because [18], by (Select) 
+  18] Y >= Y  by (Meta) 
+  19] foldl*(F, X, cons(Y, Z)) >= Z  because [20], by (Select) 
+  20] cons(Y, Z) >= Z  because [7], by (Star) 
+
+  21] sum(X) >= foldl(/\x./\y.plus(x, y), _|_, X)  because [22], by (Star) 
+  22] sum*(X) >= foldl(/\x./\y.plus(x, y), _|_, X)  because sum > foldl, [23], [30] and [31], by (Copy) 
+  23] sum*(X) >= /\y./\z.plus(y, z)  because [24], by (F-Abs) 
+  24] sum*(X, x) >= /\z.plus(x, z)  because [25], by (F-Abs) 
+  25] sum*(X, x, y) >= plus(x, y)  because sum > plus, [26] and [28], by (Copy) 
+  26] sum*(X, x, y) >= x  because [27], by (Select) 
+  27] x >= x  by (Var) 
+  28] sum*(X, x, y) >= y  because [29], by (Select) 
+  29] y >= y  by (Var) 
+  30] sum*(X) >= _|_  by (Bot) 
+  31] sum*(X) >= X  because [32], by (Select) 
+  32] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  foldl(F, X, nil) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldl(F, X, cons(Y, Z)) >? foldl(F, F X Y, Z) 
+  sum(X) >? foldl(/\x./\y.plus(x, y), O, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[@_{o -> o}(x_1, x_2)]] = @_{o -> o}(x_2, x_1) 
+  [[O]] = _|_ 
+  [[foldl(x_1, x_2, x_3)]] = foldl(x_3, x_1, x_2) 
+
+We choose Lex = {@_{o -> o}, foldl} and Mul = {@_{o -> o -> o}, cons, plus, sum}, and the following precedence: cons > sum > @_{o -> o} = foldl > @_{o -> o -> o} > plus
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldl(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z) 
+  sum(X) > foldl(/\x./\y.plus(x, y), _|_, X) 
+
+With these choices, we have:
+
+  1] foldl(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because [2], by (Star) 
+  2] foldl*(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because foldl in Lex, [3], [6], [8] and [17], by (Stat) 
+  3] cons(Y, Z) > Z  because [4], by definition 
+  4] cons*(Y, Z) >= Z  because [5], by (Select) 
+  5] Z >= Z  by (Meta) 
+  6] foldl*(F, X, cons(Y, Z)) >= F  because [7], by (Select) 
+  7] F >= F  by (Meta) 
+  8] foldl*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, X), Y)  because foldl = @_{o -> o}, foldl in Lex, [9], [12] and [15], by (Stat) 
+  9] cons(Y, Z) > Y  because [10], by definition 
+  10] cons*(Y, Z) >= Y  because [11], by (Select) 
+  11] Y >= Y  by (Meta) 
+  12] foldl*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, X)  because foldl > @_{o -> o -> o}, [6] and [13], by (Copy) 
+  13] foldl*(F, X, cons(Y, Z)) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+  15] foldl*(F, X, cons(Y, Z)) >= Y  because [16], by (Select) 
+  16] cons(Y, Z) >= Y  because [10], by (Star) 
+  17] foldl*(F, X, cons(Y, Z)) >= Z  because [18], by (Select) 
+  18] cons(Y, Z) >= Z  because [4], by (Star) 
+
+  19] sum(X) > foldl(/\x./\y.plus(x, y), _|_, X)  because [20], by definition 
+  20] sum*(X) >= foldl(/\x./\y.plus(x, y), _|_, X)  because sum > foldl, [21], [28] and [29], by (Copy) 
+  21] sum*(X) >= /\y./\z.plus(y, z)  because [22], by (F-Abs) 
+  22] sum*(X, x) >= /\z.plus(x, z)  because [23], by (F-Abs) 
+  23] sum*(X, x, y) >= plus(x, y)  because sum > plus, [24] and [26], by (Copy) 
+  24] sum*(X, x, y) >= x  because [25], by (Select) 
+  25] x >= x  by (Var) 
+  26] sum*(X, x, y) >= y  because [27], by (Select) 
+  27] y >= y  by (Var) 
+  28] sum*(X) >= _|_  by (Bot) 
+  29] sum*(X) >= X  because [30], by (Select) 
+  30] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  sum(X) => foldl(/\x./\y.plus(x, y), O, X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldl(F, X, cons(Y, Z)) >? foldl(F, F X Y, Z) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[@_{o -> o}(x_1, x_2)]] = @_{o -> o}(x_2, x_1) 
+  [[foldl(x_1, x_2, x_3)]] = foldl(x_3, x_1, x_2) 
+
+We choose Lex = {@_{o -> o}, foldl} and Mul = {@_{o -> o -> o}, cons}, and the following precedence: @_{o -> o} = foldl > cons > @_{o -> o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldl(F, X, cons(Y, Z)) > foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z) 
+
+With these choices, we have:
+
+  1] foldl(F, X, cons(Y, Z)) > foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because [2], by definition 
+  2] foldl*(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because foldl in Lex, [3], [6], [8] and [17], by (Stat) 
+  3] cons(Y, Z) > Z  because [4], by definition 
+  4] cons*(Y, Z) >= Z  because [5], by (Select) 
+  5] Z >= Z  by (Meta) 
+  6] foldl*(F, X, cons(Y, Z)) >= F  because [7], by (Select) 
+  7] F >= F  by (Meta) 
+  8] foldl*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, X), Y)  because foldl = @_{o -> o}, foldl in Lex, [9], [12] and [15], by (Stat) 
+  9] cons(Y, Z) > Y  because [10], by definition 
+  10] cons*(Y, Z) >= Y  because [11], by (Select) 
+  11] Y >= Y  by (Meta) 
+  12] foldl*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, X)  because foldl > @_{o -> o -> o}, [6] and [13], by (Copy) 
+  13] foldl*(F, X, cons(Y, Z)) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+  15] foldl*(F, X, cons(Y, Z)) >= Y  because [16], by (Select) 
+  16] cons(Y, Z) >= Y  because [10], by (Star) 
+  17] foldl*(F, X, cons(Y, Z)) >= Z  because [18], by (Select) 
+  18] cons(Y, Z) >= Z  because [4], by (Star) 
+
+We can thus remove the following rules:
+
+  foldl(F, X, cons(Y, Z)) => foldl(F, F X Y, Z) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

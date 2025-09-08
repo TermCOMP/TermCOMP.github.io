@@ -1,0 +1,114 @@
+YES
+We consider the system AT5TQ.
+
+  Alphabet:
+
+    O : [] --> b 
+    cons : [b * a] --> a 
+    curry : [b -> b -> b * b] --> b -> b 
+    inc : [] --> a -> a 
+    map : [b -> b] --> a -> a 
+    nil : [] --> a 
+    plus : [] --> b -> b -> b 
+    s : [b] --> b 
+
+  Rules:
+
+    plus O X => X 
+    plus s(X) Y => s(plus X Y) 
+    map(F) nil => nil 
+    map(F) cons(X, Y) => cons(F X, map(F) Y) 
+    curry(F, X) Y => F X Y 
+    inc => map(curry(plus, s(O))) 
+
+Symbol curry is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    O : [] --> b 
+    cons : [b * a] --> a 
+    inc : [] --> a -> a 
+    map : [b -> b] --> a -> a 
+    nil : [] --> a 
+    plus : [b] --> b -> b 
+    s : [b] --> b 
+
+  Rules:
+
+    plus(O) X => X 
+    plus(s(X)) Y => s(plus(X) Y) 
+    map(F) nil => nil 
+    map(F) cons(X, Y) => cons(F X, map(F) Y) 
+    inc => map(plus(s(O))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O) X >? X 
+  plus(s(X)) Y >? s(plus(X) Y) 
+  map(F) nil >? nil 
+  map(F) cons(X, Y) >? cons(F X, map(F) Y) 
+  inc >? map(plus(s(O))) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  cons = Lam[y0;y1].3 + y0 + y1 
+  inc = Lam[y0].3 + 3*y0 
+  map = Lam[G0;y1].G0(0) + y1*G0(y1) 
+  nil = 3 
+  plus = Lam[y0;y1].2*y0 
+  s = Lam[y0].1 + y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[plus(O) _x0]] = x0 >= x0 = [[_x0]] 
+  [[plus(s(_x0)) _x1]] = 2 + x1 + 2*x0 > 1 + x1 + 2*x0 = [[s(plus(_x0) _x1)]] 
+  [[map(_F0) nil]] = 3 + F0(0) + 3*F0(3) >= 3 = [[nil]] 
+  [[map(_F0) cons(_x1, _x2)]] = 3 + x1 + x2 + F0(0) + 3*F0(3 + x1 + x2) + x1*F0(3 + x1 + x2) + x2*F0(3 + x1 + x2) >= 3 + x1 + x2 + F0(0) + F0(x1) + x2*F0(x2) = [[cons(_F0 _x1, map(_F0) _x2)]] 
+  [[inc]] = Lam[y0].3 + 3*y0 > Lam[y0].2 + 2*y0 = [[map(plus(s(O)))]] 
+
+We can thus remove the following rules:
+
+  plus(s(X)) Y => s(plus(X) Y) 
+  inc => map(plus(s(O))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O, X) >? X 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  cons = Lam[y0;y1].3 + y0 + y1 
+  map = Lam[G0;y1].3 + 3*y1 + 2*G0(0) + 2*G0(y1) + 3*y1*G0(y1) 
+  nil = 0 
+  plus = Lam[y0;y1].3 + y0 + y1 
+
+Using this interpretation, the requirements translate to:
+
+  [[plus(O, _x0)]] = 6 + x0 > x0 = [[_x0]] 
+  [[map(_F0, nil)]] = 3 + 4*F0(0) > 0 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 12 + 3*x1 + 3*x2 + 2*F0(0) + 3*x1*F0(3 + x1 + x2) + 3*x2*F0(3 + x1 + x2) + 11*F0(3 + x1 + x2) > 6 + x1 + 3*x2 + F0(x1) + 2*F0(0) + 2*F0(x2) + 3*x2*F0(x2) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+
+We can thus remove the following rules:
+
+  plus(O, X) => X 
+  map(F, nil) => nil 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

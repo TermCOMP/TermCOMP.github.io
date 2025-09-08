@@ -1,0 +1,992 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/yQCm1.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 13 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 567 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 33 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 49 ms]
+        (13) AND
+            (14) IRSwT
+                (15) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+                (16) IRSwT
+                (17) TempFilterProof [SOUND, 4 ms]
+                (18) IntTRS
+                (19) RankingReductionPairProof [EQUIVALENT, 0 ms]
+                (20) YES
+            (21) IRSwT
+                (22) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+                (23) IRSwT
+                (24) IntTRSUnneededArgumentFilterProof [EQUIVALENT, 0 ms]
+                (25) IRSwT
+                (26) TempFilterProof [SOUND, 2 ms]
+                (27) IntTRS
+                (28) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+                (29) YES
+    (30) JBCTerminationSCC
+        (31) SCCToIRSProof [SOUND, 56 ms]
+        (32) IRSwT
+        (33) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (34) IRSwT
+        (35) IRSwTTerminationDigraphProof [EQUIVALENT, 50 ms]
+        (36) IRSwT
+        (37) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (38) IRSwT
+        (39) TempFilterProof [SOUND, 32 ms]
+        (40) IntTRS
+        (41) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (42) AND
+            (43) IntTRS
+                (44) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+                (45) YES
+            (46) IntTRS
+                (47) RankingReductionPairProof [EQUIVALENT, 4 ms]
+                (48) IntTRS
+                (49) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+                (50) YES
+    (51) JBCTerminationSCC
+        (52) SCCToIRSProof [SOUND, 38 ms]
+        (53) IRSwT
+        (54) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (55) IRSwT
+        (56) IRSwTTerminationDigraphProof [EQUIVALENT, 43 ms]
+        (57) IRSwT
+        (58) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (59) IRSwT
+        (60) TempFilterProof [SOUND, 50 ms]
+        (61) IntTRS
+        (62) PolynomialOrderProcessor [EQUIVALENT, 11 ms]
+        (63) IntTRS
+        (64) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (65) IntTRS
+        (66) RankingReductionPairProof [EQUIVALENT, 0 ms]
+        (67) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+class Queen
+{
+    static int n;	
+    static int [] queen; // position (i,queen[i])
+    static int nbsol;
+
+    static void displayChessboard()
+    {
+	int i,j;
+
+	//System.out.println("");
+
+	for(i=0;i<n;i++) {
+	    for(j=0;j<n;j++) {
+		if (queen[i]!=j) {} //System.out.print("0");
+		else {} //System.out.print("1");
+	    }	
+	    //System.out.println("");
+	}
+    }
+
+    static boolean wrongPos(int i1, int j1, int i2, int j2) {
+	return (i1==i2 || j1==j2 || i1-i2 == j1-j2 || i1-i2 == j2-j1);
+    }
+
+    // Place safely queen i at column j?
+    static boolean safeMove(int i, int j) {
+	boolean result=true;
+
+	for(int k=0;k<i;k++)
+	    result=result&&!wrongPos(i,j,k,queen[k]);
+
+	return result;	
+    }
+
+    static boolean search(int row)
+    {
+	boolean result=false;
+	 
+	if (row>=n) {
+	    displayChessboard();
+	    nbsol++; 
+	}
+	else {	
+	    int j=0;
+	    while(!result && j<n) {
+		if (safeMove(row,j)) {
+		    queen[row]=j;
+		    result=search(row+1);
+		} 
+		// Backtracking here
+		j++; // explore all columns
+	    }	
+	}
+
+	return result;	
+    }
+
+    public static void main(String [] args)
+    {
+	n = args.length;
+	queen = new int[n];
+	nbsol=0;
+	search(0);
+	//System.out.println("Total number of solutions:"+nbsol);
+    }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+class Queen
+{
+    static int n;	
+    static int [] queen; // position (i,queen[i])
+    static int nbsol;
+
+    static void displayChessboard()
+    {
+	int i,j;
+
+	//System.out.println("");
+
+	for(i=0;i<n;i++) {
+	    for(j=0;j<n;j++) {
+		if (queen[i]!=j) {} //System.out.print("0");
+		else {} //System.out.print("1");
+	    }	
+	    //System.out.println("");
+	}
+    }
+
+    static boolean wrongPos(int i1, int j1, int i2, int j2) {
+	return (i1==i2 || j1==j2 || i1-i2 == j1-j2 || i1-i2 == j2-j1);
+    }
+
+    // Place safely queen i at column j?
+    static boolean safeMove(int i, int j) {
+	boolean result=true;
+
+	for(int k=0;k<i;k++)
+	    result=result&&!wrongPos(i,j,k,queen[k]);
+
+	return result;	
+    }
+
+    static boolean search(int row)
+    {
+	boolean result=false;
+	 
+	if (row>=n) {
+	    displayChessboard();
+	    nbsol++; 
+	}
+	else {	
+	    int j=0;
+	    while(!result && j<n) {
+		if (safeMove(row,j)) {
+		    queen[row]=j;
+		    result=search(row+1);
+		} 
+		// Backtracking here
+		j++; // explore all columns
+	    }	
+	}
+
+	return result;	
+    }
+
+    public static void main(String [] args)
+    {
+	n = args.length;
+	queen = new int[n];
+	nbsol=0;
+	search(0);
+	//System.out.println("Total number of solutions:"+nbsol);
+    }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+Queen.main([Ljava/lang/String;)V: Graph of 33 nodes with 0 SCCs.
+
+
+
+Queen.search(I)Z: Graph of 101 nodes with 1 SCC.
+
+
+
+Queen.displayChessboard()V: Graph of 61 nodes with 1 SCC.
+
+
+
+Queen.safeMove(II)Z: Graph of 72 nodes with 1 SCC.
+
+
+
+Queen.wrongPos(IIII)Z: Graph of 39 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 3 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Queen.safeMove(II)Z
+SCC calls the following helper methods: Queen.wrongPos(IIII)Z
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 42 IRulesP rules:
+f16627_0_safeMove_Load(EOS(STATIC_16627(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1187, i1188, i1188) -> f16629_0_safeMove_GE(EOS(STATIC_16629(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1187, i1188, i1188, i1186) :|: TRUE
+f16629_0_safeMove_GE(EOS(STATIC_16629(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1187, i1188, i1188, i1186) -> f16632_0_safeMove_GE(EOS(STATIC_16632(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1187, i1188, i1188, i1186) :|: i1188 < i1186
+f16632_0_safeMove_GE(EOS(STATIC_16632(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1187, i1188, i1188, i1186) -> f16635_0_safeMove_Load(EOS(STATIC_16635(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1187, i1188) :|: i1188 < i1186
+f16635_0_safeMove_Load(EOS(STATIC_16635(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1187, i1188) -> f16638_0_safeMove_EQ(EOS(STATIC_16638(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1187) :|: TRUE
+f16638_0_safeMove_EQ(EOS(STATIC_16638(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1198) -> f16641_0_safeMove_EQ(EOS(STATIC_16641(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1198) :|: TRUE
+f16638_0_safeMove_EQ(EOS(STATIC_16638(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, matching1) -> f16642_0_safeMove_EQ(EOS(STATIC_16642(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, 0) :|: TRUE && matching1 = 0
+f16641_0_safeMove_EQ(EOS(STATIC_16641(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1198) -> f16645_0_safeMove_Load(EOS(STATIC_16645(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188) :|: i1198 > 0
+f16645_0_safeMove_Load(EOS(STATIC_16645(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188) -> f16649_0_safeMove_Load(EOS(STATIC_16649(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186) :|: TRUE
+f16649_0_safeMove_Load(EOS(STATIC_16649(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186) -> f16653_0_safeMove_Load(EOS(STATIC_16653(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107) :|: TRUE
+f16653_0_safeMove_Load(EOS(STATIC_16653(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107) -> f16657_0_safeMove_FieldAccess(EOS(STATIC_16657(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188) :|: TRUE
+f16657_0_safeMove_FieldAccess(EOS(STATIC_16657(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188) -> f16660_0_safeMove_Load(EOS(STATIC_16660(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, java.lang.Object(ARRAY(i1105))) :|: TRUE
+f16660_0_safeMove_Load(EOS(STATIC_16660(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, java.lang.Object(ARRAY(i1105))) -> f16663_0_safeMove_ArrayAccess(EOS(STATIC_16663(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, java.lang.Object(ARRAY(i1105)), i1188) :|: TRUE
+f16663_0_safeMove_ArrayAccess(EOS(STATIC_16663(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, java.lang.Object(ARRAY(i1105)), i1188) -> f16665_0_safeMove_ArrayAccess(EOS(STATIC_16665(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, java.lang.Object(ARRAY(i1105)), i1188) :|: TRUE
+f16665_0_safeMove_ArrayAccess(EOS(STATIC_16665(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, java.lang.Object(ARRAY(i1105)), i1188) -> f16670_0_safeMove_InvokeMethod(EOS(STATIC_16670(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, i1212) :|: i1188 < i1105
+f16670_0_safeMove_InvokeMethod(EOS(STATIC_16670(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, i1212) -> f16675_0_wrongPos_Load(EOS(STATIC_16675(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1188, i1212, i1186, i1107, i1188, i1212) :|: i1186 >= 1 && i1105 >= 1 && i1105 > i1186 && i1105 > i1107 && i1105 > i1188 && i1188 < i1186
+f16670_0_safeMove_InvokeMethod(EOS(STATIC_16670(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, i1212) -> f16675_1_wrongPos_Load(EOS(STATIC_16675(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, i1186, i1107, i1188, i1212) :|: i1186 >= 1 && i1105 >= 1 && i1105 > i1186 && i1105 > i1107 && i1105 > i1188 && i1188 < i1186
+f16675_0_wrongPos_Load(EOS(STATIC_16675(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1188, i1212, i1186, i1107, i1188, i1212) -> f17059_0_wrongPos_Load(EOS(STATIC_17059(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1188, i1212, i1186, i1107, i1188, i1212) :|: TRUE
+f16739_0_wrongPos_Return(EOS(STATIC_16739(java.lang.Object(ARRAY(i1265)))), i1270, i1268, i1270, i1268, i1272, matching1) -> f16800_0_wrongPos_Return(EOS(STATIC_16800(java.lang.Object(ARRAY(i1265)))), i1270, i1268, i1270, i1268, i1272, 1) :|: TRUE && matching1 = 1
+f16800_0_wrongPos_Return(EOS(STATIC_16800(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, i1367) -> f16803_0_safeMove_NE(EOS(STATIC_16803(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, i1367) :|: TRUE
+f16803_0_safeMove_NE(EOS(STATIC_16803(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, matching1) -> f16806_0_safeMove_NE(EOS(STATIC_16806(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, 1) :|: TRUE && matching1 = 1
+f16803_0_safeMove_NE(EOS(STATIC_16803(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, matching1) -> f16807_0_safeMove_NE(EOS(STATIC_16807(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, 0) :|: TRUE && matching1 = 0
+f16806_0_safeMove_NE(EOS(STATIC_16806(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, matching1) -> f16810_0_safeMove_ConstantStackPush(EOS(STATIC_16810(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370) :|: 1 > 0 && matching1 = 1
+f16810_0_safeMove_ConstantStackPush(EOS(STATIC_16810(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370) -> f16646_0_safeMove_ConstantStackPush(EOS(STATIC_16646(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370) :|: TRUE
+f16646_0_safeMove_ConstantStackPush(EOS(STATIC_16646(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188) -> f16650_0_safeMove_Store(EOS(STATIC_16650(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, 0) :|: TRUE
+f16650_0_safeMove_Store(EOS(STATIC_16650(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, matching1) -> f16654_0_safeMove_Inc(EOS(STATIC_16654(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, 0, i1188) :|: TRUE && matching1 = 0
+f16654_0_safeMove_Inc(EOS(STATIC_16654(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, matching1, i1188) -> f16658_0_safeMove_JMP(EOS(STATIC_16658(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, 0, i1188 + 1) :|: TRUE && matching1 = 0
+f16658_0_safeMove_JMP(EOS(STATIC_16658(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, matching1, i1199) -> f16661_0_safeMove_Load(EOS(STATIC_16661(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, 0, i1199) :|: TRUE && matching1 = 0
+f16661_0_safeMove_Load(EOS(STATIC_16661(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, matching1, i1199) -> f16626_0_safeMove_Load(EOS(STATIC_16626(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, 0, i1199) :|: TRUE && matching1 = 0
+f16626_0_safeMove_Load(EOS(STATIC_16626(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1187, i1188) -> f16627_0_safeMove_Load(EOS(STATIC_16627(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1187, i1188, i1188) :|: TRUE
+f16807_0_safeMove_NE(EOS(STATIC_16807(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, matching1) -> f16811_0_safeMove_ConstantStackPush(EOS(STATIC_16811(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370) :|: TRUE && matching1 = 0
+f16811_0_safeMove_ConstantStackPush(EOS(STATIC_16811(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370) -> f16813_0_safeMove_JMP(EOS(STATIC_16813(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, 1) :|: TRUE
+f16813_0_safeMove_JMP(EOS(STATIC_16813(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, matching1) -> f16816_0_safeMove_Store(EOS(STATIC_16816(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, 1) :|: TRUE && matching1 = 1
+f16816_0_safeMove_Store(EOS(STATIC_16816(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, i1370, matching1) -> f16819_0_safeMove_Inc(EOS(STATIC_16819(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, 1, i1370) :|: TRUE && matching1 = 1
+f16819_0_safeMove_Inc(EOS(STATIC_16819(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, matching1, i1370) -> f16822_0_safeMove_JMP(EOS(STATIC_16822(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, 1, i1370 + 1) :|: TRUE && matching1 = 1
+f16822_0_safeMove_JMP(EOS(STATIC_16822(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, matching1, i1389) -> f16825_0_safeMove_Load(EOS(STATIC_16825(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, 1, i1389) :|: TRUE && matching1 = 1
+f16825_0_safeMove_Load(EOS(STATIC_16825(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, matching1, i1389) -> f16626_0_safeMove_Load(EOS(STATIC_16626(java.lang.Object(ARRAY(i1366)))), i1368, i1369, i1368, i1369, 1, i1389) :|: TRUE && matching1 = 1
+f16774_0_wrongPos_Return(EOS(STATIC_16774(java.lang.Object(ARRAY(i1292)))), i1296, i1294, i1296, i1294, i1298, matching1) -> f16739_0_wrongPos_Return(EOS(STATIC_16739(java.lang.Object(ARRAY(i1292)))), i1296, i1294, i1296, i1294, i1298, 1) :|: TRUE && matching1 = 1
+f16799_0_wrongPos_Return(EOS(STATIC_16799(java.lang.Object(ARRAY(i1340)))), i1344, i1342, i1344, i1342, i1346, matching1) -> f16800_0_wrongPos_Return(EOS(STATIC_16800(java.lang.Object(ARRAY(i1340)))), i1344, i1342, i1344, i1342, i1346, 0) :|: TRUE && matching1 = 0
+f16642_0_safeMove_EQ(EOS(STATIC_16642(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188, matching1) -> f16646_0_safeMove_ConstantStackPush(EOS(STATIC_16646(java.lang.Object(ARRAY(i1105)))), i1186, i1107, i1186, i1107, i1188) :|: TRUE && matching1 = 0
+f16675_1_wrongPos_Load(EOS(STATIC_16675(java.lang.Object(ARRAY(i1265)))), i1270, i1268, i1270, i1268, i1272, i1270, i1268, i1272, i1268) -> f16739_0_wrongPos_Return(EOS(STATIC_16739(java.lang.Object(ARRAY(i1265)))), i1270, i1268, i1270, i1268, i1272, 1) :|: TRUE
+f16675_1_wrongPos_Load(EOS(STATIC_16675(java.lang.Object(ARRAY(i1292)))), i1296, i1294, i1296, i1294, i1298, i1296, i1294, i1298, i1212) -> f16774_0_wrongPos_Return(EOS(STATIC_16774(java.lang.Object(ARRAY(i1292)))), i1296, i1294, i1296, i1294, i1298, 1) :|: TRUE
+f16675_1_wrongPos_Load(EOS(STATIC_16675(java.lang.Object(ARRAY(i1340)))), i1344, i1342, i1344, i1342, i1346, i1344, i1342, i1346, i1212) -> f16799_0_wrongPos_Return(EOS(STATIC_16799(java.lang.Object(ARRAY(i1340)))), i1344, i1342, i1344, i1342, i1346, 0) :|: TRUE
+Combined rules. Obtained 6 IRulesP rules:
+f16803_0_safeMove_NE(EOS(STATIC_16803(java.lang.Object(ARRAY(i1366:0)))), i1368:0, i1369:0, i1368:0, i1369:0, i1370:0, 1) -> f16627_0_safeMove_Load(EOS(STATIC_16627(java.lang.Object(ARRAY(i1366:0)))), i1368:0, i1369:0, i1368:0, i1369:0, 0, i1370:0 + 1, i1370:0 + 1) :|: TRUE
+f16803_0_safeMove_NE(EOS(STATIC_16803(java.lang.Object(ARRAY(i1366:0)))), i1368:0, i1369:0, i1368:0, i1369:0, i1370:0, 0) -> f16627_0_safeMove_Load(EOS(STATIC_16627(java.lang.Object(ARRAY(i1366:0)))), i1368:0, i1369:0, i1368:0, i1369:0, 1, i1370:0 + 1, i1370:0 + 1) :|: TRUE
+f16627_0_safeMove_Load(EOS(STATIC_16627(java.lang.Object(ARRAY(i1105:0)))), i1186:0, i1107:0, i1186:0, i1107:0, i1187:0, i1188:0, i1188:0) -> f16803_0_safeMove_NE(EOS(STATIC_16803(java.lang.Object(ARRAY(i1105:0)))), i1186:0, i1107:0, i1186:0, i1107:0, i1188:0, 1) :|: i1188:0 < i1186:0 && i1187:0 > 0 && i1105:0 > 0 && i1186:0 > 0 && i1186:0 < i1105:0 && i1107:0 < i1105:0 && i1188:0 < i1105:0
+f16627_0_safeMove_Load(EOS(STATIC_16627(java.lang.Object(ARRAY(i1105:0)))), i1186:0, i1107:0, i1186:0, i1107:0, i1187:0, i1188:0, i1188:0) -> f16803_0_safeMove_NE(EOS(STATIC_16803(java.lang.Object(ARRAY(i1105:0)))), i1186:0, i1107:0, i1186:0, i1107:0, i1188:0, 0) :|: i1188:0 < i1186:0 && i1187:0 > 0 && i1105:0 > 0 && i1186:0 > 0 && i1186:0 < i1105:0 && i1107:0 < i1105:0 && i1188:0 < i1105:0
+f16627_0_safeMove_Load(EOS(STATIC_16627(java.lang.Object(ARRAY(i1105:0)))), i1186:0, i1107:0, i1186:0, i1107:0, 0, i1188:0, i1188:0) -> f16627_0_safeMove_Load(EOS(STATIC_16627(java.lang.Object(ARRAY(i1105:0)))), i1186:0, i1107:0, i1186:0, i1107:0, 0, i1188:0 + 1, i1188:0 + 1) :|: i1188:0 < i1186:0
+Removed following non-SCC rules:
+f16627_0_safeMove_Load(EOS(STATIC_16627(java.lang.Object(ARRAY(i1105:0)))), i1186:0, i1107:0, i1186:0, i1107:0, i1187:0, i1188:0, i1188:0) -> f17059_0_wrongPos_Load(EOS(STATIC_17059(java.lang.Object(ARRAY(i1105:0)))), i1186:0, i1107:0, i1188:0, i1212:0, i1186:0, i1107:0, i1188:0, i1212:0) :|: i1188:0 < i1186:0 && i1187:0 > 0 && i1105:0 > 0 && i1186:0 > 0 && i1186:0 < i1105:0 && i1107:0 < i1105:0 && i1188:0 < i1105:0
+Filtered duplicate arguments:
+   f16803_0_safeMove_NE(x1, x2, x3, x4, x5, x6, x7) -> f16803_0_safeMove_NE(x1, x4, x5, x6, x7)
+   f16627_0_safeMove_Load(x1, x2, x3, x4, x5, x6, x7, x8) -> f16627_0_safeMove_Load(x1, x4, x5, x6, x8)
+Finished conversion. Obtained 5 rules.P rules:
+f16803_0_safeMove_NE(i1368:0, i1369:0, i1370:0, cons_1, i1366:0) -> f16627_0_safeMove_Load(i1368:0, i1369:0, 0, i1370:0 + 1, i1366:0) :|: TRUE && cons_1 = 1
+f16803_0_safeMove_NE(i1368:0, i1369:0, i1370:0, cons_0, i1366:0) -> f16627_0_safeMove_Load(i1368:0, i1369:0, 1, i1370:0 + 1, i1366:0) :|: TRUE && cons_0 = 0
+f16627_0_safeMove_Load(i1186:0, i1107:0, i1187:0, i1188:0, i1105:0) -> f16803_0_safeMove_NE(i1186:0, i1107:0, i1188:0, 1, i1105:0) :|: i1187:0 > 0 && i1188:0 < i1186:0 && i1105:0 > 0 && i1186:0 > 0 && i1186:0 < i1105:0 && i1188:0 < i1105:0 && i1107:0 < i1105:0
+f16627_0_safeMove_Load(i1186:0, i1107:0, i1187:0, i1188:0, i1105:0) -> f16803_0_safeMove_NE(i1186:0, i1107:0, i1188:0, 0, i1105:0) :|: i1187:0 > 0 && i1188:0 < i1186:0 && i1105:0 > 0 && i1186:0 > 0 && i1186:0 < i1105:0 && i1188:0 < i1105:0 && i1107:0 < i1105:0
+f16627_0_safeMove_Load(i1186:0, i1107:0, cons_0, i1188:0, i1105:0) -> f16627_0_safeMove_Load(i1186:0, i1107:0, 0, i1188:0 + 1, i1105:0) :|: i1188:0 < i1186:0 && cons_0 = 0
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f16803_0_safeMove_NE(i1368:0, i1369:0, i1370:0, cons_1, i1366:0) -> f16627_0_safeMove_Load(i1368:0, i1369:0, 0, i1370:0 + 1, i1366:0) :|: TRUE && cons_1 = 1
+f16803_0_safeMove_NE(x, x1, x2, x3, x4) -> f16627_0_safeMove_Load(x, x1, 1, x2 + 1, x4) :|: TRUE && x3 = 0
+f16627_0_safeMove_Load(i1186:0, i1107:0, i1187:0, i1188:0, i1105:0) -> f16803_0_safeMove_NE(i1186:0, i1107:0, i1188:0, 1, i1105:0) :|: i1187:0 > 0 && i1188:0 < i1186:0 && i1105:0 > 0 && i1186:0 > 0 && i1186:0 < i1105:0 && i1188:0 < i1105:0 && i1107:0 < i1105:0
+f16627_0_safeMove_Load(x5, x6, x7, x8, x9) -> f16803_0_safeMove_NE(x5, x6, x8, 0, x9) :|: x7 > 0 && x8 < x5 && x9 > 0 && x5 > 0 && x5 < x9 && x8 < x9 && x6 < x9
+f16627_0_safeMove_Load(x10, x11, x12, x13, x14) -> f16627_0_safeMove_Load(x10, x11, 0, x13 + 1, x14) :|: x13 < x10 && x12 = 0
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f16803_0_safeMove_NE(i1368:0, i1369:0, i1370:0, cons_1, i1366:0) -> f16627_0_safeMove_Load(i1368:0, i1369:0, 0, arith, i1366:0) :|: TRUE && cons_1 = 1 && arith = i1370:0 + 1
+f16803_0_safeMove_NE(x15, x16, x17, x18, x19) -> f16627_0_safeMove_Load(x15, x16, 1, x20, x19) :|: TRUE && x18 = 0 && x20 = x17 + 1
+f16627_0_safeMove_Load(i1186:0, i1107:0, i1187:0, i1188:0, i1105:0) -> f16803_0_safeMove_NE(i1186:0, i1107:0, i1188:0, 1, i1105:0) :|: i1187:0 > 0 && i1188:0 < i1186:0 && i1105:0 > 0 && i1186:0 > 0 && i1186:0 < i1105:0 && i1188:0 < i1105:0 && i1107:0 < i1105:0
+f16627_0_safeMove_Load(x5, x6, x7, x8, x9) -> f16803_0_safeMove_NE(x5, x6, x8, 0, x9) :|: x7 > 0 && x8 < x5 && x9 > 0 && x5 > 0 && x5 < x9 && x8 < x9 && x6 < x9
+f16627_0_safeMove_Load(x21, x22, x23, x24, x25) -> f16627_0_safeMove_Load(x21, x22, 0, x26, x25) :|: x24 < x21 && x23 = 0 && x26 = x24 + 1
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f16803_0_safeMove_NE(i1368:0, i1369:0, i1370:0, cons_1, i1366:0) -> f16627_0_safeMove_Load(i1368:0, i1369:0, 0, arith, i1366:0) :|: TRUE && cons_1 = 1 && arith = i1370:0 + 1
+(2) f16803_0_safeMove_NE(x15, x16, x17, x18, x19) -> f16627_0_safeMove_Load(x15, x16, 1, x20, x19) :|: TRUE && x18 = 0 && x20 = x17 + 1
+(3) f16627_0_safeMove_Load(i1186:0, i1107:0, i1187:0, i1188:0, i1105:0) -> f16803_0_safeMove_NE(i1186:0, i1107:0, i1188:0, 1, i1105:0) :|: i1187:0 > 0 && i1188:0 < i1186:0 && i1105:0 > 0 && i1186:0 > 0 && i1186:0 < i1105:0 && i1188:0 < i1105:0 && i1107:0 < i1105:0
+(4) f16627_0_safeMove_Load(x5, x6, x7, x8, x9) -> f16803_0_safeMove_NE(x5, x6, x8, 0, x9) :|: x7 > 0 && x8 < x5 && x9 > 0 && x5 > 0 && x5 < x9 && x8 < x9 && x6 < x9
+(5) f16627_0_safeMove_Load(x21, x22, x23, x24, x25) -> f16627_0_safeMove_Load(x21, x22, 0, x26, x25) :|: x24 < x21 && x23 = 0 && x26 = x24 + 1
+
+Arcs:
+(1) -> (5)
+(2) -> (3), (4)
+(3) -> (1)
+(4) -> (2)
+(5) -> (5)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(14)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f16803_0_safeMove_NE(x15, x16, x17, x18, x19) -> f16627_0_safeMove_Load(x15, x16, 1, x20, x19) :|: TRUE && x18 = 0 && x20 = x17 + 1
+(2) f16627_0_safeMove_Load(x5, x6, x7, x8, x9) -> f16803_0_safeMove_NE(x5, x6, x8, 0, x9) :|: x7 > 0 && x8 < x5 && x9 > 0 && x5 > 0 && x5 < x9 && x8 < x9 && x6 < x9
+
+Arcs:
+(1) -> (2)
+(2) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(15) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f16803_0_safeMove_NE(x15:0, x16:0, x17:0, cons_0, x19:0) -> f16803_0_safeMove_NE(x15:0, x16:0, x17:0 + 1, 0, x19:0) :|: x19:0 > x17:0 + 1 && x19:0 > x16:0 && x19:0 > x15:0 && x15:0 > 0 && x17:0 + 1 < x15:0 && x19:0 > 0 && cons_0 = 0
+
+----------------------------------------
+
+(17) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f16803_0_safeMove_NE(INTEGER, INTEGER, INTEGER, VARIABLE, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(18)
+Obligation:
+Rules:
+f16803_0_safeMove_NE(x15:0, x16:0, x17:0, c, x19:0) -> f16803_0_safeMove_NE(x15:0, x16:0, c1, c2, x19:0) :|: c2 = 0 && (c1 = x17:0 + 1 && c = 0) && (x19:0 > x17:0 + 1 && x19:0 > x16:0 && x19:0 > x15:0 && x15:0 > 0 && x17:0 + 1 < x15:0 && x19:0 > 0 && cons_0 = 0)
+
+----------------------------------------
+
+(19) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f16803_0_safeMove_NE ] = f16803_0_safeMove_NE_5 + -1*f16803_0_safeMove_NE_3
+
+The following rules are decreasing:
+f16803_0_safeMove_NE(x15:0, x16:0, x17:0, c, x19:0) -> f16803_0_safeMove_NE(x15:0, x16:0, c1, c2, x19:0) :|: c2 = 0 && (c1 = x17:0 + 1 && c = 0) && (x19:0 > x17:0 + 1 && x19:0 > x16:0 && x19:0 > x15:0 && x15:0 > 0 && x17:0 + 1 < x15:0 && x19:0 > 0 && cons_0 = 0)
+
+The following rules are bounded:
+f16803_0_safeMove_NE(x15:0, x16:0, x17:0, c, x19:0) -> f16803_0_safeMove_NE(x15:0, x16:0, c1, c2, x19:0) :|: c2 = 0 && (c1 = x17:0 + 1 && c = 0) && (x19:0 > x17:0 + 1 && x19:0 > x16:0 && x19:0 > x15:0 && x15:0 > 0 && x17:0 + 1 < x15:0 && x19:0 > 0 && cons_0 = 0)
+
+
+----------------------------------------
+
+(20)
+YES
+
+----------------------------------------
+
+(21)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f16627_0_safeMove_Load(x21, x22, x23, x24, x25) -> f16627_0_safeMove_Load(x21, x22, 0, x26, x25) :|: x24 < x21 && x23 = 0 && x26 = x24 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(22) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(23)
+Obligation:
+Rules:
+f16627_0_safeMove_Load(x21:0, x22:0, cons_0, x24:0, x25:0) -> f16627_0_safeMove_Load(x21:0, x22:0, 0, x24:0 + 1, x25:0) :|: x24:0 < x21:0 && cons_0 = 0
+
+----------------------------------------
+
+(24) IntTRSUnneededArgumentFilterProof (EQUIVALENT)
+Some arguments are removed because they cannot influence termination. We removed arguments according to the following replacements:
+
+   f16627_0_safeMove_Load(x1, x2, x3, x4, x5) -> f16627_0_safeMove_Load(x1, x3, x4)
+
+----------------------------------------
+
+(25)
+Obligation:
+Rules:
+f16627_0_safeMove_Load(x21:0, cons_0, x24:0) -> f16627_0_safeMove_Load(x21:0, 0, x24:0 + 1) :|: x24:0 < x21:0 && cons_0 = 0
+
+----------------------------------------
+
+(26) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f16627_0_safeMove_Load(INTEGER, VARIABLE, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(27)
+Obligation:
+Rules:
+f16627_0_safeMove_Load(x21:0, c, x24:0) -> f16627_0_safeMove_Load(x21:0, c1, c2) :|: c2 = x24:0 + 1 && (c1 = 0 && c = 0) && (x24:0 < x21:0 && cons_0 = 0)
+
+----------------------------------------
+
+(28) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f16627_0_safeMove_Load(x, x1, x2)] = x + c1*x1 - x2
+
+The following rules are decreasing:
+f16627_0_safeMove_Load(x21:0, c, x24:0) -> f16627_0_safeMove_Load(x21:0, c1, c2) :|: c2 = x24:0 + 1 && (c1 = 0 && c = 0) && (x24:0 < x21:0 && cons_0 = 0)
+The following rules are bounded:
+f16627_0_safeMove_Load(x21:0, c, x24:0) -> f16627_0_safeMove_Load(x21:0, c1, c2) :|: c2 = x24:0 + 1 && (c1 = 0 && c = 0) && (x24:0 < x21:0 && cons_0 = 0)
+
+----------------------------------------
+
+(29)
+YES
+
+----------------------------------------
+
+(30)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Queen.displayChessboard()V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(31) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 31 IRulesP rules:
+f6717_0_displayChessboard_FieldAccess(EOS(STATIC_6717(i535, java.lang.Object(ARRAY(i535)))), i536, i536) -> f6724_0_displayChessboard_GE(EOS(STATIC_6724(i535, java.lang.Object(ARRAY(i535)))), i536, i536, i535) :|: TRUE
+f6724_0_displayChessboard_GE(EOS(STATIC_6724(i535, java.lang.Object(ARRAY(i535)))), i536, i536, i535) -> f6749_0_displayChessboard_GE(EOS(STATIC_6749(i535, java.lang.Object(ARRAY(i535)))), i536, i536, i535) :|: i536 < i535
+f6749_0_displayChessboard_GE(EOS(STATIC_6749(i535, java.lang.Object(ARRAY(i535)))), i536, i536, i535) -> f6768_0_displayChessboard_ConstantStackPush(EOS(STATIC_6768(i535, java.lang.Object(ARRAY(i535)))), i536) :|: i536 < i535
+f6768_0_displayChessboard_ConstantStackPush(EOS(STATIC_6768(i535, java.lang.Object(ARRAY(i535)))), i536) -> f6772_0_displayChessboard_Store(EOS(STATIC_6772(i535, java.lang.Object(ARRAY(i535)))), i536, 0) :|: TRUE
+f6772_0_displayChessboard_Store(EOS(STATIC_6772(i535, java.lang.Object(ARRAY(i535)))), i536, matching1) -> f6804_0_displayChessboard_Load(EOS(STATIC_6804(i535, java.lang.Object(ARRAY(i535)))), i536, 0) :|: TRUE && matching1 = 0
+f6804_0_displayChessboard_Load(EOS(STATIC_6804(i535, java.lang.Object(ARRAY(i535)))), i536, matching1) -> f7114_0_displayChessboard_Load(EOS(STATIC_7114(i535, java.lang.Object(ARRAY(i535)))), i536, 0) :|: TRUE && matching1 = 0
+f7114_0_displayChessboard_Load(EOS(STATIC_7114(i535, java.lang.Object(ARRAY(i535)))), i536, i561) -> f11220_0_displayChessboard_Load(EOS(STATIC_11220(i535, java.lang.Object(ARRAY(i535)))), i536, i561) :|: TRUE
+f11220_0_displayChessboard_Load(EOS(STATIC_11220(i535, java.lang.Object(ARRAY(i535)))), i536, i749) -> f12089_0_displayChessboard_Load(EOS(STATIC_12089(i535, java.lang.Object(ARRAY(i535)))), i536, i749) :|: TRUE
+f12089_0_displayChessboard_Load(EOS(STATIC_12089(i535, java.lang.Object(ARRAY(i535)))), i536, i830) -> f12198_0_displayChessboard_FieldAccess(EOS(STATIC_12198(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830) :|: TRUE
+f12198_0_displayChessboard_FieldAccess(EOS(STATIC_12198(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830) -> f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i535) :|: TRUE
+f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i535) -> f12232_0_displayChessboard_GE(EOS(STATIC_12232(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i535) :|: i830 >= i535
+f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i535) -> f12233_0_displayChessboard_GE(EOS(STATIC_12233(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i535) :|: i830 < i535
+f12232_0_displayChessboard_GE(EOS(STATIC_12232(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i535) -> f12237_0_displayChessboard_Inc(EOS(STATIC_12237(i535, java.lang.Object(ARRAY(i535)))), i536) :|: i830 >= i535
+f12237_0_displayChessboard_Inc(EOS(STATIC_12237(i535, java.lang.Object(ARRAY(i535)))), i536) -> f12246_0_displayChessboard_JMP(EOS(STATIC_12246(i535, java.lang.Object(ARRAY(i535)))), i536 + 1) :|: TRUE
+f12246_0_displayChessboard_JMP(EOS(STATIC_12246(i535, java.lang.Object(ARRAY(i535)))), i851) -> f12267_0_displayChessboard_Load(EOS(STATIC_12267(i535, java.lang.Object(ARRAY(i535)))), i851) :|: TRUE
+f12267_0_displayChessboard_Load(EOS(STATIC_12267(i535, java.lang.Object(ARRAY(i535)))), i851) -> f6588_0_displayChessboard_Load(EOS(STATIC_6588(i535, java.lang.Object(ARRAY(i535)))), i851) :|: TRUE
+f6588_0_displayChessboard_Load(EOS(STATIC_6588(i535, java.lang.Object(ARRAY(i535)))), i536) -> f6717_0_displayChessboard_FieldAccess(EOS(STATIC_6717(i535, java.lang.Object(ARRAY(i535)))), i536, i536) :|: TRUE
+f12233_0_displayChessboard_GE(EOS(STATIC_12233(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i535) -> f12242_0_displayChessboard_FieldAccess(EOS(STATIC_12242(i535, java.lang.Object(ARRAY(i535)))), i536, i830) :|: i830 < i535
+f12242_0_displayChessboard_FieldAccess(EOS(STATIC_12242(i535, java.lang.Object(ARRAY(i535)))), i536, i830) -> f12249_0_displayChessboard_Load(EOS(STATIC_12249(i535, java.lang.Object(ARRAY(i535)))), i536, i830, java.lang.Object(ARRAY(i535))) :|: TRUE
+f12249_0_displayChessboard_Load(EOS(STATIC_12249(i535, java.lang.Object(ARRAY(i535)))), i536, i830, java.lang.Object(ARRAY(i535))) -> f12269_0_displayChessboard_ArrayAccess(EOS(STATIC_12269(i535, java.lang.Object(ARRAY(i535)))), i536, i830, java.lang.Object(ARRAY(i535)), i536) :|: TRUE
+f12269_0_displayChessboard_ArrayAccess(EOS(STATIC_12269(i535, java.lang.Object(ARRAY(i535)))), i536, i830, java.lang.Object(ARRAY(i535)), i536) -> f12272_0_displayChessboard_ArrayAccess(EOS(STATIC_12272(i535, java.lang.Object(ARRAY(i535)))), i536, i830, java.lang.Object(ARRAY(i535)), i536) :|: TRUE
+f12272_0_displayChessboard_ArrayAccess(EOS(STATIC_12272(i535, java.lang.Object(ARRAY(i535)))), i536, i830, java.lang.Object(ARRAY(i535)), i536) -> f12293_0_displayChessboard_Load(EOS(STATIC_12293(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i856) :|: i536 < i535
+f12293_0_displayChessboard_Load(EOS(STATIC_12293(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i856) -> f12320_0_displayChessboard_EQ(EOS(STATIC_12320(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i856, i830) :|: TRUE
+f12320_0_displayChessboard_EQ(EOS(STATIC_12320(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i830) -> f12340_0_displayChessboard_EQ(EOS(STATIC_12340(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i830) :|: i856 = i830
+f12320_0_displayChessboard_EQ(EOS(STATIC_12320(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i856, i830) -> f12341_0_displayChessboard_EQ(EOS(STATIC_12341(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i856, i830) :|: !(i856 = i830)
+f12340_0_displayChessboard_EQ(EOS(STATIC_12340(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i830, i830) -> f12352_0_displayChessboard_Inc(EOS(STATIC_12352(i535, java.lang.Object(ARRAY(i535)))), i536, i830) :|: TRUE
+f12352_0_displayChessboard_Inc(EOS(STATIC_12352(i535, java.lang.Object(ARRAY(i535)))), i536, i830) -> f12414_0_displayChessboard_JMP(EOS(STATIC_12414(i535, java.lang.Object(ARRAY(i535)))), i536, i830 + 1) :|: TRUE
+f12414_0_displayChessboard_JMP(EOS(STATIC_12414(i535, java.lang.Object(ARRAY(i535)))), i536, i877) -> f12440_0_displayChessboard_Load(EOS(STATIC_12440(i535, java.lang.Object(ARRAY(i535)))), i536, i877) :|: TRUE
+f12440_0_displayChessboard_Load(EOS(STATIC_12440(i535, java.lang.Object(ARRAY(i535)))), i536, i877) -> f12089_0_displayChessboard_Load(EOS(STATIC_12089(i535, java.lang.Object(ARRAY(i535)))), i536, i877) :|: TRUE
+f12341_0_displayChessboard_EQ(EOS(STATIC_12341(i535, java.lang.Object(ARRAY(i535)))), i536, i830, i856, i830) -> f12373_0_displayChessboard_Inc(EOS(STATIC_12373(i535, java.lang.Object(ARRAY(i535)))), i536, i830) :|: !(i856 = i830)
+f12373_0_displayChessboard_Inc(EOS(STATIC_12373(i535, java.lang.Object(ARRAY(i535)))), i536, i830) -> f12352_0_displayChessboard_Inc(EOS(STATIC_12352(i535, java.lang.Object(ARRAY(i535)))), i536, i830) :|: TRUE
+Combined rules. Obtained 4 IRulesP rules:
+f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535:0, java.lang.Object(ARRAY(i535:0)))), i536:0, i830:0, i830:0, i535:0) -> f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535:0, java.lang.Object(ARRAY(i535:0)))), i536:0, i830:0 + 1, i830:0 + 1, i535:0) :|: i830:0 < i535:0 && i536:0 < i535:0
+f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535:0, java.lang.Object(ARRAY(i535:0)))), i536:0, i830:0, i830:0, i535:0) -> f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535:0, java.lang.Object(ARRAY(i535:0)))), i536:0 + 1, 0, 0, i535:0) :|: i536:0 + 1 < i535:0 && i830:0 >= i535:0
+f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535:0, java.lang.Object(ARRAY(i535:0)))), i536:0, i830:0, i830:0, i535:0) -> f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535:0, java.lang.Object(ARRAY(i535:0)))), i536:0, i830:0 + 1, i830:0 + 1, i535:0) :|: i830:0 < i535:0 && i536:0 < i535:0 && i856:0 < i830:0
+f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535:0, java.lang.Object(ARRAY(i535:0)))), i536:0, i830:0, i830:0, i535:0) -> f12216_0_displayChessboard_GE(EOS(STATIC_12216(i535:0, java.lang.Object(ARRAY(i535:0)))), i536:0, i830:0 + 1, i830:0 + 1, i535:0) :|: i830:0 < i535:0 && i536:0 < i535:0 && i856:0 > i830:0
+Filtered duplicate arguments:
+   f12216_0_displayChessboard_GE(x1, x2, x3, x4, x5) -> f12216_0_displayChessboard_GE(x1, x2, x4, x5)
+Finished conversion. Obtained 4 rules.P rules:
+f12216_0_displayChessboard_GE(i536:0, i830:0, i535:0, i535:0, i535:0) -> f12216_0_displayChessboard_GE(i536:0, i830:0 + 1, i535:0, i535:0, i535:0) :|: i830:0 < i535:0 && i536:0 < i535:0
+f12216_0_displayChessboard_GE(i536:0, i830:0, i535:0, i535:0, i535:0) -> f12216_0_displayChessboard_GE(i536:0 + 1, 0, i535:0, i535:0, i535:0) :|: i536:0 + 1 < i535:0 && i830:0 >= i535:0
+f12216_0_displayChessboard_GE(i536:0, i830:0, i535:0, i535:0, i535:0) -> f12216_0_displayChessboard_GE(i536:0, i830:0 + 1, i535:0, i535:0, i535:0) :|: i536:0 < i535:0 && i856:0 < i830:0 && i830:0 < i535:0
+f12216_0_displayChessboard_GE(i536:0, i830:0, i535:0, i535:0, i535:0) -> f12216_0_displayChessboard_GE(i536:0, i830:0 + 1, i535:0, i535:0, i535:0) :|: i536:0 < i535:0 && i856:0 > i830:0 && i830:0 < i535:0
+
+----------------------------------------
+
+(32)
+Obligation:
+Rules:
+f12216_0_displayChessboard_GE(i536:0, i830:0, i535:0, i535:0, i535:0) -> f12216_0_displayChessboard_GE(i536:0, i830:0 + 1, i535:0, i535:0, i535:0) :|: i830:0 < i535:0 && i536:0 < i535:0
+f12216_0_displayChessboard_GE(x, x1, x2, x2, x2) -> f12216_0_displayChessboard_GE(x + 1, 0, x2, x2, x2) :|: x + 1 < x2 && x1 >= x2
+f12216_0_displayChessboard_GE(x3, x4, x5, x5, x5) -> f12216_0_displayChessboard_GE(x3, x4 + 1, x5, x5, x5) :|: x3 < x5 && x6 < x4 && x4 < x5
+f12216_0_displayChessboard_GE(x7, x8, x9, x9, x9) -> f12216_0_displayChessboard_GE(x7, x8 + 1, x9, x9, x9) :|: x7 < x9 && x10 > x8 && x8 < x9
+
+----------------------------------------
+
+(33) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(34)
+Obligation:
+Rules:
+f12216_0_displayChessboard_GE(i536:0, i830:0, i535:0, i535:0, i535:0) -> f12216_0_displayChessboard_GE(i536:0, arith, i535:0, i535:0, i535:0) :|: i830:0 < i535:0 && i536:0 < i535:0 && arith = i830:0 + 1
+f12216_0_displayChessboard_GE(x11, x12, x13, x13, x13) -> f12216_0_displayChessboard_GE(x14, 0, x13, x13, x13) :|: x11 + 1 < x13 && x12 >= x13 && x14 = x11 + 1
+f12216_0_displayChessboard_GE(x15, x16, x17, x17, x17) -> f12216_0_displayChessboard_GE(x15, x18, x17, x17, x17) :|: x15 < x17 && x19 < x16 && x16 < x17 && x18 = x16 + 1
+f12216_0_displayChessboard_GE(x20, x21, x22, x22, x22) -> f12216_0_displayChessboard_GE(x20, x23, x22, x22, x22) :|: x20 < x22 && x24 > x21 && x21 < x22 && x23 = x21 + 1
+
+----------------------------------------
+
+(35) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f12216_0_displayChessboard_GE(i536:0, i830:0, i535:0, i535:0, i535:0) -> f12216_0_displayChessboard_GE(i536:0, arith, i535:0, i535:0, i535:0) :|: i830:0 < i535:0 && i536:0 < i535:0 && arith = i830:0 + 1
+(2) f12216_0_displayChessboard_GE(x11, x12, x13, x13, x13) -> f12216_0_displayChessboard_GE(x14, 0, x13, x13, x13) :|: x11 + 1 < x13 && x12 >= x13 && x14 = x11 + 1
+(3) f12216_0_displayChessboard_GE(x15, x16, x17, x17, x17) -> f12216_0_displayChessboard_GE(x15, x18, x17, x17, x17) :|: x15 < x17 && x19 < x16 && x16 < x17 && x18 = x16 + 1
+(4) f12216_0_displayChessboard_GE(x20, x21, x22, x22, x22) -> f12216_0_displayChessboard_GE(x20, x23, x22, x22, x22) :|: x20 < x22 && x24 > x21 && x21 < x22 && x23 = x21 + 1
+
+Arcs:
+(1) -> (1), (2), (3), (4)
+(2) -> (1), (2), (3), (4)
+(3) -> (1), (2), (3), (4)
+(4) -> (1), (2), (3), (4)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(36)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f12216_0_displayChessboard_GE(i536:0, i830:0, i535:0, i535:0, i535:0) -> f12216_0_displayChessboard_GE(i536:0, arith, i535:0, i535:0, i535:0) :|: i830:0 < i535:0 && i536:0 < i535:0 && arith = i830:0 + 1
+(2) f12216_0_displayChessboard_GE(x11, x12, x13, x13, x13) -> f12216_0_displayChessboard_GE(x14, 0, x13, x13, x13) :|: x11 + 1 < x13 && x12 >= x13 && x14 = x11 + 1
+(3) f12216_0_displayChessboard_GE(x15, x16, x17, x17, x17) -> f12216_0_displayChessboard_GE(x15, x18, x17, x17, x17) :|: x15 < x17 && x19 < x16 && x16 < x17 && x18 = x16 + 1
+(4) f12216_0_displayChessboard_GE(x20, x21, x22, x22, x22) -> f12216_0_displayChessboard_GE(x20, x23, x22, x22, x22) :|: x20 < x22 && x24 > x21 && x21 < x22 && x23 = x21 + 1
+
+Arcs:
+(1) -> (1), (2), (3), (4)
+(2) -> (1), (2), (3), (4)
+(3) -> (1), (2), (3), (4)
+(4) -> (1), (2), (3), (4)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(37) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(38)
+Obligation:
+Rules:
+f12216_0_displayChessboard_GE(x11:0, x12:0, x13:0, x13:0, x13:0) -> f12216_0_displayChessboard_GE(x11:0 + 1, 0, x13:0, x13:0, x13:0) :|: x13:0 > x11:0 + 1 && x13:0 <= x12:0
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, x16:0 + 1, x17:0, x17:0, x17:0) :|: x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0
+f12216_0_displayChessboard_GE(i536:0:0, i830:0:0, i535:0:0, i535:0:0, i535:0:0) -> f12216_0_displayChessboard_GE(i536:0:0, i830:0:0 + 1, i535:0:0, i535:0:0, i535:0:0) :|: i830:0:0 < i535:0:0 && i536:0:0 < i535:0:0
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, x21:0 + 1, x22:0, x22:0, x22:0) :|: x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0
+
+----------------------------------------
+
+(39) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f12216_0_displayChessboard_GE(INTEGER, VARIABLE, INTEGER, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(40)
+Obligation:
+Rules:
+f12216_0_displayChessboard_GE(x11:0, x12:0, x13:0, x13:0, x13:0) -> f12216_0_displayChessboard_GE(c, c1, x13:0, x13:0, x13:0) :|: c1 = 0 && c = x11:0 + 1 && (x13:0 > x11:0 + 1 && x13:0 <= x12:0)
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, c2, x17:0, x17:0, x17:0) :|: c2 = x16:0 + 1 && (x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0)
+f12216_0_displayChessboard_GE(i536:0:0, i830:0:0, i535:0:0, i535:0:0, i535:0:0) -> f12216_0_displayChessboard_GE(i536:0:0, c3, i535:0:0, i535:0:0, i535:0:0) :|: c3 = i830:0:0 + 1 && (i830:0:0 < i535:0:0 && i536:0:0 < i535:0:0)
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, c4, x22:0, x22:0, x22:0) :|: c4 = x21:0 + 1 && (x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0)
+
+----------------------------------------
+
+(41) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f12216_0_displayChessboard_GE(x, x1, x2, x3, x4)] = -1 - x + x3
+
+The following rules are decreasing:
+f12216_0_displayChessboard_GE(x11:0, x12:0, x13:0, x13:0, x13:0) -> f12216_0_displayChessboard_GE(c, c1, x13:0, x13:0, x13:0) :|: c1 = 0 && c = x11:0 + 1 && (x13:0 > x11:0 + 1 && x13:0 <= x12:0)
+The following rules are bounded:
+f12216_0_displayChessboard_GE(i536:0:0, i830:0:0, i535:0:0, i535:0:0, i535:0:0) -> f12216_0_displayChessboard_GE(i536:0:0, c3, i535:0:0, i535:0:0, i535:0:0) :|: c3 = i830:0:0 + 1 && (i830:0:0 < i535:0:0 && i536:0:0 < i535:0:0)
+
+----------------------------------------
+
+(42)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(43)
+Obligation:
+Rules:
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, c2, x17:0, x17:0, x17:0) :|: c2 = x16:0 + 1 && (x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0)
+f12216_0_displayChessboard_GE(i536:0:0, i830:0:0, i535:0:0, i535:0:0, i535:0:0) -> f12216_0_displayChessboard_GE(i536:0:0, c3, i535:0:0, i535:0:0, i535:0:0) :|: c3 = i830:0:0 + 1 && (i830:0:0 < i535:0:0 && i536:0:0 < i535:0:0)
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, c4, x22:0, x22:0, x22:0) :|: c4 = x21:0 + 1 && (x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0)
+
+----------------------------------------
+
+(44) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f12216_0_displayChessboard_GE(x, x1, x2, x3, x4)] = -x1 + x3
+
+The following rules are decreasing:
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, c2, x17:0, x17:0, x17:0) :|: c2 = x16:0 + 1 && (x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0)
+f12216_0_displayChessboard_GE(i536:0:0, i830:0:0, i535:0:0, i535:0:0, i535:0:0) -> f12216_0_displayChessboard_GE(i536:0:0, c3, i535:0:0, i535:0:0, i535:0:0) :|: c3 = i830:0:0 + 1 && (i830:0:0 < i535:0:0 && i536:0:0 < i535:0:0)
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, c4, x22:0, x22:0, x22:0) :|: c4 = x21:0 + 1 && (x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0)
+The following rules are bounded:
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, c2, x17:0, x17:0, x17:0) :|: c2 = x16:0 + 1 && (x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0)
+f12216_0_displayChessboard_GE(i536:0:0, i830:0:0, i535:0:0, i535:0:0, i535:0:0) -> f12216_0_displayChessboard_GE(i536:0:0, c3, i535:0:0, i535:0:0, i535:0:0) :|: c3 = i830:0:0 + 1 && (i830:0:0 < i535:0:0 && i536:0:0 < i535:0:0)
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, c4, x22:0, x22:0, x22:0) :|: c4 = x21:0 + 1 && (x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0)
+
+----------------------------------------
+
+(45)
+YES
+
+----------------------------------------
+
+(46)
+Obligation:
+Rules:
+f12216_0_displayChessboard_GE(x11:0, x12:0, x13:0, x13:0, x13:0) -> f12216_0_displayChessboard_GE(c, c1, x13:0, x13:0, x13:0) :|: c1 = 0 && c = x11:0 + 1 && (x13:0 > x11:0 + 1 && x13:0 <= x12:0)
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, c2, x17:0, x17:0, x17:0) :|: c2 = x16:0 + 1 && (x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0)
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, c4, x22:0, x22:0, x22:0) :|: c4 = x21:0 + 1 && (x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0)
+
+----------------------------------------
+
+(47) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f12216_0_displayChessboard_GE ] = f12216_0_displayChessboard_GE_5 + -1*f12216_0_displayChessboard_GE_1
+
+The following rules are decreasing:
+f12216_0_displayChessboard_GE(x11:0, x12:0, x13:0, x13:0, x13:0) -> f12216_0_displayChessboard_GE(c, c1, x13:0, x13:0, x13:0) :|: c1 = 0 && c = x11:0 + 1 && (x13:0 > x11:0 + 1 && x13:0 <= x12:0)
+
+The following rules are bounded:
+f12216_0_displayChessboard_GE(x11:0, x12:0, x13:0, x13:0, x13:0) -> f12216_0_displayChessboard_GE(c, c1, x13:0, x13:0, x13:0) :|: c1 = 0 && c = x11:0 + 1 && (x13:0 > x11:0 + 1 && x13:0 <= x12:0)
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, c2, x17:0, x17:0, x17:0) :|: c2 = x16:0 + 1 && (x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0)
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, c4, x22:0, x22:0, x22:0) :|: c4 = x21:0 + 1 && (x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0)
+
+
+----------------------------------------
+
+(48)
+Obligation:
+Rules:
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, c2, x17:0, x17:0, x17:0) :|: c2 = x16:0 + 1 && (x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0)
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, c4, x22:0, x22:0, x22:0) :|: c4 = x21:0 + 1 && (x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0)
+
+----------------------------------------
+
+(49) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f12216_0_displayChessboard_GE(x, x1, x2, x3, x4)] = -x1 + x3
+
+The following rules are decreasing:
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, c2, x17:0, x17:0, x17:0) :|: c2 = x16:0 + 1 && (x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0)
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, c4, x22:0, x22:0, x22:0) :|: c4 = x21:0 + 1 && (x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0)
+The following rules are bounded:
+f12216_0_displayChessboard_GE(x15:0, x16:0, x17:0, x17:0, x17:0) -> f12216_0_displayChessboard_GE(x15:0, c2, x17:0, x17:0, x17:0) :|: c2 = x16:0 + 1 && (x17:0 > x15:0 && x19:0 < x16:0 && x17:0 > x16:0)
+f12216_0_displayChessboard_GE(x20:0, x21:0, x22:0, x22:0, x22:0) -> f12216_0_displayChessboard_GE(x20:0, c4, x22:0, x22:0, x22:0) :|: c4 = x21:0 + 1 && (x22:0 > x20:0 && x24:0 > x21:0 && x22:0 > x21:0)
+
+----------------------------------------
+
+(50)
+YES
+
+----------------------------------------
+
+(51)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Queen.search(I)Z
+SCC calls the following helper methods: Queen.safeMove(II)Z, Queen.search(I)Z, Queen.wrongPos(IIII)Z, Queen.displayChessboard()V
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(52) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 49 IRulesP rules:
+f16630_0_search_Store(EOS(STATIC_16630(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, matching1) -> f16633_0_search_Load(EOS(STATIC_16633(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, 0) :|: TRUE && matching1 = 0
+f16633_0_search_Load(EOS(STATIC_16633(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, matching1) -> f16636_0_search_FieldAccess(EOS(STATIC_16636(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, 0, i1197) :|: TRUE && matching1 = 0
+f16636_0_search_FieldAccess(EOS(STATIC_16636(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, matching1, i1197) -> f16639_0_search_LT(EOS(STATIC_16639(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, 0, i1197, i1195) :|: TRUE && matching1 = 0
+f16639_0_search_LT(EOS(STATIC_16639(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, matching1, i1197, i1195) -> f16643_0_search_LT(EOS(STATIC_16643(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, 0, i1197, i1195) :|: i1197 < i1195 && matching1 = 0
+f16643_0_search_LT(EOS(STATIC_16643(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, matching1, i1197, i1195) -> f16647_0_search_ConstantStackPush(EOS(STATIC_16647(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, 0) :|: i1197 < i1195 && matching1 = 0
+f16647_0_search_ConstantStackPush(EOS(STATIC_16647(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, matching1) -> f16651_0_search_Store(EOS(STATIC_16651(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, 0, 0) :|: TRUE && matching1 = 0
+f16651_0_search_Store(EOS(STATIC_16651(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, matching1, matching2) -> f16655_0_search_Load(EOS(STATIC_16655(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, 0, 0) :|: TRUE && matching1 = 0 && matching2 = 0
+f16655_0_search_Load(EOS(STATIC_16655(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, matching1, matching2) -> f16723_0_search_Load(EOS(STATIC_16723(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, 0, 0) :|: TRUE && matching1 = 0 && matching2 = 0
+f16723_0_search_Load(EOS(STATIC_16723(i1251, java.lang.Object(ARRAY(i1251)))), i1196, i1252, matching1, i1253) -> f16798_0_search_Load(EOS(STATIC_16798(i1251, java.lang.Object(ARRAY(i1251)))), i1196, i1252, 0, i1253) :|: TRUE && matching1 = 0
+f16798_0_search_Load(EOS(STATIC_16798(i1357, java.lang.Object(ARRAY(i1357)))), i1196, i1358, matching1, i1359) -> f16844_0_search_Load(EOS(STATIC_16844(i1357, java.lang.Object(ARRAY(i1357)))), i1196, i1358, 0, i1359) :|: TRUE && matching1 = 0
+f16844_0_search_Load(EOS(STATIC_16844(i1448, java.lang.Object(ARRAY(i1448)))), i1196, i1449, matching1, i1450) -> f16909_0_search_Load(EOS(STATIC_16909(i1448, java.lang.Object(ARRAY(i1448)))), i1196, i1449, 0, i1450) :|: TRUE && matching1 = 0
+f16909_0_search_Load(EOS(STATIC_16909(i1576, java.lang.Object(ARRAY(i1576)))), i1196, i1577, matching1, i1578) -> f16944_0_search_Load(EOS(STATIC_16944(i1576, java.lang.Object(ARRAY(i1576)))), i1196, i1577, 0, i1578) :|: TRUE && matching1 = 0
+f16944_0_search_Load(EOS(STATIC_16944(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641) -> f16946_0_search_NE(EOS(STATIC_16946(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, 0, i1641, 0) :|: TRUE && matching1 = 0
+f16946_0_search_NE(EOS(STATIC_16946(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641, matching2) -> f16948_0_search_Load(EOS(STATIC_16948(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, 0, i1641) :|: TRUE && matching1 = 0 && matching2 = 0
+f16948_0_search_Load(EOS(STATIC_16948(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641) -> f16949_0_search_FieldAccess(EOS(STATIC_16949(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, 0, i1641, i1641) :|: TRUE && matching1 = 0
+f16949_0_search_FieldAccess(EOS(STATIC_16949(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641, i1641) -> f16950_0_search_GE(EOS(STATIC_16950(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, 0, i1641, i1641, i1639) :|: TRUE && matching1 = 0
+f16950_0_search_GE(EOS(STATIC_16950(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641, i1641, i1639) -> f16952_0_search_GE(EOS(STATIC_16952(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, 0, i1641, i1641, i1639) :|: i1641 < i1639 && matching1 = 0
+f16952_0_search_GE(EOS(STATIC_16952(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641, i1641, i1639) -> f16954_0_search_Load(EOS(STATIC_16954(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, 0, i1641) :|: i1641 < i1639 && matching1 = 0
+f16954_0_search_Load(EOS(STATIC_16954(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641) -> f16956_0_search_Load(EOS(STATIC_16956(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, 0, i1641, i1640) :|: TRUE && matching1 = 0
+f16956_0_search_Load(EOS(STATIC_16956(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641, i1640) -> f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, 0, i1641, i1640, i1641) :|: TRUE && matching1 = 0
+f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641, i1640, i1641) -> f16959_0_safeMove_ConstantStackPush(EOS(STATIC_16959(i1639, java.lang.Object(ARRAY(i1639)))), i1640, i1641, i1640, i1641) :|: i1639 >= 1 && i1639 >= i1196 && i1640 < i1639 && i1641 < i1639 && matching1 = 0
+f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, matching1, i1641, i1640, i1641) -> f16959_1_safeMove_ConstantStackPush(EOS(STATIC_16959(i1639, java.lang.Object(ARRAY(i1639)))), i1196, i1640, 0, i1641, i1640, i1641) :|: i1639 >= 1 && i1639 >= i1196 && i1640 < i1639 && i1641 < i1639 && matching1 = 0
+f16959_0_safeMove_ConstantStackPush(EOS(STATIC_16959(i1639, java.lang.Object(ARRAY(i1639)))), i1640, i1641, i1640, i1641) -> f17303_0_safeMove_ConstantStackPush(EOS(STATIC_17303(i1639, java.lang.Object(ARRAY(i1639)))), i1640, i1641, i1640, i1641) :|: TRUE
+f16962_0_safeMove_Return(EOS(STATIC_16962(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, matching1, i1670, i1663) -> f16964_0_search_EQ(EOS(STATIC_16964(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, 0, i1670, i1663) :|: TRUE && matching1 = 0
+f16964_0_search_EQ(EOS(STATIC_16964(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, matching1, i1670, i1681) -> f16966_0_search_EQ(EOS(STATIC_16966(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, 0, i1670, i1681) :|: TRUE && matching1 = 0
+f16964_0_search_EQ(EOS(STATIC_16964(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, matching1, i1670, matching2) -> f16967_0_search_EQ(EOS(STATIC_16967(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, 0, i1670, 0) :|: TRUE && matching1 = 0 && matching2 = 0
+f16966_0_search_EQ(EOS(STATIC_16966(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, matching1, i1670, i1681) -> f16969_0_search_FieldAccess(EOS(STATIC_16969(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670) :|: i1681 > 0 && matching1 = 0
+f16969_0_search_FieldAccess(EOS(STATIC_16969(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670) -> f16971_0_search_Load(EOS(STATIC_16971(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, java.lang.Object(ARRAY(i1666))) :|: TRUE
+f16971_0_search_Load(EOS(STATIC_16971(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, java.lang.Object(ARRAY(i1666))) -> f16975_0_search_Load(EOS(STATIC_16975(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, java.lang.Object(ARRAY(i1666)), i1668) :|: TRUE
+f16975_0_search_Load(EOS(STATIC_16975(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, java.lang.Object(ARRAY(i1666)), i1668) -> f16978_0_search_ArrayAccess(EOS(STATIC_16978(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, java.lang.Object(ARRAY(i1666)), i1668, i1670) :|: TRUE
+f16978_0_search_ArrayAccess(EOS(STATIC_16978(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, java.lang.Object(ARRAY(i1666)), i1668, i1670) -> f16980_0_search_ArrayAccess(EOS(STATIC_16980(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, java.lang.Object(ARRAY(i1666)), i1668, i1670) :|: TRUE
+f16980_0_search_ArrayAccess(EOS(STATIC_16980(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, java.lang.Object(ARRAY(i1666)), i1668, i1670) -> f16982_0_search_Load(EOS(STATIC_16982(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670) :|: i1668 < i1666
+f16982_0_search_Load(EOS(STATIC_16982(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670) -> f16984_0_search_ConstantStackPush(EOS(STATIC_16984(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, i1668) :|: TRUE
+f16984_0_search_ConstantStackPush(EOS(STATIC_16984(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, i1668) -> f16985_0_search_IntArithmetic(EOS(STATIC_16985(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, i1668, 1) :|: TRUE
+f16985_0_search_IntArithmetic(EOS(STATIC_16985(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, i1668, matching1) -> f16987_0_search_InvokeMethod(EOS(STATIC_16987(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, i1668 + 1) :|: i1668 >= 0 && matching1 = 1
+f16987_0_search_InvokeMethod(EOS(STATIC_16987(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, i1702) -> f16989_0_search_ConstantStackPush(EOS(STATIC_16989(i1666, java.lang.Object(ARRAY(i1666)))), i1702, i1702) :|: i1702 >= 1 && i1666 >= 1 && i1666 >= i1196 && i1668 < i1666 && i1670 < i1666 && i1702 > i1668 && i1702 <= i1666
+f16987_0_search_InvokeMethod(EOS(STATIC_16987(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, i1702) -> f16989_1_search_ConstantStackPush(EOS(STATIC_16989(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, i1702) :|: i1702 >= 1 && i1666 >= 1 && i1666 >= i1196 && i1668 < i1666 && i1670 < i1666 && i1702 > i1668 && i1702 <= i1666
+f16989_0_search_ConstantStackPush(EOS(STATIC_16989(i1666, java.lang.Object(ARRAY(i1666)))), i1702, i1702) -> f16990_0_search_ConstantStackPush(EOS(STATIC_16990(i1666, java.lang.Object(ARRAY(i1666)))), i1702, i1702) :|: TRUE
+f16990_0_search_ConstantStackPush(EOS(STATIC_16990(i1666, java.lang.Object(ARRAY(i1666)))), i1702, i1702) -> f16628_0_search_ConstantStackPush(EOS(STATIC_16628(i1666, java.lang.Object(ARRAY(i1666)))), i1702, i1702) :|: TRUE
+f16628_0_search_ConstantStackPush(EOS(STATIC_16628(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197) -> f16630_0_search_Store(EOS(STATIC_16630(i1195, java.lang.Object(ARRAY(i1195)))), i1196, i1197, 0) :|: TRUE
+f16996_0_search_Return(EOS(STATIC_16996(i1723, java.lang.Object(ARRAY(i1723)))), i1196, i1668, i1670, matching1) -> f17000_0_search_Store(EOS(STATIC_17000(i1723, java.lang.Object(ARRAY(i1723)))), i1196, i1668, i1670, 0) :|: TRUE && matching1 = 0
+f17000_0_search_Store(EOS(STATIC_17000(i1723, java.lang.Object(ARRAY(i1723)))), i1196, i1668, i1670, matching1) -> f17003_0_search_Inc(EOS(STATIC_17003(i1723, java.lang.Object(ARRAY(i1723)))), i1196, i1668, 0, i1670) :|: TRUE && matching1 = 0
+f17003_0_search_Inc(EOS(STATIC_17003(i1723, java.lang.Object(ARRAY(i1723)))), i1196, i1668, matching1, i1670) -> f16970_0_search_Inc(EOS(STATIC_16970(i1723, java.lang.Object(ARRAY(i1723)))), i1196, i1668, 0, i1670) :|: TRUE && matching1 = 0
+f16970_0_search_Inc(EOS(STATIC_16970(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, matching1, i1670) -> f16972_0_search_JMP(EOS(STATIC_16972(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, 0, i1670 + 1) :|: TRUE && matching1 = 0
+f16972_0_search_JMP(EOS(STATIC_16972(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, matching1, i1688) -> f16976_0_search_Load(EOS(STATIC_16976(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, 0, i1688) :|: TRUE && matching1 = 0
+f16976_0_search_Load(EOS(STATIC_16976(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, matching1, i1688) -> f16944_0_search_Load(EOS(STATIC_16944(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, 0, i1688) :|: TRUE && matching1 = 0
+f16967_0_search_EQ(EOS(STATIC_16967(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, matching1, i1670, matching2) -> f16970_0_search_Inc(EOS(STATIC_16970(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, 0, i1670) :|: TRUE && matching1 = 0 && matching2 = 0
+f16959_1_safeMove_ConstantStackPush(EOS(STATIC_16959(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, matching1, i1670, i1668, i1670) -> f16962_0_safeMove_Return(EOS(STATIC_16962(i1666, java.lang.Object(ARRAY(i1666)))), i1196, i1668, 0, i1670, i1663) :|: TRUE && matching1 = 0
+f16989_1_search_ConstantStackPush(EOS(STATIC_16989(i1723, java.lang.Object(ARRAY(i1666)))), i1196, i1668, i1670, i1702) -> f16996_0_search_Return(EOS(STATIC_16996(i1723, java.lang.Object(ARRAY(i1723)))), i1196, i1668, i1670, 0) :|: TRUE
+Combined rules. Obtained 4 IRulesP rules:
+f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639:0, java.lang.Object(ARRAY(i1639:0)))), i1196:0, i1640:0, 0, i1641:0, i1640:0, i1641:0) -> f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639:0, java.lang.Object(ARRAY(i1639:0)))), i1196:0, i1640:0, 0, i1641:0 + 1, i1640:0, i1641:0 + 1) :|: i1641:0 + 1 < i1639:0 && i1639:0 >= i1196:0 && i1640:0 < i1639:0 && i1639:0 > 0
+f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639:0, java.lang.Object(ARRAY(i1639:0)))), i1196:0, i1640:0, 0, i1641:0, i1640:0, i1641:0) -> f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639:0, java.lang.Object(ARRAY(i1639:0)))), i1640:0 + 1, i1640:0 + 1, 0, 0, i1640:0 + 1, 0) :|: i1640:0 + 1 < i1639:0 && i1663:0 > 0 && i1639:0 > 0 && i1640:0 > -1 && i1639:0 >= i1196:0 && i1641:0 < i1639:0 && i1640:0 + 1 > i1640:0
+f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639:0, java.lang.Object(ARRAY(i1639:0)))), i1196:0, i1640:0, 0, i1641:0, i1640:0, i1641:0) -> f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639:0, java.lang.Object(ARRAY(i1639:0)))), i1196:0, i1640:0, 0, i1641:0 + 1, i1640:0, i1641:0 + 1) :|: i1641:0 + 1 < i1639:0 && i1663:0 > 0 && i1639:0 > 0 && i1640:0 > -1 && i1639:0 >= i1196:0 && i1640:0 < i1639:0 && i1640:0 + 1 > i1640:0 && i1640:0 + 1 <= i1639:0
+Removed following non-SCC rules:
+f16958_0_search_InvokeMethod(EOS(STATIC_16958(i1639:0, java.lang.Object(ARRAY(i1639:0)))), i1196:0, i1640:0, 0, i1641:0, i1640:0, i1641:0) -> f17303_0_safeMove_ConstantStackPush(EOS(STATIC_17303(i1639:0, java.lang.Object(ARRAY(i1639:0)))), i1640:0, i1641:0, i1640:0, i1641:0) :|: i1639:0 >= i1196:0 && i1639:0 > 0 && i1641:0 < i1639:0 && i1640:0 < i1639:0
+Filtered constant ground arguments:
+   f16958_0_search_InvokeMethod(x1, x2, x3, x4, x5, x6, x7) -> f16958_0_search_InvokeMethod(x1, x2, x3, x5, x6, x7)
+Filtered duplicate arguments:
+   f16958_0_search_InvokeMethod(x1, x2, x3, x4, x5, x6) -> f16958_0_search_InvokeMethod(x1, x2, x5, x6)
+Finished conversion. Obtained 3 rules.P rules:
+f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0, i1639:0, i1639:0) -> f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0 + 1, i1639:0, i1639:0) :|: i1639:0 >= i1196:0 && i1641:0 + 1 < i1639:0 && i1639:0 > 0 && i1640:0 < i1639:0
+f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0, i1639:0, i1639:0) -> f16958_0_search_InvokeMethod(i1640:0 + 1, i1640:0 + 1, 0, i1639:0, i1639:0) :|: i1663:0 > 0 && i1640:0 + 1 < i1639:0 && i1639:0 > 0 && i1640:0 > -1 && i1639:0 >= i1196:0 && i1640:0 + 1 > i1640:0 && i1641:0 < i1639:0
+f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0, i1639:0, i1639:0) -> f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0 + 1, i1639:0, i1639:0) :|: i1663:0 > 0 && i1641:0 + 1 < i1639:0 && i1639:0 > 0 && i1640:0 > -1 && i1639:0 >= i1196:0 && i1640:0 < i1639:0 && i1640:0 + 1 <= i1639:0 && i1640:0 + 1 > i1640:0
+
+----------------------------------------
+
+(53)
+Obligation:
+Rules:
+f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0, i1639:0, i1639:0) -> f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0 + 1, i1639:0, i1639:0) :|: i1639:0 >= i1196:0 && i1641:0 + 1 < i1639:0 && i1639:0 > 0 && i1640:0 < i1639:0
+f16958_0_search_InvokeMethod(x, x1, x2, x3, x3) -> f16958_0_search_InvokeMethod(x1 + 1, x1 + 1, 0, x3, x3) :|: x4 > 0 && x1 + 1 < x3 && x3 > 0 && x1 > -1 && x3 >= x && x1 + 1 > x1 && x2 < x3
+f16958_0_search_InvokeMethod(x5, x6, x7, x8, x8) -> f16958_0_search_InvokeMethod(x5, x6, x7 + 1, x8, x8) :|: x9 > 0 && x7 + 1 < x8 && x8 > 0 && x6 > -1 && x8 >= x5 && x6 < x8 && x6 + 1 <= x8 && x6 + 1 > x6
+
+----------------------------------------
+
+(54) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(55)
+Obligation:
+Rules:
+f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0, i1639:0, i1639:0) -> f16958_0_search_InvokeMethod(i1196:0, i1640:0, arith, i1639:0, i1639:0) :|: i1639:0 >= i1196:0 && i1641:0 + 1 < i1639:0 && i1639:0 > 0 && i1640:0 < i1639:0 && arith = i1641:0 + 1
+f16958_0_search_InvokeMethod(x10, x11, x12, x13, x13) -> f16958_0_search_InvokeMethod(x14, x14, 0, x13, x13) :|: x15 > 0 && x11 + 1 < x13 && x13 > 0 && x11 > -1 && x13 >= x10 && x11 + 1 > x11 && x12 < x13 && x14 = x11 + 1 && x14 = x11 + 1
+f16958_0_search_InvokeMethod(x16, x17, x18, x19, x19) -> f16958_0_search_InvokeMethod(x16, x17, x20, x19, x19) :|: x21 > 0 && x18 + 1 < x19 && x19 > 0 && x17 > -1 && x19 >= x16 && x17 < x19 && x17 + 1 <= x19 && x17 + 1 > x17 && x20 = x18 + 1
+
+----------------------------------------
+
+(56) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0, i1639:0, i1639:0) -> f16958_0_search_InvokeMethod(i1196:0, i1640:0, arith, i1639:0, i1639:0) :|: i1639:0 >= i1196:0 && i1641:0 + 1 < i1639:0 && i1639:0 > 0 && i1640:0 < i1639:0 && arith = i1641:0 + 1
+(2) f16958_0_search_InvokeMethod(x10, x11, x12, x13, x13) -> f16958_0_search_InvokeMethod(x14, x14, 0, x13, x13) :|: x15 > 0 && x11 + 1 < x13 && x13 > 0 && x11 > -1 && x13 >= x10 && x11 + 1 > x11 && x12 < x13 && x14 = x11 + 1 && x14 = x11 + 1
+(3) f16958_0_search_InvokeMethod(x16, x17, x18, x19, x19) -> f16958_0_search_InvokeMethod(x16, x17, x20, x19, x19) :|: x21 > 0 && x18 + 1 < x19 && x19 > 0 && x17 > -1 && x19 >= x16 && x17 < x19 && x17 + 1 <= x19 && x17 + 1 > x17 && x20 = x18 + 1
+
+Arcs:
+(1) -> (1), (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (1), (2), (3)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(57)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f16958_0_search_InvokeMethod(i1196:0, i1640:0, i1641:0, i1639:0, i1639:0) -> f16958_0_search_InvokeMethod(i1196:0, i1640:0, arith, i1639:0, i1639:0) :|: i1639:0 >= i1196:0 && i1641:0 + 1 < i1639:0 && i1639:0 > 0 && i1640:0 < i1639:0 && arith = i1641:0 + 1
+(2) f16958_0_search_InvokeMethod(x10, x11, x12, x13, x13) -> f16958_0_search_InvokeMethod(x14, x14, 0, x13, x13) :|: x15 > 0 && x11 + 1 < x13 && x13 > 0 && x11 > -1 && x13 >= x10 && x11 + 1 > x11 && x12 < x13 && x14 = x11 + 1 && x14 = x11 + 1
+(3) f16958_0_search_InvokeMethod(x16, x17, x18, x19, x19) -> f16958_0_search_InvokeMethod(x16, x17, x20, x19, x19) :|: x21 > 0 && x18 + 1 < x19 && x19 > 0 && x17 > -1 && x19 >= x16 && x17 < x19 && x17 + 1 <= x19 && x17 + 1 > x17 && x20 = x18 + 1
+
+Arcs:
+(1) -> (1), (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (1), (2), (3)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(58) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(59)
+Obligation:
+Rules:
+f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, i1641:0:0, i1639:0:0, i1639:0:0) -> f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, i1641:0:0 + 1, i1639:0:0, i1639:0:0) :|: i1639:0:0 > 0 && i1640:0:0 < i1639:0:0 && i1641:0:0 + 1 < i1639:0:0 && i1639:0:0 >= i1196:0:0
+f16958_0_search_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x19:0) -> f16958_0_search_InvokeMethod(x16:0, x17:0, x18:0 + 1, x19:0, x19:0) :|: x19:0 >= x17:0 + 1 && x17:0 + 1 > x17:0 && x19:0 > x17:0 && x19:0 >= x16:0 && x17:0 > -1 && x19:0 > 0 && x19:0 > x18:0 + 1 && x21:0 > 0
+f16958_0_search_InvokeMethod(x10:0, x11:0, x12:0, x13:0, x13:0) -> f16958_0_search_InvokeMethod(x11:0 + 1, x11:0 + 1, 0, x13:0, x13:0) :|: x11:0 + 1 > x11:0 && x13:0 > x12:0 && x13:0 >= x10:0 && x11:0 > -1 && x13:0 > 0 && x13:0 > x11:0 + 1 && x15:0 > 0
+
+----------------------------------------
+
+(60) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f16958_0_search_InvokeMethod(INTEGER, INTEGER, VARIABLE, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(61)
+Obligation:
+Rules:
+f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, i1641:0:0, i1639:0:0, i1639:0:0) -> f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, c, i1639:0:0, i1639:0:0) :|: c = i1641:0:0 + 1 && (i1639:0:0 > 0 && i1640:0:0 < i1639:0:0 && i1641:0:0 + 1 < i1639:0:0 && i1639:0:0 >= i1196:0:0)
+f16958_0_search_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x19:0) -> f16958_0_search_InvokeMethod(x16:0, x17:0, c1, x19:0, x19:0) :|: c1 = x18:0 + 1 && (x19:0 >= x17:0 + 1 && x17:0 + 1 > x17:0 && x19:0 > x17:0 && x19:0 >= x16:0 && x17:0 > -1 && x19:0 > 0 && x19:0 > x18:0 + 1 && x21:0 > 0)
+f16958_0_search_InvokeMethod(x10:0, x11:0, x12:0, x13:0, x13:0) -> f16958_0_search_InvokeMethod(c2, c3, c4, x13:0, x13:0) :|: c4 = 0 && (c3 = x11:0 + 1 && c2 = x11:0 + 1) && (x11:0 + 1 > x11:0 && x13:0 > x12:0 && x13:0 >= x10:0 && x11:0 > -1 && x13:0 > 0 && x13:0 > x11:0 + 1 && x15:0 > 0)
+
+----------------------------------------
+
+(62) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f16958_0_search_InvokeMethod(x, x1, x2, x3, x4)] = -x1 + x4
+
+The following rules are decreasing:
+f16958_0_search_InvokeMethod(x10:0, x11:0, x12:0, x13:0, x13:0) -> f16958_0_search_InvokeMethod(c2, c3, c4, x13:0, x13:0) :|: c4 = 0 && (c3 = x11:0 + 1 && c2 = x11:0 + 1) && (x11:0 + 1 > x11:0 && x13:0 > x12:0 && x13:0 >= x10:0 && x11:0 > -1 && x13:0 > 0 && x13:0 > x11:0 + 1 && x15:0 > 0)
+The following rules are bounded:
+f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, i1641:0:0, i1639:0:0, i1639:0:0) -> f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, c, i1639:0:0, i1639:0:0) :|: c = i1641:0:0 + 1 && (i1639:0:0 > 0 && i1640:0:0 < i1639:0:0 && i1641:0:0 + 1 < i1639:0:0 && i1639:0:0 >= i1196:0:0)
+f16958_0_search_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x19:0) -> f16958_0_search_InvokeMethod(x16:0, x17:0, c1, x19:0, x19:0) :|: c1 = x18:0 + 1 && (x19:0 >= x17:0 + 1 && x17:0 + 1 > x17:0 && x19:0 > x17:0 && x19:0 >= x16:0 && x17:0 > -1 && x19:0 > 0 && x19:0 > x18:0 + 1 && x21:0 > 0)
+f16958_0_search_InvokeMethod(x10:0, x11:0, x12:0, x13:0, x13:0) -> f16958_0_search_InvokeMethod(c2, c3, c4, x13:0, x13:0) :|: c4 = 0 && (c3 = x11:0 + 1 && c2 = x11:0 + 1) && (x11:0 + 1 > x11:0 && x13:0 > x12:0 && x13:0 >= x10:0 && x11:0 > -1 && x13:0 > 0 && x13:0 > x11:0 + 1 && x15:0 > 0)
+
+----------------------------------------
+
+(63)
+Obligation:
+Rules:
+f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, i1641:0:0, i1639:0:0, i1639:0:0) -> f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, c, i1639:0:0, i1639:0:0) :|: c = i1641:0:0 + 1 && (i1639:0:0 > 0 && i1640:0:0 < i1639:0:0 && i1641:0:0 + 1 < i1639:0:0 && i1639:0:0 >= i1196:0:0)
+f16958_0_search_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x19:0) -> f16958_0_search_InvokeMethod(x16:0, x17:0, c1, x19:0, x19:0) :|: c1 = x18:0 + 1 && (x19:0 >= x17:0 + 1 && x17:0 + 1 > x17:0 && x19:0 > x17:0 && x19:0 >= x16:0 && x17:0 > -1 && x19:0 > 0 && x19:0 > x18:0 + 1 && x21:0 > 0)
+
+----------------------------------------
+
+(64) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f16958_0_search_InvokeMethod(x, x1, x2, x3, x4)] = -4 - x - 2*x2 + 3*x4
+
+The following rules are decreasing:
+f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, i1641:0:0, i1639:0:0, i1639:0:0) -> f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, c, i1639:0:0, i1639:0:0) :|: c = i1641:0:0 + 1 && (i1639:0:0 > 0 && i1640:0:0 < i1639:0:0 && i1641:0:0 + 1 < i1639:0:0 && i1639:0:0 >= i1196:0:0)
+f16958_0_search_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x19:0) -> f16958_0_search_InvokeMethod(x16:0, x17:0, c1, x19:0, x19:0) :|: c1 = x18:0 + 1 && (x19:0 >= x17:0 + 1 && x17:0 + 1 > x17:0 && x19:0 > x17:0 && x19:0 >= x16:0 && x17:0 > -1 && x19:0 > 0 && x19:0 > x18:0 + 1 && x21:0 > 0)
+The following rules are bounded:
+f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, i1641:0:0, i1639:0:0, i1639:0:0) -> f16958_0_search_InvokeMethod(i1196:0:0, i1640:0:0, c, i1639:0:0, i1639:0:0) :|: c = i1641:0:0 + 1 && (i1639:0:0 > 0 && i1640:0:0 < i1639:0:0 && i1641:0:0 + 1 < i1639:0:0 && i1639:0:0 >= i1196:0:0)
+
+----------------------------------------
+
+(65)
+Obligation:
+Rules:
+f16958_0_search_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x19:0) -> f16958_0_search_InvokeMethod(x16:0, x17:0, c1, x19:0, x19:0) :|: c1 = x18:0 + 1 && (x19:0 >= x17:0 + 1 && x17:0 + 1 > x17:0 && x19:0 > x17:0 && x19:0 >= x16:0 && x17:0 > -1 && x19:0 > 0 && x19:0 > x18:0 + 1 && x21:0 > 0)
+
+----------------------------------------
+
+(66) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f16958_0_search_InvokeMethod ] = f16958_0_search_InvokeMethod_5 + -1*f16958_0_search_InvokeMethod_3
+
+The following rules are decreasing:
+f16958_0_search_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x19:0) -> f16958_0_search_InvokeMethod(x16:0, x17:0, c1, x19:0, x19:0) :|: c1 = x18:0 + 1 && (x19:0 >= x17:0 + 1 && x17:0 + 1 > x17:0 && x19:0 > x17:0 && x19:0 >= x16:0 && x17:0 > -1 && x19:0 > 0 && x19:0 > x18:0 + 1 && x21:0 > 0)
+
+The following rules are bounded:
+f16958_0_search_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x19:0) -> f16958_0_search_InvokeMethod(x16:0, x17:0, c1, x19:0, x19:0) :|: c1 = x18:0 + 1 && (x19:0 >= x17:0 + 1 && x17:0 + 1 > x17:0 && x19:0 > x17:0 && x19:0 >= x16:0 && x17:0 > -1 && x19:0 > 0 && x19:0 > x18:0 + 1 && x21:0 > 0)
+
+
+----------------------------------------
+
+(67)
+YES

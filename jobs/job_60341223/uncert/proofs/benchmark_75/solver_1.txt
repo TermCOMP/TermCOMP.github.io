@@ -1,0 +1,55 @@
+YES
+We consider the system Qokny.
+
+  Alphabet:
+
+    cons : [a * b] --> b 
+    foldr : [a -> b -> b * b * b] --> b 
+    nil : [] --> b 
+
+  Rules:
+
+    foldr(F, X, nil) => X 
+    foldr(F, X, cons(Y, Z)) => F Y foldr(F, X, Z) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldr(F, X, nil) >? X 
+  foldr(F, X, cons(Y, Z)) >? F Y foldr(F, X, Z) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, cons, foldr, nil}, and the following precedence: cons > @_{o -> o -> o} = foldr > @_{o -> o} > nil
+
+With these choices, we have:
+
+  1] foldr(F, X, nil) > X  because [2], by definition 
+  2] foldr*(F, X, nil) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] foldr(F, X, cons(Y, Z)) > @_{o -> o}(@_{o -> o -> o}(F, Y), foldr(F, X, Z))  because [5], by definition 
+  5] foldr*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), foldr(F, X, Z))  because foldr > @_{o -> o}, [6] and [11], by (Copy) 
+  6] foldr*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, Y)  because foldr = @_{o -> o -> o}, foldr in Mul, [7] and [8], by (Stat) 
+  7] F >= F  by (Meta) 
+  8] cons(Y, Z) > Y  because [9], by definition 
+  9] cons*(Y, Z) >= Y  because [10], by (Select) 
+  10] Y >= Y  by (Meta) 
+  11] foldr*(F, X, cons(Y, Z)) >= foldr(F, X, Z)  because foldr in Mul, [7], [12] and [13], by (Stat) 
+  12] X >= X  by (Meta) 
+  13] cons(Y, Z) > Z  because [14], by definition 
+  14] cons*(Y, Z) >= Z  because [15], by (Select) 
+  15] Z >= Z  by (Meta) 
+
+We can thus remove the following rules:
+
+  foldr(F, X, nil) => X 
+  foldr(F, X, cons(Y, Z)) => F Y foldr(F, X, Z) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

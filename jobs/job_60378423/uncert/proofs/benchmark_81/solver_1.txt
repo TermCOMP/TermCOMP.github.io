@@ -1,0 +1,127 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/Xyaeu.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 56 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) TRUE
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+public class CyclicPair {
+	CyclicPair next;
+
+	public static void main(String[] args) {
+		Random.args = args;
+		CyclicPair one = new CyclicPair();
+		CyclicPair two = new CyclicPair();
+		int i = Random.random();
+		if (i == 0) { //two cyclic
+			two.next = two;
+		} else {      //one cyclic
+			one.next = one;
+		}
+
+		while (two.next == two && one.next == one) {
+			one.next = two;      //one: o1, two: o2 | o1: (next=o2), o2: (next=o2)
+			two.next = one;      //one: o1, two: o2 | o1: (next=o2), o2: (next=o1)
+			one.next = two.next; //one: o2, two: o2 | o1: (next=o1), o2: (next=o1)
+			two.next = two;
+		}
+	}
+}
+
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+public class CyclicPair {
+	CyclicPair next;
+
+	public static void main(String[] args) {
+		Random.args = args;
+		CyclicPair one = new CyclicPair();
+		CyclicPair two = new CyclicPair();
+		int i = Random.random();
+		if (i == 0) { //two cyclic
+			two.next = two;
+		} else {      //one cyclic
+			one.next = one;
+		}
+
+		while (two.next == two && one.next == one) {
+			one.next = two;      //one: o1, two: o2 | o1: (next=o2), o2: (next=o2)
+			two.next = one;      //one: o1, two: o2 | o1: (next=o2), o2: (next=o1)
+			one.next = two.next; //one: o2, two: o2 | o1: (next=o1), o2: (next=o1)
+			two.next = two;
+		}
+	}
+}
+
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+CyclicPair.main([Ljava/lang/String;)V: Graph of 138 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Proven termination by absence of SCCs
+----------------------------------------
+
+(6)
+TRUE

@@ -1,0 +1,147 @@
+YES
+We consider the system bLrjW.
+
+  Alphabet:
+
+    O : [] --> nat 
+    false : [] --> bool 
+    h : [nat -> bool * nat -> nat * nat] --> nat 
+    if : [bool * nat * nat] --> nat 
+    s : [nat] --> nat 
+    true : [] --> bool 
+
+  Rules:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    h(F, G, O) => O 
+    h(F, G, s(X)) => G h(F, G, if(F X, X, O)) 
+
+We observe that the rules contain a first-order subset:
+
+  if(true, X, Y) => X 
+  if(false, X, Y) => Y 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: if(true(),PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     2: if(false(),PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 2
+ || Direct POLO(bPol) ... removes: 1 2
+ ||       false	w: 1
+ ||       true	w: 1
+ ||       if	w: 2 * x1 + 2 * x2 + 2 * x3
+ || Number of strict rules: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] h#(F, G, s(X)) =#> h#(F, G, if(F X, X, O))   
+    1] h#(F, G, s(X)) =#> if#(F X, X, O)   
+
+  Rules R_0:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    h(F, G, O) => O 
+    h(F, G, s(X)) => G h(F, G, if(F X, X, O)) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0, 1 
+    * 1 :  
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    h#(F, G, s(X)) =#> h#(F, G, if(F X, X, O))   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+The formative rules of (P_1, R_0) are R_1 ::=
+
+  if(true, X, Y) => X 
+  if(false, X, Y) => Y 
+  h(F, G, s(X)) => G h(F, G, if(F X, X, O)) 
+
+By [Kop12, Thm. 7.17], we may replace the dependency pair problem (P_1, R_0, computable, formative) by (P_1, R_1, computable, formative).
+
+Thus, the original system is terminating if (P_1, R_1, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_1, computable, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  It suffices to find a standard reduction pair [Kop12, Def. 6.69].  Thus, we must orient:
+
+  h#(F, G, s(X)) >? h#(F, G, if(F X, X, O)) 
+  if(true, X, Y) >= X 
+  if(false, X, Y) >= Y 
+  h(F, G, s(X)) >= G h(F, G, if(F X, X, O)) 
+
+Since this representation is not advantageous for the higher-order recursive path ordering, we present the strict requirements in their unextended form, which is not problematic since for any F, s and substituion gamma: (F s)gamma beta-reduces to F(s)gamma.)
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[if(x_1, x_2, x_3)]] = if(x_2, x_3) 
+
+We choose Lex = {} and Mul = {@_{o -> o}, false, h, h#, if, s, true}, and the following precedence: h > @_{o -> o} > h# > s > if > true > false
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  h#(F, G, s(X)) > h#(F, G, if(X, _|_)) 
+  if(X, Y) >= X 
+  if(X, Y) >= Y 
+  h(F, G, s(X)) >= @_{o -> o}(G, h(F, G, if(X, _|_))) 
+
+With these choices, we have:
+
+  1] h#(F, G, s(X)) > h#(F, G, if(X, _|_))  because [2], by definition 
+  2] h#*(F, G, s(X)) >= h#(F, G, if(X, _|_))  because h# in Mul, [3], [4] and [5], by (Stat) 
+  3] F >= F  by (Meta) 
+  4] G >= G  by (Meta) 
+  5] s(X) > if(X, _|_)  because [6], by definition 
+  6] s*(X) >= if(X, _|_)  because s > if, [7] and [9], by (Copy) 
+  7] s*(X) >= X  because [8], by (Select) 
+  8] X >= X  by (Meta) 
+  9] s*(X) >= _|_  by (Bot) 
+
+  10] if(X, Y) >= X  because [11], by (Star) 
+  11] if*(X, Y) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+
+  13] if(X, Y) >= Y  because [14], by (Star) 
+  14] if*(X, Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+
+  16] h(F, G, s(X)) >= @_{o -> o}(G, h(F, G, if(X, _|_)))  because [17], by (Star) 
+  17] h*(F, G, s(X)) >= @_{o -> o}(G, h(F, G, if(X, _|_)))  because h > @_{o -> o}, [18] and [19], by (Copy) 
+  18] h*(F, G, s(X)) >= G  because [4], by (Select) 
+  19] h*(F, G, s(X)) >= h(F, G, if(X, _|_))  because h in Mul, [3], [4] and [5], by (Stat) 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace a dependency pair problem (P_1, R_1) by ({}, R_1).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

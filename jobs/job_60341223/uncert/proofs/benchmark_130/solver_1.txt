@@ -1,0 +1,186 @@
+YES
+We consider the system NtMQV.
+
+  Alphabet:
+
+    cons : [nat * list] --> list 
+    explode : [list * nat -> nat * nat] --> nat 
+    implode : [list * nat -> nat * nat] --> nat 
+    nil : [] --> list 
+    op : [nat -> nat * nat -> nat] --> nat -> nat 
+
+  Rules:
+
+    op(F, G) X => F (G X) 
+    implode(nil, F, X) => X 
+    implode(cons(X, Y), F, Z) => implode(Y, F, F Z) 
+    explode(nil, F, X) => X 
+    explode(cons(X, Y), F, Z) => explode(Y, op(F, F), F Z) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  op(F, G) X >? F (G X) 
+  implode(nil, F, X) >? X 
+  implode(cons(X, Y), F, Z) >? implode(Y, F, F Z) 
+  explode(nil, F, X) >? X 
+  explode(cons(X, Y), F, Z) >? explode(Y, op(F, F), F Z) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[explode(x_1, x_2, x_3)]] = explode(x_1, x_3, x_2) 
+
+We choose Lex = {explode, implode} and Mul = {@_{o -> o}, cons, nil, op}, and the following precedence: cons > explode > nil > implode > op > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(op(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X)) 
+  implode(nil, F, X) >= X 
+  implode(cons(X, Y), F, Z) >= implode(Y, F, @_{o -> o}(F, Z)) 
+  explode(nil, F, X) > X 
+  explode(cons(X, Y), F, Z) > explode(Y, op(F, F), @_{o -> o}(F, Z)) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(op(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [2], by (Star) 
+  2] @_{o -> o}*(op(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [3], by (Select) 
+  3] op(F, G) @_{o -> o}*(op(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [4] 
+  4] op*(F, G, @_{o -> o}*(op(F, G), X)) >= @_{o -> o}(F, @_{o -> o}(G, X))  because op > @_{o -> o}, [5] and [7], by (Copy) 
+  5] op*(F, G, @_{o -> o}*(op(F, G), X)) >= F  because [6], by (Select) 
+  6] F >= F  by (Meta) 
+  7] op*(F, G, @_{o -> o}*(op(F, G), X)) >= @_{o -> o}(G, X)  because op > @_{o -> o}, [8] and [10], by (Copy) 
+  8] op*(F, G, @_{o -> o}*(op(F, G), X)) >= G  because [9], by (Select) 
+  9] G >= G  by (Meta) 
+  10] op*(F, G, @_{o -> o}*(op(F, G), X)) >= X  because [11], by (Select) 
+  11] @_{o -> o}*(op(F, G), X) >= X  because [12], by (Select) 
+  12] op(F, G) @_{o -> o}*(op(F, G), X) >= X  because [13] 
+  13] op*(F, G, @_{o -> o}*(op(F, G), X)) >= X  because [14], by (Select) 
+  14] @_{o -> o}*(op(F, G), X) >= X  because [15], by (Select) 
+  15] X >= X  by (Meta) 
+
+  16] implode(nil, F, X) >= X  because [17], by (Star) 
+  17] implode*(nil, F, X) >= X  because [18], by (Select) 
+  18] X >= X  by (Meta) 
+
+  19] implode(cons(X, Y), F, Z) >= implode(Y, F, @_{o -> o}(F, Z))  because [20], by (Star) 
+  20] implode*(cons(X, Y), F, Z) >= implode(Y, F, @_{o -> o}(F, Z))  because implode in Lex, [21], [24], [26] and [28], by (Stat) 
+  21] cons(X, Y) > Y  because [22], by definition 
+  22] cons*(X, Y) >= Y  because [23], by (Select) 
+  23] Y >= Y  by (Meta) 
+  24] implode*(cons(X, Y), F, Z) >= Y  because [25], by (Select) 
+  25] cons(X, Y) >= Y  because [22], by (Star) 
+  26] implode*(cons(X, Y), F, Z) >= F  because [27], by (Select) 
+  27] F >= F  by (Meta) 
+  28] implode*(cons(X, Y), F, Z) >= @_{o -> o}(F, Z)  because implode > @_{o -> o}, [26] and [29], by (Copy) 
+  29] implode*(cons(X, Y), F, Z) >= Z  because [30], by (Select) 
+  30] Z >= Z  by (Meta) 
+
+  31] explode(nil, F, X) > X  because [32], by definition 
+  32] explode*(nil, F, X) >= X  because [33], by (Select) 
+  33] X >= X  by (Meta) 
+
+  34] explode(cons(X, Y), F, Z) > explode(Y, op(F, F), @_{o -> o}(F, Z))  because [35], by definition 
+  35] explode*(cons(X, Y), F, Z) >= explode(Y, op(F, F), @_{o -> o}(F, Z))  because explode in Lex, [36], [39], [41] and [44], by (Stat) 
+  36] cons(X, Y) > Y  because [37], by definition 
+  37] cons*(X, Y) >= Y  because [38], by (Select) 
+  38] Y >= Y  by (Meta) 
+  39] explode*(cons(X, Y), F, Z) >= Y  because [40], by (Select) 
+  40] cons(X, Y) >= Y  because [37], by (Star) 
+  41] explode*(cons(X, Y), F, Z) >= op(F, F)  because explode > op, [42] and [42], by (Copy) 
+  42] explode*(cons(X, Y), F, Z) >= F  because [43], by (Select) 
+  43] F >= F  by (Meta) 
+  44] explode*(cons(X, Y), F, Z) >= @_{o -> o}(F, Z)  because explode > @_{o -> o}, [42] and [45], by (Copy) 
+  45] explode*(cons(X, Y), F, Z) >= Z  because [46], by (Select) 
+  46] Z >= Z  by (Meta) 
+
+We can thus remove the following rules:
+
+  explode(nil, F, X) => X 
+  explode(cons(X, Y), F, Z) => explode(Y, op(F, F), F Z) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  op(F, G, X) >? F (G X) 
+  implode(nil, F, X) >? X 
+  implode(cons(X, Y), F, Z) >? implode(Y, F, F Z) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[implode(x_1, x_2, x_3)]] = implode(x_1, x_3, x_2) 
+
+We choose Lex = {implode} and Mul = {@_{o -> o}, cons, nil, op}, and the following precedence: op > nil > implode > cons > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  op(F, G, X) > @_{o -> o}(F, @_{o -> o}(G, X)) 
+  implode(nil, F, X) >= X 
+  implode(cons(X, Y), F, Z) > implode(Y, F, @_{o -> o}(F, Z)) 
+
+With these choices, we have:
+
+  1] op(F, G, X) > @_{o -> o}(F, @_{o -> o}(G, X))  because [2], by definition 
+  2] op*(F, G, X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because op > @_{o -> o}, [3] and [5], by (Copy) 
+  3] op*(F, G, X) >= F  because [4], by (Select) 
+  4] F >= F  by (Meta) 
+  5] op*(F, G, X) >= @_{o -> o}(G, X)  because op > @_{o -> o}, [6] and [8], by (Copy) 
+  6] op*(F, G, X) >= G  because [7], by (Select) 
+  7] G >= G  by (Meta) 
+  8] op*(F, G, X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+
+  10] implode(nil, F, X) >= X  because [11], by (Star) 
+  11] implode*(nil, F, X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+
+  13] implode(cons(X, Y), F, Z) > implode(Y, F, @_{o -> o}(F, Z))  because [14], by definition 
+  14] implode*(cons(X, Y), F, Z) >= implode(Y, F, @_{o -> o}(F, Z))  because implode in Lex, [15], [18], [20] and [22], by (Stat) 
+  15] cons(X, Y) > Y  because [16], by definition 
+  16] cons*(X, Y) >= Y  because [17], by (Select) 
+  17] Y >= Y  by (Meta) 
+  18] implode*(cons(X, Y), F, Z) >= Y  because [19], by (Select) 
+  19] cons(X, Y) >= Y  because [16], by (Star) 
+  20] implode*(cons(X, Y), F, Z) >= F  because [21], by (Select) 
+  21] F >= F  by (Meta) 
+  22] implode*(cons(X, Y), F, Z) >= @_{o -> o}(F, Z)  because implode > @_{o -> o}, [20] and [23], by (Copy) 
+  23] implode*(cons(X, Y), F, Z) >= Z  because [24], by (Select) 
+  24] Z >= Z  by (Meta) 
+
+We can thus remove the following rules:
+
+  op(F, G, X) => F (G X) 
+  implode(cons(X, Y), F, Z) => implode(Y, F, F Z) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  implode(nil, F, X) >? X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  implode = Lam[y0;G1;y2].3 + y0 + y2 + G1(0) 
+  nil = 3 
+
+Using this interpretation, the requirements translate to:
+
+  [[implode(nil, _F0, _x1)]] = 6 + x1 + F0(0) > x1 = [[_x1]] 
+
+We can thus remove the following rules:
+
+  implode(nil, F, X) => X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

@@ -1,0 +1,169 @@
+YES
+We consider the system JkAgb.
+
+  Alphabet:
+
+    !280 : [nat -> nat] --> nat -> nat 
+    O : [] --> nat 
+    cons : [nat * list] --> list 
+    map : [nat -> nat * list] --> list 
+    nil : [] --> list 
+    op : [nat -> nat * nat -> nat] --> nat -> nat 
+    pow : [nat -> nat * nat] --> nat -> nat 
+    s : [nat] --> nat 
+
+  Rules:
+
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    pow(F, O) => !280(/\x.x) 
+    pow(F, s(X)) => op(F, pow(F, X)) 
+    op(F, G) X => F (G X) 
+    !280(/\x.!280(F) x) => F 
+    !280(F) X => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  pow(F, O) >? !280(/\x.x) 
+  pow(F, s(X)) >? op(F, pow(F, X)) 
+  op(F, G) X >? F (G X) 
+  !280(/\x.!280(F) x) >? F 
+  !280(F) X >? F X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[nil]] = _|_ 
+
+We choose Lex = {} and Mul = {!280, @_{o -> o}, O, cons, map, op, pow, s}, and the following precedence: O > map > cons > pow > !280 > op > @_{o -> o} > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  map(F, _|_) >= _|_ 
+  map(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y)) 
+  pow(F, O) > !280(/\x.x) 
+  pow(F, s(X)) >= op(F, pow(F, X)) 
+  @_{o -> o}(op(F, G), X) > @_{o -> o}(F, @_{o -> o}(G, X)) 
+  !280(/\x.@_{o -> o}(!280(F), x)) >= F 
+  @_{o -> o}(!280(F), X) >= @_{o -> o}(F, X) 
+
+With these choices, we have:
+
+  1] map(F, _|_) >= _|_  by (Bot) 
+
+  2] map(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because [3], by (Star) 
+  3] map*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because map > cons, [4] and [11], by (Copy) 
+  4] map*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because map > @_{o -> o}, [5] and [7], by (Copy) 
+  5] map*(F, cons(X, Y)) >= F  because [6], by (Select) 
+  6] F >= F  by (Meta) 
+  7] map*(F, cons(X, Y)) >= X  because [8], by (Select) 
+  8] cons(X, Y) >= X  because [9], by (Star) 
+  9] cons*(X, Y) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+  11] map*(F, cons(X, Y)) >= map(F, Y)  because map in Mul, [12] and [13], by (Stat) 
+  12] F >= F  by (Meta) 
+  13] cons(X, Y) > Y  because [14], by definition 
+  14] cons*(X, Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+
+  16] pow(F, O) > !280(/\x.x)  because [17], by definition 
+  17] pow*(F, O) >= !280(/\x.x)  because pow > !280 and [18], by (Copy) 
+  18] pow*(F, O) >= /\y.y  because [19], by (F-Abs) 
+  19] pow*(F, O, x) >= x  because [20], by (Select) 
+  20] x >= x  by (Var) 
+
+  21] pow(F, s(X)) >= op(F, pow(F, X))  because [22], by (Star) 
+  22] pow*(F, s(X)) >= op(F, pow(F, X))  because pow > op, [23] and [25], by (Copy) 
+  23] pow*(F, s(X)) >= F  because [24], by (Select) 
+  24] F >= F  by (Meta) 
+  25] pow*(F, s(X)) >= pow(F, X)  because pow in Mul, [26] and [27], by (Stat) 
+  26] F >= F  by (Meta) 
+  27] s(X) > X  because [28], by definition 
+  28] s*(X) >= X  because [29], by (Select) 
+  29] X >= X  by (Meta) 
+
+  30] @_{o -> o}(op(F, G), X) > @_{o -> o}(F, @_{o -> o}(G, X))  because [31], by definition 
+  31] @_{o -> o}*(op(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [32], by (Select) 
+  32] op(F, G) @_{o -> o}*(op(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [33] 
+  33] op*(F, G, @_{o -> o}*(op(F, G), X)) >= @_{o -> o}(F, @_{o -> o}(G, X))  because op > @_{o -> o}, [34] and [36], by (Copy) 
+  34] op*(F, G, @_{o -> o}*(op(F, G), X)) >= F  because [35], by (Select) 
+  35] F >= F  by (Meta) 
+  36] op*(F, G, @_{o -> o}*(op(F, G), X)) >= @_{o -> o}(G, X)  because op > @_{o -> o}, [37] and [39], by (Copy) 
+  37] op*(F, G, @_{o -> o}*(op(F, G), X)) >= G  because [38], by (Select) 
+  38] G >= G  by (Meta) 
+  39] op*(F, G, @_{o -> o}*(op(F, G), X)) >= X  because [40], by (Select) 
+  40] @_{o -> o}*(op(F, G), X) >= X  because [41], by (Select) 
+  41] X >= X  by (Meta) 
+
+  42] !280(/\x.@_{o -> o}(!280(F), x)) >= F  because [43], by (Star) 
+  43] !280*(/\x.@_{o -> o}(!280(F), x)) >= F  because [44], by (Select) 
+  44] /\x.@_{o -> o}(!280(F), x) >= F  because [45], by (Eta)[Kop13:2] 
+  45] !280(F) >= F  because [46], by (Star) 
+  46] !280*(F) >= F  because [47], by (Select) 
+  47] F >= F  by (Meta) 
+
+  48] @_{o -> o}(!280(F), X) >= @_{o -> o}(F, X)  because [49], by (Star) 
+  49] @_{o -> o}*(!280(F), X) >= @_{o -> o}(F, X)  because [50], by (Select) 
+  50] !280(F) @_{o -> o}*(!280(F), X) >= @_{o -> o}(F, X)  because [51] 
+  51] !280*(F, @_{o -> o}*(!280(F), X)) >= @_{o -> o}(F, X)  because !280 > @_{o -> o}, [52] and [54], by (Copy) 
+  52] !280*(F, @_{o -> o}*(!280(F), X)) >= F  because [53], by (Select) 
+  53] F >= F  by (Meta) 
+  54] !280*(F, @_{o -> o}*(!280(F), X)) >= X  because [55], by (Select) 
+  55] @_{o -> o}*(!280(F), X) >= X  because [56], by (Select) 
+  56] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  pow(F, O) => !280(/\x.x) 
+  op(F, G) X => F (G X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  pow(F, s(X)) >? op(F, pow(F, X)) 
+  !280(/\x.!280(F) x) >? F 
+  !280(F) X >? F X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  !280 = Lam[G0;y1].3 + G0(y1) 
+  cons = Lam[y0;y1].3 + y0 + y1 
+  map = Lam[G0;y1].3 + 3*y1 + G0(0) + y1*G0(y1) 
+  nil = 0 
+  op = Lam[G0;G1;y2].G0(0) + 2*G1(0) 
+  pow = Lam[G0;y1;y2].y1 + 2*G0(0) + 2*G0(y2) + 3*y1*G0(y1) 
+  s = Lam[y0].3 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[map(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 12 + 3*x1 + 3*x2 + F0(0) + 3*F0(3 + x1 + x2) + x1*F0(3 + x1 + x2) + x2*F0(3 + x1 + x2) > 6 + x1 + 3*x2 + F0(0) + F0(x1) + x2*F0(x2) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+  [[pow(_F0, s(_x1))]] = Lam[y0].3 + 3*x1 + 2*F0(0) + 2*F0(y0) + 9*x1*F0(3 + 3*x1) + 9*F0(3 + 3*x1) > Lam[y0].2*x1 + 6*x1*F0(x1) + 9*F0(0) = [[op(_F0, pow(_F0, _x1))]] 
+  [[!280(/\x.!280(_F0) x)]] = Lam[y0].6 + y0 + F0(y0) > Lam[y0].F0(y0) = [[_F0]] 
+  [[!280(_F0) _x1]] = 3 + x1 + F0(x1) > x1 + F0(x1) = [[_F0 _x1]] 
+
+We can thus remove the following rules:
+
+  map(F, nil) => nil 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  pow(F, s(X)) => op(F, pow(F, X)) 
+  !280(/\x.!280(F) x) => F 
+  !280(F) X => F X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[Kop13:2]  C. Kop.  StarHorpo with an Eta-Rule.  Unpublished manuscript, http://cl-informatik.uibk.ac.at/users/kop/etahorpo.pdf, 2013.

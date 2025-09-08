@@ -1,0 +1,325 @@
+YES
+We consider the system wMmja.
+
+  Alphabet:
+
+    O : [] --> nat 
+    mult : [nat * nat] --> nat 
+    plus : [nat * nat] --> nat 
+    plus3 : [nat] --> nat -> nat -> nat 
+    rec : [nat * nat * nat -> nat -> nat] --> nat 
+    s : [nat] --> nat 
+    succ2 : [] --> nat -> nat -> nat 
+    xap : [nat -> nat -> nat * nat] --> nat -> nat 
+    yap : [nat -> nat * nat] --> nat 
+
+  Rules:
+
+    rec(O, X, /\x./\y.yap(xap(F, x), y)) => X 
+    rec(s(X), Y, /\x./\y.yap(xap(F, x), y)) => yap(xap(F, X), rec(X, Y, /\z./\u.yap(xap(F, z), u))) 
+    succ2 X Y => s(Y) 
+    plus(X, Y) => rec(X, Y, succ2) 
+    plus3(X) Y Z => plus(X, plus(Y, Z)) 
+    mult(X, Y) => rec(X, O, plus3(Y)) 
+    xap(F, X) => F X 
+    yap(F, X) => F X 
+
+Symbol xap is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    O : [] --> nat 
+    mult : [nat * nat] --> nat 
+    plus : [nat * nat] --> nat 
+    plus3 : [nat] --> nat -> nat -> nat 
+    rec : [nat * nat * nat -> nat -> nat] --> nat 
+    s : [nat] --> nat 
+    succ2 : [] --> nat -> nat -> nat 
+    yap : [nat -> nat * nat] --> nat 
+
+  Rules:
+
+    rec(O, X, /\x./\y.yap(F[x], y)) => X 
+    rec(s(X), Y, /\x./\y.yap(F[x], y)) => yap(F[X], rec(X, Y, /\z./\u.yap(F[z], u))) 
+    succ2 X Y => s(Y) 
+    plus(X, Y) => rec(X, Y, succ2) 
+    plus3(X) Y Z => plus(X, plus(Y, Z)) 
+    mult(X, Y) => rec(X, O, plus3(Y)) 
+    yap(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(O, X, /\x./\y.yap(F[x], y)) >? X 
+  rec(s(X), Y, /\x./\y.yap(F[x], y)) >? yap(F[X], rec(X, Y, /\z./\u.yap(F[z], u))) 
+  succ2 X Y >? s(Y) 
+  plus(X, Y) >? rec(X, Y, succ2) 
+  plus3(X) Y Z >? plus(X, plus(Y, Z)) 
+  mult(X, Y) >? rec(X, O, plus3(Y)) 
+  yap(F, X) >? F X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, mult, plus, plus3, rec, s, succ2, yap}, and the following precedence: @_{o -> o -> o} > mult > yap > plus3 > s > @_{o -> o} > plus > rec > succ2
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  rec(_|_, X, /\x./\y.yap(F[x], y)) > X 
+  rec(s(X), Y, /\x./\y.yap(F[x], y)) >= yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y))) 
+  @_{o -> o}(@_{o -> o -> o}(succ2, X), Y) >= s(Y) 
+  plus(X, Y) >= rec(X, Y, succ2) 
+  @_{o -> o}(@_{o -> o -> o}(plus3(X), Y), Z) >= plus(X, plus(Y, Z)) 
+  mult(X, Y) >= rec(X, _|_, plus3(Y)) 
+  yap(F, X) >= @_{o -> o}(F, X) 
+
+With these choices, we have:
+
+  1] rec(_|_, X, /\x./\y.yap(F[x], y)) > X  because [2], by definition 
+  2] rec*(_|_, X, /\x./\y.yap(F[x], y)) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] rec(s(X), Y, /\x./\y.yap(F[x], y)) >= yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y)))  because [5], by (Star) 
+  5] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y)))  because [6], by (Select) 
+  6] yap(F[rec*(s(X), Y, /\x./\y.yap(F[x], y))], rec*(s(X), Y, /\z./\u.yap(F[z], u))) >= yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y)))  because yap in Mul, [7] and [12], by (Fun) 
+  7] F[rec*(s(X), Y, /\x./\y.yap(F[x], y))] >= F[X]  because [8], by (Meta) 
+  8] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= X  because [9], by (Select) 
+  9] s(X) >= X  because [10], by (Star) 
+  10] s*(X) >= X  because [11], by (Select) 
+  11] X >= X  by (Meta) 
+  12] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= rec(X, Y, /\x./\y.yap(F[x], y))  because rec in Mul, [13], [15] and [16], by (Stat) 
+  13] s(X) > X  because [14], by definition 
+  14] s*(X) >= X  because [11], by (Select) 
+  15] Y >= Y  by (Meta) 
+  16] /\x./\z.yap(F[x], z) >= /\x./\z.yap(F[x], z)  because [17], by (Abs) 
+  17] /\z.yap(F[y], z) >= /\z.yap(F[y], z)  because [18], by (Abs) 
+  18] yap(F[y], x) >= yap(F[y], x)  because yap in Mul, [19] and [21], by (Fun) 
+  19] F[y] >= F[y]  because [20], by (Meta) 
+  20] y >= y  by (Var) 
+  21] x >= x  by (Var) 
+
+  22] @_{o -> o}(@_{o -> o -> o}(succ2, X), Y) >= s(Y)  because [23], by (Star) 
+  23] @_{o -> o}*(@_{o -> o -> o}(succ2, X), Y) >= s(Y)  because [24], by (Select) 
+  24] @_{o -> o -> o}(succ2, X) @_{o -> o}*(@_{o -> o -> o}(succ2, X), Y) >= s(Y)  because [25] 
+  25] @_{o -> o -> o}*(succ2, X, @_{o -> o}*(@_{o -> o -> o}(succ2, X), Y)) >= s(Y)  because @_{o -> o -> o} > s and [26], by (Copy) 
+  26] @_{o -> o -> o}*(succ2, X, @_{o -> o}*(@_{o -> o -> o}(succ2, X), Y)) >= Y  because [27], by (Select) 
+  27] @_{o -> o}*(@_{o -> o -> o}(succ2, X), Y) >= Y  because [28], by (Select) 
+  28] Y >= Y  by (Meta) 
+
+  29] plus(X, Y) >= rec(X, Y, succ2)  because [30], by (Star) 
+  30] plus*(X, Y) >= rec(X, Y, succ2)  because plus > rec, [31], [33] and [35], by (Copy) 
+  31] plus*(X, Y) >= X  because [32], by (Select) 
+  32] X >= X  by (Meta) 
+  33] plus*(X, Y) >= Y  because [34], by (Select) 
+  34] Y >= Y  by (Meta) 
+  35] plus*(X, Y) >= succ2  because plus > succ2, by (Copy) 
+
+  36] @_{o -> o}(@_{o -> o -> o}(plus3(X), Y), Z) >= plus(X, plus(Y, Z))  because [37], by (Star) 
+  37] @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z) >= plus(X, plus(Y, Z))  because [38], by (Select) 
+  38] @_{o -> o -> o}(plus3(X), Y) @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z) >= plus(X, plus(Y, Z))  because [39] 
+  39] @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) >= plus(X, plus(Y, Z))  because [40], by (Select) 
+  40] plus3(X) @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) >= plus(X, plus(Y, Z))  because [41] 
+  41] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= plus(X, plus(Y, Z))  because plus3 > plus, [42] and [44], by (Copy) 
+  42] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= X  because [43], by (Select) 
+  43] X >= X  by (Meta) 
+  44] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= plus(Y, Z)  because plus3 > plus, [45] and [48], by (Copy) 
+  45] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= Y  because [46], by (Select) 
+  46] @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) >= Y  because [47], by (Select) 
+  47] Y >= Y  by (Meta) 
+  48] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= Z  because [49], by (Select) 
+  49] @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) >= Z  because [50], by (Select) 
+  50] @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z) >= Z  because [51], by (Select) 
+  51] Z >= Z  by (Meta) 
+
+  52] mult(X, Y) >= rec(X, _|_, plus3(Y))  because [53], by (Star) 
+  53] mult*(X, Y) >= rec(X, _|_, plus3(Y))  because mult > rec, [54], [56] and [57], by (Copy) 
+  54] mult*(X, Y) >= X  because [55], by (Select) 
+  55] X >= X  by (Meta) 
+  56] mult*(X, Y) >= _|_  by (Bot) 
+  57] mult*(X, Y) >= plus3(Y)  because mult > plus3 and [58], by (Copy) 
+  58] mult*(X, Y) >= Y  because [59], by (Select) 
+  59] Y >= Y  by (Meta) 
+
+  60] yap(F, X) >= @_{o -> o}(F, X)  because [61], by (Star) 
+  61] yap*(F, X) >= @_{o -> o}(F, X)  because yap > @_{o -> o}, [62] and [64], by (Copy) 
+  62] yap*(F, X) >= F  because [63], by (Select) 
+  63] F >= F  by (Meta) 
+  64] yap*(F, X) >= X  because [65], by (Select) 
+  65] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  rec(O, X, /\x./\y.yap(F[x], y)) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(s(X), Y, /\x./\y.yap(F[x], y)) >? yap(F[X], rec(X, Y, /\z./\u.yap(F[z], u))) 
+  succ2 X Y >? s(Y) 
+  plus(X, Y) >? rec(X, Y, succ2) 
+  plus3(X) Y Z >? plus(X, plus(Y, Z)) 
+  mult(X, Y) >? rec(X, O, plus3(Y)) 
+  yap(F, X) >? F X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, mult, plus, plus3, rec, s, succ2, yap}, and the following precedence: @_{o -> o -> o} > mult > plus3 > plus > succ2 > yap > @_{o -> o} > s > rec
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  rec(s(X), Y, /\x./\y.yap(F[x], y)) > yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y))) 
+  @_{o -> o}(@_{o -> o -> o}(succ2, X), Y) >= s(Y) 
+  plus(X, Y) >= rec(X, Y, succ2) 
+  @_{o -> o}(@_{o -> o -> o}(plus3(X), Y), Z) >= plus(X, plus(Y, Z)) 
+  mult(X, Y) >= rec(X, _|_, plus3(Y)) 
+  yap(F, X) >= @_{o -> o}(F, X) 
+
+With these choices, we have:
+
+  1] rec(s(X), Y, /\x./\y.yap(F[x], y)) > yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y)))  because [2], by definition 
+  2] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y)))  because [3], by (Select) 
+  3] yap(F[rec*(s(X), Y, /\x./\y.yap(F[x], y))], rec*(s(X), Y, /\z./\u.yap(F[z], u))) >= yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y)))  because yap in Mul, [4] and [9], by (Fun) 
+  4] F[rec*(s(X), Y, /\x./\y.yap(F[x], y))] >= F[X]  because [5], by (Meta) 
+  5] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= X  because [6], by (Select) 
+  6] s(X) >= X  because [7], by (Star) 
+  7] s*(X) >= X  because [8], by (Select) 
+  8] X >= X  by (Meta) 
+  9] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= rec(X, Y, /\x./\y.yap(F[x], y))  because rec in Mul, [10], [12] and [13], by (Stat) 
+  10] s(X) > X  because [11], by definition 
+  11] s*(X) >= X  because [8], by (Select) 
+  12] Y >= Y  by (Meta) 
+  13] /\x./\z.yap(F[x], z) >= /\x./\z.yap(F[x], z)  because [14], by (Abs) 
+  14] /\z.yap(F[y], z) >= /\z.yap(F[y], z)  because [15], by (Abs) 
+  15] yap(F[y], x) >= yap(F[y], x)  because yap in Mul, [16] and [18], by (Fun) 
+  16] F[y] >= F[y]  because [17], by (Meta) 
+  17] y >= y  by (Var) 
+  18] x >= x  by (Var) 
+
+  19] @_{o -> o}(@_{o -> o -> o}(succ2, X), Y) >= s(Y)  because [20], by (Star) 
+  20] @_{o -> o}*(@_{o -> o -> o}(succ2, X), Y) >= s(Y)  because @_{o -> o} > s and [21], by (Copy) 
+  21] @_{o -> o}*(@_{o -> o -> o}(succ2, X), Y) >= Y  because [22], by (Select) 
+  22] Y >= Y  by (Meta) 
+
+  23] plus(X, Y) >= rec(X, Y, succ2)  because [24], by (Star) 
+  24] plus*(X, Y) >= rec(X, Y, succ2)  because plus > rec, [25], [27] and [29], by (Copy) 
+  25] plus*(X, Y) >= X  because [26], by (Select) 
+  26] X >= X  by (Meta) 
+  27] plus*(X, Y) >= Y  because [28], by (Select) 
+  28] Y >= Y  by (Meta) 
+  29] plus*(X, Y) >= succ2  because plus > succ2, by (Copy) 
+
+  30] @_{o -> o}(@_{o -> o -> o}(plus3(X), Y), Z) >= plus(X, plus(Y, Z))  because [31], by (Star) 
+  31] @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z) >= plus(X, plus(Y, Z))  because [32], by (Select) 
+  32] @_{o -> o -> o}(plus3(X), Y) @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z) >= plus(X, plus(Y, Z))  because [33] 
+  33] @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) >= plus(X, plus(Y, Z))  because [34], by (Select) 
+  34] plus3(X) @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) >= plus(X, plus(Y, Z))  because [35] 
+  35] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= plus(X, plus(Y, Z))  because plus3 > plus, [36] and [38], by (Copy) 
+  36] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= X  because [37], by (Select) 
+  37] X >= X  by (Meta) 
+  38] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= plus(Y, Z)  because plus3 > plus, [39] and [42], by (Copy) 
+  39] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= Y  because [40], by (Select) 
+  40] @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) >= Y  because [41], by (Select) 
+  41] Y >= Y  by (Meta) 
+  42] plus3*(X, @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)), @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z))) >= Z  because [43], by (Select) 
+  43] @_{o -> o -> o}*(plus3(X), Y, @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z)) >= Z  because [44], by (Select) 
+  44] @_{o -> o}*(@_{o -> o -> o}(plus3(X), Y), Z) >= Z  because [45], by (Select) 
+  45] Z >= Z  by (Meta) 
+
+  46] mult(X, Y) >= rec(X, _|_, plus3(Y))  because [47], by (Star) 
+  47] mult*(X, Y) >= rec(X, _|_, plus3(Y))  because mult > rec, [48], [50] and [51], by (Copy) 
+  48] mult*(X, Y) >= X  because [49], by (Select) 
+  49] X >= X  by (Meta) 
+  50] mult*(X, Y) >= _|_  by (Bot) 
+  51] mult*(X, Y) >= plus3(Y)  because mult > plus3 and [52], by (Copy) 
+  52] mult*(X, Y) >= Y  because [53], by (Select) 
+  53] Y >= Y  by (Meta) 
+
+  54] yap(F, X) >= @_{o -> o}(F, X)  because [55], by (Star) 
+  55] yap*(F, X) >= @_{o -> o}(F, X)  because yap > @_{o -> o}, [56] and [58], by (Copy) 
+  56] yap*(F, X) >= F  because [57], by (Select) 
+  57] F >= F  by (Meta) 
+  58] yap*(F, X) >= X  because [59], by (Select) 
+  59] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  rec(s(X), Y, /\x./\y.yap(F[x], y)) => yap(F[X], rec(X, Y, /\z./\u.yap(F[z], u))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ2 X Y >? s(Y) 
+  plus(X, Y) >? rec(X, Y, succ2) 
+  plus3(X) Y Z >? plus(X, plus(Y, Z)) 
+  mult(X, Y) >? rec(X, O, plus3(Y)) 
+  yap(F, X) >? F X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  mult = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  plus = Lam[y0;y1].y0 + y1 
+  plus3 = Lam[y0;y1;y2].1 + y0 
+  rec = Lam[y0;y1;G2].y0 + y1 + 2*G2(y0,y1) 
+  s = Lam[y0].y0 
+  succ2 = Lam[y0;y1].0 
+  yap = Lam[G0;y1].3 + 2*y1 + G0(y1) 
+
+Using this interpretation, the requirements translate to:
+
+  [[succ2 _x0 _x1]] = x0 + x1 >= x1 = [[s(_x1)]] 
+  [[plus(_x0, _x1)]] = x0 + x1 >= x0 + x1 = [[rec(_x0, _x1, succ2)]] 
+  [[plus3(_x0) _x1 _x2]] = 1 + x0 + x1 + x2 > x0 + x1 + x2 = [[plus(_x0, plus(_x1, _x2))]] 
+  [[mult(_x0, _x1)]] = 3 + 3*x0 + 3*x1 > 2 + x0 + 2*x1 = [[rec(_x0, O, plus3(_x1))]] 
+  [[yap(_F0, _x1)]] = 3 + 2*x1 + F0(x1) > x1 + F0(x1) = [[_F0 _x1]] 
+
+We can thus remove the following rules:
+
+  plus3(X) Y Z => plus(X, plus(Y, Z)) 
+  mult(X, Y) => rec(X, O, plus3(Y)) 
+  yap(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ2 X Y >? s(Y) 
+  plus(X, Y) >? rec(X, Y, succ2) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  plus = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  rec = Lam[y0;y1;G2].y0 + y1 + G2(0,0) 
+  s = Lam[y0].y0 
+  succ2 = Lam[y0;y1].1 
+
+Using this interpretation, the requirements translate to:
+
+  [[succ2 _x0 _x1]] = 1 + x0 + x1 > x1 = [[s(_x1)]] 
+  [[plus(_x0, _x1)]] = 3 + 3*x0 + 3*x1 > 1 + x0 + x1 = [[rec(_x0, _x1, succ2)]] 
+
+We can thus remove the following rules:
+
+  succ2 X Y => s(Y) 
+  plus(X, Y) => rec(X, Y, succ2) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

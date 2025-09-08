@@ -1,0 +1,792 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/VtR20.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 637 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 163 ms]
+        (9) QDP
+        (10) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (11) YES
+    (12) JBCTerminationSCC
+        (13) SCCToIRSProof [SOUND, 126 ms]
+        (14) IRSwT
+        (15) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (16) IRSwT
+        (17) IRSwTTerminationDigraphProof [EQUIVALENT, 32 ms]
+        (18) IRSwT
+        (19) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (20) IRSwT
+        (21) TempFilterProof [SOUND, 14 ms]
+        (22) IntTRS
+        (23) PolynomialOrderProcessor [EQUIVALENT, 6 ms]
+        (24) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+public class DuplicateNodes {
+    public static void main(String[] args) {
+		Random.args = args;
+        Tree tree = Tree.createTree();
+
+		randomlyDuplicate(tree);
+    }
+
+	public static void randomlyDuplicate(Tree tree) {
+		Tree cur = tree;
+		
+		while (cur != null) {
+			if (Random.random() > 42) {
+				cur.right = new Tree(cur.left, cur.right);
+				cur = cur.left;
+			} else {
+				cur.left = new Tree(cur.left, cur.right);
+				cur = cur.right;
+			}
+		}
+	}
+}
+
+
+public class List {
+  Tree value;
+  List next;
+
+  public List(Tree value, List next) {
+    this.value = value;
+    this.next = next;
+  }
+}
+
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+public class Tree {
+  Tree left;
+  Tree right;
+  Object value;
+
+  public Tree(Tree l, Tree r) {
+    this.left = l;
+    this.right = r;
+  }
+
+  public Tree() {
+  }
+
+  public static Tree createNode() {
+   if (Random.random() == 0) {
+      return null;
+    }
+    Tree result = new Tree();
+    return result;
+  }
+
+  public static Tree createTree() {
+    Tree result = createNode();
+    List list = new List(result, null);
+    
+    int counter = Random.random();
+    while (counter > 0 && list != null) {
+      Tree first = list.value;
+      list = list.next;
+
+      if (first != null) {
+        Tree left = createNode();
+        Tree right = createNode();
+        first.left = left;
+        first.right = right;
+        list = new List(left, list);
+        list = new List(right, list);
+      }
+
+      counter--;
+    }
+
+    return result;
+  }
+
+  public static void main(String[] args) {
+    Random.args = args;
+    createTree();
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+public class DuplicateNodes {
+    public static void main(String[] args) {
+		Random.args = args;
+        Tree tree = Tree.createTree();
+
+		randomlyDuplicate(tree);
+    }
+
+	public static void randomlyDuplicate(Tree tree) {
+		Tree cur = tree;
+		
+		while (cur != null) {
+			if (Random.random() > 42) {
+				cur.right = new Tree(cur.left, cur.right);
+				cur = cur.left;
+			} else {
+				cur.left = new Tree(cur.left, cur.right);
+				cur = cur.right;
+			}
+		}
+	}
+}
+
+
+public class List {
+  Tree value;
+  List next;
+
+  public List(Tree value, List next) {
+    this.value = value;
+    this.next = next;
+  }
+}
+
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+public class Tree {
+  Tree left;
+  Tree right;
+  Object value;
+
+  public Tree(Tree l, Tree r) {
+    this.left = l;
+    this.right = r;
+  }
+
+  public Tree() {
+  }
+
+  public static Tree createNode() {
+   if (Random.random() == 0) {
+      return null;
+    }
+    Tree result = new Tree();
+    return result;
+  }
+
+  public static Tree createTree() {
+    Tree result = createNode();
+    List list = new List(result, null);
+    
+    int counter = Random.random();
+    while (counter > 0 && list != null) {
+      Tree first = list.value;
+      list = list.next;
+
+      if (first != null) {
+        Tree left = createNode();
+        Tree right = createNode();
+        first.left = left;
+        first.right = right;
+        list = new List(left, list);
+        list = new List(right, list);
+      }
+
+      counter--;
+    }
+
+    return result;
+  }
+
+  public static void main(String[] args) {
+    Random.args = args;
+    createTree();
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+DuplicateNodes.main([Ljava/lang/String;)V: Graph of 45 nodes with 0 SCCs.
+
+
+
+Tree.createTree()LTree;: Graph of 407 nodes with 1 SCC.
+
+
+
+Tree.createNode()LTree;: Graph of 109 nodes with 0 SCCs.
+
+
+
+DuplicateNodes.randomlyDuplicate(LTree;)V: Graph of 129 nodes with 1 SCC.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: DuplicateNodes.randomlyDuplicate(LTree;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Tree: [left, right]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 76 rules for P and 0 rules for R.P rules:
+f13232_0_randomlyDuplicate_NULL(EOS(STATIC_13232(java.lang.Object(o4441sub))), java.lang.Object(o4518sub), java.lang.Object(o4518sub)) -> f13239_0_randomlyDuplicate_NULL(EOS(STATIC_13239(java.lang.Object(o4441sub))), java.lang.Object(o4518sub), java.lang.Object(o4518sub)) :|: TRUE
+f13239_0_randomlyDuplicate_NULL(EOS(STATIC_13239(java.lang.Object(o4441sub))), java.lang.Object(o4518sub), java.lang.Object(o4518sub)) -> f13264_0_randomlyDuplicate_InvokeMethod(EOS(STATIC_13264(java.lang.Object(o4441sub))), java.lang.Object(o4518sub)) :|: TRUE
+f13264_0_randomlyDuplicate_InvokeMethod(EOS(STATIC_13264(java.lang.Object(o4441sub))), java.lang.Object(o4518sub)) -> f13277_0_random_FieldAccess(EOS(STATIC_13277(java.lang.Object(o4441sub))), java.lang.Object(o4518sub)) :|: TRUE
+f13277_0_random_FieldAccess(EOS(STATIC_13277(java.lang.Object(o4441sub))), java.lang.Object(o4518sub)) -> f13290_0_random_FieldAccess(EOS(STATIC_13290(java.lang.Object(o4441sub))), java.lang.Object(o4518sub), java.lang.Object(o4441sub)) :|: TRUE
+f13290_0_random_FieldAccess(EOS(STATIC_13290(java.lang.Object(o4441sub))), java.lang.Object(o4518sub), java.lang.Object(o4441sub)) -> f13305_0_random_ArrayAccess(EOS(STATIC_13305(java.lang.Object(o4441sub))), java.lang.Object(o4518sub), java.lang.Object(o4441sub)) :|: TRUE
+f13305_0_random_ArrayAccess(EOS(STATIC_13305(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(ARRAY(i5894))) -> f13326_0_random_ArrayAccess(EOS(STATIC_13326(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(ARRAY(i5894))) :|: TRUE
+f13326_0_random_ArrayAccess(EOS(STATIC_13326(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(ARRAY(i5894))) -> f13343_0_random_ArrayAccess(EOS(STATIC_13343(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(ARRAY(i5894))) :|: TRUE
+f13343_0_random_ArrayAccess(EOS(STATIC_13343(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(ARRAY(i5894))) -> f13356_0_random_Store(EOS(STATIC_13356(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) :|: TRUE
+f13356_0_random_Store(EOS(STATIC_13356(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) -> f13370_0_random_FieldAccess(EOS(STATIC_13370(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) :|: TRUE
+f13370_0_random_FieldAccess(EOS(STATIC_13370(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) -> f13371_0_random_ConstantStackPush(EOS(STATIC_13371(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) :|: TRUE
+f13371_0_random_ConstantStackPush(EOS(STATIC_13371(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) -> f13389_0_random_IntArithmetic(EOS(STATIC_13389(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) :|: TRUE
+f13389_0_random_IntArithmetic(EOS(STATIC_13389(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) -> f13417_0_random_FieldAccess(EOS(STATIC_13417(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) :|: TRUE
+f13417_0_random_FieldAccess(EOS(STATIC_13417(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) -> f13446_0_random_Load(EOS(STATIC_13446(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) :|: TRUE
+f13446_0_random_Load(EOS(STATIC_13446(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) -> f13474_0_random_InvokeMethod(EOS(STATIC_13474(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), o4564) :|: TRUE
+f13474_0_random_InvokeMethod(EOS(STATIC_13474(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4931sub)) -> f13511_0_random_InvokeMethod(EOS(STATIC_13511(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4931sub)) :|: TRUE
+f13511_0_random_InvokeMethod(EOS(STATIC_13511(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4977sub)) -> f13533_0_random_InvokeMethod(EOS(STATIC_13533(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4977sub)) :|: TRUE
+f13533_0_random_InvokeMethod(EOS(STATIC_13533(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4977sub)) -> f13562_0_length_Load(EOS(STATIC_13562(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4977sub)) :|: TRUE
+f13562_0_length_Load(EOS(STATIC_13562(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4977sub)) -> f13595_0_length_FieldAccess(EOS(STATIC_13595(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4977sub)) :|: TRUE
+f13595_0_length_FieldAccess(EOS(STATIC_13595(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(java.lang.String(EOC, i6401))) -> f13609_0_length_FieldAccess(EOS(STATIC_13609(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(java.lang.String(EOC, i6401))) :|: i6401 >= 0
+f13609_0_length_FieldAccess(EOS(STATIC_13609(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(java.lang.String(EOC, i6401))) -> f13629_0_length_Return(EOS(STATIC_13629(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6401) :|: TRUE
+f13629_0_length_Return(EOS(STATIC_13629(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6401) -> f13785_0_random_Return(EOS(STATIC_13785(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6401) :|: TRUE
+f13785_0_random_Return(EOS(STATIC_13785(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6401) -> f13790_0_randomlyDuplicate_ConstantStackPush(EOS(STATIC_13790(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6401) :|: TRUE
+f13790_0_randomlyDuplicate_ConstantStackPush(EOS(STATIC_13790(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6401) -> f13798_0_randomlyDuplicate_LE(EOS(STATIC_13798(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6401, 42) :|: TRUE
+f13798_0_randomlyDuplicate_LE(EOS(STATIC_13798(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6443, matching1) -> f13828_0_randomlyDuplicate_LE(EOS(STATIC_13828(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6443, 42) :|: TRUE && matching1 = 42
+f13798_0_randomlyDuplicate_LE(EOS(STATIC_13798(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6444, matching1) -> f13829_0_randomlyDuplicate_LE(EOS(STATIC_13829(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6444, 42) :|: TRUE && matching1 = 42
+f13828_0_randomlyDuplicate_LE(EOS(STATIC_13828(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6443, matching1) -> f13860_0_randomlyDuplicate_Load(EOS(STATIC_13860(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub)) :|: i6443 <= 42 && matching1 = 42
+f13860_0_randomlyDuplicate_Load(EOS(STATIC_13860(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub)) -> f13875_0_randomlyDuplicate_New(EOS(STATIC_13875(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub)) :|: TRUE
+f13875_0_randomlyDuplicate_New(EOS(STATIC_13875(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub)) -> f13917_0_randomlyDuplicate_Duplicate(EOS(STATIC_13917(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL))) :|: TRUE
+f13917_0_randomlyDuplicate_Duplicate(EOS(STATIC_13917(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL))) -> f13937_0_randomlyDuplicate_Load(EOS(STATIC_13937(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL))) :|: TRUE
+f13937_0_randomlyDuplicate_Load(EOS(STATIC_13937(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL))) -> f13951_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13951(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(o4518sub)) :|: TRUE
+f13951_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13951(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, o5076, o5077))) -> f13961_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13961(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, o5076, o5077))) :|: TRUE
+f13961_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13961(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, o5076, o5077))) -> f13969_0_randomlyDuplicate_Load(EOS(STATIC_13969(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076) :|: TRUE
+f13969_0_randomlyDuplicate_Load(EOS(STATIC_13969(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076) -> f13981_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13981(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, java.lang.Object(Tree(EOC, o5076, o5077))) :|: TRUE
+f13981_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13981(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, java.lang.Object(Tree(EOC, o5076, o5077))) -> f13989_0_randomlyDuplicate_InvokeMethod(EOS(STATIC_13989(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077) :|: TRUE
+f13989_0_randomlyDuplicate_InvokeMethod(EOS(STATIC_13989(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077) -> f13996_0__init__Load(EOS(STATIC_13996(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077) :|: TRUE
+f13996_0__init__Load(EOS(STATIC_13996(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077) -> f14012_0__init__InvokeMethod(EOS(STATIC_14012(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077, java.lang.Object(Tree(EOC, NULL, NULL))) :|: TRUE
+f14012_0__init__InvokeMethod(EOS(STATIC_14012(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077, java.lang.Object(Tree(EOC, NULL, NULL))) -> f14046_0__init__Load(EOS(STATIC_14046(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077) :|: TRUE
+f14046_0__init__Load(EOS(STATIC_14046(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077) -> f14052_0__init__Load(EOS(STATIC_14052(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077, java.lang.Object(Tree(EOC, NULL, NULL))) :|: TRUE
+f14052_0__init__Load(EOS(STATIC_14052(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5076, o5077, java.lang.Object(Tree(EOC, NULL, NULL))) -> f14057_0__init__FieldAccess(EOS(STATIC_14057(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5077, java.lang.Object(Tree(EOC, NULL, NULL)), o5076) :|: TRUE
+f14057_0__init__FieldAccess(EOS(STATIC_14057(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5077, java.lang.Object(Tree(EOC, NULL, NULL)), o5076) -> f14128_0__init__Load(EOS(STATIC_14128(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, NULL)), java.lang.Object(Tree(EOC, o5076, NULL)), o5077) :|: TRUE
+f14128_0__init__Load(EOS(STATIC_14128(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, NULL)), java.lang.Object(Tree(EOC, o5076, NULL)), o5077) -> f14170_0__init__Load(EOS(STATIC_14170(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, NULL)), o5077, java.lang.Object(Tree(EOC, o5076, NULL))) :|: TRUE
+f14170_0__init__Load(EOS(STATIC_14170(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, NULL)), o5077, java.lang.Object(Tree(EOC, o5076, NULL))) -> f14364_0__init__FieldAccess(EOS(STATIC_14364(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, NULL)), java.lang.Object(Tree(EOC, o5076, NULL)), o5077) :|: TRUE
+f14364_0__init__FieldAccess(EOS(STATIC_14364(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, NULL)), java.lang.Object(Tree(EOC, o5076, NULL)), o5077) -> f14394_0__init__Return(EOS(STATIC_14394(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077))) :|: TRUE
+f14394_0__init__Return(EOS(STATIC_14394(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077))) -> f14401_0_randomlyDuplicate_FieldAccess(EOS(STATIC_14401(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077))) :|: TRUE
+f14401_0_randomlyDuplicate_FieldAccess(EOS(STATIC_14401(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077)), java.lang.Object(Tree(EOC, o5076, o5077))) -> f14414_0_randomlyDuplicate_Load(EOS(STATIC_14414(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, java.lang.Object(Tree(EOC, o5076, o5077)), o5077))) :|: TRUE
+f14414_0_randomlyDuplicate_Load(EOS(STATIC_14414(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, java.lang.Object(Tree(EOC, o5076, o5077)), o5077))) -> f14441_0_randomlyDuplicate_FieldAccess(EOS(STATIC_14441(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, java.lang.Object(Tree(EOC, o5076, o5077)), o5077))) :|: TRUE
+f14441_0_randomlyDuplicate_FieldAccess(EOS(STATIC_14441(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, java.lang.Object(Tree(EOC, o5076, o5077)), o5077))) -> f14457_0_randomlyDuplicate_Store(EOS(STATIC_14457(java.lang.Object(ARRAY(i5894)))), o5077) :|: TRUE
+f14457_0_randomlyDuplicate_Store(EOS(STATIC_14457(java.lang.Object(ARRAY(i5894)))), o5077) -> f14474_0_randomlyDuplicate_JMP(EOS(STATIC_14474(java.lang.Object(ARRAY(i5894)))), o5077) :|: TRUE
+f14474_0_randomlyDuplicate_JMP(EOS(STATIC_14474(java.lang.Object(ARRAY(i5894)))), o5077) -> f14484_0_randomlyDuplicate_Load(EOS(STATIC_14484(java.lang.Object(ARRAY(i5894)))), o5077) :|: TRUE
+f14484_0_randomlyDuplicate_Load(EOS(STATIC_14484(java.lang.Object(ARRAY(i5894)))), o5077) -> f13200_0_randomlyDuplicate_Load(EOS(STATIC_13200(java.lang.Object(ARRAY(i5894)))), o5077) :|: TRUE
+f13200_0_randomlyDuplicate_Load(EOS(STATIC_13200(java.lang.Object(o4441sub))), o4443) -> f13232_0_randomlyDuplicate_NULL(EOS(STATIC_13232(java.lang.Object(o4441sub))), o4443, o4443) :|: TRUE
+f13829_0_randomlyDuplicate_LE(EOS(STATIC_13829(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), i6444, matching1) -> f13866_0_randomlyDuplicate_Load(EOS(STATIC_13866(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub)) :|: i6444 > 42 && matching1 = 42
+f13866_0_randomlyDuplicate_Load(EOS(STATIC_13866(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub)) -> f13876_0_randomlyDuplicate_New(EOS(STATIC_13876(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub)) :|: TRUE
+f13876_0_randomlyDuplicate_New(EOS(STATIC_13876(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub)) -> f13919_0_randomlyDuplicate_Duplicate(EOS(STATIC_13919(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL))) :|: TRUE
+f13919_0_randomlyDuplicate_Duplicate(EOS(STATIC_13919(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL))) -> f13939_0_randomlyDuplicate_Load(EOS(STATIC_13939(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL))) :|: TRUE
+f13939_0_randomlyDuplicate_Load(EOS(STATIC_13939(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL))) -> f13953_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13953(java.lang.Object(ARRAY(i5894)))), java.lang.Object(o4518sub), java.lang.Object(o4518sub), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(o4518sub)) :|: TRUE
+f13953_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13953(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, o5080, o5081))) -> f13963_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13963(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, o5080, o5081))) :|: TRUE
+f13963_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13963(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, o5080, o5081))) -> f13971_0_randomlyDuplicate_Load(EOS(STATIC_13971(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080) :|: TRUE
+f13971_0_randomlyDuplicate_Load(EOS(STATIC_13971(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080) -> f13983_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13983(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, java.lang.Object(Tree(EOC, o5080, o5081))) :|: TRUE
+f13983_0_randomlyDuplicate_FieldAccess(EOS(STATIC_13983(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, java.lang.Object(Tree(EOC, o5080, o5081))) -> f13991_0_randomlyDuplicate_InvokeMethod(EOS(STATIC_13991(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081) :|: TRUE
+f13991_0_randomlyDuplicate_InvokeMethod(EOS(STATIC_13991(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081) -> f13997_0__init__Load(EOS(STATIC_13997(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081) :|: TRUE
+f13997_0__init__Load(EOS(STATIC_13997(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081) -> f14015_0__init__InvokeMethod(EOS(STATIC_14015(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081, java.lang.Object(Tree(EOC, NULL, NULL))) :|: TRUE
+f14015_0__init__InvokeMethod(EOS(STATIC_14015(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081, java.lang.Object(Tree(EOC, NULL, NULL))) -> f14047_0__init__Load(EOS(STATIC_14047(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081) :|: TRUE
+f14047_0__init__Load(EOS(STATIC_14047(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081) -> f14053_0__init__Load(EOS(STATIC_14053(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081, java.lang.Object(Tree(EOC, NULL, NULL))) :|: TRUE
+f14053_0__init__Load(EOS(STATIC_14053(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5080, o5081, java.lang.Object(Tree(EOC, NULL, NULL))) -> f14061_0__init__FieldAccess(EOS(STATIC_14061(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5081, java.lang.Object(Tree(EOC, NULL, NULL)), o5080) :|: TRUE
+f14061_0__init__FieldAccess(EOS(STATIC_14061(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, NULL, NULL)), java.lang.Object(Tree(EOC, NULL, NULL)), o5081, java.lang.Object(Tree(EOC, NULL, NULL)), o5080) -> f14131_0__init__Load(EOS(STATIC_14131(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, NULL)), java.lang.Object(Tree(EOC, o5080, NULL)), o5081) :|: TRUE
+f14131_0__init__Load(EOS(STATIC_14131(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, NULL)), java.lang.Object(Tree(EOC, o5080, NULL)), o5081) -> f14175_0__init__Load(EOS(STATIC_14175(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, NULL)), o5081, java.lang.Object(Tree(EOC, o5080, NULL))) :|: TRUE
+f14175_0__init__Load(EOS(STATIC_14175(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, NULL)), o5081, java.lang.Object(Tree(EOC, o5080, NULL))) -> f14372_0__init__FieldAccess(EOS(STATIC_14372(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, NULL)), java.lang.Object(Tree(EOC, o5080, NULL)), o5081) :|: TRUE
+f14372_0__init__FieldAccess(EOS(STATIC_14372(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, NULL)), java.lang.Object(Tree(EOC, o5080, NULL)), o5081) -> f14395_0__init__Return(EOS(STATIC_14395(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081))) :|: TRUE
+f14395_0__init__Return(EOS(STATIC_14395(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081))) -> f14403_0_randomlyDuplicate_FieldAccess(EOS(STATIC_14403(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081))) :|: TRUE
+f14403_0_randomlyDuplicate_FieldAccess(EOS(STATIC_14403(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081)), java.lang.Object(Tree(EOC, o5080, o5081))) -> f14418_0_randomlyDuplicate_Load(EOS(STATIC_14418(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, java.lang.Object(Tree(EOC, o5080, o5081))))) :|: TRUE
+f14418_0_randomlyDuplicate_Load(EOS(STATIC_14418(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, java.lang.Object(Tree(EOC, o5080, o5081))))) -> f14442_0_randomlyDuplicate_FieldAccess(EOS(STATIC_14442(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, java.lang.Object(Tree(EOC, o5080, o5081))))) :|: TRUE
+f14442_0_randomlyDuplicate_FieldAccess(EOS(STATIC_14442(java.lang.Object(ARRAY(i5894)))), java.lang.Object(Tree(EOC, o5080, java.lang.Object(Tree(EOC, o5080, o5081))))) -> f14459_0_randomlyDuplicate_Store(EOS(STATIC_14459(java.lang.Object(ARRAY(i5894)))), o5080) :|: TRUE
+f14459_0_randomlyDuplicate_Store(EOS(STATIC_14459(java.lang.Object(ARRAY(i5894)))), o5080) -> f14476_0_randomlyDuplicate_JMP(EOS(STATIC_14476(java.lang.Object(ARRAY(i5894)))), o5080) :|: TRUE
+f14476_0_randomlyDuplicate_JMP(EOS(STATIC_14476(java.lang.Object(ARRAY(i5894)))), o5080) -> f14485_0_randomlyDuplicate_Load(EOS(STATIC_14485(java.lang.Object(ARRAY(i5894)))), o5080) :|: TRUE
+f14485_0_randomlyDuplicate_Load(EOS(STATIC_14485(java.lang.Object(ARRAY(i5894)))), o5080) -> f13200_0_randomlyDuplicate_Load(EOS(STATIC_13200(java.lang.Object(ARRAY(i5894)))), o5080) :|: TRUE
+R rules:
+Combined rules. Obtained 2 conditional rules for P and 0 conditional rules for R.P rules:
+f13232_0_randomlyDuplicate_NULL(EOS(STATIC_13232(java.lang.Object(ARRAY(i5894:0)))), java.lang.Object(Tree(EOC, o5076:0, o5077:0)), java.lang.Object(Tree(EOC, o5076:0, o5077:0))) -> f13232_0_randomlyDuplicate_NULL(EOS(STATIC_13232(java.lang.Object(ARRAY(i5894:0)))), o5077:0, o5077:0) :|: TRUE
+f13232_0_randomlyDuplicate_NULL(EOS(STATIC_13232(java.lang.Object(ARRAY(i5894:0)))), java.lang.Object(Tree(EOC, o5080:0, o5081:0)), java.lang.Object(Tree(EOC, o5080:0, o5081:0))) -> f13232_0_randomlyDuplicate_NULL(EOS(STATIC_13232(java.lang.Object(ARRAY(i5894:0)))), o5080:0, o5080:0) :|: TRUE
+R rules:
+Filtered ground terms:
+   Tree(x1, x2, x3) -> Tree(x2, x3)
+Filtered unneeded arguments:
+   f13232_0_randomlyDuplicate_NULL(x1, x2, x3) -> f13232_0_randomlyDuplicate_NULL(x2, x3)
+Filtered duplicate args:
+   f13232_0_randomlyDuplicate_NULL(x1, x2) -> f13232_0_randomlyDuplicate_NULL(x2)
+Combined rules. Obtained 2 conditional rules for P and 0 conditional rules for R.P rules:
+F13232_0_RANDOMLYDUPLICATE_NULL(java.lang.Object(Tree(o5076:0:0, o5077:0:0))) -> F13232_0_RANDOMLYDUPLICATE_NULL(o5077:0:0) :|: TRUE
+F13232_0_RANDOMLYDUPLICATE_NULL(java.lang.Object(Tree(o5080:0:0, o5081:0:0))) -> F13232_0_RANDOMLYDUPLICATE_NULL(o5080:0:0) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F13232_0_RANDOMLYDUPLICATE_NULL(java.lang.Object(Tree(o5076:0:0, o5077:0:0))) -> F13232_0_RANDOMLYDUPLICATE_NULL(o5077:0:0)
+   F13232_0_RANDOMLYDUPLICATE_NULL(java.lang.Object(Tree(o5080:0:0, o5081:0:0))) -> F13232_0_RANDOMLYDUPLICATE_NULL(o5080:0:0)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F13232_0_RANDOMLYDUPLICATE_NULL(java.lang.Object(Tree(o5076:0:0, o5077:0:0))) -> F13232_0_RANDOMLYDUPLICATE_NULL(o5077:0:0)
+The graph contains the following edges 1 > 1
+
+
+*F13232_0_RANDOMLYDUPLICATE_NULL(java.lang.Object(Tree(o5080:0:0, o5081:0:0))) -> F13232_0_RANDOMLYDUPLICATE_NULL(o5080:0:0)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(11)
+YES
+
+----------------------------------------
+
+(12)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Tree.createTree()LTree;
+SCC calls the following helper methods: Tree.createNode()LTree;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*List: [value, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(13) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 208 IRulesP rules:
+f13789_0_createTree_LE(EOS(STATIC_13789), o5050, i6442, i6442) -> f13795_0_createTree_LE(EOS(STATIC_13795), o5050, i6442, i6442) :|: TRUE
+f13795_0_createTree_LE(EOS(STATIC_13795), o5050, i6442, i6442) -> f13808_0_createTree_Load(EOS(STATIC_13808), o5050, i6442) :|: i6442 > 0
+f13808_0_createTree_Load(EOS(STATIC_13808), o5050, i6442) -> f13837_0_createTree_NULL(EOS(STATIC_13837), o5050, i6442, o5050) :|: TRUE
+f13837_0_createTree_NULL(EOS(STATIC_13837), java.lang.Object(o5057sub), i6442, java.lang.Object(o5057sub)) -> f13873_0_createTree_NULL(EOS(STATIC_13873), java.lang.Object(o5057sub), i6442, java.lang.Object(o5057sub)) :|: TRUE
+f13873_0_createTree_NULL(EOS(STATIC_13873), java.lang.Object(o5057sub), i6442, java.lang.Object(o5057sub)) -> f13901_0_createTree_Load(EOS(STATIC_13901), java.lang.Object(o5057sub), i6442) :|: TRUE
+f13901_0_createTree_Load(EOS(STATIC_13901), java.lang.Object(o5057sub), i6442) -> f13934_0_createTree_FieldAccess(EOS(STATIC_13934), java.lang.Object(o5057sub), i6442, java.lang.Object(o5057sub)) :|: TRUE
+f13934_0_createTree_FieldAccess(EOS(STATIC_13934), java.lang.Object(List(EOC, o5071, o5073)), i6442, java.lang.Object(List(EOC, o5071, o5073))) -> f13949_0_createTree_FieldAccess(EOS(STATIC_13949), java.lang.Object(List(EOC, o5071, o5073)), i6442, java.lang.Object(List(EOC, o5071, o5073))) :|: TRUE
+f13949_0_createTree_FieldAccess(EOS(STATIC_13949), java.lang.Object(List(EOC, o5071, o5073)), i6442, java.lang.Object(List(EOC, o5071, o5073))) -> f13960_0_createTree_Store(EOS(STATIC_13960), java.lang.Object(List(EOC, o5071, o5073)), i6442, o5071) :|: TRUE
+f13960_0_createTree_Store(EOS(STATIC_13960), java.lang.Object(List(EOC, o5071, o5073)), i6442, o5071) -> f13968_0_createTree_Load(EOS(STATIC_13968), java.lang.Object(List(EOC, o5071, o5073)), i6442, o5071) :|: TRUE
+f13968_0_createTree_Load(EOS(STATIC_13968), java.lang.Object(List(EOC, o5071, o5073)), i6442, o5071) -> f13979_0_createTree_FieldAccess(EOS(STATIC_13979), i6442, o5071, java.lang.Object(List(EOC, o5071, o5073))) :|: TRUE
+f13979_0_createTree_FieldAccess(EOS(STATIC_13979), i6442, o5071, java.lang.Object(List(EOC, o5071, o5073))) -> f13988_0_createTree_Store(EOS(STATIC_13988), i6442, o5071, o5073) :|: TRUE
+f13988_0_createTree_Store(EOS(STATIC_13988), i6442, o5071, o5073) -> f13995_0_createTree_Load(EOS(STATIC_13995), o5073, i6442, o5071) :|: TRUE
+f13995_0_createTree_Load(EOS(STATIC_13995), o5073, i6442, o5071) -> f14001_0_createTree_NULL(EOS(STATIC_14001), o5073, i6442, o5071, o5071) :|: TRUE
+f14001_0_createTree_NULL(EOS(STATIC_14001), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(o5083sub)) -> f14008_0_createTree_NULL(EOS(STATIC_14008), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(o5083sub)) :|: TRUE
+f14001_0_createTree_NULL(EOS(STATIC_14001), o5073, i6442, NULL, NULL) -> f14009_0_createTree_NULL(EOS(STATIC_14009), o5073, i6442, NULL, NULL) :|: TRUE
+f14008_0_createTree_NULL(EOS(STATIC_14008), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(o5083sub)) -> f14044_0_createTree_InvokeMethod(EOS(STATIC_14044), o5073, i6442, java.lang.Object(o5083sub)) :|: TRUE
+f14044_0_createTree_InvokeMethod(EOS(STATIC_14044), o5073, i6442, java.lang.Object(o5083sub)) -> f14050_0_createNode_InvokeMethod(EOS(STATIC_14050)) :|: i6442 >= 1 && i6434 >= 1
+f14044_0_createTree_InvokeMethod(EOS(STATIC_14044), o5073, i6442, java.lang.Object(o5083sub)) -> f14050_1_createNode_InvokeMethod(EOS(STATIC_14050), o5073, i6442, java.lang.Object(o5083sub)) :|: i6442 >= 1 && i6434 >= 1
+f14050_0_createNode_InvokeMethod(EOS(STATIC_14050)) -> f15971_0_createNode_InvokeMethod(EOS(STATIC_15971)) :|: TRUE
+f14373_0_createNode_Return(EOS(STATIC_14373), o5073, i6442, java.lang.Object(o5083sub), NULL) -> f14396_0_createTree_Store(EOS(STATIC_14396), o5073, i6442, java.lang.Object(o5083sub), NULL) :|: TRUE
+f14396_0_createTree_Store(EOS(STATIC_14396), o5073, i6442, java.lang.Object(o5083sub), NULL) -> f14404_0_createTree_InvokeMethod(EOS(STATIC_14404), o5073, i6442, java.lang.Object(o5083sub), NULL) :|: TRUE
+f14404_0_createTree_InvokeMethod(EOS(STATIC_14404), o5073, i6442, java.lang.Object(o5083sub), NULL) -> f14420_0_createNode_InvokeMethod(EOS(STATIC_14420)) :|: i6442 >= 1 && i6465 >= 1
+f14404_0_createTree_InvokeMethod(EOS(STATIC_14404), o5073, i6442, java.lang.Object(o5083sub), NULL) -> f14420_1_createNode_InvokeMethod(EOS(STATIC_14420), o5073, i6442, java.lang.Object(o5083sub), NULL) :|: i6442 >= 1 && i6465 >= 1
+f14420_0_createNode_InvokeMethod(EOS(STATIC_14420)) -> f15995_0_createNode_InvokeMethod(EOS(STATIC_15995)) :|: TRUE
+f14559_0_createNode_Return(EOS(STATIC_14559), o5073, i6442, java.lang.Object(o5083sub), NULL, NULL) -> f14572_0_createTree_Store(EOS(STATIC_14572), o5073, i6442, java.lang.Object(o5083sub), NULL, NULL) :|: TRUE
+f14572_0_createTree_Store(EOS(STATIC_14572), o5073, i6442, java.lang.Object(o5083sub), NULL, NULL) -> f14582_0_createTree_Load(EOS(STATIC_14582), o5073, i6442, java.lang.Object(o5083sub), NULL, NULL) :|: TRUE
+f14582_0_createTree_Load(EOS(STATIC_14582), o5073, i6442, java.lang.Object(o5083sub), NULL, NULL) -> f14593_0_createTree_Load(EOS(STATIC_14593), o5073, i6442, java.lang.Object(o5083sub), NULL, NULL, java.lang.Object(o5083sub)) :|: TRUE
+f14593_0_createTree_Load(EOS(STATIC_14593), o5073, i6442, java.lang.Object(o5083sub), NULL, NULL, java.lang.Object(o5083sub)) -> f14616_0_createTree_FieldAccess(EOS(STATIC_14616), o5073, i6442, java.lang.Object(o5083sub), NULL, NULL, java.lang.Object(o5083sub), NULL) :|: TRUE
+f14616_0_createTree_FieldAccess(EOS(STATIC_14616), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, NULL, java.lang.Object(Tree(EOC)), NULL) -> f14660_0_createTree_FieldAccess(EOS(STATIC_14660), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, NULL, java.lang.Object(Tree(EOC)), NULL) :|: TRUE
+f14660_0_createTree_FieldAccess(EOS(STATIC_14660), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, NULL, java.lang.Object(Tree(EOC)), NULL) -> f14680_0_createTree_Load(EOS(STATIC_14680), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, NULL) :|: TRUE
+f14680_0_createTree_Load(EOS(STATIC_14680), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, NULL) -> f14707_0_createTree_Load(EOS(STATIC_14707), o5073, i6442, NULL, NULL, java.lang.Object(Tree(EOC))) :|: TRUE
+f14707_0_createTree_Load(EOS(STATIC_14707), o5073, i6442, NULL, NULL, java.lang.Object(Tree(EOC))) -> f14713_0_createTree_FieldAccess(EOS(STATIC_14713), o5073, i6442, NULL, NULL, java.lang.Object(Tree(EOC)), NULL) :|: TRUE
+f14713_0_createTree_FieldAccess(EOS(STATIC_14713), o5073, i6442, NULL, NULL, java.lang.Object(Tree(EOC)), NULL) -> f14725_0_createTree_New(EOS(STATIC_14725), o5073, i6442, NULL, NULL) :|: TRUE
+f14725_0_createTree_New(EOS(STATIC_14725), o5073, i6442, NULL, NULL) -> f14738_0_createTree_Duplicate(EOS(STATIC_14738), o5073, i6442, NULL, NULL, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14738_0_createTree_Duplicate(EOS(STATIC_14738), o5073, i6442, NULL, NULL, java.lang.Object(List(EOC, NULL, NULL))) -> f14743_0_createTree_Load(EOS(STATIC_14743), o5073, i6442, NULL, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14743_0_createTree_Load(EOS(STATIC_14743), o5073, i6442, NULL, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) -> f14749_0_createTree_Load(EOS(STATIC_14749), o5073, i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL) :|: TRUE
+f14749_0_createTree_Load(EOS(STATIC_14749), o5073, i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL) -> f14758_0_createTree_InvokeMethod(EOS(STATIC_14758), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) :|: TRUE
+f14758_0_createTree_InvokeMethod(EOS(STATIC_14758), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) -> f14768_0__init__Load(EOS(STATIC_14768), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) :|: TRUE
+f14768_0__init__Load(EOS(STATIC_14768), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) -> f14776_0__init__InvokeMethod(EOS(STATIC_14776), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14776_0__init__InvokeMethod(EOS(STATIC_14776), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14785_0__init__Load(EOS(STATIC_14785), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) :|: TRUE
+f14785_0__init__Load(EOS(STATIC_14785), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) -> f14805_0__init__Load(EOS(STATIC_14805), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14805_0__init__Load(EOS(STATIC_14805), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14815_0__init__FieldAccess(EOS(STATIC_14815), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL)), NULL) :|: TRUE
+f14815_0__init__FieldAccess(EOS(STATIC_14815), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL)), NULL) -> f14835_0__init__Load(EOS(STATIC_14835), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073) :|: TRUE
+f14835_0__init__Load(EOS(STATIC_14835), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073) -> f14859_0__init__Load(EOS(STATIC_14859), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14859_0__init__Load(EOS(STATIC_14859), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14875_0__init__FieldAccess(EOS(STATIC_14875), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073) :|: TRUE
+f14875_0__init__FieldAccess(EOS(STATIC_14875), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073) -> f14890_0__init__Return(EOS(STATIC_14890), i6442, NULL, java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f14890_0__init__Return(EOS(STATIC_14890), i6442, NULL, java.lang.Object(List(EOC, NULL, o5073))) -> f14913_0_createTree_Store(EOS(STATIC_14913), i6442, NULL, java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f14913_0_createTree_Store(EOS(STATIC_14913), i6442, NULL, java.lang.Object(List(EOC, NULL, o5073))) -> f14922_0_createTree_New(EOS(STATIC_14922), java.lang.Object(List(EOC, NULL, o5073)), i6442, NULL) :|: TRUE
+f14922_0_createTree_New(EOS(STATIC_14922), java.lang.Object(List(EOC, NULL, o5073)), i6442, NULL) -> f14930_0_createTree_Duplicate(EOS(STATIC_14930), java.lang.Object(List(EOC, NULL, o5073)), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14930_0_createTree_Duplicate(EOS(STATIC_14930), java.lang.Object(List(EOC, NULL, o5073)), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL))) -> f14935_0_createTree_Load(EOS(STATIC_14935), java.lang.Object(List(EOC, NULL, o5073)), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14935_0_createTree_Load(EOS(STATIC_14935), java.lang.Object(List(EOC, NULL, o5073)), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) -> f14943_0_createTree_Load(EOS(STATIC_14943), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL) :|: TRUE
+f14943_0_createTree_Load(EOS(STATIC_14943), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL) -> f14952_0_createTree_InvokeMethod(EOS(STATIC_14952), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f14952_0_createTree_InvokeMethod(EOS(STATIC_14952), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073))) -> f14961_0__init__Load(EOS(STATIC_14961), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f14961_0__init__Load(EOS(STATIC_14961), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073))) -> f14974_0__init__InvokeMethod(EOS(STATIC_14974), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14974_0__init__InvokeMethod(EOS(STATIC_14974), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f14992_0__init__Load(EOS(STATIC_14992), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f14992_0__init__Load(EOS(STATIC_14992), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073))) -> f15018_0__init__Load(EOS(STATIC_15018), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f15018_0__init__Load(EOS(STATIC_15018), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f15047_0__init__FieldAccess(EOS(STATIC_15047), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL)), NULL) :|: TRUE
+f15047_0__init__FieldAccess(EOS(STATIC_15047), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL)), NULL) -> f15071_0__init__Load(EOS(STATIC_15071), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f15071_0__init__Load(EOS(STATIC_15071), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073))) -> f15340_0__init__Load(EOS(STATIC_15340), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f15340_0__init__Load(EOS(STATIC_15340), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f15354_0__init__FieldAccess(EOS(STATIC_15354), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f15354_0__init__FieldAccess(EOS(STATIC_15354), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073))) -> f15373_0__init__Return(EOS(STATIC_15373), i6442, java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073))))) :|: TRUE
+f15373_0__init__Return(EOS(STATIC_15373), i6442, java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073))))) -> f15397_0_createTree_Store(EOS(STATIC_15397), i6442, java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073))))) :|: TRUE
+f15397_0_createTree_Store(EOS(STATIC_15397), i6442, java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073))))) -> f15408_0_createTree_Inc(EOS(STATIC_15408), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073)))), i6442) :|: TRUE
+f15408_0_createTree_Inc(EOS(STATIC_15408), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073)))), i6442) -> f15422_0_createTree_JMP(EOS(STATIC_15422), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073)))), i6442 + -1) :|: TRUE
+f15422_0_createTree_JMP(EOS(STATIC_15422), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073)))), i7561) -> f15450_0_createTree_Load(EOS(STATIC_15450), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073)))), i7561) :|: TRUE
+f15450_0_createTree_Load(EOS(STATIC_15450), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073)))), i7561) -> f13735_0_createTree_Load(EOS(STATIC_13735), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073)))), i7561) :|: TRUE
+f13735_0_createTree_Load(EOS(STATIC_13735), o5050, i6435) -> f13789_0_createTree_LE(EOS(STATIC_13789), o5050, i6435, i6435) :|: TRUE
+f14561_0_createNode_Return(EOS(STATIC_14561), o5073, i6442, java.lang.Object(o5083sub), NULL, java.lang.Object(Tree(EOC))) -> f14573_0_createTree_Store(EOS(STATIC_14573), o5073, i6442, java.lang.Object(o5083sub), NULL, java.lang.Object(Tree(EOC))) :|: TRUE
+f14573_0_createTree_Store(EOS(STATIC_14573), o5073, i6442, java.lang.Object(o5083sub), NULL, java.lang.Object(Tree(EOC))) -> f14584_0_createTree_Load(EOS(STATIC_14584), o5073, i6442, java.lang.Object(o5083sub), NULL, java.lang.Object(Tree(EOC))) :|: TRUE
+f14584_0_createTree_Load(EOS(STATIC_14584), o5073, i6442, java.lang.Object(o5083sub), NULL, java.lang.Object(Tree(EOC))) -> f14595_0_createTree_Load(EOS(STATIC_14595), o5073, i6442, java.lang.Object(o5083sub), NULL, java.lang.Object(Tree(EOC)), java.lang.Object(o5083sub)) :|: TRUE
+f14595_0_createTree_Load(EOS(STATIC_14595), o5073, i6442, java.lang.Object(o5083sub), NULL, java.lang.Object(Tree(EOC)), java.lang.Object(o5083sub)) -> f14618_0_createTree_FieldAccess(EOS(STATIC_14618), o5073, i6442, java.lang.Object(o5083sub), NULL, java.lang.Object(Tree(EOC)), java.lang.Object(o5083sub), NULL) :|: TRUE
+f14618_0_createTree_FieldAccess(EOS(STATIC_14618), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), NULL) -> f14663_0_createTree_FieldAccess(EOS(STATIC_14663), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), NULL) :|: TRUE
+f14663_0_createTree_FieldAccess(EOS(STATIC_14663), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), NULL) -> f14682_0_createTree_Load(EOS(STATIC_14682), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC))) :|: TRUE
+f14682_0_createTree_Load(EOS(STATIC_14682), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC))) -> f14710_0_createTree_Load(EOS(STATIC_14710), o5073, i6442, NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14710_0_createTree_Load(EOS(STATIC_14710), o5073, i6442, NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14715_0_createTree_FieldAccess(EOS(STATIC_14715), o5073, i6442, NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14715_0_createTree_FieldAccess(EOS(STATIC_14715), o5073, i6442, NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14730_0_createTree_New(EOS(STATIC_14730), o5073, i6442, NULL, java.lang.Object(Tree(EOC))) :|: TRUE
+f14730_0_createTree_New(EOS(STATIC_14730), o5073, i6442, NULL, java.lang.Object(Tree(EOC))) -> f14739_0_createTree_Duplicate(EOS(STATIC_14739), o5073, i6442, NULL, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14739_0_createTree_Duplicate(EOS(STATIC_14739), o5073, i6442, NULL, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL))) -> f14744_0_createTree_Load(EOS(STATIC_14744), o5073, i6442, NULL, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14744_0_createTree_Load(EOS(STATIC_14744), o5073, i6442, NULL, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) -> f14751_0_createTree_Load(EOS(STATIC_14751), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL) :|: TRUE
+f14751_0_createTree_Load(EOS(STATIC_14751), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL) -> f14761_0_createTree_InvokeMethod(EOS(STATIC_14761), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) :|: TRUE
+f14761_0_createTree_InvokeMethod(EOS(STATIC_14761), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) -> f14770_0__init__Load(EOS(STATIC_14770), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) :|: TRUE
+f14770_0__init__Load(EOS(STATIC_14770), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) -> f14779_0__init__InvokeMethod(EOS(STATIC_14779), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14779_0__init__InvokeMethod(EOS(STATIC_14779), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14789_0__init__Load(EOS(STATIC_14789), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) :|: TRUE
+f14789_0__init__Load(EOS(STATIC_14789), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073) -> f14807_0__init__Load(EOS(STATIC_14807), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14807_0__init__Load(EOS(STATIC_14807), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14819_0__init__FieldAccess(EOS(STATIC_14819), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL)), NULL) :|: TRUE
+f14819_0__init__FieldAccess(EOS(STATIC_14819), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL)), NULL) -> f14838_0__init__Load(EOS(STATIC_14838), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073) :|: TRUE
+f14838_0__init__Load(EOS(STATIC_14838), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073) -> f14863_0__init__Load(EOS(STATIC_14863), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14863_0__init__Load(EOS(STATIC_14863), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14877_0__init__FieldAccess(EOS(STATIC_14877), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073) :|: TRUE
+f14877_0__init__FieldAccess(EOS(STATIC_14877), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073) -> f14896_0__init__Return(EOS(STATIC_14896), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f14896_0__init__Return(EOS(STATIC_14896), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) -> f14915_0_createTree_Store(EOS(STATIC_14915), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f14915_0_createTree_Store(EOS(STATIC_14915), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) -> f14924_0_createTree_New(EOS(STATIC_14924), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(Tree(EOC))) :|: TRUE
+f14924_0_createTree_New(EOS(STATIC_14924), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(Tree(EOC))) -> f14931_0_createTree_Duplicate(EOS(STATIC_14931), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14931_0_createTree_Duplicate(EOS(STATIC_14931), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL))) -> f14937_0_createTree_Load(EOS(STATIC_14937), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14937_0_createTree_Load(EOS(STATIC_14937), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) -> f14946_0_createTree_Load(EOS(STATIC_14946), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14946_0_createTree_Load(EOS(STATIC_14946), java.lang.Object(List(EOC, NULL, o5073)), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) -> f14954_0_createTree_InvokeMethod(EOS(STATIC_14954), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f14954_0_createTree_InvokeMethod(EOS(STATIC_14954), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) -> f14963_0__init__Load(EOS(STATIC_14963), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f14963_0__init__Load(EOS(STATIC_14963), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) -> f14982_0__init__InvokeMethod(EOS(STATIC_14982), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14982_0__init__InvokeMethod(EOS(STATIC_14982), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f15000_0__init__Load(EOS(STATIC_15000), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f15000_0__init__Load(EOS(STATIC_15000), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))) -> f15024_0__init__Load(EOS(STATIC_15024), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f15024_0__init__Load(EOS(STATIC_15024), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f15054_0__init__FieldAccess(EOS(STATIC_15054), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) :|: TRUE
+f15054_0__init__FieldAccess(EOS(STATIC_15054), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) -> f15300_0__init__Load(EOS(STATIC_15300), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f15300_0__init__Load(EOS(STATIC_15300), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, NULL, o5073))) -> f15341_0__init__Load(EOS(STATIC_15341), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL))) :|: TRUE
+f15341_0__init__Load(EOS(STATIC_15341), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, NULL, o5073)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL))) -> f15360_0__init__FieldAccess(EOS(STATIC_15360), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, NULL, o5073))) :|: TRUE
+f15360_0__init__FieldAccess(EOS(STATIC_15360), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, NULL, o5073))) -> f15381_0__init__Return(EOS(STATIC_15381), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))))) :|: TRUE
+f15381_0__init__Return(EOS(STATIC_15381), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))))) -> f15400_0_createTree_Store(EOS(STATIC_15400), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))))) :|: TRUE
+f15400_0_createTree_Store(EOS(STATIC_15400), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073))))) -> f15411_0_createTree_Inc(EOS(STATIC_15411), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)))), i6442) :|: TRUE
+f15411_0_createTree_Inc(EOS(STATIC_15411), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)))), i6442) -> f15425_0_createTree_JMP(EOS(STATIC_15425), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)))), i6442 + -1) :|: TRUE
+f15425_0_createTree_JMP(EOS(STATIC_15425), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)))), i7564) -> f15471_0_createTree_Load(EOS(STATIC_15471), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)))), i7564) :|: TRUE
+f15471_0_createTree_Load(EOS(STATIC_15471), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)))), i7564) -> f13735_0_createTree_Load(EOS(STATIC_13735), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073)))), i7564) :|: TRUE
+f14375_0_createNode_Return(EOS(STATIC_14375), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) -> f14397_0_createTree_Store(EOS(STATIC_14397), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) :|: TRUE
+f14397_0_createTree_Store(EOS(STATIC_14397), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) -> f14406_0_createTree_InvokeMethod(EOS(STATIC_14406), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) :|: TRUE
+f14406_0_createTree_InvokeMethod(EOS(STATIC_14406), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) -> f14421_0_createNode_InvokeMethod(EOS(STATIC_14421)) :|: i6442 >= 1 && i6475 >= 1
+f14406_0_createTree_InvokeMethod(EOS(STATIC_14406), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) -> f14421_1_createNode_InvokeMethod(EOS(STATIC_14421), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) :|: i6442 >= 1 && i6475 >= 1
+f14421_0_createNode_InvokeMethod(EOS(STATIC_14421)) -> f16186_0_createNode_InvokeMethod(EOS(STATIC_16186)) :|: TRUE
+f14566_0_createNode_Return(EOS(STATIC_14566), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), NULL) -> f14575_0_createTree_Store(EOS(STATIC_14575), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), NULL) :|: TRUE
+f14575_0_createTree_Store(EOS(STATIC_14575), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), NULL) -> f14589_0_createTree_Load(EOS(STATIC_14589), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), NULL) :|: TRUE
+f14589_0_createTree_Load(EOS(STATIC_14589), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), NULL) -> f14597_0_createTree_Load(EOS(STATIC_14597), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), NULL, java.lang.Object(o5083sub)) :|: TRUE
+f14597_0_createTree_Load(EOS(STATIC_14597), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), NULL, java.lang.Object(o5083sub)) -> f14639_0_createTree_FieldAccess(EOS(STATIC_14639), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), NULL, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) :|: TRUE
+f14639_0_createTree_FieldAccess(EOS(STATIC_14639), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14671_0_createTree_FieldAccess(EOS(STATIC_14671), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14671_0_createTree_FieldAccess(EOS(STATIC_14671), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14695_0_createTree_Load(EOS(STATIC_14695), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), NULL) :|: TRUE
+f14695_0_createTree_Load(EOS(STATIC_14695), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), NULL) -> f14711_0_createTree_Load(EOS(STATIC_14711), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC))) :|: TRUE
+f14711_0_createTree_Load(EOS(STATIC_14711), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC))) -> f14718_0_createTree_FieldAccess(EOS(STATIC_14718), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC)), NULL) :|: TRUE
+f14718_0_createTree_FieldAccess(EOS(STATIC_14718), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(Tree(EOC)), NULL) -> f14733_0_createTree_New(EOS(STATIC_14733), o5073, i6442, java.lang.Object(Tree(EOC)), NULL) :|: TRUE
+f14733_0_createTree_New(EOS(STATIC_14733), o5073, i6442, java.lang.Object(Tree(EOC)), NULL) -> f14740_0_createTree_Duplicate(EOS(STATIC_14740), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14740_0_createTree_Duplicate(EOS(STATIC_14740), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(List(EOC, NULL, NULL))) -> f14745_0_createTree_Load(EOS(STATIC_14745), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14745_0_createTree_Load(EOS(STATIC_14745), o5073, i6442, java.lang.Object(Tree(EOC)), NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) -> f14753_0_createTree_Load(EOS(STATIC_14753), o5073, i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14753_0_createTree_Load(EOS(STATIC_14753), o5073, i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) -> f14763_0_createTree_InvokeMethod(EOS(STATIC_14763), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) :|: TRUE
+f14763_0_createTree_InvokeMethod(EOS(STATIC_14763), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) -> f14772_0__init__Load(EOS(STATIC_14772), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) :|: TRUE
+f14772_0__init__Load(EOS(STATIC_14772), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) -> f14781_0__init__InvokeMethod(EOS(STATIC_14781), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14781_0__init__InvokeMethod(EOS(STATIC_14781), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14795_0__init__Load(EOS(STATIC_14795), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) :|: TRUE
+f14795_0__init__Load(EOS(STATIC_14795), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) -> f14810_0__init__Load(EOS(STATIC_14810), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14810_0__init__Load(EOS(STATIC_14810), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14824_0__init__FieldAccess(EOS(STATIC_14824), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14824_0__init__FieldAccess(EOS(STATIC_14824), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) -> f14845_0__init__Load(EOS(STATIC_14845), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073) :|: TRUE
+f14845_0__init__Load(EOS(STATIC_14845), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073) -> f14868_0__init__Load(EOS(STATIC_14868), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL))) :|: TRUE
+f14868_0__init__Load(EOS(STATIC_14868), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL))) -> f14882_0__init__FieldAccess(EOS(STATIC_14882), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073) :|: TRUE
+f14882_0__init__FieldAccess(EOS(STATIC_14882), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073) -> f14905_0__init__Return(EOS(STATIC_14905), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f14905_0__init__Return(EOS(STATIC_14905), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f14918_0_createTree_Store(EOS(STATIC_14918), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f14918_0_createTree_Store(EOS(STATIC_14918), i6442, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f14926_0_createTree_New(EOS(STATIC_14926), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, NULL) :|: TRUE
+f14926_0_createTree_New(EOS(STATIC_14926), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, NULL) -> f14932_0_createTree_Duplicate(EOS(STATIC_14932), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14932_0_createTree_Duplicate(EOS(STATIC_14932), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL))) -> f14939_0_createTree_Load(EOS(STATIC_14939), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14939_0_createTree_Load(EOS(STATIC_14939), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, NULL, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) -> f14948_0_createTree_Load(EOS(STATIC_14948), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL) :|: TRUE
+f14948_0_createTree_Load(EOS(STATIC_14948), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL) -> f14956_0_createTree_InvokeMethod(EOS(STATIC_14956), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f14956_0_createTree_InvokeMethod(EOS(STATIC_14956), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f14964_0__init__Load(EOS(STATIC_14964), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f14964_0__init__Load(EOS(STATIC_14964), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f14986_0__init__InvokeMethod(EOS(STATIC_14986), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14986_0__init__InvokeMethod(EOS(STATIC_14986), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f15007_0__init__Load(EOS(STATIC_15007), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f15007_0__init__Load(EOS(STATIC_15007), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f15031_0__init__Load(EOS(STATIC_15031), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f15031_0__init__Load(EOS(STATIC_15031), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f15056_0__init__FieldAccess(EOS(STATIC_15056), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL)), NULL) :|: TRUE
+f15056_0__init__FieldAccess(EOS(STATIC_15056), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL)), NULL) -> f15308_0__init__Load(EOS(STATIC_15308), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f15308_0__init__Load(EOS(STATIC_15308), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f15344_0__init__Load(EOS(STATIC_15344), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f15344_0__init__Load(EOS(STATIC_15344), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f15366_0__init__FieldAccess(EOS(STATIC_15366), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f15366_0__init__FieldAccess(EOS(STATIC_15366), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f15386_0__init__Return(EOS(STATIC_15386), i6442, java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))))) :|: TRUE
+f15386_0__init__Return(EOS(STATIC_15386), i6442, java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))))) -> f15402_0_createTree_Store(EOS(STATIC_15402), i6442, java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))))) :|: TRUE
+f15402_0_createTree_Store(EOS(STATIC_15402), i6442, java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))))) -> f15414_0_createTree_Inc(EOS(STATIC_15414), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i6442) :|: TRUE
+f15414_0_createTree_Inc(EOS(STATIC_15414), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i6442) -> f15428_0_createTree_JMP(EOS(STATIC_15428), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i6442 + -1) :|: TRUE
+f15428_0_createTree_JMP(EOS(STATIC_15428), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i7569) -> f15472_0_createTree_Load(EOS(STATIC_15472), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i7569) :|: TRUE
+f15472_0_createTree_Load(EOS(STATIC_15472), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i7569) -> f13735_0_createTree_Load(EOS(STATIC_13735), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i7569) :|: TRUE
+f14568_0_createNode_Return(EOS(STATIC_14568), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14577_0_createTree_Store(EOS(STATIC_14577), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14577_0_createTree_Store(EOS(STATIC_14577), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14590_0_createTree_Load(EOS(STATIC_14590), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14590_0_createTree_Load(EOS(STATIC_14590), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14600_0_createTree_Load(EOS(STATIC_14600), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(o5083sub)) :|: TRUE
+f14600_0_createTree_Load(EOS(STATIC_14600), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(o5083sub)) -> f14646_0_createTree_FieldAccess(EOS(STATIC_14646), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) :|: TRUE
+f14646_0_createTree_FieldAccess(EOS(STATIC_14646), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14678_0_createTree_FieldAccess(EOS(STATIC_14678), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14678_0_createTree_FieldAccess(EOS(STATIC_14678), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14705_0_createTree_Load(EOS(STATIC_14705), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14705_0_createTree_Load(EOS(STATIC_14705), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14712_0_createTree_Load(EOS(STATIC_14712), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14712_0_createTree_Load(EOS(STATIC_14712), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14721_0_createTree_FieldAccess(EOS(STATIC_14721), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14721_0_createTree_FieldAccess(EOS(STATIC_14721), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14736_0_createTree_New(EOS(STATIC_14736), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14736_0_createTree_New(EOS(STATIC_14736), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) -> f14742_0_createTree_Duplicate(EOS(STATIC_14742), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14742_0_createTree_Duplicate(EOS(STATIC_14742), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL))) -> f14747_0_createTree_Load(EOS(STATIC_14747), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14747_0_createTree_Load(EOS(STATIC_14747), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) -> f14756_0_createTree_Load(EOS(STATIC_14756), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14756_0_createTree_Load(EOS(STATIC_14756), o5073, i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) -> f14766_0_createTree_InvokeMethod(EOS(STATIC_14766), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) :|: TRUE
+f14766_0_createTree_InvokeMethod(EOS(STATIC_14766), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) -> f14773_0__init__Load(EOS(STATIC_14773), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) :|: TRUE
+f14773_0__init__Load(EOS(STATIC_14773), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) -> f14783_0__init__InvokeMethod(EOS(STATIC_14783), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14783_0__init__InvokeMethod(EOS(STATIC_14783), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14802_0__init__Load(EOS(STATIC_14802), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) :|: TRUE
+f14802_0__init__Load(EOS(STATIC_14802), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073) -> f14814_0__init__Load(EOS(STATIC_14814), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073, java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14814_0__init__Load(EOS(STATIC_14814), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), o5073, java.lang.Object(List(EOC, NULL, NULL))) -> f14833_0__init__FieldAccess(EOS(STATIC_14833), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14833_0__init__FieldAccess(EOS(STATIC_14833), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o5073, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) -> f14855_0__init__Load(EOS(STATIC_14855), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073) :|: TRUE
+f14855_0__init__Load(EOS(STATIC_14855), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073) -> f14873_0__init__Load(EOS(STATIC_14873), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL))) :|: TRUE
+f14873_0__init__Load(EOS(STATIC_14873), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL))) -> f14884_0__init__FieldAccess(EOS(STATIC_14884), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073) :|: TRUE
+f14884_0__init__FieldAccess(EOS(STATIC_14884), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), o5073) -> f14911_0__init__Return(EOS(STATIC_14911), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f14911_0__init__Return(EOS(STATIC_14911), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f14920_0_createTree_Store(EOS(STATIC_14920), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f14920_0_createTree_Store(EOS(STATIC_14920), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f14928_0_createTree_New(EOS(STATIC_14928), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(Tree(EOC))) :|: TRUE
+f14928_0_createTree_New(EOS(STATIC_14928), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(Tree(EOC))) -> f14933_0_createTree_Duplicate(EOS(STATIC_14933), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14933_0_createTree_Duplicate(EOS(STATIC_14933), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL))) -> f14942_0_createTree_Load(EOS(STATIC_14942), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14942_0_createTree_Load(EOS(STATIC_14942), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) -> f14950_0_createTree_Load(EOS(STATIC_14950), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) :|: TRUE
+f14950_0_createTree_Load(EOS(STATIC_14950), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) -> f14959_0_createTree_InvokeMethod(EOS(STATIC_14959), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f14959_0_createTree_InvokeMethod(EOS(STATIC_14959), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f14965_0__init__Load(EOS(STATIC_14965), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f14965_0__init__Load(EOS(STATIC_14965), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f14988_0__init__InvokeMethod(EOS(STATIC_14988), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f14988_0__init__InvokeMethod(EOS(STATIC_14988), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f15012_0__init__Load(EOS(STATIC_15012), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f15012_0__init__Load(EOS(STATIC_15012), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f15040_0__init__Load(EOS(STATIC_15040), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f15040_0__init__Load(EOS(STATIC_15040), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL))) -> f15064_0__init__FieldAccess(EOS(STATIC_15064), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) :|: TRUE
+f15064_0__init__FieldAccess(EOS(STATIC_15064), i6442, java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(Tree(EOC))) -> f15334_0__init__Load(EOS(STATIC_15334), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f15334_0__init__Load(EOS(STATIC_15334), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f15350_0__init__Load(EOS(STATIC_15350), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL))) :|: TRUE
+f15350_0__init__Load(EOS(STATIC_15350), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL))) -> f15368_0__init__FieldAccess(EOS(STATIC_15368), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) :|: TRUE
+f15368_0__init__FieldAccess(EOS(STATIC_15368), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), NULL)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))) -> f15394_0__init__Return(EOS(STATIC_15394), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))))) :|: TRUE
+f15394_0__init__Return(EOS(STATIC_15394), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))))) -> f15406_0_createTree_Store(EOS(STATIC_15406), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))))) :|: TRUE
+f15406_0_createTree_Store(EOS(STATIC_15406), i6442, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073))))) -> f15417_0_createTree_Inc(EOS(STATIC_15417), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i6442) :|: TRUE
+f15417_0_createTree_Inc(EOS(STATIC_15417), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i6442) -> f15433_0_createTree_JMP(EOS(STATIC_15433), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i6442 + -1) :|: TRUE
+f15433_0_createTree_JMP(EOS(STATIC_15433), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i7576) -> f15477_0_createTree_Load(EOS(STATIC_15477), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i7576) :|: TRUE
+f15477_0_createTree_Load(EOS(STATIC_15477), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i7576) -> f13735_0_createTree_Load(EOS(STATIC_13735), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073)))), i7576) :|: TRUE
+f14009_0_createTree_NULL(EOS(STATIC_14009), o5073, i6442, NULL, NULL) -> f14045_0_createTree_Inc(EOS(STATIC_14045), o5073, i6442) :|: TRUE
+f14045_0_createTree_Inc(EOS(STATIC_14045), o5073, i6442) -> f14051_0_createTree_JMP(EOS(STATIC_14051), o5073, i6442 + -1) :|: TRUE
+f14051_0_createTree_JMP(EOS(STATIC_14051), o5073, i6455) -> f14056_0_createTree_Load(EOS(STATIC_14056), o5073, i6455) :|: TRUE
+f14056_0_createTree_Load(EOS(STATIC_14056), o5073, i6455) -> f13735_0_createTree_Load(EOS(STATIC_13735), o5073, i6455) :|: TRUE
+f14050_1_createNode_InvokeMethod(EOS(STATIC_14050), o5073, i6442, java.lang.Object(o5083sub)) -> f14373_0_createNode_Return(EOS(STATIC_14373), o5073, i6442, java.lang.Object(o5083sub), NULL) :|: TRUE
+f14050_1_createNode_InvokeMethod(EOS(STATIC_14050), o5073, i6442, java.lang.Object(o5083sub)) -> f14375_0_createNode_Return(EOS(STATIC_14375), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) :|: TRUE
+f14420_1_createNode_InvokeMethod(EOS(STATIC_14420), o5073, i6442, java.lang.Object(o5083sub), NULL) -> f14559_0_createNode_Return(EOS(STATIC_14559), o5073, i6442, java.lang.Object(o5083sub), NULL, NULL) :|: TRUE
+f14420_1_createNode_InvokeMethod(EOS(STATIC_14420), o5073, i6442, java.lang.Object(o5083sub), NULL) -> f14561_0_createNode_Return(EOS(STATIC_14561), o5073, i6442, java.lang.Object(o5083sub), NULL, java.lang.Object(Tree(EOC))) :|: TRUE
+f14421_1_createNode_InvokeMethod(EOS(STATIC_14421), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) -> f14566_0_createNode_Return(EOS(STATIC_14566), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), NULL) :|: TRUE
+f14421_1_createNode_InvokeMethod(EOS(STATIC_14421), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC))) -> f14568_0_createNode_Return(EOS(STATIC_14568), o5073, i6442, java.lang.Object(o5083sub), java.lang.Object(Tree(EOC)), java.lang.Object(Tree(EOC))) :|: TRUE
+Combined rules. Obtained 8 IRulesP rules:
+f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073:0)), i6442:0, i6442:0) -> f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073:0)))), i6442:0 - 1, i6442:0 - 1) :|: i6442:0 > 0 && i6475:0 > 0 && i6434:0 > 0
+f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, NULL, o5073:0)), i6442:0, i6442:0) -> f13789_0_createTree_LE(EOS(STATIC_13789), o5073:0, i6442:0 - 1, i6442:0 - 1) :|: i6442:0 > 0
+f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073:0)), i6442:0, i6442:0) -> f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, NULL, java.lang.Object(List(EOC, NULL, o5073:0)))), i6442:0 - 1, i6442:0 - 1) :|: i6442:0 > 0 && i6465:0 > 0 && i6434:0 > 0
+f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073:0)), i6442:0, i6442:0) -> f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, NULL, o5073:0)))), i6442:0 - 1, i6442:0 - 1) :|: i6442:0 > 0 && i6465:0 > 0 && i6434:0 > 0
+f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073:0)), i6442:0, i6442:0) -> f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), java.lang.Object(List(EOC, java.lang.Object(Tree(EOC)), o5073:0)))), i6442:0 - 1, i6442:0 - 1) :|: i6442:0 > 0 && i6475:0 > 0 && i6434:0 > 0
+Removed following non-SCC rules:
+f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, java.lang.Object(o5083sub:0), o5073:0)), i6442:0, i6442:0) -> f15971_0_createNode_InvokeMethod(EOS(STATIC_15971)) :|: i6442:0 > 0 && i6434:0 > 0
+f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, java.lang.Object(o5083sub:0), o5073:0)), i6442:0, i6442:0) -> f16186_0_createNode_InvokeMethod(EOS(STATIC_16186)) :|: i6442:0 > 0 && i6475:0 > 0 && i6434:0 > 0
+f13789_0_createTree_LE(EOS(STATIC_13789), java.lang.Object(List(EOC, java.lang.Object(o5083sub:0), o5073:0)), i6442:0, i6442:0) -> f15995_0_createNode_InvokeMethod(EOS(STATIC_15995)) :|: i6442:0 > 0 && i6465:0 > 0 && i6434:0 > 0
+Filtered constant ground arguments:
+   f13789_0_createTree_LE(x1, x2, x3, x4) -> f13789_0_createTree_LE(x2, x3, x4)
+   EOS(x1) -> EOS
+   List(x1, x2, x3) -> List(x2, x3)
+   Tree(x1) -> Tree
+Filtered duplicate arguments:
+   f13789_0_createTree_LE(x1, x2, x3) -> f13789_0_createTree_LE(x1, x3)
+Finished conversion. Obtained 5 rules.P rules:
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), o5073:0)), i6442:0) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(java.lang.Object(Tree), o5073:0)))), i6442:0 - 1) :|: i6475:0 > 0 && i6434:0 > 0 && i6442:0 > 0
+f13789_0_createTree_LE(java.lang.Object(List(NULL, o5073:0)), i6442:0) -> f13789_0_createTree_LE(o5073:0, i6442:0 - 1) :|: i6442:0 > 0
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), o5073:0)), i6442:0) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(NULL, o5073:0)))), i6442:0 - 1) :|: i6465:0 > 0 && i6434:0 > 0 && i6442:0 > 0
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), o5073:0)), i6442:0) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(NULL, o5073:0)))), i6442:0 - 1) :|: i6465:0 > 0 && i6434:0 > 0 && i6442:0 > 0
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), o5073:0)), i6442:0) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(java.lang.Object(Tree), o5073:0)))), i6442:0 - 1) :|: i6475:0 > 0 && i6434:0 > 0 && i6442:0 > 0
+
+----------------------------------------
+
+(14)
+Obligation:
+Rules:
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), o5073:0)), i6442:0) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(java.lang.Object(Tree), o5073:0)))), i6442:0 - 1) :|: i6475:0 > 0 && i6434:0 > 0 && i6442:0 > 0
+f13789_0_createTree_LE(java.lang.Object(List(NULL, x)), x1) -> f13789_0_createTree_LE(x, x1 - 1) :|: x1 > 0
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x2)), x3) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(NULL, x2)))), x3 - 1) :|: x4 > 0 && x5 > 0 && x3 > 0
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x6)), x7) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(NULL, x6)))), x7 - 1) :|: x8 > 0 && x9 > 0 && x7 > 0
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x10)), x11) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(java.lang.Object(Tree), x10)))), x11 - 1) :|: x12 > 0 && x13 > 0 && x11 > 0
+
+----------------------------------------
+
+(15) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), o5073:0)), i6442:0) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(java.lang.Object(Tree), o5073:0)))), arith) :|: i6475:0 > 0 && i6434:0 > 0 && i6442:0 > 0 && arith = i6442:0 - 1
+f13789_0_createTree_LE(java.lang.Object(List(NULL, x14)), x15) -> f13789_0_createTree_LE(x14, x16) :|: x15 > 0 && x16 = x15 - 1
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x17)), x18) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(NULL, x17)))), x19) :|: x20 > 0 && x21 > 0 && x18 > 0 && x19 = x18 - 1
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x22)), x23) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(NULL, x22)))), x24) :|: x25 > 0 && x26 > 0 && x23 > 0 && x24 = x23 - 1
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x27)), x28) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(java.lang.Object(Tree), x27)))), x29) :|: x30 > 0 && x31 > 0 && x28 > 0 && x29 = x28 - 1
+
+----------------------------------------
+
+(17) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), o5073:0)), i6442:0) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(java.lang.Object(Tree), o5073:0)))), arith) :|: i6475:0 > 0 && i6434:0 > 0 && i6442:0 > 0 && arith = i6442:0 - 1
+(2) f13789_0_createTree_LE(java.lang.Object(List(NULL, x14)), x15) -> f13789_0_createTree_LE(x14, x16) :|: x15 > 0 && x16 = x15 - 1
+(3) f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x17)), x18) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(NULL, x17)))), x19) :|: x20 > 0 && x21 > 0 && x18 > 0 && x19 = x18 - 1
+(4) f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x22)), x23) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(NULL, x22)))), x24) :|: x25 > 0 && x26 > 0 && x23 > 0 && x24 = x23 - 1
+(5) f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x27)), x28) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(java.lang.Object(Tree), x27)))), x29) :|: x30 > 0 && x31 > 0 && x28 > 0 && x29 = x28 - 1
+
+Arcs:
+(1) -> (2)
+(2) -> (1), (2), (3), (4), (5)
+(3) -> (2)
+(4) -> (1), (3), (4), (5)
+(5) -> (1), (3), (4), (5)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(18)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), o5073:0)), i6442:0) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(java.lang.Object(Tree), o5073:0)))), arith) :|: i6475:0 > 0 && i6434:0 > 0 && i6442:0 > 0 && arith = i6442:0 - 1
+(2) f13789_0_createTree_LE(java.lang.Object(List(NULL, x14)), x15) -> f13789_0_createTree_LE(x14, x16) :|: x15 > 0 && x16 = x15 - 1
+(3) f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x17)), x18) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(NULL, x17)))), x19) :|: x20 > 0 && x21 > 0 && x18 > 0 && x19 = x18 - 1
+(4) f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x22)), x23) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(NULL, x22)))), x24) :|: x25 > 0 && x26 > 0 && x23 > 0 && x24 = x23 - 1
+(5) f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x27)), x28) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(java.lang.Object(Tree), x27)))), x29) :|: x30 > 0 && x31 > 0 && x28 > 0 && x29 = x28 - 1
+
+Arcs:
+(1) -> (2)
+(2) -> (1), (2), (3), (4), (5)
+(3) -> (2)
+(4) -> (1), (3), (4), (5)
+(5) -> (1), (3), (4), (5)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(19) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(20)
+Obligation:
+Rules:
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x27:0)), x28:0) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(java.lang.Object(Tree), x27:0)))), x28:0 - 1) :|: x30:0 > 0 && x31:0 > 0 && x28:0 > 0
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x22:0)), x23:0) -> f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), java.lang.Object(List(NULL, x22:0)))), x23:0 - 1) :|: x25:0 > 0 && x26:0 > 0 && x23:0 > 0
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), o5073:0:0)), i6442:0:0) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(java.lang.Object(Tree), o5073:0:0)))), i6442:0:0 - 1) :|: i6475:0:0 > 0 && i6434:0:0 > 0 && i6442:0:0 > 0
+f13789_0_createTree_LE(java.lang.Object(List(NULL, x14:0)), x15:0) -> f13789_0_createTree_LE(x14:0, x15:0 - 1) :|: x15:0 > 0
+f13789_0_createTree_LE(java.lang.Object(List(java.lang.Object(Tree), x17:0)), x18:0) -> f13789_0_createTree_LE(java.lang.Object(List(NULL, java.lang.Object(List(NULL, x17:0)))), x18:0 - 1) :|: x20:0 > 0 && x21:0 > 0 && x18:0 > 0
+
+----------------------------------------
+
+(21) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f13789_0_createTree_LE(VARIABLE, INTEGER)
+java.lang.Object(VARIABLE)
+List(VARIABLE, VARIABLE)
+Tree()
+NULL()
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f13789_0_createTree_LE(c, x28:0) -> f13789_0_createTree_LE(c1, c2) :|: c2 = x28:0 - 1 && (c1 = 0 && c = 0) && (x30:0 > 0 && x31:0 > 0 && x28:0 > 0)
+f13789_0_createTree_LE(c9, x15:0) -> f13789_0_createTree_LE(x14:0, c10) :|: c10 = x15:0 - 1 && c9 = 0 && x15:0 > 0
+
+----------------------------------------
+
+(23) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f13789_0_createTree_LE(x, x1)] = x1
+
+The following rules are decreasing:
+f13789_0_createTree_LE(c, x28:0) -> f13789_0_createTree_LE(c1, c2) :|: c2 = x28:0 - 1 && (c1 = 0 && c = 0) && (x30:0 > 0 && x31:0 > 0 && x28:0 > 0)
+f13789_0_createTree_LE(c9, x15:0) -> f13789_0_createTree_LE(x14:0, c10) :|: c10 = x15:0 - 1 && c9 = 0 && x15:0 > 0
+The following rules are bounded:
+f13789_0_createTree_LE(c, x28:0) -> f13789_0_createTree_LE(c1, c2) :|: c2 = x28:0 - 1 && (c1 = 0 && c = 0) && (x30:0 > 0 && x31:0 > 0 && x28:0 > 0)
+f13789_0_createTree_LE(c9, x15:0) -> f13789_0_createTree_LE(x14:0, c10) :|: c10 = x15:0 - 1 && c9 = 0 && x15:0 > 0
+
+----------------------------------------
+
+(24)
+YES

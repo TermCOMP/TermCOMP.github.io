@@ -1,0 +1,1195 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/eudjl.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+times(g,g,a)
+
+w.r.t. the given Prolog program could successfully be proven:
+
+(0) Prolog
+(1) PrologToPiTRSProof [SOUND, 0 ms]
+(2) PiTRS
+(3) DependencyPairsProof [EQUIVALENT, 0 ms]
+(4) PiDP
+(5) DependencyGraphProof [EQUIVALENT, 0 ms]
+(6) AND
+    (7) PiDP
+        (8) UsableRulesProof [EQUIVALENT, 0 ms]
+        (9) PiDP
+        (10) PiDPToQDPProof [SOUND, 0 ms]
+        (11) QDP
+        (12) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (13) YES
+    (14) PiDP
+        (15) UsableRulesProof [EQUIVALENT, 0 ms]
+        (16) PiDP
+        (17) PiDPToQDPProof [SOUND, 0 ms]
+        (18) QDP
+        (19) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (20) YES
+    (21) PiDP
+        (22) UsableRulesProof [EQUIVALENT, 0 ms]
+        (23) PiDP
+        (24) PiDPToQDPProof [SOUND, 0 ms]
+        (25) QDP
+        (26) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (27) YES
+    (28) PiDP
+        (29) UsableRulesProof [EQUIVALENT, 0 ms]
+        (30) PiDP
+        (31) PiDPToQDPProof [SOUND, 0 ms]
+        (32) QDP
+        (33) MRRProof [EQUIVALENT, 31 ms]
+        (34) QDP
+        (35) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (36) TRUE
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+even(0, true).
+even(s(0), false).
+even(s(s(X)), B) :- even(X, B).
+half(0, 0).
+half(s(s(X)), s(Y)) :- half(X, Y).
+plus(0, Y, Y).
+plus(s(X), Y, s(Z)) :- plus(X, Y, Z).
+times(0, Y, 0).
+times(s(X), Y, Z) :- ','(even(s(X), B), if(B, s(X), Y, Z)).
+if(true, s(X), Y, Z) :- ','(half(s(X), X1), ','(times(X1, Y, Y1), plus(Y1, Y1, Z))).
+if(false, s(X), Y, Z) :- ','(times(X, Y, U), plus(Y, U, Z)).
+
+
+Query: times(g,g,a)
+----------------------------------------
+
+(1) PrologToPiTRSProof (SOUND)
+We use the technique of [TOCL09]. With regard to the inferred argument filtering the predicates were used in the following modes:
+
+times_in_3: (b,b,f)
+
+even_in_2: (b,f)
+
+if_in_4: (b,b,b,f)
+
+half_in_2: (b,f)
+
+plus_in_3: (b,b,f)
+
+Transforming Prolog into the following Term Rewriting System:
+
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   times_in_gga(0, Y, 0) -> times_out_gga(0, Y, 0)
+   times_in_gga(s(X), Y, Z) -> U4_gga(X, Y, Z, even_in_ga(s(X), B))
+   even_in_ga(0, true) -> even_out_ga(0, true)
+   even_in_ga(s(0), false) -> even_out_ga(s(0), false)
+   even_in_ga(s(s(X)), B) -> U1_ga(X, B, even_in_ga(X, B))
+   U1_ga(X, B, even_out_ga(X, B)) -> even_out_ga(s(s(X)), B)
+   U4_gga(X, Y, Z, even_out_ga(s(X), B)) -> U5_gga(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   if_in_ggga(true, s(X), Y, Z) -> U6_ggga(X, Y, Z, half_in_ga(s(X), X1))
+   half_in_ga(0, 0) -> half_out_ga(0, 0)
+   half_in_ga(s(s(X)), s(Y)) -> U2_ga(X, Y, half_in_ga(X, Y))
+   U2_ga(X, Y, half_out_ga(X, Y)) -> half_out_ga(s(s(X)), s(Y))
+   U6_ggga(X, Y, Z, half_out_ga(s(X), X1)) -> U7_ggga(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U7_ggga(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_ggga(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   plus_in_gga(0, Y, Y) -> plus_out_gga(0, Y, Y)
+   plus_in_gga(s(X), Y, s(Z)) -> U3_gga(X, Y, Z, plus_in_gga(X, Y, Z))
+   U3_gga(X, Y, Z, plus_out_gga(X, Y, Z)) -> plus_out_gga(s(X), Y, s(Z))
+   U8_ggga(X, Y, Z, plus_out_gga(Y1, Y1, Z)) -> if_out_ggga(true, s(X), Y, Z)
+   if_in_ggga(false, s(X), Y, Z) -> U9_ggga(X, Y, Z, times_in_gga(X, Y, U))
+   U9_ggga(X, Y, Z, times_out_gga(X, Y, U)) -> U10_ggga(X, Y, Z, plus_in_gga(Y, U, Z))
+   U10_ggga(X, Y, Z, plus_out_gga(Y, U, Z)) -> if_out_ggga(false, s(X), Y, Z)
+   U5_gga(X, Y, Z, if_out_ggga(B, s(X), Y, Z)) -> times_out_gga(s(X), Y, Z)
+
+The argument filtering Pi contains the following mapping:
+times_in_gga(x1, x2, x3)  =  times_in_gga(x1, x2)
+
+0  =  0
+
+times_out_gga(x1, x2, x3)  =  times_out_gga(x3)
+
+s(x1)  =  s(x1)
+
+U4_gga(x1, x2, x3, x4)  =  U4_gga(x1, x2, x4)
+
+even_in_ga(x1, x2)  =  even_in_ga(x1)
+
+even_out_ga(x1, x2)  =  even_out_ga(x2)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+U5_gga(x1, x2, x3, x4)  =  U5_gga(x4)
+
+if_in_ggga(x1, x2, x3, x4)  =  if_in_ggga(x1, x2, x3)
+
+true  =  true
+
+U6_ggga(x1, x2, x3, x4)  =  U6_ggga(x2, x4)
+
+half_in_ga(x1, x2)  =  half_in_ga(x1)
+
+half_out_ga(x1, x2)  =  half_out_ga(x2)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x3)
+
+U7_ggga(x1, x2, x3, x4)  =  U7_ggga(x4)
+
+U8_ggga(x1, x2, x3, x4)  =  U8_ggga(x4)
+
+plus_in_gga(x1, x2, x3)  =  plus_in_gga(x1, x2)
+
+plus_out_gga(x1, x2, x3)  =  plus_out_gga(x3)
+
+U3_gga(x1, x2, x3, x4)  =  U3_gga(x4)
+
+if_out_ggga(x1, x2, x3, x4)  =  if_out_ggga(x4)
+
+false  =  false
+
+U9_ggga(x1, x2, x3, x4)  =  U9_ggga(x2, x4)
+
+U10_ggga(x1, x2, x3, x4)  =  U10_ggga(x4)
+
+
+
+
+
+Infinitary Constructor Rewriting Termination of PiTRS implies Termination of Prolog
+
+
+
+----------------------------------------
+
+(2)
+Obligation:
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   times_in_gga(0, Y, 0) -> times_out_gga(0, Y, 0)
+   times_in_gga(s(X), Y, Z) -> U4_gga(X, Y, Z, even_in_ga(s(X), B))
+   even_in_ga(0, true) -> even_out_ga(0, true)
+   even_in_ga(s(0), false) -> even_out_ga(s(0), false)
+   even_in_ga(s(s(X)), B) -> U1_ga(X, B, even_in_ga(X, B))
+   U1_ga(X, B, even_out_ga(X, B)) -> even_out_ga(s(s(X)), B)
+   U4_gga(X, Y, Z, even_out_ga(s(X), B)) -> U5_gga(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   if_in_ggga(true, s(X), Y, Z) -> U6_ggga(X, Y, Z, half_in_ga(s(X), X1))
+   half_in_ga(0, 0) -> half_out_ga(0, 0)
+   half_in_ga(s(s(X)), s(Y)) -> U2_ga(X, Y, half_in_ga(X, Y))
+   U2_ga(X, Y, half_out_ga(X, Y)) -> half_out_ga(s(s(X)), s(Y))
+   U6_ggga(X, Y, Z, half_out_ga(s(X), X1)) -> U7_ggga(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U7_ggga(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_ggga(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   plus_in_gga(0, Y, Y) -> plus_out_gga(0, Y, Y)
+   plus_in_gga(s(X), Y, s(Z)) -> U3_gga(X, Y, Z, plus_in_gga(X, Y, Z))
+   U3_gga(X, Y, Z, plus_out_gga(X, Y, Z)) -> plus_out_gga(s(X), Y, s(Z))
+   U8_ggga(X, Y, Z, plus_out_gga(Y1, Y1, Z)) -> if_out_ggga(true, s(X), Y, Z)
+   if_in_ggga(false, s(X), Y, Z) -> U9_ggga(X, Y, Z, times_in_gga(X, Y, U))
+   U9_ggga(X, Y, Z, times_out_gga(X, Y, U)) -> U10_ggga(X, Y, Z, plus_in_gga(Y, U, Z))
+   U10_ggga(X, Y, Z, plus_out_gga(Y, U, Z)) -> if_out_ggga(false, s(X), Y, Z)
+   U5_gga(X, Y, Z, if_out_ggga(B, s(X), Y, Z)) -> times_out_gga(s(X), Y, Z)
+
+The argument filtering Pi contains the following mapping:
+times_in_gga(x1, x2, x3)  =  times_in_gga(x1, x2)
+
+0  =  0
+
+times_out_gga(x1, x2, x3)  =  times_out_gga(x3)
+
+s(x1)  =  s(x1)
+
+U4_gga(x1, x2, x3, x4)  =  U4_gga(x1, x2, x4)
+
+even_in_ga(x1, x2)  =  even_in_ga(x1)
+
+even_out_ga(x1, x2)  =  even_out_ga(x2)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+U5_gga(x1, x2, x3, x4)  =  U5_gga(x4)
+
+if_in_ggga(x1, x2, x3, x4)  =  if_in_ggga(x1, x2, x3)
+
+true  =  true
+
+U6_ggga(x1, x2, x3, x4)  =  U6_ggga(x2, x4)
+
+half_in_ga(x1, x2)  =  half_in_ga(x1)
+
+half_out_ga(x1, x2)  =  half_out_ga(x2)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x3)
+
+U7_ggga(x1, x2, x3, x4)  =  U7_ggga(x4)
+
+U8_ggga(x1, x2, x3, x4)  =  U8_ggga(x4)
+
+plus_in_gga(x1, x2, x3)  =  plus_in_gga(x1, x2)
+
+plus_out_gga(x1, x2, x3)  =  plus_out_gga(x3)
+
+U3_gga(x1, x2, x3, x4)  =  U3_gga(x4)
+
+if_out_ggga(x1, x2, x3, x4)  =  if_out_ggga(x4)
+
+false  =  false
+
+U9_ggga(x1, x2, x3, x4)  =  U9_ggga(x2, x4)
+
+U10_ggga(x1, x2, x3, x4)  =  U10_ggga(x4)
+
+
+
+----------------------------------------
+
+(3) DependencyPairsProof (EQUIVALENT)
+Using Dependency Pairs [AG00,LOPSTR] we result in the following initial DP problem:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   TIMES_IN_GGA(s(X), Y, Z) -> U4_GGA(X, Y, Z, even_in_ga(s(X), B))
+   TIMES_IN_GGA(s(X), Y, Z) -> EVEN_IN_GA(s(X), B)
+   EVEN_IN_GA(s(s(X)), B) -> U1_GA(X, B, even_in_ga(X, B))
+   EVEN_IN_GA(s(s(X)), B) -> EVEN_IN_GA(X, B)
+   U4_GGA(X, Y, Z, even_out_ga(s(X), B)) -> U5_GGA(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   U4_GGA(X, Y, Z, even_out_ga(s(X), B)) -> IF_IN_GGGA(B, s(X), Y, Z)
+   IF_IN_GGGA(true, s(X), Y, Z) -> U6_GGGA(X, Y, Z, half_in_ga(s(X), X1))
+   IF_IN_GGGA(true, s(X), Y, Z) -> HALF_IN_GA(s(X), X1)
+   HALF_IN_GA(s(s(X)), s(Y)) -> U2_GA(X, Y, half_in_ga(X, Y))
+   HALF_IN_GA(s(s(X)), s(Y)) -> HALF_IN_GA(X, Y)
+   U6_GGGA(X, Y, Z, half_out_ga(s(X), X1)) -> U7_GGGA(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U6_GGGA(X, Y, Z, half_out_ga(s(X), X1)) -> TIMES_IN_GGA(X1, Y, Y1)
+   U7_GGGA(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_GGGA(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   U7_GGGA(X, Y, Z, times_out_gga(X1, Y, Y1)) -> PLUS_IN_GGA(Y1, Y1, Z)
+   PLUS_IN_GGA(s(X), Y, s(Z)) -> U3_GGA(X, Y, Z, plus_in_gga(X, Y, Z))
+   PLUS_IN_GGA(s(X), Y, s(Z)) -> PLUS_IN_GGA(X, Y, Z)
+   IF_IN_GGGA(false, s(X), Y, Z) -> U9_GGGA(X, Y, Z, times_in_gga(X, Y, U))
+   IF_IN_GGGA(false, s(X), Y, Z) -> TIMES_IN_GGA(X, Y, U)
+   U9_GGGA(X, Y, Z, times_out_gga(X, Y, U)) -> U10_GGGA(X, Y, Z, plus_in_gga(Y, U, Z))
+   U9_GGGA(X, Y, Z, times_out_gga(X, Y, U)) -> PLUS_IN_GGA(Y, U, Z)
+
+The TRS R consists of the following rules:
+
+   times_in_gga(0, Y, 0) -> times_out_gga(0, Y, 0)
+   times_in_gga(s(X), Y, Z) -> U4_gga(X, Y, Z, even_in_ga(s(X), B))
+   even_in_ga(0, true) -> even_out_ga(0, true)
+   even_in_ga(s(0), false) -> even_out_ga(s(0), false)
+   even_in_ga(s(s(X)), B) -> U1_ga(X, B, even_in_ga(X, B))
+   U1_ga(X, B, even_out_ga(X, B)) -> even_out_ga(s(s(X)), B)
+   U4_gga(X, Y, Z, even_out_ga(s(X), B)) -> U5_gga(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   if_in_ggga(true, s(X), Y, Z) -> U6_ggga(X, Y, Z, half_in_ga(s(X), X1))
+   half_in_ga(0, 0) -> half_out_ga(0, 0)
+   half_in_ga(s(s(X)), s(Y)) -> U2_ga(X, Y, half_in_ga(X, Y))
+   U2_ga(X, Y, half_out_ga(X, Y)) -> half_out_ga(s(s(X)), s(Y))
+   U6_ggga(X, Y, Z, half_out_ga(s(X), X1)) -> U7_ggga(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U7_ggga(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_ggga(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   plus_in_gga(0, Y, Y) -> plus_out_gga(0, Y, Y)
+   plus_in_gga(s(X), Y, s(Z)) -> U3_gga(X, Y, Z, plus_in_gga(X, Y, Z))
+   U3_gga(X, Y, Z, plus_out_gga(X, Y, Z)) -> plus_out_gga(s(X), Y, s(Z))
+   U8_ggga(X, Y, Z, plus_out_gga(Y1, Y1, Z)) -> if_out_ggga(true, s(X), Y, Z)
+   if_in_ggga(false, s(X), Y, Z) -> U9_ggga(X, Y, Z, times_in_gga(X, Y, U))
+   U9_ggga(X, Y, Z, times_out_gga(X, Y, U)) -> U10_ggga(X, Y, Z, plus_in_gga(Y, U, Z))
+   U10_ggga(X, Y, Z, plus_out_gga(Y, U, Z)) -> if_out_ggga(false, s(X), Y, Z)
+   U5_gga(X, Y, Z, if_out_ggga(B, s(X), Y, Z)) -> times_out_gga(s(X), Y, Z)
+
+The argument filtering Pi contains the following mapping:
+times_in_gga(x1, x2, x3)  =  times_in_gga(x1, x2)
+
+0  =  0
+
+times_out_gga(x1, x2, x3)  =  times_out_gga(x3)
+
+s(x1)  =  s(x1)
+
+U4_gga(x1, x2, x3, x4)  =  U4_gga(x1, x2, x4)
+
+even_in_ga(x1, x2)  =  even_in_ga(x1)
+
+even_out_ga(x1, x2)  =  even_out_ga(x2)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+U5_gga(x1, x2, x3, x4)  =  U5_gga(x4)
+
+if_in_ggga(x1, x2, x3, x4)  =  if_in_ggga(x1, x2, x3)
+
+true  =  true
+
+U6_ggga(x1, x2, x3, x4)  =  U6_ggga(x2, x4)
+
+half_in_ga(x1, x2)  =  half_in_ga(x1)
+
+half_out_ga(x1, x2)  =  half_out_ga(x2)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x3)
+
+U7_ggga(x1, x2, x3, x4)  =  U7_ggga(x4)
+
+U8_ggga(x1, x2, x3, x4)  =  U8_ggga(x4)
+
+plus_in_gga(x1, x2, x3)  =  plus_in_gga(x1, x2)
+
+plus_out_gga(x1, x2, x3)  =  plus_out_gga(x3)
+
+U3_gga(x1, x2, x3, x4)  =  U3_gga(x4)
+
+if_out_ggga(x1, x2, x3, x4)  =  if_out_ggga(x4)
+
+false  =  false
+
+U9_ggga(x1, x2, x3, x4)  =  U9_ggga(x2, x4)
+
+U10_ggga(x1, x2, x3, x4)  =  U10_ggga(x4)
+
+TIMES_IN_GGA(x1, x2, x3)  =  TIMES_IN_GGA(x1, x2)
+
+U4_GGA(x1, x2, x3, x4)  =  U4_GGA(x1, x2, x4)
+
+EVEN_IN_GA(x1, x2)  =  EVEN_IN_GA(x1)
+
+U1_GA(x1, x2, x3)  =  U1_GA(x3)
+
+U5_GGA(x1, x2, x3, x4)  =  U5_GGA(x4)
+
+IF_IN_GGGA(x1, x2, x3, x4)  =  IF_IN_GGGA(x1, x2, x3)
+
+U6_GGGA(x1, x2, x3, x4)  =  U6_GGGA(x2, x4)
+
+HALF_IN_GA(x1, x2)  =  HALF_IN_GA(x1)
+
+U2_GA(x1, x2, x3)  =  U2_GA(x3)
+
+U7_GGGA(x1, x2, x3, x4)  =  U7_GGGA(x4)
+
+U8_GGGA(x1, x2, x3, x4)  =  U8_GGGA(x4)
+
+PLUS_IN_GGA(x1, x2, x3)  =  PLUS_IN_GGA(x1, x2)
+
+U3_GGA(x1, x2, x3, x4)  =  U3_GGA(x4)
+
+U9_GGGA(x1, x2, x3, x4)  =  U9_GGGA(x2, x4)
+
+U10_GGGA(x1, x2, x3, x4)  =  U10_GGGA(x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(4)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   TIMES_IN_GGA(s(X), Y, Z) -> U4_GGA(X, Y, Z, even_in_ga(s(X), B))
+   TIMES_IN_GGA(s(X), Y, Z) -> EVEN_IN_GA(s(X), B)
+   EVEN_IN_GA(s(s(X)), B) -> U1_GA(X, B, even_in_ga(X, B))
+   EVEN_IN_GA(s(s(X)), B) -> EVEN_IN_GA(X, B)
+   U4_GGA(X, Y, Z, even_out_ga(s(X), B)) -> U5_GGA(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   U4_GGA(X, Y, Z, even_out_ga(s(X), B)) -> IF_IN_GGGA(B, s(X), Y, Z)
+   IF_IN_GGGA(true, s(X), Y, Z) -> U6_GGGA(X, Y, Z, half_in_ga(s(X), X1))
+   IF_IN_GGGA(true, s(X), Y, Z) -> HALF_IN_GA(s(X), X1)
+   HALF_IN_GA(s(s(X)), s(Y)) -> U2_GA(X, Y, half_in_ga(X, Y))
+   HALF_IN_GA(s(s(X)), s(Y)) -> HALF_IN_GA(X, Y)
+   U6_GGGA(X, Y, Z, half_out_ga(s(X), X1)) -> U7_GGGA(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U6_GGGA(X, Y, Z, half_out_ga(s(X), X1)) -> TIMES_IN_GGA(X1, Y, Y1)
+   U7_GGGA(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_GGGA(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   U7_GGGA(X, Y, Z, times_out_gga(X1, Y, Y1)) -> PLUS_IN_GGA(Y1, Y1, Z)
+   PLUS_IN_GGA(s(X), Y, s(Z)) -> U3_GGA(X, Y, Z, plus_in_gga(X, Y, Z))
+   PLUS_IN_GGA(s(X), Y, s(Z)) -> PLUS_IN_GGA(X, Y, Z)
+   IF_IN_GGGA(false, s(X), Y, Z) -> U9_GGGA(X, Y, Z, times_in_gga(X, Y, U))
+   IF_IN_GGGA(false, s(X), Y, Z) -> TIMES_IN_GGA(X, Y, U)
+   U9_GGGA(X, Y, Z, times_out_gga(X, Y, U)) -> U10_GGGA(X, Y, Z, plus_in_gga(Y, U, Z))
+   U9_GGGA(X, Y, Z, times_out_gga(X, Y, U)) -> PLUS_IN_GGA(Y, U, Z)
+
+The TRS R consists of the following rules:
+
+   times_in_gga(0, Y, 0) -> times_out_gga(0, Y, 0)
+   times_in_gga(s(X), Y, Z) -> U4_gga(X, Y, Z, even_in_ga(s(X), B))
+   even_in_ga(0, true) -> even_out_ga(0, true)
+   even_in_ga(s(0), false) -> even_out_ga(s(0), false)
+   even_in_ga(s(s(X)), B) -> U1_ga(X, B, even_in_ga(X, B))
+   U1_ga(X, B, even_out_ga(X, B)) -> even_out_ga(s(s(X)), B)
+   U4_gga(X, Y, Z, even_out_ga(s(X), B)) -> U5_gga(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   if_in_ggga(true, s(X), Y, Z) -> U6_ggga(X, Y, Z, half_in_ga(s(X), X1))
+   half_in_ga(0, 0) -> half_out_ga(0, 0)
+   half_in_ga(s(s(X)), s(Y)) -> U2_ga(X, Y, half_in_ga(X, Y))
+   U2_ga(X, Y, half_out_ga(X, Y)) -> half_out_ga(s(s(X)), s(Y))
+   U6_ggga(X, Y, Z, half_out_ga(s(X), X1)) -> U7_ggga(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U7_ggga(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_ggga(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   plus_in_gga(0, Y, Y) -> plus_out_gga(0, Y, Y)
+   plus_in_gga(s(X), Y, s(Z)) -> U3_gga(X, Y, Z, plus_in_gga(X, Y, Z))
+   U3_gga(X, Y, Z, plus_out_gga(X, Y, Z)) -> plus_out_gga(s(X), Y, s(Z))
+   U8_ggga(X, Y, Z, plus_out_gga(Y1, Y1, Z)) -> if_out_ggga(true, s(X), Y, Z)
+   if_in_ggga(false, s(X), Y, Z) -> U9_ggga(X, Y, Z, times_in_gga(X, Y, U))
+   U9_ggga(X, Y, Z, times_out_gga(X, Y, U)) -> U10_ggga(X, Y, Z, plus_in_gga(Y, U, Z))
+   U10_ggga(X, Y, Z, plus_out_gga(Y, U, Z)) -> if_out_ggga(false, s(X), Y, Z)
+   U5_gga(X, Y, Z, if_out_ggga(B, s(X), Y, Z)) -> times_out_gga(s(X), Y, Z)
+
+The argument filtering Pi contains the following mapping:
+times_in_gga(x1, x2, x3)  =  times_in_gga(x1, x2)
+
+0  =  0
+
+times_out_gga(x1, x2, x3)  =  times_out_gga(x3)
+
+s(x1)  =  s(x1)
+
+U4_gga(x1, x2, x3, x4)  =  U4_gga(x1, x2, x4)
+
+even_in_ga(x1, x2)  =  even_in_ga(x1)
+
+even_out_ga(x1, x2)  =  even_out_ga(x2)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+U5_gga(x1, x2, x3, x4)  =  U5_gga(x4)
+
+if_in_ggga(x1, x2, x3, x4)  =  if_in_ggga(x1, x2, x3)
+
+true  =  true
+
+U6_ggga(x1, x2, x3, x4)  =  U6_ggga(x2, x4)
+
+half_in_ga(x1, x2)  =  half_in_ga(x1)
+
+half_out_ga(x1, x2)  =  half_out_ga(x2)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x3)
+
+U7_ggga(x1, x2, x3, x4)  =  U7_ggga(x4)
+
+U8_ggga(x1, x2, x3, x4)  =  U8_ggga(x4)
+
+plus_in_gga(x1, x2, x3)  =  plus_in_gga(x1, x2)
+
+plus_out_gga(x1, x2, x3)  =  plus_out_gga(x3)
+
+U3_gga(x1, x2, x3, x4)  =  U3_gga(x4)
+
+if_out_ggga(x1, x2, x3, x4)  =  if_out_ggga(x4)
+
+false  =  false
+
+U9_ggga(x1, x2, x3, x4)  =  U9_ggga(x2, x4)
+
+U10_ggga(x1, x2, x3, x4)  =  U10_ggga(x4)
+
+TIMES_IN_GGA(x1, x2, x3)  =  TIMES_IN_GGA(x1, x2)
+
+U4_GGA(x1, x2, x3, x4)  =  U4_GGA(x1, x2, x4)
+
+EVEN_IN_GA(x1, x2)  =  EVEN_IN_GA(x1)
+
+U1_GA(x1, x2, x3)  =  U1_GA(x3)
+
+U5_GGA(x1, x2, x3, x4)  =  U5_GGA(x4)
+
+IF_IN_GGGA(x1, x2, x3, x4)  =  IF_IN_GGGA(x1, x2, x3)
+
+U6_GGGA(x1, x2, x3, x4)  =  U6_GGGA(x2, x4)
+
+HALF_IN_GA(x1, x2)  =  HALF_IN_GA(x1)
+
+U2_GA(x1, x2, x3)  =  U2_GA(x3)
+
+U7_GGGA(x1, x2, x3, x4)  =  U7_GGGA(x4)
+
+U8_GGGA(x1, x2, x3, x4)  =  U8_GGGA(x4)
+
+PLUS_IN_GGA(x1, x2, x3)  =  PLUS_IN_GGA(x1, x2)
+
+U3_GGA(x1, x2, x3, x4)  =  U3_GGA(x4)
+
+U9_GGGA(x1, x2, x3, x4)  =  U9_GGGA(x2, x4)
+
+U10_GGGA(x1, x2, x3, x4)  =  U10_GGGA(x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(5) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LOPSTR] contains 4 SCCs with 12 less nodes.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   PLUS_IN_GGA(s(X), Y, s(Z)) -> PLUS_IN_GGA(X, Y, Z)
+
+The TRS R consists of the following rules:
+
+   times_in_gga(0, Y, 0) -> times_out_gga(0, Y, 0)
+   times_in_gga(s(X), Y, Z) -> U4_gga(X, Y, Z, even_in_ga(s(X), B))
+   even_in_ga(0, true) -> even_out_ga(0, true)
+   even_in_ga(s(0), false) -> even_out_ga(s(0), false)
+   even_in_ga(s(s(X)), B) -> U1_ga(X, B, even_in_ga(X, B))
+   U1_ga(X, B, even_out_ga(X, B)) -> even_out_ga(s(s(X)), B)
+   U4_gga(X, Y, Z, even_out_ga(s(X), B)) -> U5_gga(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   if_in_ggga(true, s(X), Y, Z) -> U6_ggga(X, Y, Z, half_in_ga(s(X), X1))
+   half_in_ga(0, 0) -> half_out_ga(0, 0)
+   half_in_ga(s(s(X)), s(Y)) -> U2_ga(X, Y, half_in_ga(X, Y))
+   U2_ga(X, Y, half_out_ga(X, Y)) -> half_out_ga(s(s(X)), s(Y))
+   U6_ggga(X, Y, Z, half_out_ga(s(X), X1)) -> U7_ggga(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U7_ggga(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_ggga(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   plus_in_gga(0, Y, Y) -> plus_out_gga(0, Y, Y)
+   plus_in_gga(s(X), Y, s(Z)) -> U3_gga(X, Y, Z, plus_in_gga(X, Y, Z))
+   U3_gga(X, Y, Z, plus_out_gga(X, Y, Z)) -> plus_out_gga(s(X), Y, s(Z))
+   U8_ggga(X, Y, Z, plus_out_gga(Y1, Y1, Z)) -> if_out_ggga(true, s(X), Y, Z)
+   if_in_ggga(false, s(X), Y, Z) -> U9_ggga(X, Y, Z, times_in_gga(X, Y, U))
+   U9_ggga(X, Y, Z, times_out_gga(X, Y, U)) -> U10_ggga(X, Y, Z, plus_in_gga(Y, U, Z))
+   U10_ggga(X, Y, Z, plus_out_gga(Y, U, Z)) -> if_out_ggga(false, s(X), Y, Z)
+   U5_gga(X, Y, Z, if_out_ggga(B, s(X), Y, Z)) -> times_out_gga(s(X), Y, Z)
+
+The argument filtering Pi contains the following mapping:
+times_in_gga(x1, x2, x3)  =  times_in_gga(x1, x2)
+
+0  =  0
+
+times_out_gga(x1, x2, x3)  =  times_out_gga(x3)
+
+s(x1)  =  s(x1)
+
+U4_gga(x1, x2, x3, x4)  =  U4_gga(x1, x2, x4)
+
+even_in_ga(x1, x2)  =  even_in_ga(x1)
+
+even_out_ga(x1, x2)  =  even_out_ga(x2)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+U5_gga(x1, x2, x3, x4)  =  U5_gga(x4)
+
+if_in_ggga(x1, x2, x3, x4)  =  if_in_ggga(x1, x2, x3)
+
+true  =  true
+
+U6_ggga(x1, x2, x3, x4)  =  U6_ggga(x2, x4)
+
+half_in_ga(x1, x2)  =  half_in_ga(x1)
+
+half_out_ga(x1, x2)  =  half_out_ga(x2)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x3)
+
+U7_ggga(x1, x2, x3, x4)  =  U7_ggga(x4)
+
+U8_ggga(x1, x2, x3, x4)  =  U8_ggga(x4)
+
+plus_in_gga(x1, x2, x3)  =  plus_in_gga(x1, x2)
+
+plus_out_gga(x1, x2, x3)  =  plus_out_gga(x3)
+
+U3_gga(x1, x2, x3, x4)  =  U3_gga(x4)
+
+if_out_ggga(x1, x2, x3, x4)  =  if_out_ggga(x4)
+
+false  =  false
+
+U9_ggga(x1, x2, x3, x4)  =  U9_ggga(x2, x4)
+
+U10_ggga(x1, x2, x3, x4)  =  U10_ggga(x4)
+
+PLUS_IN_GGA(x1, x2, x3)  =  PLUS_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(8) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(9)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   PLUS_IN_GGA(s(X), Y, s(Z)) -> PLUS_IN_GGA(X, Y, Z)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+s(x1)  =  s(x1)
+
+PLUS_IN_GGA(x1, x2, x3)  =  PLUS_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(10) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   PLUS_IN_GGA(s(X), Y) -> PLUS_IN_GGA(X, Y)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(12) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*PLUS_IN_GGA(s(X), Y) -> PLUS_IN_GGA(X, Y)
+The graph contains the following edges 1 > 1, 2 >= 2
+
+
+----------------------------------------
+
+(13)
+YES
+
+----------------------------------------
+
+(14)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   HALF_IN_GA(s(s(X)), s(Y)) -> HALF_IN_GA(X, Y)
+
+The TRS R consists of the following rules:
+
+   times_in_gga(0, Y, 0) -> times_out_gga(0, Y, 0)
+   times_in_gga(s(X), Y, Z) -> U4_gga(X, Y, Z, even_in_ga(s(X), B))
+   even_in_ga(0, true) -> even_out_ga(0, true)
+   even_in_ga(s(0), false) -> even_out_ga(s(0), false)
+   even_in_ga(s(s(X)), B) -> U1_ga(X, B, even_in_ga(X, B))
+   U1_ga(X, B, even_out_ga(X, B)) -> even_out_ga(s(s(X)), B)
+   U4_gga(X, Y, Z, even_out_ga(s(X), B)) -> U5_gga(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   if_in_ggga(true, s(X), Y, Z) -> U6_ggga(X, Y, Z, half_in_ga(s(X), X1))
+   half_in_ga(0, 0) -> half_out_ga(0, 0)
+   half_in_ga(s(s(X)), s(Y)) -> U2_ga(X, Y, half_in_ga(X, Y))
+   U2_ga(X, Y, half_out_ga(X, Y)) -> half_out_ga(s(s(X)), s(Y))
+   U6_ggga(X, Y, Z, half_out_ga(s(X), X1)) -> U7_ggga(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U7_ggga(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_ggga(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   plus_in_gga(0, Y, Y) -> plus_out_gga(0, Y, Y)
+   plus_in_gga(s(X), Y, s(Z)) -> U3_gga(X, Y, Z, plus_in_gga(X, Y, Z))
+   U3_gga(X, Y, Z, plus_out_gga(X, Y, Z)) -> plus_out_gga(s(X), Y, s(Z))
+   U8_ggga(X, Y, Z, plus_out_gga(Y1, Y1, Z)) -> if_out_ggga(true, s(X), Y, Z)
+   if_in_ggga(false, s(X), Y, Z) -> U9_ggga(X, Y, Z, times_in_gga(X, Y, U))
+   U9_ggga(X, Y, Z, times_out_gga(X, Y, U)) -> U10_ggga(X, Y, Z, plus_in_gga(Y, U, Z))
+   U10_ggga(X, Y, Z, plus_out_gga(Y, U, Z)) -> if_out_ggga(false, s(X), Y, Z)
+   U5_gga(X, Y, Z, if_out_ggga(B, s(X), Y, Z)) -> times_out_gga(s(X), Y, Z)
+
+The argument filtering Pi contains the following mapping:
+times_in_gga(x1, x2, x3)  =  times_in_gga(x1, x2)
+
+0  =  0
+
+times_out_gga(x1, x2, x3)  =  times_out_gga(x3)
+
+s(x1)  =  s(x1)
+
+U4_gga(x1, x2, x3, x4)  =  U4_gga(x1, x2, x4)
+
+even_in_ga(x1, x2)  =  even_in_ga(x1)
+
+even_out_ga(x1, x2)  =  even_out_ga(x2)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+U5_gga(x1, x2, x3, x4)  =  U5_gga(x4)
+
+if_in_ggga(x1, x2, x3, x4)  =  if_in_ggga(x1, x2, x3)
+
+true  =  true
+
+U6_ggga(x1, x2, x3, x4)  =  U6_ggga(x2, x4)
+
+half_in_ga(x1, x2)  =  half_in_ga(x1)
+
+half_out_ga(x1, x2)  =  half_out_ga(x2)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x3)
+
+U7_ggga(x1, x2, x3, x4)  =  U7_ggga(x4)
+
+U8_ggga(x1, x2, x3, x4)  =  U8_ggga(x4)
+
+plus_in_gga(x1, x2, x3)  =  plus_in_gga(x1, x2)
+
+plus_out_gga(x1, x2, x3)  =  plus_out_gga(x3)
+
+U3_gga(x1, x2, x3, x4)  =  U3_gga(x4)
+
+if_out_ggga(x1, x2, x3, x4)  =  if_out_ggga(x4)
+
+false  =  false
+
+U9_ggga(x1, x2, x3, x4)  =  U9_ggga(x2, x4)
+
+U10_ggga(x1, x2, x3, x4)  =  U10_ggga(x4)
+
+HALF_IN_GA(x1, x2)  =  HALF_IN_GA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(15) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(16)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   HALF_IN_GA(s(s(X)), s(Y)) -> HALF_IN_GA(X, Y)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+s(x1)  =  s(x1)
+
+HALF_IN_GA(x1, x2)  =  HALF_IN_GA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(17) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(18)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   HALF_IN_GA(s(s(X))) -> HALF_IN_GA(X)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(19) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*HALF_IN_GA(s(s(X))) -> HALF_IN_GA(X)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(20)
+YES
+
+----------------------------------------
+
+(21)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   EVEN_IN_GA(s(s(X)), B) -> EVEN_IN_GA(X, B)
+
+The TRS R consists of the following rules:
+
+   times_in_gga(0, Y, 0) -> times_out_gga(0, Y, 0)
+   times_in_gga(s(X), Y, Z) -> U4_gga(X, Y, Z, even_in_ga(s(X), B))
+   even_in_ga(0, true) -> even_out_ga(0, true)
+   even_in_ga(s(0), false) -> even_out_ga(s(0), false)
+   even_in_ga(s(s(X)), B) -> U1_ga(X, B, even_in_ga(X, B))
+   U1_ga(X, B, even_out_ga(X, B)) -> even_out_ga(s(s(X)), B)
+   U4_gga(X, Y, Z, even_out_ga(s(X), B)) -> U5_gga(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   if_in_ggga(true, s(X), Y, Z) -> U6_ggga(X, Y, Z, half_in_ga(s(X), X1))
+   half_in_ga(0, 0) -> half_out_ga(0, 0)
+   half_in_ga(s(s(X)), s(Y)) -> U2_ga(X, Y, half_in_ga(X, Y))
+   U2_ga(X, Y, half_out_ga(X, Y)) -> half_out_ga(s(s(X)), s(Y))
+   U6_ggga(X, Y, Z, half_out_ga(s(X), X1)) -> U7_ggga(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U7_ggga(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_ggga(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   plus_in_gga(0, Y, Y) -> plus_out_gga(0, Y, Y)
+   plus_in_gga(s(X), Y, s(Z)) -> U3_gga(X, Y, Z, plus_in_gga(X, Y, Z))
+   U3_gga(X, Y, Z, plus_out_gga(X, Y, Z)) -> plus_out_gga(s(X), Y, s(Z))
+   U8_ggga(X, Y, Z, plus_out_gga(Y1, Y1, Z)) -> if_out_ggga(true, s(X), Y, Z)
+   if_in_ggga(false, s(X), Y, Z) -> U9_ggga(X, Y, Z, times_in_gga(X, Y, U))
+   U9_ggga(X, Y, Z, times_out_gga(X, Y, U)) -> U10_ggga(X, Y, Z, plus_in_gga(Y, U, Z))
+   U10_ggga(X, Y, Z, plus_out_gga(Y, U, Z)) -> if_out_ggga(false, s(X), Y, Z)
+   U5_gga(X, Y, Z, if_out_ggga(B, s(X), Y, Z)) -> times_out_gga(s(X), Y, Z)
+
+The argument filtering Pi contains the following mapping:
+times_in_gga(x1, x2, x3)  =  times_in_gga(x1, x2)
+
+0  =  0
+
+times_out_gga(x1, x2, x3)  =  times_out_gga(x3)
+
+s(x1)  =  s(x1)
+
+U4_gga(x1, x2, x3, x4)  =  U4_gga(x1, x2, x4)
+
+even_in_ga(x1, x2)  =  even_in_ga(x1)
+
+even_out_ga(x1, x2)  =  even_out_ga(x2)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+U5_gga(x1, x2, x3, x4)  =  U5_gga(x4)
+
+if_in_ggga(x1, x2, x3, x4)  =  if_in_ggga(x1, x2, x3)
+
+true  =  true
+
+U6_ggga(x1, x2, x3, x4)  =  U6_ggga(x2, x4)
+
+half_in_ga(x1, x2)  =  half_in_ga(x1)
+
+half_out_ga(x1, x2)  =  half_out_ga(x2)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x3)
+
+U7_ggga(x1, x2, x3, x4)  =  U7_ggga(x4)
+
+U8_ggga(x1, x2, x3, x4)  =  U8_ggga(x4)
+
+plus_in_gga(x1, x2, x3)  =  plus_in_gga(x1, x2)
+
+plus_out_gga(x1, x2, x3)  =  plus_out_gga(x3)
+
+U3_gga(x1, x2, x3, x4)  =  U3_gga(x4)
+
+if_out_ggga(x1, x2, x3, x4)  =  if_out_ggga(x4)
+
+false  =  false
+
+U9_ggga(x1, x2, x3, x4)  =  U9_ggga(x2, x4)
+
+U10_ggga(x1, x2, x3, x4)  =  U10_ggga(x4)
+
+EVEN_IN_GA(x1, x2)  =  EVEN_IN_GA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(22) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(23)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   EVEN_IN_GA(s(s(X)), B) -> EVEN_IN_GA(X, B)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+s(x1)  =  s(x1)
+
+EVEN_IN_GA(x1, x2)  =  EVEN_IN_GA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(24) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(25)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   EVEN_IN_GA(s(s(X))) -> EVEN_IN_GA(X)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(26) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*EVEN_IN_GA(s(s(X))) -> EVEN_IN_GA(X)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(27)
+YES
+
+----------------------------------------
+
+(28)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U4_GGA(X, Y, Z, even_out_ga(s(X), B)) -> IF_IN_GGGA(B, s(X), Y, Z)
+   IF_IN_GGGA(true, s(X), Y, Z) -> U6_GGGA(X, Y, Z, half_in_ga(s(X), X1))
+   U6_GGGA(X, Y, Z, half_out_ga(s(X), X1)) -> TIMES_IN_GGA(X1, Y, Y1)
+   TIMES_IN_GGA(s(X), Y, Z) -> U4_GGA(X, Y, Z, even_in_ga(s(X), B))
+   IF_IN_GGGA(false, s(X), Y, Z) -> TIMES_IN_GGA(X, Y, U)
+
+The TRS R consists of the following rules:
+
+   times_in_gga(0, Y, 0) -> times_out_gga(0, Y, 0)
+   times_in_gga(s(X), Y, Z) -> U4_gga(X, Y, Z, even_in_ga(s(X), B))
+   even_in_ga(0, true) -> even_out_ga(0, true)
+   even_in_ga(s(0), false) -> even_out_ga(s(0), false)
+   even_in_ga(s(s(X)), B) -> U1_ga(X, B, even_in_ga(X, B))
+   U1_ga(X, B, even_out_ga(X, B)) -> even_out_ga(s(s(X)), B)
+   U4_gga(X, Y, Z, even_out_ga(s(X), B)) -> U5_gga(X, Y, Z, if_in_ggga(B, s(X), Y, Z))
+   if_in_ggga(true, s(X), Y, Z) -> U6_ggga(X, Y, Z, half_in_ga(s(X), X1))
+   half_in_ga(0, 0) -> half_out_ga(0, 0)
+   half_in_ga(s(s(X)), s(Y)) -> U2_ga(X, Y, half_in_ga(X, Y))
+   U2_ga(X, Y, half_out_ga(X, Y)) -> half_out_ga(s(s(X)), s(Y))
+   U6_ggga(X, Y, Z, half_out_ga(s(X), X1)) -> U7_ggga(X, Y, Z, times_in_gga(X1, Y, Y1))
+   U7_ggga(X, Y, Z, times_out_gga(X1, Y, Y1)) -> U8_ggga(X, Y, Z, plus_in_gga(Y1, Y1, Z))
+   plus_in_gga(0, Y, Y) -> plus_out_gga(0, Y, Y)
+   plus_in_gga(s(X), Y, s(Z)) -> U3_gga(X, Y, Z, plus_in_gga(X, Y, Z))
+   U3_gga(X, Y, Z, plus_out_gga(X, Y, Z)) -> plus_out_gga(s(X), Y, s(Z))
+   U8_ggga(X, Y, Z, plus_out_gga(Y1, Y1, Z)) -> if_out_ggga(true, s(X), Y, Z)
+   if_in_ggga(false, s(X), Y, Z) -> U9_ggga(X, Y, Z, times_in_gga(X, Y, U))
+   U9_ggga(X, Y, Z, times_out_gga(X, Y, U)) -> U10_ggga(X, Y, Z, plus_in_gga(Y, U, Z))
+   U10_ggga(X, Y, Z, plus_out_gga(Y, U, Z)) -> if_out_ggga(false, s(X), Y, Z)
+   U5_gga(X, Y, Z, if_out_ggga(B, s(X), Y, Z)) -> times_out_gga(s(X), Y, Z)
+
+The argument filtering Pi contains the following mapping:
+times_in_gga(x1, x2, x3)  =  times_in_gga(x1, x2)
+
+0  =  0
+
+times_out_gga(x1, x2, x3)  =  times_out_gga(x3)
+
+s(x1)  =  s(x1)
+
+U4_gga(x1, x2, x3, x4)  =  U4_gga(x1, x2, x4)
+
+even_in_ga(x1, x2)  =  even_in_ga(x1)
+
+even_out_ga(x1, x2)  =  even_out_ga(x2)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+U5_gga(x1, x2, x3, x4)  =  U5_gga(x4)
+
+if_in_ggga(x1, x2, x3, x4)  =  if_in_ggga(x1, x2, x3)
+
+true  =  true
+
+U6_ggga(x1, x2, x3, x4)  =  U6_ggga(x2, x4)
+
+half_in_ga(x1, x2)  =  half_in_ga(x1)
+
+half_out_ga(x1, x2)  =  half_out_ga(x2)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x3)
+
+U7_ggga(x1, x2, x3, x4)  =  U7_ggga(x4)
+
+U8_ggga(x1, x2, x3, x4)  =  U8_ggga(x4)
+
+plus_in_gga(x1, x2, x3)  =  plus_in_gga(x1, x2)
+
+plus_out_gga(x1, x2, x3)  =  plus_out_gga(x3)
+
+U3_gga(x1, x2, x3, x4)  =  U3_gga(x4)
+
+if_out_ggga(x1, x2, x3, x4)  =  if_out_ggga(x4)
+
+false  =  false
+
+U9_ggga(x1, x2, x3, x4)  =  U9_ggga(x2, x4)
+
+U10_ggga(x1, x2, x3, x4)  =  U10_ggga(x4)
+
+TIMES_IN_GGA(x1, x2, x3)  =  TIMES_IN_GGA(x1, x2)
+
+U4_GGA(x1, x2, x3, x4)  =  U4_GGA(x1, x2, x4)
+
+IF_IN_GGGA(x1, x2, x3, x4)  =  IF_IN_GGGA(x1, x2, x3)
+
+U6_GGGA(x1, x2, x3, x4)  =  U6_GGGA(x2, x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(29) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(30)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U4_GGA(X, Y, Z, even_out_ga(s(X), B)) -> IF_IN_GGGA(B, s(X), Y, Z)
+   IF_IN_GGGA(true, s(X), Y, Z) -> U6_GGGA(X, Y, Z, half_in_ga(s(X), X1))
+   U6_GGGA(X, Y, Z, half_out_ga(s(X), X1)) -> TIMES_IN_GGA(X1, Y, Y1)
+   TIMES_IN_GGA(s(X), Y, Z) -> U4_GGA(X, Y, Z, even_in_ga(s(X), B))
+   IF_IN_GGGA(false, s(X), Y, Z) -> TIMES_IN_GGA(X, Y, U)
+
+The TRS R consists of the following rules:
+
+   half_in_ga(s(s(X)), s(Y)) -> U2_ga(X, Y, half_in_ga(X, Y))
+   even_in_ga(s(0), false) -> even_out_ga(s(0), false)
+   even_in_ga(s(s(X)), B) -> U1_ga(X, B, even_in_ga(X, B))
+   U2_ga(X, Y, half_out_ga(X, Y)) -> half_out_ga(s(s(X)), s(Y))
+   U1_ga(X, B, even_out_ga(X, B)) -> even_out_ga(s(s(X)), B)
+   half_in_ga(0, 0) -> half_out_ga(0, 0)
+   even_in_ga(0, true) -> even_out_ga(0, true)
+
+The argument filtering Pi contains the following mapping:
+0  =  0
+
+s(x1)  =  s(x1)
+
+even_in_ga(x1, x2)  =  even_in_ga(x1)
+
+even_out_ga(x1, x2)  =  even_out_ga(x2)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+true  =  true
+
+half_in_ga(x1, x2)  =  half_in_ga(x1)
+
+half_out_ga(x1, x2)  =  half_out_ga(x2)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x3)
+
+false  =  false
+
+TIMES_IN_GGA(x1, x2, x3)  =  TIMES_IN_GGA(x1, x2)
+
+U4_GGA(x1, x2, x3, x4)  =  U4_GGA(x1, x2, x4)
+
+IF_IN_GGGA(x1, x2, x3, x4)  =  IF_IN_GGGA(x1, x2, x3)
+
+U6_GGGA(x1, x2, x3, x4)  =  U6_GGGA(x2, x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(31) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(32)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U4_GGA(X, Y, even_out_ga(B)) -> IF_IN_GGGA(B, s(X), Y)
+   IF_IN_GGGA(true, s(X), Y) -> U6_GGGA(Y, half_in_ga(s(X)))
+   U6_GGGA(Y, half_out_ga(X1)) -> TIMES_IN_GGA(X1, Y)
+   TIMES_IN_GGA(s(X), Y) -> U4_GGA(X, Y, even_in_ga(s(X)))
+   IF_IN_GGGA(false, s(X), Y) -> TIMES_IN_GGA(X, Y)
+
+The TRS R consists of the following rules:
+
+   half_in_ga(s(s(X))) -> U2_ga(half_in_ga(X))
+   even_in_ga(s(0)) -> even_out_ga(false)
+   even_in_ga(s(s(X))) -> U1_ga(even_in_ga(X))
+   U2_ga(half_out_ga(Y)) -> half_out_ga(s(Y))
+   U1_ga(even_out_ga(B)) -> even_out_ga(B)
+   half_in_ga(0) -> half_out_ga(0)
+   even_in_ga(0) -> even_out_ga(true)
+
+The set Q consists of the following terms:
+
+   half_in_ga(x0)
+   even_in_ga(x0)
+   U2_ga(x0)
+   U1_ga(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(33) MRRProof (EQUIVALENT)
+By using the rule removal processor [LPAR04] with the following ordering, at least one Dependency Pair or term rewrite system rule of this QDP problem can be strictly oriented.
+
+Strictly oriented dependency pairs:
+
+   IF_IN_GGGA(false, s(X), Y) -> TIMES_IN_GGA(X, Y)
+
+Strictly oriented rules of the TRS R:
+
+   half_in_ga(s(s(X))) -> U2_ga(half_in_ga(X))
+   even_in_ga(s(0)) -> even_out_ga(false)
+   even_in_ga(s(s(X))) -> U1_ga(even_in_ga(X))
+
+Used ordering: Polynomial interpretation [POLO]:
+
+   POL(0) = 0
+   POL(IF_IN_GGGA(x_1, x_2, x_3)) = 2*x_1 + x_2 + x_3
+   POL(TIMES_IN_GGA(x_1, x_2)) = 2*x_1 + x_2
+   POL(U1_ga(x_1)) = x_1
+   POL(U2_ga(x_1)) = 2 + 2*x_1
+   POL(U4_GGA(x_1, x_2, x_3)) = 1 + 2*x_1 + x_2 + x_3
+   POL(U6_GGGA(x_1, x_2)) = x_1 + x_2
+   POL(even_in_ga(x_1)) = x_1
+   POL(even_out_ga(x_1)) = 2*x_1
+   POL(false) = 0
+   POL(half_in_ga(x_1)) = x_1
+   POL(half_out_ga(x_1)) = 2*x_1
+   POL(s(x_1)) = 1 + 2*x_1
+   POL(true) = 0
+
+
+----------------------------------------
+
+(34)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U4_GGA(X, Y, even_out_ga(B)) -> IF_IN_GGGA(B, s(X), Y)
+   IF_IN_GGGA(true, s(X), Y) -> U6_GGGA(Y, half_in_ga(s(X)))
+   U6_GGGA(Y, half_out_ga(X1)) -> TIMES_IN_GGA(X1, Y)
+   TIMES_IN_GGA(s(X), Y) -> U4_GGA(X, Y, even_in_ga(s(X)))
+
+The TRS R consists of the following rules:
+
+   U2_ga(half_out_ga(Y)) -> half_out_ga(s(Y))
+   U1_ga(even_out_ga(B)) -> even_out_ga(B)
+   half_in_ga(0) -> half_out_ga(0)
+   even_in_ga(0) -> even_out_ga(true)
+
+The set Q consists of the following terms:
+
+   half_in_ga(x0)
+   even_in_ga(x0)
+   U2_ga(x0)
+   U1_ga(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(35) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 0 SCCs with 4 less nodes.
+----------------------------------------
+
+(36)
+TRUE

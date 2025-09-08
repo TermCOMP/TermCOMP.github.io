@@ -1,0 +1,65 @@
+YES
+We consider the system KVYx7.
+
+  Alphabet:
+
+    cons : [t * f] --> f 
+    heightf : [f] --> N 
+    heightt : [t] --> N 
+    leaf : [] --> t 
+    max : [N * N] --> N 
+    nil : [] --> f 
+    node : [f] --> t 
+    s : [N] --> N 
+    z : [] --> N 
+
+  Rules:
+
+    heightf(nil) => z 
+    heightf(cons(X, Y)) => max(heightt(X), heightf(Y)) 
+    heightt(leaf) => z 
+    heightt(node(X)) => s(heightf(X)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  heightf(nil) >? z 
+  heightf(cons(X, Y)) >? max(heightt(X), heightf(Y)) 
+  heightt(leaf) >? z 
+  heightt(node(X)) >? s(heightf(X)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  cons = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  heightf = Lam[y0].y0 
+  heightt = Lam[y0].y0 
+  leaf = 3 
+  max = Lam[y0;y1].y0 + y1 
+  nil = 3 
+  node = Lam[y0].3 + 3*y0 
+  s = Lam[y0].y0 
+  z = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[heightf(nil)]] = 3 > 0 = [[z]] 
+  [[heightf(cons(_x0, _x1))]] = 3 + 3*x0 + 3*x1 > x0 + x1 = [[max(heightt(_x0), heightf(_x1))]] 
+  [[heightt(leaf)]] = 3 > 0 = [[z]] 
+  [[heightt(node(_x0))]] = 3 + 3*x0 > x0 = [[s(heightf(_x0))]] 
+
+We can thus remove the following rules:
+
+  heightf(nil) => z 
+  heightf(cons(X, Y)) => max(heightt(X), heightf(Y)) 
+  heightt(leaf) => z 
+  heightt(node(X)) => s(heightf(X)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

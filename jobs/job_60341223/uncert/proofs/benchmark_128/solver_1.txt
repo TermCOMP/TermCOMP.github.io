@@ -1,0 +1,198 @@
+YES
+We consider the system hKZWt.
+
+  Alphabet:
+
+    O : [] --> nat 
+    add : [nat] --> nat -> nat 
+    eq : [nat] --> nat -> bool 
+    err : [] --> nat 
+    false : [] --> bool 
+    id : [] --> nat -> nat 
+    nul : [] --> nat -> bool 
+    pred : [nat] --> nat 
+    s : [nat] --> nat 
+    true : [] --> bool 
+
+  Rules:
+
+    nul O => true 
+    nul s(X) => false 
+    nul err => false 
+    pred(O) => err 
+    pred(s(X)) => X 
+    id X => X 
+    eq(O) => nul 
+    eq(s(X)) => /\x.eq(X) pred(x) 
+    add(O) => id 
+    add(s(X)) => /\x.add(X) s(x) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  nul O >? true 
+  nul s(X) >? false 
+  nul err >? false 
+  pred(O) >? err 
+  pred(s(X)) >? X 
+  id X >? X 
+  eq(O) >? nul 
+  eq(s(X)) >? /\x.eq(X) pred(x) 
+  add(O) >? id 
+  add(s(X)) >? /\x.add(X) s(x) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[err]] = _|_ 
+  [[false]] = _|_ 
+  [[id]] = _|_ 
+  [[nul]] = _|_ 
+  [[true]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, O, add, eq, pred, s}, and the following precedence: O > add > s > eq > @_{o -> o} > pred
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(_|_, O) >= _|_ 
+  @_{o -> o}(_|_, s(X)) >= _|_ 
+  @_{o -> o}(_|_, _|_) >= _|_ 
+  pred(O) >= _|_ 
+  pred(s(X)) > X 
+  @_{o -> o}(_|_, X) >= X 
+  eq(O) >= _|_ 
+  eq(s(X)) > /\x.@_{o -> o}(eq(X), pred(x)) 
+  add(O) >= _|_ 
+  add(s(X)) > /\x.@_{o -> o}(add(X), s(x)) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(_|_, O) >= _|_  by (Bot) 
+
+  2] @_{o -> o}(_|_, s(X)) >= _|_  by (Bot) 
+
+  3] @_{o -> o}(_|_, _|_) >= _|_  by (Bot) 
+
+  4] pred(O) >= _|_  by (Bot) 
+
+  5] pred(s(X)) > X  because [6], by definition 
+  6] pred*(s(X)) >= X  because [7], by (Select) 
+  7] s(X) >= X  because [8], by (Star) 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+
+  10] @_{o -> o}(_|_, X) >= X  because [11], by (Star) 
+  11] @_{o -> o}*(_|_, X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+
+  13] eq(O) >= _|_  by (Bot) 
+
+  14] eq(s(X)) > /\x.@_{o -> o}(eq(X), pred(x))  because [15], by definition 
+  15] eq*(s(X)) >= /\y.@_{o -> o}(eq(X), pred(y))  because [16], by (F-Abs) 
+  16] eq*(s(X), x) >= @_{o -> o}(eq(X), pred(x))  because eq > @_{o -> o}, [17] and [21], by (Copy) 
+  17] eq*(s(X), x) >= eq(X)  because eq in Mul and [18], by (Stat) 
+  18] s(X) > X  because [19], by definition 
+  19] s*(X) >= X  because [20], by (Select) 
+  20] X >= X  by (Meta) 
+  21] eq*(s(X), x) >= pred(x)  because eq > pred and [22], by (Copy) 
+  22] eq*(s(X), x) >= x  because [23], by (Select) 
+  23] x >= x  by (Var) 
+
+  24] add(O) >= _|_  by (Bot) 
+
+  25] add(s(X)) > /\x.@_{o -> o}(add(X), s(x))  because [26], by definition 
+  26] add*(s(X)) >= /\y.@_{o -> o}(add(X), s(y))  because [27], by (F-Abs) 
+  27] add*(s(X), x) >= @_{o -> o}(add(X), s(x))  because add > @_{o -> o}, [28] and [32], by (Copy) 
+  28] add*(s(X), x) >= add(X)  because add in Mul and [29], by (Stat) 
+  29] s(X) > X  because [30], by definition 
+  30] s*(X) >= X  because [31], by (Select) 
+  31] X >= X  by (Meta) 
+  32] add*(s(X), x) >= s(x)  because add > s and [33], by (Copy) 
+  33] add*(s(X), x) >= x  because [34], by (Select) 
+  34] x >= x  by (Var) 
+
+We can thus remove the following rules:
+
+  pred(s(X)) => X 
+  eq(s(X)) => /\x.eq(X) pred(x) 
+  add(s(X)) => /\x.add(X) s(x) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  nul O >? true 
+  nul s(X) >? false 
+  nul err >? false 
+  pred(O) >? err 
+  id X >? X 
+  eq(O) >? nul 
+  add(O) >? id 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  add = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  eq = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  err = 0 
+  false = 0 
+  id = Lam[y0].3*y0 
+  nul = Lam[y0].3*y0 
+  pred = Lam[y0].3 + 3*y0 
+  s = Lam[y0].3 + y0 
+  true = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[nul O]] = 12 > 0 = [[true]] 
+  [[nul s(_x0)]] = 12 + 4*x0 > 0 = [[false]] 
+  [[nul err]] = 0 >= 0 = [[false]] 
+  [[pred(O)]] = 12 > 0 = [[err]] 
+  [[id _x0]] = 4*x0 >= x0 = [[_x0]] 
+  [[eq(O)]] = Lam[y0].12 + 3*y0 > Lam[y0].3*y0 = [[nul]] 
+  [[add(O)]] = Lam[y0].12 + 3*y0 > Lam[y0].3*y0 = [[id]] 
+
+We can thus remove the following rules:
+
+  nul O => true 
+  nul s(X) => false 
+  pred(O) => err 
+  eq(O) => nul 
+  add(O) => id 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  nul(err) >? false 
+  id(X) >? X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  err = 3 
+  false = 0 
+  id = Lam[y0].3 + y0 
+  nul = Lam[y0].3 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[nul(err)]] = 12 > 0 = [[false]] 
+  [[id(_x0)]] = 3 + x0 > x0 = [[_x0]] 
+
+We can thus remove the following rules:
+
+  nul(err) => false 
+  id(X) => X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

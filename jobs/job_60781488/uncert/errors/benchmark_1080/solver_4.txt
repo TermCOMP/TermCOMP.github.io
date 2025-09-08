@@ -1,0 +1,546 @@
+Input TRS:
+    1: active(sel(s(X),cons(Y,Z))) -> mark(sel(X,Z))
+    2: active(sel(0(),cons(X,Z))) -> mark(X)
+    3: active(first(0(),Z)) -> mark(nil())
+    4: active(first(s(X),cons(Y,Z))) -> mark(cons(Y,first(X,Z)))
+    5: active(from(X)) -> mark(cons(X,from(s(X))))
+    6: active(sel1(s(X),cons(Y,Z))) -> mark(sel1(X,Z))
+    7: active(sel1(0(),cons(X,Z))) -> mark(quote(X))
+    8: active(first1(0(),Z)) -> mark(nil1())
+    9: active(first1(s(X),cons(Y,Z))) -> mark(cons1(quote(Y),first1(X,Z)))
+    10: active(quote(0())) -> mark(01())
+    11: active(quote1(cons(X,Z))) -> mark(cons1(quote(X),quote1(Z)))
+    12: active(quote1(nil())) -> mark(nil1())
+    13: active(quote(s(X))) -> mark(s1(quote(X)))
+    14: active(quote(sel(X,Z))) -> mark(sel1(X,Z))
+    15: active(quote1(first(X,Z))) -> mark(first1(X,Z))
+    16: active(unquote(01())) -> mark(0())
+    17: active(unquote(s1(X))) -> mark(s(unquote(X)))
+    18: active(unquote1(nil1())) -> mark(nil())
+    19: active(unquote1(cons1(X,Z))) -> mark(fcons(unquote(X),unquote1(Z)))
+    20: active(fcons(X,Z)) -> mark(cons(X,Z))
+    21: active(sel(X1,X2)) -> sel(active(X1),X2)
+    22: active(sel(X1,X2)) -> sel(X1,active(X2))
+    23: active(s(X)) -> s(active(X))
+    24: active(cons(X1,X2)) -> cons(active(X1),X2)
+    25: active(first(X1,X2)) -> first(active(X1),X2)
+    26: active(first(X1,X2)) -> first(X1,active(X2))
+    27: active(from(X)) -> from(active(X))
+    28: active(sel1(X1,X2)) -> sel1(active(X1),X2)
+    29: active(sel1(X1,X2)) -> sel1(X1,active(X2))
+    30: active(first1(X1,X2)) -> first1(active(X1),X2)
+    31: active(first1(X1,X2)) -> first1(X1,active(X2))
+    32: active(cons1(X1,X2)) -> cons1(active(X1),X2)
+    33: active(cons1(X1,X2)) -> cons1(X1,active(X2))
+    34: active(s1(X)) -> s1(active(X))
+    35: active(unquote(X)) -> unquote(active(X))
+    36: active(unquote1(X)) -> unquote1(active(X))
+    37: active(fcons(X1,X2)) -> fcons(active(X1),X2)
+    38: active(fcons(X1,X2)) -> fcons(X1,active(X2))
+    39: sel(mark(X1),X2) -> mark(sel(X1,X2))
+    40: sel(X1,mark(X2)) -> mark(sel(X1,X2))
+    41: s(mark(X)) -> mark(s(X))
+    42: cons(mark(X1),X2) -> mark(cons(X1,X2))
+    43: first(mark(X1),X2) -> mark(first(X1,X2))
+    44: first(X1,mark(X2)) -> mark(first(X1,X2))
+    45: from(mark(X)) -> mark(from(X))
+    46: sel1(mark(X1),X2) -> mark(sel1(X1,X2))
+    47: sel1(X1,mark(X2)) -> mark(sel1(X1,X2))
+    48: first1(mark(X1),X2) -> mark(first1(X1,X2))
+    49: first1(X1,mark(X2)) -> mark(first1(X1,X2))
+    50: cons1(mark(X1),X2) -> mark(cons1(X1,X2))
+    51: cons1(X1,mark(X2)) -> mark(cons1(X1,X2))
+    52: s1(mark(X)) -> mark(s1(X))
+    53: unquote(mark(X)) -> mark(unquote(X))
+    54: unquote1(mark(X)) -> mark(unquote1(X))
+    55: fcons(mark(X1),X2) -> mark(fcons(X1,X2))
+    56: fcons(X1,mark(X2)) -> mark(fcons(X1,X2))
+    57: proper(sel(X1,X2)) -> sel(proper(X1),proper(X2))
+    58: proper(s(X)) -> s(proper(X))
+    59: proper(cons(X1,X2)) -> cons(proper(X1),proper(X2))
+    60: proper(0()) -> ok(0())
+    61: proper(first(X1,X2)) -> first(proper(X1),proper(X2))
+    62: proper(nil()) -> ok(nil())
+    63: proper(from(X)) -> from(proper(X))
+    64: proper(sel1(X1,X2)) -> sel1(proper(X1),proper(X2))
+    65: proper(quote(X)) -> quote(proper(X))
+    66: proper(first1(X1,X2)) -> first1(proper(X1),proper(X2))
+    67: proper(nil1()) -> ok(nil1())
+    68: proper(cons1(X1,X2)) -> cons1(proper(X1),proper(X2))
+    69: proper(01()) -> ok(01())
+    70: proper(quote1(X)) -> quote1(proper(X))
+    71: proper(s1(X)) -> s1(proper(X))
+    72: proper(unquote(X)) -> unquote(proper(X))
+    73: proper(unquote1(X)) -> unquote1(proper(X))
+    74: proper(fcons(X1,X2)) -> fcons(proper(X1),proper(X2))
+    75: sel(ok(X1),ok(X2)) -> ok(sel(X1,X2))
+    76: s(ok(X)) -> ok(s(X))
+    77: cons(ok(X1),ok(X2)) -> ok(cons(X1,X2))
+    78: first(ok(X1),ok(X2)) -> ok(first(X1,X2))
+    79: from(ok(X)) -> ok(from(X))
+    80: sel1(ok(X1),ok(X2)) -> ok(sel1(X1,X2))
+    81: quote(ok(X)) -> ok(quote(X))
+    82: first1(ok(X1),ok(X2)) -> ok(first1(X1,X2))
+    83: cons1(ok(X1),ok(X2)) -> ok(cons1(X1,X2))
+    84: quote1(ok(X)) -> ok(quote1(X))
+    85: s1(ok(X)) -> ok(s1(X))
+    86: unquote(ok(X)) -> ok(unquote(X))
+    87: unquote1(ok(X)) -> ok(unquote1(X))
+    88: fcons(ok(X1),ok(X2)) -> ok(fcons(X1,X2))
+    89: top(mark(X)) -> top(proper(X))
+    90: top(ok(X)) -> top(active(X))
+Number of strict rules: 90
+Direct Order(PosReal,>,Poly) ... failed.
+Freezing ... failed.
+Dependency Pairs:
+   #1: #unquote(ok(X)) -> #unquote(X)
+   #2: #first(mark(X1),X2) -> #first(X1,X2)
+   #3: #active(sel1(X1,X2)) -> #sel1(X1,active(X2))
+   #4: #active(sel1(X1,X2)) -> #active(X2)
+   #5: #active(unquote(X)) -> #unquote(active(X))
+   #6: #active(unquote(X)) -> #active(X)
+   #7: #cons1(ok(X1),ok(X2)) -> #cons1(X1,X2)
+   #8: #proper(first1(X1,X2)) -> #first1(proper(X1),proper(X2))
+   #9: #proper(first1(X1,X2)) -> #proper(X1)
+   #10: #proper(first1(X1,X2)) -> #proper(X2)
+   #11: #sel1(mark(X1),X2) -> #sel1(X1,X2)
+   #12: #cons(mark(X1),X2) -> #cons(X1,X2)
+   #13: #s(mark(X)) -> #s(X)
+   #14: #active(fcons(X1,X2)) -> #fcons(active(X1),X2)
+   #15: #active(fcons(X1,X2)) -> #active(X1)
+   #16: #proper(unquote1(X)) -> #unquote1(proper(X))
+   #17: #proper(unquote1(X)) -> #proper(X)
+   #18: #sel1(X1,mark(X2)) -> #sel1(X1,X2)
+   #19: #unquote(mark(X)) -> #unquote(X)
+   #20: #proper(s1(X)) -> #s1(proper(X))
+   #21: #proper(s1(X)) -> #proper(X)
+   #22: #first1(mark(X1),X2) -> #first1(X1,X2)
+   #23: #sel(ok(X1),ok(X2)) -> #sel(X1,X2)
+   #24: #proper(fcons(X1,X2)) -> #fcons(proper(X1),proper(X2))
+   #25: #proper(fcons(X1,X2)) -> #proper(X1)
+   #26: #proper(fcons(X1,X2)) -> #proper(X2)
+   #27: #proper(s(X)) -> #s(proper(X))
+   #28: #proper(s(X)) -> #proper(X)
+   #29: #proper(first(X1,X2)) -> #first(proper(X1),proper(X2))
+   #30: #proper(first(X1,X2)) -> #proper(X1)
+   #31: #proper(first(X1,X2)) -> #proper(X2)
+   #32: #active(fcons(X1,X2)) -> #fcons(X1,active(X2))
+   #33: #active(fcons(X1,X2)) -> #active(X2)
+   #34: #active(sel1(s(X),cons(Y,Z))) -> #sel1(X,Z)
+   #35: #proper(cons(X1,X2)) -> #cons(proper(X1),proper(X2))
+   #36: #proper(cons(X1,X2)) -> #proper(X1)
+   #37: #proper(cons(X1,X2)) -> #proper(X2)
+   #38: #fcons(mark(X1),X2) -> #fcons(X1,X2)
+   #39: #sel(X1,mark(X2)) -> #sel(X1,X2)
+   #40: #top(ok(X)) -> #top(active(X))
+   #41: #top(ok(X)) -> #active(X)
+   #42: #cons1(X1,mark(X2)) -> #cons1(X1,X2)
+   #43: #active(quote(s(X))) -> #s1(quote(X))
+   #44: #active(quote(s(X))) -> #quote(X)
+   #45: #active(first1(s(X),cons(Y,Z))) -> #cons1(quote(Y),first1(X,Z))
+   #46: #active(first1(s(X),cons(Y,Z))) -> #quote(Y)
+   #47: #active(first1(s(X),cons(Y,Z))) -> #first1(X,Z)
+   #48: #active(quote1(cons(X,Z))) -> #cons1(quote(X),quote1(Z))
+   #49: #active(quote1(cons(X,Z))) -> #quote(X)
+   #50: #active(quote1(cons(X,Z))) -> #quote1(Z)
+   #51: #proper(sel(X1,X2)) -> #sel(proper(X1),proper(X2))
+   #52: #proper(sel(X1,X2)) -> #proper(X1)
+   #53: #proper(sel(X1,X2)) -> #proper(X2)
+   #54: #s(ok(X)) -> #s(X)
+   #55: #active(cons(X1,X2)) -> #cons(active(X1),X2)
+   #56: #active(cons(X1,X2)) -> #active(X1)
+   #57: #proper(quote1(X)) -> #quote1(proper(X))
+   #58: #proper(quote1(X)) -> #proper(X)
+   #59: #active(s(X)) -> #s(active(X))
+   #60: #active(s(X)) -> #active(X)
+   #61: #quote(ok(X)) -> #quote(X)
+   #62: #first(ok(X1),ok(X2)) -> #first(X1,X2)
+   #63: #from(mark(X)) -> #from(X)
+   #64: #active(first1(X1,X2)) -> #first1(X1,active(X2))
+   #65: #active(first1(X1,X2)) -> #active(X2)
+   #66: #from(ok(X)) -> #from(X)
+   #67: #fcons(X1,mark(X2)) -> #fcons(X1,X2)
+   #68: #top(mark(X)) -> #top(proper(X))
+   #69: #top(mark(X)) -> #proper(X)
+   #70: #first1(ok(X1),ok(X2)) -> #first1(X1,X2)
+   #71: #active(quote(sel(X,Z))) -> #sel1(X,Z)
+   #72: #active(first1(X1,X2)) -> #first1(active(X1),X2)
+   #73: #active(first1(X1,X2)) -> #active(X1)
+   #74: #s1(mark(X)) -> #s1(X)
+   #75: #first1(X1,mark(X2)) -> #first1(X1,X2)
+   #76: #active(first(X1,X2)) -> #first(active(X1),X2)
+   #77: #active(first(X1,X2)) -> #active(X1)
+   #78: #active(fcons(X,Z)) -> #cons(X,Z)
+   #79: #fcons(ok(X1),ok(X2)) -> #fcons(X1,X2)
+   #80: #active(sel1(0(),cons(X,Z))) -> #quote(X)
+   #81: #sel(mark(X1),X2) -> #sel(X1,X2)
+   #82: #proper(sel1(X1,X2)) -> #sel1(proper(X1),proper(X2))
+   #83: #proper(sel1(X1,X2)) -> #proper(X1)
+   #84: #proper(sel1(X1,X2)) -> #proper(X2)
+   #85: #active(cons1(X1,X2)) -> #cons1(X1,active(X2))
+   #86: #active(cons1(X1,X2)) -> #active(X2)
+   #87: #proper(unquote(X)) -> #unquote(proper(X))
+   #88: #proper(unquote(X)) -> #proper(X)
+   #89: #active(from(X)) -> #cons(X,from(s(X)))
+   #90: #active(from(X)) -> #from(s(X))
+   #91: #active(from(X)) -> #s(X)
+   #92: #first(X1,mark(X2)) -> #first(X1,X2)
+   #93: #proper(quote(X)) -> #quote(proper(X))
+   #94: #proper(quote(X)) -> #proper(X)
+   #95: #active(sel1(X1,X2)) -> #sel1(active(X1),X2)
+   #96: #active(sel1(X1,X2)) -> #active(X1)
+   #97: #active(sel(X1,X2)) -> #sel(X1,active(X2))
+   #98: #active(sel(X1,X2)) -> #active(X2)
+   #99: #active(s1(X)) -> #s1(active(X))
+   #100: #active(s1(X)) -> #active(X)
+   #101: #quote1(ok(X)) -> #quote1(X)
+   #102: #unquote1(ok(X)) -> #unquote1(X)
+   #103: #active(from(X)) -> #from(active(X))
+   #104: #active(from(X)) -> #active(X)
+   #105: #active(unquote(s1(X))) -> #s(unquote(X))
+   #106: #active(unquote(s1(X))) -> #unquote(X)
+   #107: #active(cons1(X1,X2)) -> #cons1(active(X1),X2)
+   #108: #active(cons1(X1,X2)) -> #active(X1)
+   #109: #active(unquote1(cons1(X,Z))) -> #fcons(unquote(X),unquote1(Z))
+   #110: #active(unquote1(cons1(X,Z))) -> #unquote(X)
+   #111: #active(unquote1(cons1(X,Z))) -> #unquote1(Z)
+   #112: #proper(from(X)) -> #from(proper(X))
+   #113: #proper(from(X)) -> #proper(X)
+   #114: #active(first(X1,X2)) -> #first(X1,active(X2))
+   #115: #active(first(X1,X2)) -> #active(X2)
+   #116: #s1(ok(X)) -> #s1(X)
+   #117: #proper(cons1(X1,X2)) -> #cons1(proper(X1),proper(X2))
+   #118: #proper(cons1(X1,X2)) -> #proper(X1)
+   #119: #proper(cons1(X1,X2)) -> #proper(X2)
+   #120: #active(unquote1(X)) -> #unquote1(active(X))
+   #121: #active(unquote1(X)) -> #active(X)
+   #122: #active(sel(X1,X2)) -> #sel(active(X1),X2)
+   #123: #active(sel(X1,X2)) -> #active(X1)
+   #124: #cons(ok(X1),ok(X2)) -> #cons(X1,X2)
+   #125: #active(sel(s(X),cons(Y,Z))) -> #sel(X,Z)
+   #126: #unquote1(mark(X)) -> #unquote1(X)
+   #127: #active(quote1(first(X,Z))) -> #first1(X,Z)
+   #128: #active(first(s(X),cons(Y,Z))) -> #cons(Y,first(X,Z))
+   #129: #active(first(s(X),cons(Y,Z))) -> #first(X,Z)
+   #130: #sel1(ok(X1),ok(X2)) -> #sel1(X1,X2)
+   #131: #cons1(mark(X1),X2) -> #cons1(X1,X2)
+Number of SCCs: 17, DPs: 73, edges: 849
+	SCC { #61 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+    01()	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+unquote1(x1)	weight: 0
+#quote1(x1)	weight: 0
+#cons1(x1,x2)	weight: 0
+   top(x1)	weight: 0
+#unquote1(x1)	weight: 0
+ #top(x1)	weight: 0
+#fcons(x1,x2)	weight: 0
+#first1(x1,x2)	weight: 0
+ cons1(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+     0()	weight: 0
+ #sel(x1,x2)	weight: 0
+   sel(x1,x2)	weight: 0
+  from(x1)	weight: 0
+   #s(x1)	weight: 0
+#first(x1,x2)	weight: 0
+   nil()	weight: 0
+#sel1(x1,x2)	weight: 0
+quote1(x1)	weight: 0
+  mark(x1)	weight: 0
+  nil1()	weight: 0
+ first(x1,x2)	weight: 0
+first1(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+#unquote(x1)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+ quote(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+#quote(x1)	weight: x1
+  #s1(x1)	weight: 0
+  sel1(x1,x2)	weight: 0
+    s1(x1)	weight: 0
+unquote(x1)	weight: 0
+ fcons(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #61
+Number of SCCs: 16, DPs: 72, edges: 848
+	SCC { #101 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+    01()	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+unquote1(x1)	weight: 0
+#quote1(x1)	weight: x1
+#cons1(x1,x2)	weight: 0
+   top(x1)	weight: 0
+#unquote1(x1)	weight: 0
+ #top(x1)	weight: 0
+#fcons(x1,x2)	weight: 0
+#first1(x1,x2)	weight: 0
+ cons1(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+     0()	weight: 0
+ #sel(x1,x2)	weight: 0
+   sel(x1,x2)	weight: 0
+  from(x1)	weight: 0
+   #s(x1)	weight: 0
+#first(x1,x2)	weight: 0
+   nil()	weight: 0
+#sel1(x1,x2)	weight: 0
+quote1(x1)	weight: 0
+  mark(x1)	weight: 0
+  nil1()	weight: 0
+ first(x1,x2)	weight: 0
+first1(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+#unquote(x1)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+ quote(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+#quote(x1)	weight: 0
+  #s1(x1)	weight: 0
+  sel1(x1,x2)	weight: 0
+    s1(x1)	weight: 0
+unquote(x1)	weight: 0
+ fcons(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #101
+Number of SCCs: 15, DPs: 71, edges: 847
+	SCC { #74 #116 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+    01()	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+unquote1(x1)	weight: 0
+#quote1(x1)	weight: 0
+#cons1(x1,x2)	weight: 0
+   top(x1)	weight: 0
+#unquote1(x1)	weight: 0
+ #top(x1)	weight: 0
+#fcons(x1,x2)	weight: 0
+#first1(x1,x2)	weight: 0
+ cons1(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+     0()	weight: 0
+ #sel(x1,x2)	weight: 0
+   sel(x1,x2)	weight: 0
+  from(x1)	weight: 0
+   #s(x1)	weight: 0
+#first(x1,x2)	weight: 0
+   nil()	weight: 0
+#sel1(x1,x2)	weight: 0
+quote1(x1)	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+  nil1()	weight: 0
+ first(x1,x2)	weight: 0
+first1(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+#unquote(x1)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+ quote(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+#quote(x1)	weight: 0
+  #s1(x1)	weight: x1
+  sel1(x1,x2)	weight: 0
+    s1(x1)	weight: 0
+unquote(x1)	weight: 0
+ fcons(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #74 #116
+Number of SCCs: 14, DPs: 69, edges: 843
+	SCC { #102 #126 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+    01()	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+unquote1(x1)	weight: 0
+#quote1(x1)	weight: 0
+#cons1(x1,x2)	weight: 0
+   top(x1)	weight: 0
+#unquote1(x1)	weight: x1
+ #top(x1)	weight: 0
+#fcons(x1,x2)	weight: 0
+#first1(x1,x2)	weight: 0
+ cons1(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+     0()	weight: 0
+ #sel(x1,x2)	weight: 0
+   sel(x1,x2)	weight: 0
+  from(x1)	weight: 0
+   #s(x1)	weight: 0
+#first(x1,x2)	weight: 0
+   nil()	weight: 0
+#sel1(x1,x2)	weight: 0
+quote1(x1)	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+  nil1()	weight: 0
+ first(x1,x2)	weight: 0
+first1(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+#unquote(x1)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+ quote(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+#quote(x1)	weight: 0
+  #s1(x1)	weight: 0
+  sel1(x1,x2)	weight: 0
+    s1(x1)	weight: 0
+unquote(x1)	weight: 0
+ fcons(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #102 #126
+Number of SCCs: 13, DPs: 67, edges: 839
+	SCC { #1 #19 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+    01()	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+unquote1(x1)	weight: 0
+#quote1(x1)	weight: 0
+#cons1(x1,x2)	weight: 0
+   top(x1)	weight: 0
+#unquote1(x1)	weight: 0
+ #top(x1)	weight: 0
+#fcons(x1,x2)	weight: 0
+#first1(x1,x2)	weight: 0
+ cons1(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+     0()	weight: 0
+ #sel(x1,x2)	weight: 0
+   sel(x1,x2)	weight: 0
+  from(x1)	weight: 0
+   #s(x1)	weight: 0
+#first(x1,x2)	weight: 0
+   nil()	weight: 0
+#sel1(x1,x2)	weight: 0
+quote1(x1)	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+  nil1()	weight: 0
+ first(x1,x2)	weight: 0
+first1(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+#unquote(x1)	weight: x1
+#from(x1)	weight: 0
+active(x1)	weight: 0
+ quote(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+#quote(x1)	weight: 0
+  #s1(x1)	weight: 0
+  sel1(x1,x2)	weight: 0
+    s1(x1)	weight: 0
+unquote(x1)	weight: 0
+ fcons(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #1 #19
+Number of SCCs: 12, DPs: 65, edges: 835
+	SCC { #13 #54 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+    01()	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+unquote1(x1)	weight: 0
+#quote1(x1)	weight: 0
+#cons1(x1,x2)	weight: 0
+   top(x1)	weight: 0
+#unquote1(x1)	weight: 0
+ #top(x1)	weight: 0
+#fcons(x1,x2)	weight: 0
+#first1(x1,x2)	weight: 0
+ cons1(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+     0()	weight: 0
+ #sel(x1,x2)	weight: 0
+   sel(x1,x2)	weight: 0
+  from(x1)	weight: 0
+   #s(x1)	weight: x1
+#first(x1,x2)	weight: 0
+   nil()	weight: 0
+#sel1(x1,x2)	weight: 0
+quote1(x1)	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+  nil1()	weight: 0
+ first(x1,x2)	weight: 0
+first1(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+#unquote(x1)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+ quote(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+#quote(x1)	weight: 0
+  #s1(x1)	weight: 0
+  sel1(x1,x2)	weight: 0
+    s1(x1)	weight: 0
+unquote(x1)	weight: 0
+ fcons(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #13 #54
+Number of SCCs: 11, DPs: 63, edges: 831
+	SCC { #63 #66 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+    01()	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+unquote1(x1)	weight: 0
+#quote1(x1)	weight: 0
+#cons1(x1,x2)	weight: 0
+   top(x1)	weight: 0
+#unquote1(x1)	weight: 0
+ #top(x1)	weight: 0
+#fcons(x1,x2)	weight: 0
+#first1(x1,x2)	weight: 0
+ cons1(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+     0()	weight: 0
+ #sel(x1,x2)	weight: 0
+   sel(x1,x2)	weight: 0
+  from(x1)	weight: 0
+   #s(x1)	weight: 0
+#first(x1,x2)	weight: 0
+   nil()	weight: 0
+#sel1(x1,x2)	weight: 0
+quote1(x1)	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+  nil1()	weight: 0
+ first(x1,x2)	weight: 0
+first1(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+#unquote(x1)	weight: 0
+#from(x1)	weight: x1
+active(x1)	weight: 0
+ quote(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+#quote(x1)	weight: 0
+  #s1(x1)	weight: 0
+  sel1(x1,x2)	weight: 0
+    s1(x1)	weight: 0
+unquote(x1)	weight: 0
+ fcons(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #63 #66
+Number of SCCs: 10, DPs: 61, edges: 827
+	SCC { #40 #68 }
+Removing DPs: Order(PosReal,>,Sum)... Order(PosReal,>,Max)... QLPOpS... Order(PosReal,>,MaxSum)... QWPOpS(PosReal,>,MaxSum)... Order(PosReal,>,Sum-Sum; PosReal,≥,Sum-Sum)... Order(PosReal,>,Sum-Sum; NegReal,≥,Sum)... Order(PosReal,>,MaxSum-Sum; NegReal,≥,Sum)... failed.
+Removing edges: failed.
+Finding a loop...  failed.

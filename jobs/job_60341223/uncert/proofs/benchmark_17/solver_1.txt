@@ -1,0 +1,75 @@
+YES
+We consider the system T8zTt.
+
+  Alphabet:
+
+    NIL : [] --> A 
+    in : [N * N -> A] --> A 
+    new : [N -> A] --> A 
+    out : [N * N * A] --> A 
+    sum : [A * A] --> A 
+    tau : [A] --> A 
+
+  Rules:
+
+    sum(NIL, X) => X 
+    new(/\x.X) => X 
+    new(/\x.sum(X[x], Y[x])) => sum(new(/\y.X[y]), new(/\z.Y[z])) 
+    new(/\x.out(x, X, Y[x])) => NIL 
+    new(/\x.out(X, Y, Z[x])) => out(X, Y, new(/\y.Z[y])) 
+    new(/\x.in(X, /\y.Y[x, y])) => in(X, /\z.new(/\u.Y[u, z])) 
+    new(/\x.tau(X[x])) => tau(new(/\y.X[y])) 
+    new(/\x.in(x, /\y.X[x, y])) => NIL 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  sum(NIL, X) >? X 
+  new(/\x.X) >? X 
+  new(/\x.sum(X[x], Y[x])) >? sum(new(/\y.X[y]), new(/\z.Y[z])) 
+  new(/\x.out(x, X, Y[x])) >? NIL 
+  new(/\x.out(X, Y, Z[x])) >? out(X, Y, new(/\y.Z[y])) 
+  new(/\x.in(X, /\y.Y[x, y])) >? in(X, /\z.new(/\u.Y[u, z])) 
+  new(/\x.tau(X[x])) >? tau(new(/\y.X[y])) 
+  new(/\x.in(x, /\y.X[x, y])) >? NIL 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  NIL = 0 
+  in = Lam[y0;G1].3 + y0 + G1(0) 
+  new = Lam[G0].2 + 3*G0(0) 
+  out = Lam[y0;y1;y2].3 + y0 + y1 + y2 
+  sum = Lam[y0;y1].3 + y0 + y1 
+  tau = Lam[y0].3 + y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[sum(NIL, _x0)]] = 3 + x0 > x0 = [[_x0]] 
+  [[new(/\x._x0)]] = 2 + 3*x0 > x0 = [[_x0]] 
+  [[new(/\x.sum(_x0[x], _x1[x]))]] = 11 + 3*F0(0) + 3*F1(0) > 7 + 3*F0(0) + 3*F1(0) = [[sum(new(/\x._x0[x]), new(/\y._x1[y]))]] 
+  [[new(/\x.out(x, _x0, _x1[x]))]] = 11 + 3*x0 + 3*F1(0) > 0 = [[NIL]] 
+  [[new(/\x.out(_x0, _x1, _x2[x]))]] = 11 + 3*x0 + 3*x1 + 3*F2(0) > 5 + x0 + x1 + 3*F2(0) = [[out(_x0, _x1, new(/\x._x2[x]))]] 
+  [[new(/\x.in(_x0, /\y._x1[x, y]))]] = 11 + 3*x0 + 3*F1(0,0) > 5 + x0 + 3*F1(0,0) = [[in(_x0, /\x.new(/\y._x1[y, x]))]] 
+  [[new(/\x.tau(_x0[x]))]] = 11 + 3*F0(0) > 5 + 3*F0(0) = [[tau(new(/\x._x0[x]))]] 
+  [[new(/\x.in(x, /\y._x0[x, y]))]] = 11 + 3*F0(0,0) > 0 = [[NIL]] 
+
+We can thus remove the following rules:
+
+  sum(NIL, X) => X 
+  new(/\x.X) => X 
+  new(/\x.sum(X[x], Y[x])) => sum(new(/\y.X[y]), new(/\z.Y[z])) 
+  new(/\x.out(x, X, Y[x])) => NIL 
+  new(/\x.out(X, Y, Z[x])) => out(X, Y, new(/\y.Z[y])) 
+  new(/\x.in(X, /\y.Y[x, y])) => in(X, /\z.new(/\u.Y[u, z])) 
+  new(/\x.tau(X[x])) => tau(new(/\y.X[y])) 
+  new(/\x.in(x, /\y.X[x, y])) => NIL 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

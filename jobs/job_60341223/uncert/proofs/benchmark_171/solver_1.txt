@@ -1,0 +1,119 @@
+YES
+We consider the system 4t3L7.
+
+  Alphabet:
+
+    comp : [c -> c * c -> c] --> c -> c 
+    cons : [a * b] --> b 
+    map : [a -> a * b] --> b 
+    nil : [] --> b 
+    twice : [c -> c] --> c -> c 
+
+  Rules:
+
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    comp(F, G) X => F (G X) 
+    twice(F) => comp(F, F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  comp(F, G) X >? F (G X) 
+  twice(F) >? comp(F, F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[nil]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, comp, cons, map, twice}, and the following precedence: map > cons > twice > comp > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  map(F, _|_) >= _|_ 
+  map(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y)) 
+  @_{o -> o}(comp(F, G), X) > @_{o -> o}(F, @_{o -> o}(G, X)) 
+  twice(F) >= comp(F, F) 
+
+With these choices, we have:
+
+  1] map(F, _|_) >= _|_  by (Bot) 
+
+  2] map(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because [3], by (Star) 
+  3] map*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because map > cons, [4] and [11], by (Copy) 
+  4] map*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because map > @_{o -> o}, [5] and [7], by (Copy) 
+  5] map*(F, cons(X, Y)) >= F  because [6], by (Select) 
+  6] F >= F  by (Meta) 
+  7] map*(F, cons(X, Y)) >= X  because [8], by (Select) 
+  8] cons(X, Y) >= X  because [9], by (Star) 
+  9] cons*(X, Y) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+  11] map*(F, cons(X, Y)) >= map(F, Y)  because map in Mul, [12] and [13], by (Stat) 
+  12] F >= F  by (Meta) 
+  13] cons(X, Y) > Y  because [14], by definition 
+  14] cons*(X, Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+
+  16] @_{o -> o}(comp(F, G), X) > @_{o -> o}(F, @_{o -> o}(G, X))  because [17], by definition 
+  17] @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [18], by (Select) 
+  18] comp(F, G) @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [19] 
+  19] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(F, @_{o -> o}(G, X))  because comp > @_{o -> o}, [20] and [22], by (Copy) 
+  20] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= F  because [21], by (Select) 
+  21] F >= F  by (Meta) 
+  22] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(G, X)  because comp > @_{o -> o}, [23] and [25], by (Copy) 
+  23] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= G  because [24], by (Select) 
+  24] G >= G  by (Meta) 
+  25] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= X  because [26], by (Select) 
+  26] @_{o -> o}*(comp(F, G), X) >= X  because [27], by (Select) 
+  27] X >= X  by (Meta) 
+
+  28] twice(F) >= comp(F, F)  because [29], by (Star) 
+  29] twice*(F) >= comp(F, F)  because twice > comp, [30] and [30], by (Copy) 
+  30] twice*(F) >= F  because [31], by (Select) 
+  31] F >= F  by (Meta) 
+
+We can thus remove the following rules:
+
+  comp(F, G) X => F (G X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  twice(F) >? comp(F, F) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  comp = Lam[G0;G1;y2].G0(0) + G1(0) 
+  cons = Lam[y0;y1].3 + y0 + y1 
+  map = Lam[G0;y1].3 + 3*y1 + G0(0) + 3*y1*G0(y1) 
+  nil = 0 
+  twice = Lam[G0;y1].3 + 3*y1 + 2*G0(0) + 3*G0(y1) 
+
+Using this interpretation, the requirements translate to:
+
+  [[map(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 12 + 3*x1 + 3*x2 + F0(0) + 3*x1*F0(3 + x1 + x2) + 3*x2*F0(3 + x1 + x2) + 9*F0(3 + x1 + x2) > 6 + x1 + 3*x2 + F0(0) + F0(x1) + 3*x2*F0(x2) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+  [[twice(_F0)]] = Lam[y0].3 + 3*y0 + 2*F0(0) + 3*F0(y0) > Lam[y0].2*F0(0) = [[comp(_F0, _F0)]] 
+
+We can thus remove the following rules:
+
+  map(F, nil) => nil 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  twice(F) => comp(F, F) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

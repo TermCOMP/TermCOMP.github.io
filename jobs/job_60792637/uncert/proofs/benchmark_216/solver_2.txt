@@ -1,0 +1,953 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/vCZAx.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+palindrome(g)
+
+w.r.t. the given Prolog program could successfully be proven:
+
+(0) Prolog
+(1) PrologToPiTRSProof [SOUND, 0 ms]
+(2) PiTRS
+(3) DependencyPairsProof [EQUIVALENT, 0 ms]
+(4) PiDP
+(5) DependencyGraphProof [EQUIVALENT, 0 ms]
+(6) AND
+    (7) PiDP
+        (8) UsableRulesProof [EQUIVALENT, 0 ms]
+        (9) PiDP
+        (10) PiDPToQDPProof [SOUND, 0 ms]
+        (11) QDP
+        (12) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (13) YES
+    (14) PiDP
+        (15) UsableRulesProof [EQUIVALENT, 0 ms]
+        (16) PiDP
+        (17) PiDPToQDPProof [SOUND, 0 ms]
+        (18) QDP
+        (19) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (20) YES
+    (21) PiDP
+        (22) UsableRulesProof [EQUIVALENT, 0 ms]
+        (23) PiDP
+        (24) PiDPToQDPProof [SOUND, 0 ms]
+        (25) QDP
+        (26) MRRProof [EQUIVALENT, 9 ms]
+        (27) QDP
+        (28) PisEmptyProof [EQUIVALENT, 0 ms]
+        (29) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+palindrome(L) :- ','(halves(L, X1s, X2s, EvenOdd), ','(eq(EvenOdd, even), eq(X1s, X2s))).
+palindrome(L) :- ','(halves(L, X1s, X2s, EvenOdd), ','(eq(EvenOdd, odd), last(X1s, X1, X2s))).
+halves([], [], [], even).
+halves(.(X, []), .(X, []), [], odd).
+halves(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) :- ','(last(.(Y, Xs), R, Rests), halves(Rests, Ts, Rs, EvenOdd)).
+last(.(T, []), T, []).
+last(.(H, T), X, .(H, M)) :- last(T, X, M).
+eq(X, X).
+
+
+Query: palindrome(g)
+----------------------------------------
+
+(1) PrologToPiTRSProof (SOUND)
+We use the technique of [TOCL09]. With regard to the inferred argument filtering the predicates were used in the following modes:
+
+palindrome_in_1: (b)
+
+halves_in_4: (b,f,f,f)
+
+last_in_3: (b,f,f) (b,f,b)
+
+Transforming Prolog into the following Term Rewriting System:
+
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   palindrome_in_g(L) -> U1_g(L, halves_in_gaaa(L, X1s, X2s, EvenOdd))
+   halves_in_gaaa([], [], [], even) -> halves_out_gaaa([], [], [], even)
+   halves_in_gaaa(.(X, []), .(X, []), [], odd) -> halves_out_gaaa(.(X, []), .(X, []), [], odd)
+   halves_in_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+   last_in_gaa(.(T, []), T, []) -> last_out_gaa(.(T, []), T, [])
+   last_in_gaa(.(H, T), X, .(H, M)) -> U8_gaa(H, T, X, M, last_in_gaa(T, X, M))
+   U8_gaa(H, T, X, M, last_out_gaa(T, X, M)) -> last_out_gaa(.(H, T), X, .(H, M))
+   U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_in_gaaa(Rests, Ts, Rs, EvenOdd))
+   U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_out_gaaa(Rests, Ts, Rs, EvenOdd)) -> halves_out_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U2_g(L, X1s, X2s, eq_in_gg(EvenOdd, even))
+   eq_in_gg(X, X) -> eq_out_gg(X, X)
+   U2_g(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> U3_g(L, eq_in_gg(X1s, X2s))
+   U3_g(L, eq_out_gg(X1s, X2s)) -> palindrome_out_g(L)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U4_g(L, X1s, X2s, eq_in_gg(EvenOdd, odd))
+   U4_g(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> U5_g(L, last_in_gag(X1s, X1, X2s))
+   last_in_gag(.(T, []), T, []) -> last_out_gag(.(T, []), T, [])
+   last_in_gag(.(H, T), X, .(H, M)) -> U8_gag(H, T, X, M, last_in_gag(T, X, M))
+   U8_gag(H, T, X, M, last_out_gag(T, X, M)) -> last_out_gag(.(H, T), X, .(H, M))
+   U5_g(L, last_out_gag(X1s, X1, X2s)) -> palindrome_out_g(L)
+
+The argument filtering Pi contains the following mapping:
+palindrome_in_g(x1)  =  palindrome_in_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x2)
+
+halves_in_gaaa(x1, x2, x3, x4)  =  halves_in_gaaa(x1)
+
+[]  =  []
+
+halves_out_gaaa(x1, x2, x3, x4)  =  halves_out_gaaa(x2, x3, x4)
+
+.(x1, x2)  =  .(x1, x2)
+
+U6_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_gaaa(x1, x8)
+
+last_in_gaa(x1, x2, x3)  =  last_in_gaa(x1)
+
+last_out_gaa(x1, x2, x3)  =  last_out_gaa(x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5)  =  U8_gaa(x1, x5)
+
+U7_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U7_gaaa(x1, x5, x8)
+
+U2_g(x1, x2, x3, x4)  =  U2_g(x2, x3, x4)
+
+eq_in_gg(x1, x2)  =  eq_in_gg(x1, x2)
+
+eq_out_gg(x1, x2)  =  eq_out_gg
+
+even  =  even
+
+U3_g(x1, x2)  =  U3_g(x2)
+
+palindrome_out_g(x1)  =  palindrome_out_g
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x2, x3, x4)
+
+odd  =  odd
+
+U5_g(x1, x2)  =  U5_g(x2)
+
+last_in_gag(x1, x2, x3)  =  last_in_gag(x1, x3)
+
+last_out_gag(x1, x2, x3)  =  last_out_gag(x2)
+
+U8_gag(x1, x2, x3, x4, x5)  =  U8_gag(x5)
+
+
+
+
+
+Infinitary Constructor Rewriting Termination of PiTRS implies Termination of Prolog
+
+
+
+----------------------------------------
+
+(2)
+Obligation:
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   palindrome_in_g(L) -> U1_g(L, halves_in_gaaa(L, X1s, X2s, EvenOdd))
+   halves_in_gaaa([], [], [], even) -> halves_out_gaaa([], [], [], even)
+   halves_in_gaaa(.(X, []), .(X, []), [], odd) -> halves_out_gaaa(.(X, []), .(X, []), [], odd)
+   halves_in_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+   last_in_gaa(.(T, []), T, []) -> last_out_gaa(.(T, []), T, [])
+   last_in_gaa(.(H, T), X, .(H, M)) -> U8_gaa(H, T, X, M, last_in_gaa(T, X, M))
+   U8_gaa(H, T, X, M, last_out_gaa(T, X, M)) -> last_out_gaa(.(H, T), X, .(H, M))
+   U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_in_gaaa(Rests, Ts, Rs, EvenOdd))
+   U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_out_gaaa(Rests, Ts, Rs, EvenOdd)) -> halves_out_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U2_g(L, X1s, X2s, eq_in_gg(EvenOdd, even))
+   eq_in_gg(X, X) -> eq_out_gg(X, X)
+   U2_g(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> U3_g(L, eq_in_gg(X1s, X2s))
+   U3_g(L, eq_out_gg(X1s, X2s)) -> palindrome_out_g(L)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U4_g(L, X1s, X2s, eq_in_gg(EvenOdd, odd))
+   U4_g(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> U5_g(L, last_in_gag(X1s, X1, X2s))
+   last_in_gag(.(T, []), T, []) -> last_out_gag(.(T, []), T, [])
+   last_in_gag(.(H, T), X, .(H, M)) -> U8_gag(H, T, X, M, last_in_gag(T, X, M))
+   U8_gag(H, T, X, M, last_out_gag(T, X, M)) -> last_out_gag(.(H, T), X, .(H, M))
+   U5_g(L, last_out_gag(X1s, X1, X2s)) -> palindrome_out_g(L)
+
+The argument filtering Pi contains the following mapping:
+palindrome_in_g(x1)  =  palindrome_in_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x2)
+
+halves_in_gaaa(x1, x2, x3, x4)  =  halves_in_gaaa(x1)
+
+[]  =  []
+
+halves_out_gaaa(x1, x2, x3, x4)  =  halves_out_gaaa(x2, x3, x4)
+
+.(x1, x2)  =  .(x1, x2)
+
+U6_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_gaaa(x1, x8)
+
+last_in_gaa(x1, x2, x3)  =  last_in_gaa(x1)
+
+last_out_gaa(x1, x2, x3)  =  last_out_gaa(x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5)  =  U8_gaa(x1, x5)
+
+U7_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U7_gaaa(x1, x5, x8)
+
+U2_g(x1, x2, x3, x4)  =  U2_g(x2, x3, x4)
+
+eq_in_gg(x1, x2)  =  eq_in_gg(x1, x2)
+
+eq_out_gg(x1, x2)  =  eq_out_gg
+
+even  =  even
+
+U3_g(x1, x2)  =  U3_g(x2)
+
+palindrome_out_g(x1)  =  palindrome_out_g
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x2, x3, x4)
+
+odd  =  odd
+
+U5_g(x1, x2)  =  U5_g(x2)
+
+last_in_gag(x1, x2, x3)  =  last_in_gag(x1, x3)
+
+last_out_gag(x1, x2, x3)  =  last_out_gag(x2)
+
+U8_gag(x1, x2, x3, x4, x5)  =  U8_gag(x5)
+
+
+
+----------------------------------------
+
+(3) DependencyPairsProof (EQUIVALENT)
+Using Dependency Pairs [AG00,LOPSTR] we result in the following initial DP problem:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   PALINDROME_IN_G(L) -> U1_G(L, halves_in_gaaa(L, X1s, X2s, EvenOdd))
+   PALINDROME_IN_G(L) -> HALVES_IN_GAAA(L, X1s, X2s, EvenOdd)
+   HALVES_IN_GAAA(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+   HALVES_IN_GAAA(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> LAST_IN_GAA(.(Y, Xs), R, Rests)
+   LAST_IN_GAA(.(H, T), X, .(H, M)) -> U8_GAA(H, T, X, M, last_in_gaa(T, X, M))
+   LAST_IN_GAA(.(H, T), X, .(H, M)) -> LAST_IN_GAA(T, X, M)
+   U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> U7_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_in_gaaa(Rests, Ts, Rs, EvenOdd))
+   U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> HALVES_IN_GAAA(Rests, Ts, Rs, EvenOdd)
+   U1_G(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U2_G(L, X1s, X2s, eq_in_gg(EvenOdd, even))
+   U1_G(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> EQ_IN_GG(EvenOdd, even)
+   U2_G(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> U3_G(L, eq_in_gg(X1s, X2s))
+   U2_G(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> EQ_IN_GG(X1s, X2s)
+   U1_G(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U4_G(L, X1s, X2s, eq_in_gg(EvenOdd, odd))
+   U1_G(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> EQ_IN_GG(EvenOdd, odd)
+   U4_G(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> U5_G(L, last_in_gag(X1s, X1, X2s))
+   U4_G(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> LAST_IN_GAG(X1s, X1, X2s)
+   LAST_IN_GAG(.(H, T), X, .(H, M)) -> U8_GAG(H, T, X, M, last_in_gag(T, X, M))
+   LAST_IN_GAG(.(H, T), X, .(H, M)) -> LAST_IN_GAG(T, X, M)
+
+The TRS R consists of the following rules:
+
+   palindrome_in_g(L) -> U1_g(L, halves_in_gaaa(L, X1s, X2s, EvenOdd))
+   halves_in_gaaa([], [], [], even) -> halves_out_gaaa([], [], [], even)
+   halves_in_gaaa(.(X, []), .(X, []), [], odd) -> halves_out_gaaa(.(X, []), .(X, []), [], odd)
+   halves_in_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+   last_in_gaa(.(T, []), T, []) -> last_out_gaa(.(T, []), T, [])
+   last_in_gaa(.(H, T), X, .(H, M)) -> U8_gaa(H, T, X, M, last_in_gaa(T, X, M))
+   U8_gaa(H, T, X, M, last_out_gaa(T, X, M)) -> last_out_gaa(.(H, T), X, .(H, M))
+   U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_in_gaaa(Rests, Ts, Rs, EvenOdd))
+   U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_out_gaaa(Rests, Ts, Rs, EvenOdd)) -> halves_out_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U2_g(L, X1s, X2s, eq_in_gg(EvenOdd, even))
+   eq_in_gg(X, X) -> eq_out_gg(X, X)
+   U2_g(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> U3_g(L, eq_in_gg(X1s, X2s))
+   U3_g(L, eq_out_gg(X1s, X2s)) -> palindrome_out_g(L)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U4_g(L, X1s, X2s, eq_in_gg(EvenOdd, odd))
+   U4_g(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> U5_g(L, last_in_gag(X1s, X1, X2s))
+   last_in_gag(.(T, []), T, []) -> last_out_gag(.(T, []), T, [])
+   last_in_gag(.(H, T), X, .(H, M)) -> U8_gag(H, T, X, M, last_in_gag(T, X, M))
+   U8_gag(H, T, X, M, last_out_gag(T, X, M)) -> last_out_gag(.(H, T), X, .(H, M))
+   U5_g(L, last_out_gag(X1s, X1, X2s)) -> palindrome_out_g(L)
+
+The argument filtering Pi contains the following mapping:
+palindrome_in_g(x1)  =  palindrome_in_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x2)
+
+halves_in_gaaa(x1, x2, x3, x4)  =  halves_in_gaaa(x1)
+
+[]  =  []
+
+halves_out_gaaa(x1, x2, x3, x4)  =  halves_out_gaaa(x2, x3, x4)
+
+.(x1, x2)  =  .(x1, x2)
+
+U6_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_gaaa(x1, x8)
+
+last_in_gaa(x1, x2, x3)  =  last_in_gaa(x1)
+
+last_out_gaa(x1, x2, x3)  =  last_out_gaa(x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5)  =  U8_gaa(x1, x5)
+
+U7_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U7_gaaa(x1, x5, x8)
+
+U2_g(x1, x2, x3, x4)  =  U2_g(x2, x3, x4)
+
+eq_in_gg(x1, x2)  =  eq_in_gg(x1, x2)
+
+eq_out_gg(x1, x2)  =  eq_out_gg
+
+even  =  even
+
+U3_g(x1, x2)  =  U3_g(x2)
+
+palindrome_out_g(x1)  =  palindrome_out_g
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x2, x3, x4)
+
+odd  =  odd
+
+U5_g(x1, x2)  =  U5_g(x2)
+
+last_in_gag(x1, x2, x3)  =  last_in_gag(x1, x3)
+
+last_out_gag(x1, x2, x3)  =  last_out_gag(x2)
+
+U8_gag(x1, x2, x3, x4, x5)  =  U8_gag(x5)
+
+PALINDROME_IN_G(x1)  =  PALINDROME_IN_G(x1)
+
+U1_G(x1, x2)  =  U1_G(x2)
+
+HALVES_IN_GAAA(x1, x2, x3, x4)  =  HALVES_IN_GAAA(x1)
+
+U6_GAAA(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_GAAA(x1, x8)
+
+LAST_IN_GAA(x1, x2, x3)  =  LAST_IN_GAA(x1)
+
+U8_GAA(x1, x2, x3, x4, x5)  =  U8_GAA(x1, x5)
+
+U7_GAAA(x1, x2, x3, x4, x5, x6, x7, x8)  =  U7_GAAA(x1, x5, x8)
+
+U2_G(x1, x2, x3, x4)  =  U2_G(x2, x3, x4)
+
+EQ_IN_GG(x1, x2)  =  EQ_IN_GG(x1, x2)
+
+U3_G(x1, x2)  =  U3_G(x2)
+
+U4_G(x1, x2, x3, x4)  =  U4_G(x2, x3, x4)
+
+U5_G(x1, x2)  =  U5_G(x2)
+
+LAST_IN_GAG(x1, x2, x3)  =  LAST_IN_GAG(x1, x3)
+
+U8_GAG(x1, x2, x3, x4, x5)  =  U8_GAG(x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(4)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   PALINDROME_IN_G(L) -> U1_G(L, halves_in_gaaa(L, X1s, X2s, EvenOdd))
+   PALINDROME_IN_G(L) -> HALVES_IN_GAAA(L, X1s, X2s, EvenOdd)
+   HALVES_IN_GAAA(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+   HALVES_IN_GAAA(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> LAST_IN_GAA(.(Y, Xs), R, Rests)
+   LAST_IN_GAA(.(H, T), X, .(H, M)) -> U8_GAA(H, T, X, M, last_in_gaa(T, X, M))
+   LAST_IN_GAA(.(H, T), X, .(H, M)) -> LAST_IN_GAA(T, X, M)
+   U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> U7_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_in_gaaa(Rests, Ts, Rs, EvenOdd))
+   U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> HALVES_IN_GAAA(Rests, Ts, Rs, EvenOdd)
+   U1_G(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U2_G(L, X1s, X2s, eq_in_gg(EvenOdd, even))
+   U1_G(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> EQ_IN_GG(EvenOdd, even)
+   U2_G(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> U3_G(L, eq_in_gg(X1s, X2s))
+   U2_G(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> EQ_IN_GG(X1s, X2s)
+   U1_G(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U4_G(L, X1s, X2s, eq_in_gg(EvenOdd, odd))
+   U1_G(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> EQ_IN_GG(EvenOdd, odd)
+   U4_G(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> U5_G(L, last_in_gag(X1s, X1, X2s))
+   U4_G(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> LAST_IN_GAG(X1s, X1, X2s)
+   LAST_IN_GAG(.(H, T), X, .(H, M)) -> U8_GAG(H, T, X, M, last_in_gag(T, X, M))
+   LAST_IN_GAG(.(H, T), X, .(H, M)) -> LAST_IN_GAG(T, X, M)
+
+The TRS R consists of the following rules:
+
+   palindrome_in_g(L) -> U1_g(L, halves_in_gaaa(L, X1s, X2s, EvenOdd))
+   halves_in_gaaa([], [], [], even) -> halves_out_gaaa([], [], [], even)
+   halves_in_gaaa(.(X, []), .(X, []), [], odd) -> halves_out_gaaa(.(X, []), .(X, []), [], odd)
+   halves_in_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+   last_in_gaa(.(T, []), T, []) -> last_out_gaa(.(T, []), T, [])
+   last_in_gaa(.(H, T), X, .(H, M)) -> U8_gaa(H, T, X, M, last_in_gaa(T, X, M))
+   U8_gaa(H, T, X, M, last_out_gaa(T, X, M)) -> last_out_gaa(.(H, T), X, .(H, M))
+   U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_in_gaaa(Rests, Ts, Rs, EvenOdd))
+   U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_out_gaaa(Rests, Ts, Rs, EvenOdd)) -> halves_out_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U2_g(L, X1s, X2s, eq_in_gg(EvenOdd, even))
+   eq_in_gg(X, X) -> eq_out_gg(X, X)
+   U2_g(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> U3_g(L, eq_in_gg(X1s, X2s))
+   U3_g(L, eq_out_gg(X1s, X2s)) -> palindrome_out_g(L)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U4_g(L, X1s, X2s, eq_in_gg(EvenOdd, odd))
+   U4_g(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> U5_g(L, last_in_gag(X1s, X1, X2s))
+   last_in_gag(.(T, []), T, []) -> last_out_gag(.(T, []), T, [])
+   last_in_gag(.(H, T), X, .(H, M)) -> U8_gag(H, T, X, M, last_in_gag(T, X, M))
+   U8_gag(H, T, X, M, last_out_gag(T, X, M)) -> last_out_gag(.(H, T), X, .(H, M))
+   U5_g(L, last_out_gag(X1s, X1, X2s)) -> palindrome_out_g(L)
+
+The argument filtering Pi contains the following mapping:
+palindrome_in_g(x1)  =  palindrome_in_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x2)
+
+halves_in_gaaa(x1, x2, x3, x4)  =  halves_in_gaaa(x1)
+
+[]  =  []
+
+halves_out_gaaa(x1, x2, x3, x4)  =  halves_out_gaaa(x2, x3, x4)
+
+.(x1, x2)  =  .(x1, x2)
+
+U6_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_gaaa(x1, x8)
+
+last_in_gaa(x1, x2, x3)  =  last_in_gaa(x1)
+
+last_out_gaa(x1, x2, x3)  =  last_out_gaa(x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5)  =  U8_gaa(x1, x5)
+
+U7_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U7_gaaa(x1, x5, x8)
+
+U2_g(x1, x2, x3, x4)  =  U2_g(x2, x3, x4)
+
+eq_in_gg(x1, x2)  =  eq_in_gg(x1, x2)
+
+eq_out_gg(x1, x2)  =  eq_out_gg
+
+even  =  even
+
+U3_g(x1, x2)  =  U3_g(x2)
+
+palindrome_out_g(x1)  =  palindrome_out_g
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x2, x3, x4)
+
+odd  =  odd
+
+U5_g(x1, x2)  =  U5_g(x2)
+
+last_in_gag(x1, x2, x3)  =  last_in_gag(x1, x3)
+
+last_out_gag(x1, x2, x3)  =  last_out_gag(x2)
+
+U8_gag(x1, x2, x3, x4, x5)  =  U8_gag(x5)
+
+PALINDROME_IN_G(x1)  =  PALINDROME_IN_G(x1)
+
+U1_G(x1, x2)  =  U1_G(x2)
+
+HALVES_IN_GAAA(x1, x2, x3, x4)  =  HALVES_IN_GAAA(x1)
+
+U6_GAAA(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_GAAA(x1, x8)
+
+LAST_IN_GAA(x1, x2, x3)  =  LAST_IN_GAA(x1)
+
+U8_GAA(x1, x2, x3, x4, x5)  =  U8_GAA(x1, x5)
+
+U7_GAAA(x1, x2, x3, x4, x5, x6, x7, x8)  =  U7_GAAA(x1, x5, x8)
+
+U2_G(x1, x2, x3, x4)  =  U2_G(x2, x3, x4)
+
+EQ_IN_GG(x1, x2)  =  EQ_IN_GG(x1, x2)
+
+U3_G(x1, x2)  =  U3_G(x2)
+
+U4_G(x1, x2, x3, x4)  =  U4_G(x2, x3, x4)
+
+U5_G(x1, x2)  =  U5_G(x2)
+
+LAST_IN_GAG(x1, x2, x3)  =  LAST_IN_GAG(x1, x3)
+
+U8_GAG(x1, x2, x3, x4, x5)  =  U8_GAG(x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(5) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LOPSTR] contains 3 SCCs with 14 less nodes.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LAST_IN_GAG(.(H, T), X, .(H, M)) -> LAST_IN_GAG(T, X, M)
+
+The TRS R consists of the following rules:
+
+   palindrome_in_g(L) -> U1_g(L, halves_in_gaaa(L, X1s, X2s, EvenOdd))
+   halves_in_gaaa([], [], [], even) -> halves_out_gaaa([], [], [], even)
+   halves_in_gaaa(.(X, []), .(X, []), [], odd) -> halves_out_gaaa(.(X, []), .(X, []), [], odd)
+   halves_in_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+   last_in_gaa(.(T, []), T, []) -> last_out_gaa(.(T, []), T, [])
+   last_in_gaa(.(H, T), X, .(H, M)) -> U8_gaa(H, T, X, M, last_in_gaa(T, X, M))
+   U8_gaa(H, T, X, M, last_out_gaa(T, X, M)) -> last_out_gaa(.(H, T), X, .(H, M))
+   U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_in_gaaa(Rests, Ts, Rs, EvenOdd))
+   U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_out_gaaa(Rests, Ts, Rs, EvenOdd)) -> halves_out_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U2_g(L, X1s, X2s, eq_in_gg(EvenOdd, even))
+   eq_in_gg(X, X) -> eq_out_gg(X, X)
+   U2_g(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> U3_g(L, eq_in_gg(X1s, X2s))
+   U3_g(L, eq_out_gg(X1s, X2s)) -> palindrome_out_g(L)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U4_g(L, X1s, X2s, eq_in_gg(EvenOdd, odd))
+   U4_g(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> U5_g(L, last_in_gag(X1s, X1, X2s))
+   last_in_gag(.(T, []), T, []) -> last_out_gag(.(T, []), T, [])
+   last_in_gag(.(H, T), X, .(H, M)) -> U8_gag(H, T, X, M, last_in_gag(T, X, M))
+   U8_gag(H, T, X, M, last_out_gag(T, X, M)) -> last_out_gag(.(H, T), X, .(H, M))
+   U5_g(L, last_out_gag(X1s, X1, X2s)) -> palindrome_out_g(L)
+
+The argument filtering Pi contains the following mapping:
+palindrome_in_g(x1)  =  palindrome_in_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x2)
+
+halves_in_gaaa(x1, x2, x3, x4)  =  halves_in_gaaa(x1)
+
+[]  =  []
+
+halves_out_gaaa(x1, x2, x3, x4)  =  halves_out_gaaa(x2, x3, x4)
+
+.(x1, x2)  =  .(x1, x2)
+
+U6_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_gaaa(x1, x8)
+
+last_in_gaa(x1, x2, x3)  =  last_in_gaa(x1)
+
+last_out_gaa(x1, x2, x3)  =  last_out_gaa(x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5)  =  U8_gaa(x1, x5)
+
+U7_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U7_gaaa(x1, x5, x8)
+
+U2_g(x1, x2, x3, x4)  =  U2_g(x2, x3, x4)
+
+eq_in_gg(x1, x2)  =  eq_in_gg(x1, x2)
+
+eq_out_gg(x1, x2)  =  eq_out_gg
+
+even  =  even
+
+U3_g(x1, x2)  =  U3_g(x2)
+
+palindrome_out_g(x1)  =  palindrome_out_g
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x2, x3, x4)
+
+odd  =  odd
+
+U5_g(x1, x2)  =  U5_g(x2)
+
+last_in_gag(x1, x2, x3)  =  last_in_gag(x1, x3)
+
+last_out_gag(x1, x2, x3)  =  last_out_gag(x2)
+
+U8_gag(x1, x2, x3, x4, x5)  =  U8_gag(x5)
+
+LAST_IN_GAG(x1, x2, x3)  =  LAST_IN_GAG(x1, x3)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(8) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(9)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LAST_IN_GAG(.(H, T), X, .(H, M)) -> LAST_IN_GAG(T, X, M)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+LAST_IN_GAG(x1, x2, x3)  =  LAST_IN_GAG(x1, x3)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(10) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   LAST_IN_GAG(.(H, T), .(H, M)) -> LAST_IN_GAG(T, M)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(12) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*LAST_IN_GAG(.(H, T), .(H, M)) -> LAST_IN_GAG(T, M)
+The graph contains the following edges 1 > 1, 2 > 2
+
+
+----------------------------------------
+
+(13)
+YES
+
+----------------------------------------
+
+(14)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LAST_IN_GAA(.(H, T), X, .(H, M)) -> LAST_IN_GAA(T, X, M)
+
+The TRS R consists of the following rules:
+
+   palindrome_in_g(L) -> U1_g(L, halves_in_gaaa(L, X1s, X2s, EvenOdd))
+   halves_in_gaaa([], [], [], even) -> halves_out_gaaa([], [], [], even)
+   halves_in_gaaa(.(X, []), .(X, []), [], odd) -> halves_out_gaaa(.(X, []), .(X, []), [], odd)
+   halves_in_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+   last_in_gaa(.(T, []), T, []) -> last_out_gaa(.(T, []), T, [])
+   last_in_gaa(.(H, T), X, .(H, M)) -> U8_gaa(H, T, X, M, last_in_gaa(T, X, M))
+   U8_gaa(H, T, X, M, last_out_gaa(T, X, M)) -> last_out_gaa(.(H, T), X, .(H, M))
+   U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_in_gaaa(Rests, Ts, Rs, EvenOdd))
+   U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_out_gaaa(Rests, Ts, Rs, EvenOdd)) -> halves_out_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U2_g(L, X1s, X2s, eq_in_gg(EvenOdd, even))
+   eq_in_gg(X, X) -> eq_out_gg(X, X)
+   U2_g(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> U3_g(L, eq_in_gg(X1s, X2s))
+   U3_g(L, eq_out_gg(X1s, X2s)) -> palindrome_out_g(L)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U4_g(L, X1s, X2s, eq_in_gg(EvenOdd, odd))
+   U4_g(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> U5_g(L, last_in_gag(X1s, X1, X2s))
+   last_in_gag(.(T, []), T, []) -> last_out_gag(.(T, []), T, [])
+   last_in_gag(.(H, T), X, .(H, M)) -> U8_gag(H, T, X, M, last_in_gag(T, X, M))
+   U8_gag(H, T, X, M, last_out_gag(T, X, M)) -> last_out_gag(.(H, T), X, .(H, M))
+   U5_g(L, last_out_gag(X1s, X1, X2s)) -> palindrome_out_g(L)
+
+The argument filtering Pi contains the following mapping:
+palindrome_in_g(x1)  =  palindrome_in_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x2)
+
+halves_in_gaaa(x1, x2, x3, x4)  =  halves_in_gaaa(x1)
+
+[]  =  []
+
+halves_out_gaaa(x1, x2, x3, x4)  =  halves_out_gaaa(x2, x3, x4)
+
+.(x1, x2)  =  .(x1, x2)
+
+U6_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_gaaa(x1, x8)
+
+last_in_gaa(x1, x2, x3)  =  last_in_gaa(x1)
+
+last_out_gaa(x1, x2, x3)  =  last_out_gaa(x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5)  =  U8_gaa(x1, x5)
+
+U7_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U7_gaaa(x1, x5, x8)
+
+U2_g(x1, x2, x3, x4)  =  U2_g(x2, x3, x4)
+
+eq_in_gg(x1, x2)  =  eq_in_gg(x1, x2)
+
+eq_out_gg(x1, x2)  =  eq_out_gg
+
+even  =  even
+
+U3_g(x1, x2)  =  U3_g(x2)
+
+palindrome_out_g(x1)  =  palindrome_out_g
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x2, x3, x4)
+
+odd  =  odd
+
+U5_g(x1, x2)  =  U5_g(x2)
+
+last_in_gag(x1, x2, x3)  =  last_in_gag(x1, x3)
+
+last_out_gag(x1, x2, x3)  =  last_out_gag(x2)
+
+U8_gag(x1, x2, x3, x4, x5)  =  U8_gag(x5)
+
+LAST_IN_GAA(x1, x2, x3)  =  LAST_IN_GAA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(15) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(16)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LAST_IN_GAA(.(H, T), X, .(H, M)) -> LAST_IN_GAA(T, X, M)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+LAST_IN_GAA(x1, x2, x3)  =  LAST_IN_GAA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(17) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(18)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   LAST_IN_GAA(.(H, T)) -> LAST_IN_GAA(T)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(19) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*LAST_IN_GAA(.(H, T)) -> LAST_IN_GAA(T)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(20)
+YES
+
+----------------------------------------
+
+(21)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> HALVES_IN_GAAA(Rests, Ts, Rs, EvenOdd)
+   HALVES_IN_GAAA(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+
+The TRS R consists of the following rules:
+
+   palindrome_in_g(L) -> U1_g(L, halves_in_gaaa(L, X1s, X2s, EvenOdd))
+   halves_in_gaaa([], [], [], even) -> halves_out_gaaa([], [], [], even)
+   halves_in_gaaa(.(X, []), .(X, []), [], odd) -> halves_out_gaaa(.(X, []), .(X, []), [], odd)
+   halves_in_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+   last_in_gaa(.(T, []), T, []) -> last_out_gaa(.(T, []), T, [])
+   last_in_gaa(.(H, T), X, .(H, M)) -> U8_gaa(H, T, X, M, last_in_gaa(T, X, M))
+   U8_gaa(H, T, X, M, last_out_gaa(T, X, M)) -> last_out_gaa(.(H, T), X, .(H, M))
+   U6_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_in_gaaa(Rests, Ts, Rs, EvenOdd))
+   U7_gaaa(T, Y, Xs, Ts, R, Rs, EvenOdd, halves_out_gaaa(Rests, Ts, Rs, EvenOdd)) -> halves_out_gaaa(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U2_g(L, X1s, X2s, eq_in_gg(EvenOdd, even))
+   eq_in_gg(X, X) -> eq_out_gg(X, X)
+   U2_g(L, X1s, X2s, eq_out_gg(EvenOdd, even)) -> U3_g(L, eq_in_gg(X1s, X2s))
+   U3_g(L, eq_out_gg(X1s, X2s)) -> palindrome_out_g(L)
+   U1_g(L, halves_out_gaaa(L, X1s, X2s, EvenOdd)) -> U4_g(L, X1s, X2s, eq_in_gg(EvenOdd, odd))
+   U4_g(L, X1s, X2s, eq_out_gg(EvenOdd, odd)) -> U5_g(L, last_in_gag(X1s, X1, X2s))
+   last_in_gag(.(T, []), T, []) -> last_out_gag(.(T, []), T, [])
+   last_in_gag(.(H, T), X, .(H, M)) -> U8_gag(H, T, X, M, last_in_gag(T, X, M))
+   U8_gag(H, T, X, M, last_out_gag(T, X, M)) -> last_out_gag(.(H, T), X, .(H, M))
+   U5_g(L, last_out_gag(X1s, X1, X2s)) -> palindrome_out_g(L)
+
+The argument filtering Pi contains the following mapping:
+palindrome_in_g(x1)  =  palindrome_in_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x2)
+
+halves_in_gaaa(x1, x2, x3, x4)  =  halves_in_gaaa(x1)
+
+[]  =  []
+
+halves_out_gaaa(x1, x2, x3, x4)  =  halves_out_gaaa(x2, x3, x4)
+
+.(x1, x2)  =  .(x1, x2)
+
+U6_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_gaaa(x1, x8)
+
+last_in_gaa(x1, x2, x3)  =  last_in_gaa(x1)
+
+last_out_gaa(x1, x2, x3)  =  last_out_gaa(x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5)  =  U8_gaa(x1, x5)
+
+U7_gaaa(x1, x2, x3, x4, x5, x6, x7, x8)  =  U7_gaaa(x1, x5, x8)
+
+U2_g(x1, x2, x3, x4)  =  U2_g(x2, x3, x4)
+
+eq_in_gg(x1, x2)  =  eq_in_gg(x1, x2)
+
+eq_out_gg(x1, x2)  =  eq_out_gg
+
+even  =  even
+
+U3_g(x1, x2)  =  U3_g(x2)
+
+palindrome_out_g(x1)  =  palindrome_out_g
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x2, x3, x4)
+
+odd  =  odd
+
+U5_g(x1, x2)  =  U5_g(x2)
+
+last_in_gag(x1, x2, x3)  =  last_in_gag(x1, x3)
+
+last_out_gag(x1, x2, x3)  =  last_out_gag(x2)
+
+U8_gag(x1, x2, x3, x4, x5)  =  U8_gag(x5)
+
+HALVES_IN_GAAA(x1, x2, x3, x4)  =  HALVES_IN_GAAA(x1)
+
+U6_GAAA(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_GAAA(x1, x8)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(22) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(23)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_out_gaa(.(Y, Xs), R, Rests)) -> HALVES_IN_GAAA(Rests, Ts, Rs, EvenOdd)
+   HALVES_IN_GAAA(.(T, .(Y, Xs)), .(T, Ts), .(R, Rs), EvenOdd) -> U6_GAAA(T, Y, Xs, Ts, R, Rs, EvenOdd, last_in_gaa(.(Y, Xs), R, Rests))
+
+The TRS R consists of the following rules:
+
+   last_in_gaa(.(T, []), T, []) -> last_out_gaa(.(T, []), T, [])
+   last_in_gaa(.(H, T), X, .(H, M)) -> U8_gaa(H, T, X, M, last_in_gaa(T, X, M))
+   U8_gaa(H, T, X, M, last_out_gaa(T, X, M)) -> last_out_gaa(.(H, T), X, .(H, M))
+
+The argument filtering Pi contains the following mapping:
+[]  =  []
+
+.(x1, x2)  =  .(x1, x2)
+
+last_in_gaa(x1, x2, x3)  =  last_in_gaa(x1)
+
+last_out_gaa(x1, x2, x3)  =  last_out_gaa(x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5)  =  U8_gaa(x1, x5)
+
+HALVES_IN_GAAA(x1, x2, x3, x4)  =  HALVES_IN_GAAA(x1)
+
+U6_GAAA(x1, x2, x3, x4, x5, x6, x7, x8)  =  U6_GAAA(x1, x8)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(24) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(25)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U6_GAAA(T, last_out_gaa(R, Rests)) -> HALVES_IN_GAAA(Rests)
+   HALVES_IN_GAAA(.(T, .(Y, Xs))) -> U6_GAAA(T, last_in_gaa(.(Y, Xs)))
+
+The TRS R consists of the following rules:
+
+   last_in_gaa(.(T, [])) -> last_out_gaa(T, [])
+   last_in_gaa(.(H, T)) -> U8_gaa(H, last_in_gaa(T))
+   U8_gaa(H, last_out_gaa(X, M)) -> last_out_gaa(X, .(H, M))
+
+The set Q consists of the following terms:
+
+   last_in_gaa(x0)
+   U8_gaa(x0, x1)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(26) MRRProof (EQUIVALENT)
+By using the rule removal processor [LPAR04] with the following ordering, at least one Dependency Pair or term rewrite system rule of this QDP problem can be strictly oriented.
+
+Strictly oriented dependency pairs:
+
+   U6_GAAA(T, last_out_gaa(R, Rests)) -> HALVES_IN_GAAA(Rests)
+   HALVES_IN_GAAA(.(T, .(Y, Xs))) -> U6_GAAA(T, last_in_gaa(.(Y, Xs)))
+
+Strictly oriented rules of the TRS R:
+
+   last_in_gaa(.(T, [])) -> last_out_gaa(T, [])
+   last_in_gaa(.(H, T)) -> U8_gaa(H, last_in_gaa(T))
+   U8_gaa(H, last_out_gaa(X, M)) -> last_out_gaa(X, .(H, M))
+
+Used ordering: Knuth-Bendix order [KBO] with precedence:last_in_gaa_1 > U8_gaa_2 > HALVES_IN_GAAA_1 > U6_GAAA_2 > last_out_gaa_2 > [] > ._2
+
+and weight map:
+
+   []=1
+   last_in_gaa_1=1
+   HALVES_IN_GAAA_1=1
+   ._2=0
+   last_out_gaa_2=1
+   U8_gaa_2=0
+   U6_GAAA_2=0
+
+The variable weight is 1
+
+----------------------------------------
+
+(27)
+Obligation:
+Q DP problem:
+P is empty.
+R is empty.
+The set Q consists of the following terms:
+
+   last_in_gaa(x0)
+   U8_gaa(x0, x1)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(28) PisEmptyProof (EQUIVALENT)
+The TRS P is empty. Hence, there is no (P,Q,R) chain.
+----------------------------------------
+
+(29)
+YES

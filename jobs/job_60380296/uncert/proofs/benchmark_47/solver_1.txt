@@ -1,0 +1,1096 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/7ylAi.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 754 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 17 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 262 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 268 ms]
+        (13) AND
+            (14) IRSwT
+                (15) TempFilterProof [SOUND, 2 ms]
+                (16) IRSwT
+                (17) IRSwTToQDPProof [SOUND, 0 ms]
+                (18) QDP
+                (19) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+                (20) YES
+            (21) IRSwT
+                (22) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+                (23) IRSwT
+                (24) TempFilterProof [SOUND, 1 ms]
+                (25) IRSwT
+                (26) IRSwTToQDPProof [SOUND, 0 ms]
+                (27) QDP
+                (28) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+                (29) YES
+    (30) JBCTerminationSCC
+        (31) SCCToIRSProof [SOUND, 153 ms]
+        (32) IRSwT
+        (33) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (34) IRSwT
+        (35) IRSwTTerminationDigraphProof [EQUIVALENT, 40 ms]
+        (36) AND
+            (37) IRSwT
+                (38) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+                (39) IRSwT
+                (40) TempFilterProof [SOUND, 17 ms]
+                (41) IntTRS
+                (42) PolynomialOrderProcessor [EQUIVALENT, 7 ms]
+                (43) YES
+            (44) IRSwT
+                (45) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+                (46) IRSwT
+                (47) TempFilterProof [SOUND, 21 ms]
+                (48) IntTRS
+                (49) RankingReductionPairProof [EQUIVALENT, 11 ms]
+                (50) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package QuicksortRec;
+
+public class List {
+
+  int value;
+  List next;
+
+  public List() {}
+
+  public List(int value, List next) {
+    this.value = value;
+    this.next = next;
+  }
+
+  public static List copy(List x) {
+    if (x == null) return null;
+    else return new List(x.value,copy(x.next));
+  }
+
+   public static String print(List t){
+	if (t == null) return "";
+	else  return t.value + " " + print(t.next);
+    }
+}
+
+
+package QuicksortRec; 
+public class QuicksortRec {
+    public static List append(List xs, List ys) {
+                if (xs == null) return ys;
+                else return append(xs.next, ys);
+    }
+
+    public static List sortedLow(List xs, int n){
+                if (xs == null) {
+                        return null;
+                } else if (xs.value <= n) {
+                        return quicksort(new List(xs.value, sortedLow(xs.next,n)));
+                } else {
+                        return sortedLow(xs.next,n);
+                }
+    }
+
+    public static List sortedHigh(List xs, int n){
+                if (xs == null) {
+                        return null;
+                } else if (xs.value > n) {
+                        return quicksort(new List(xs.value, sortedHigh(xs.next,n)));
+                } else {
+                        return sortedHigh(xs.next,n);
+                }
+    }
+
+    public static List quicksort(List xs){
+                if (xs == null) {
+                        return null;
+                } else {
+                        List lows = sortedLow(xs.next,xs.value);
+                        List highs = sortedHigh(xs.next,xs.value);
+                        return append(lows,highs);
+                }
+    }
+
+    public static void main(String[] args) {
+                Random.args = args;
+                List xs = createList(Random.random());
+                List ys = quicksort(xs);
+    }
+
+
+    public static List createList(int l) {
+                if (l <= 0) {
+                        return null;
+                } else {
+                        return new List(Random.random(), createList(l-1));
+                }
+    }
+}
+
+
+package QuicksortRec;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    if (args.length <= index) {
+      return 0;
+    }
+    String string = args[index];
+    index++;
+    if (string == null) {
+      return 0;
+    }
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package QuicksortRec;
+
+public class List {
+
+  int value;
+  List next;
+
+  public List() {}
+
+  public List(int value, List next) {
+    this.value = value;
+    this.next = next;
+  }
+
+  public static List copy(List x) {
+    if (x == null) return null;
+    else return new List(x.value,copy(x.next));
+  }
+
+   public static String print(List t){
+	if (t == null) return "";
+	else  return t.value + " " + print(t.next);
+    }
+}
+
+
+package QuicksortRec; 
+public class QuicksortRec {
+    public static List append(List xs, List ys) {
+                if (xs == null) return ys;
+                else return append(xs.next, ys);
+    }
+
+    public static List sortedLow(List xs, int n){
+                if (xs == null) {
+                        return null;
+                } else if (xs.value <= n) {
+                        return quicksort(new List(xs.value, sortedLow(xs.next,n)));
+                } else {
+                        return sortedLow(xs.next,n);
+                }
+    }
+
+    public static List sortedHigh(List xs, int n){
+                if (xs == null) {
+                        return null;
+                } else if (xs.value > n) {
+                        return quicksort(new List(xs.value, sortedHigh(xs.next,n)));
+                } else {
+                        return sortedHigh(xs.next,n);
+                }
+    }
+
+    public static List quicksort(List xs){
+                if (xs == null) {
+                        return null;
+                } else {
+                        List lows = sortedLow(xs.next,xs.value);
+                        List highs = sortedHigh(xs.next,xs.value);
+                        return append(lows,highs);
+                }
+    }
+
+    public static void main(String[] args) {
+                Random.args = args;
+                List xs = createList(Random.random());
+                List ys = quicksort(xs);
+    }
+
+
+    public static List createList(int l) {
+                if (l <= 0) {
+                        return null;
+                } else {
+                        return new List(Random.random(), createList(l-1));
+                }
+    }
+}
+
+
+package QuicksortRec;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    if (args.length <= index) {
+      return 0;
+    }
+    String string = args[index];
+    index++;
+    if (string == null) {
+      return 0;
+    }
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+QuicksortRec.QuicksortRec.main([Ljava/lang/String;)V: Graph of 177 nodes with 0 SCCs.
+
+
+
+QuicksortRec.QuicksortRec.createList(I)LQuicksortRec/List;: Graph of 199 nodes with 0 SCCs.
+
+
+
+QuicksortRec.QuicksortRec.quicksort(LQuicksortRec/List;)LQuicksortRec/List;: Graph of 64 nodes with 0 SCCs.
+
+
+
+QuicksortRec.QuicksortRec.sortedLow(LQuicksortRec/List;I)LQuicksortRec/List;: Graph of 90 nodes with 0 SCCs.
+
+
+
+QuicksortRec.QuicksortRec.sortedHigh(LQuicksortRec/List;I)LQuicksortRec/List;: Graph of 119 nodes with 0 SCCs.
+
+
+
+QuicksortRec.QuicksortRec.append(LQuicksortRec/List;LQuicksortRec/List;)LQuicksortRec/List;: Graph of 5 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: QuicksortRec.QuicksortRec.quicksort(LQuicksortRec/List;)LQuicksortRec/List;, QuicksortRec.QuicksortRec.sortedLow(LQuicksortRec/List;I)LQuicksortRec/List;, QuicksortRec.QuicksortRec.sortedHigh(LQuicksortRec/List;I)LQuicksortRec/List;
+SCC calls the following helper methods: QuicksortRec.QuicksortRec.quicksort(LQuicksortRec/List;)LQuicksortRec/List;, QuicksortRec.QuicksortRec.sortedLow(LQuicksortRec/List;I)LQuicksortRec/List;, QuicksortRec.QuicksortRec.sortedHigh(LQuicksortRec/List;I)LQuicksortRec/List;, QuicksortRec.QuicksortRec.append(LQuicksortRec/List;LQuicksortRec/List;)LQuicksortRec/List;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*QuicksortRec.List: [next, value]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 210 IRulesP rules:
+f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(o1111sub), java.lang.Object(o1111sub), java.lang.Object(o1111sub)) -> f7667_0_quicksort_NONNULL(EOS(STATIC_7667), java.lang.Object(o1111sub), java.lang.Object(o1111sub), java.lang.Object(o1111sub)) :|: TRUE
+f7667_0_quicksort_NONNULL(EOS(STATIC_7667), java.lang.Object(o1111sub), java.lang.Object(o1111sub), java.lang.Object(o1111sub)) -> f7676_0_quicksort_Load(EOS(STATIC_7676), java.lang.Object(o1111sub), java.lang.Object(o1111sub)) :|: TRUE
+f7676_0_quicksort_Load(EOS(STATIC_7676), java.lang.Object(o1111sub), java.lang.Object(o1111sub)) -> f7705_0_quicksort_FieldAccess(EOS(STATIC_7705), java.lang.Object(o1111sub), java.lang.Object(o1111sub), java.lang.Object(o1111sub)) :|: TRUE
+f7705_0_quicksort_FieldAccess(EOS(STATIC_7705), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724))) -> f7731_0_quicksort_FieldAccess(EOS(STATIC_7731), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724))) :|: TRUE
+f7731_0_quicksort_FieldAccess(EOS(STATIC_7731), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724))) -> f7740_0_quicksort_Load(EOS(STATIC_7740), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), o1149) :|: TRUE
+f7740_0_quicksort_Load(EOS(STATIC_7740), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), o1149) -> f7926_0_quicksort_FieldAccess(EOS(STATIC_7926), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), o1149, java.lang.Object(QuicksortRec.List(EOC, o1149, i1724))) :|: TRUE
+f7926_0_quicksort_FieldAccess(EOS(STATIC_7926), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), o1149, java.lang.Object(QuicksortRec.List(EOC, o1149, i1724))) -> f8129_0_quicksort_InvokeMethod(EOS(STATIC_8129), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), o1149, i1724) :|: TRUE
+f8129_0_quicksort_InvokeMethod(EOS(STATIC_8129), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), o1149, i1724) -> f8133_0_sortedLow_Load(EOS(STATIC_8133), o1149, i1724, o1149, i1724) :|: TRUE
+f8129_0_quicksort_InvokeMethod(EOS(STATIC_8129), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), o1149, i1724) -> f8133_1_sortedLow_Load(EOS(STATIC_8133), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), java.lang.Object(QuicksortRec.List(EOC, o1149, i1724)), o1149, i1724) :|: TRUE
+f8133_0_sortedLow_Load(EOS(STATIC_8133), o1149, i1724, o1149, i1724) -> f8137_0_sortedLow_Load(EOS(STATIC_8137), o1149, i1724, o1149, i1724) :|: TRUE
+f8137_0_sortedLow_Load(EOS(STATIC_8137), o1149, i1724, o1149, i1724) -> f8145_0_sortedLow_Load(EOS(STATIC_8145), o1149, i1724, o1149, i1724) :|: TRUE
+f8145_0_sortedLow_Load(EOS(STATIC_8145), o1355, i2003, o1355, i2003) -> f8159_0_sortedLow_NONNULL(EOS(STATIC_8159), o1355, i2003, o1355, i2003, o1355) :|: TRUE
+f8159_0_sortedLow_NONNULL(EOS(STATIC_8159), java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub)) -> f8164_0_sortedLow_NONNULL(EOS(STATIC_8164), java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub)) :|: TRUE
+f8164_0_sortedLow_NONNULL(EOS(STATIC_8164), java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub)) -> f8196_0_sortedLow_Load(EOS(STATIC_8196), java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub), i2003) :|: TRUE
+f8196_0_sortedLow_Load(EOS(STATIC_8196), java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub), i2003) -> f8202_0_sortedLow_FieldAccess(EOS(STATIC_8202), java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub), i2003, java.lang.Object(o1381sub)) :|: TRUE
+f8202_0_sortedLow_FieldAccess(EOS(STATIC_8202), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066))) -> f8233_0_sortedLow_FieldAccess(EOS(STATIC_8233), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066))) :|: TRUE
+f8233_0_sortedLow_FieldAccess(EOS(STATIC_8233), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066))) -> f8253_0_sortedLow_Load(EOS(STATIC_8253), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2066) :|: TRUE
+f8253_0_sortedLow_Load(EOS(STATIC_8253), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2066) -> f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2066, i2003) :|: TRUE
+f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2066, i2003) -> f8305_0_sortedLow_GT(EOS(STATIC_8305), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2066, i2003) :|: i2066 > i2003
+f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2066, i2003) -> f8306_0_sortedLow_GT(EOS(STATIC_8306), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2066, i2003) :|: i2066 <= i2003
+f8305_0_sortedLow_GT(EOS(STATIC_8305), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2066, i2003) -> f8861_0_sortedLow_Load(EOS(STATIC_8861), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003) :|: i2066 > i2003
+f8861_0_sortedLow_Load(EOS(STATIC_8861), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003) -> f9097_0_sortedLow_FieldAccess(EOS(STATIC_9097), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066))) :|: TRUE
+f9097_0_sortedLow_FieldAccess(EOS(STATIC_9097), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066))) -> f9105_0_sortedLow_Load(EOS(STATIC_9105), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2003, o1412) :|: TRUE
+f9105_0_sortedLow_Load(EOS(STATIC_9105), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2003, o1412) -> f9112_0_sortedLow_InvokeMethod(EOS(STATIC_9112), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, o1412, i2003) :|: TRUE
+f9112_0_sortedLow_InvokeMethod(EOS(STATIC_9112), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, o1412, i2003) -> f9115_0_sortedLow_Load(EOS(STATIC_9115), o1412, i2003, o1412, i2003) :|: i2066 > i2003
+f9112_0_sortedLow_InvokeMethod(EOS(STATIC_9112), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, o1412, i2003) -> f9115_1_sortedLow_Load(EOS(STATIC_9115), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, o1412, i2003) :|: i2066 > i2003
+f9115_0_sortedLow_Load(EOS(STATIC_9115), o1412, i2003, o1412, i2003) -> f9118_0_sortedLow_Load(EOS(STATIC_9118), o1412, i2003, o1412, i2003) :|: TRUE
+f9118_0_sortedLow_Load(EOS(STATIC_9118), o1412, i2003, o1412, i2003) -> f8145_0_sortedLow_Load(EOS(STATIC_8145), o1412, i2003, o1412, i2003) :|: TRUE
+f8306_0_sortedLow_GT(EOS(STATIC_8306), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2066, i2003) -> f8870_0_sortedLow_New(EOS(STATIC_8870), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003) :|: i2066 <= i2003
+f8870_0_sortedLow_New(EOS(STATIC_8870), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003) -> f9101_0_sortedLow_Duplicate(EOS(STATIC_9101), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE
+f9101_0_sortedLow_Duplicate(EOS(STATIC_9101), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1))) -> f9107_0_sortedLow_Load(EOS(STATIC_9107), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0
+f9107_0_sortedLow_Load(EOS(STATIC_9107), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2))) -> f9113_0_sortedLow_FieldAccess(EOS(STATIC_9113), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9113_0_sortedLow_FieldAccess(EOS(STATIC_9113), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066))) -> f9116_0_sortedLow_Load(EOS(STATIC_9116), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066) :|: TRUE && matching1 = 0 && matching2 = 0
+f9116_0_sortedLow_Load(EOS(STATIC_9116), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066) -> f9119_0_sortedLow_FieldAccess(EOS(STATIC_9119), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9119_0_sortedLow_FieldAccess(EOS(STATIC_9119), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, java.lang.Object(QuicksortRec.List(EOC, o1412, i2066))) -> f9121_0_sortedLow_Load(EOS(STATIC_9121), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, o1412) :|: TRUE && matching1 = 0 && matching2 = 0
+f9121_0_sortedLow_Load(EOS(STATIC_9121), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, o1412) -> f9123_0_sortedLow_InvokeMethod(EOS(STATIC_9123), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, o1412, i2003) :|: TRUE && matching1 = 0 && matching2 = 0
+f9123_0_sortedLow_InvokeMethod(EOS(STATIC_9123), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, o1412, i2003) -> f9154_0_sortedLow_Load(EOS(STATIC_9154), o1412, i2003, o1412, i2003) :|: i2066 <= i2003 && matching1 = 0 && matching2 = 0
+f9123_0_sortedLow_InvokeMethod(EOS(STATIC_9123), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, o1412, i2003) -> f9154_1_sortedLow_Load(EOS(STATIC_9154), java.lang.Object(QuicksortRec.List(EOC, o1412, i2066)), i2003, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, o1412, i2003) :|: i2066 <= i2003 && matching1 = 0 && matching2 = 0
+f9154_0_sortedLow_Load(EOS(STATIC_9154), o1412, i2003, o1412, i2003) -> f9156_0_sortedLow_Load(EOS(STATIC_9156), o1412, i2003, o1412, i2003) :|: TRUE
+f9156_0_sortedLow_Load(EOS(STATIC_9156), o1412, i2003, o1412, i2003) -> f8145_0_sortedLow_Load(EOS(STATIC_8145), o1412, i2003, o1412, i2003) :|: TRUE
+f9187_0_sortedLow_Return(EOS(STATIC_9187), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9192_0_sortedLow_InvokeMethod(EOS(STATIC_9192), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9192_0_sortedLow_InvokeMethod(EOS(STATIC_9192), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9196_0__init__Load(EOS(STATIC_9196), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9196_0__init__Load(EOS(STATIC_9196), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9208_0__init__InvokeMethod(EOS(STATIC_9208), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9208_0__init__InvokeMethod(EOS(STATIC_9208), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9213_0__init__Load(EOS(STATIC_9213), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9213_0__init__Load(EOS(STATIC_9213), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9218_0__init__Load(EOS(STATIC_9218), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9218_0__init__Load(EOS(STATIC_9218), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9221_0__init__FieldAccess(EOS(STATIC_9221), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9221_0__init__FieldAccess(EOS(STATIC_9221), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3)), i2066) -> f9228_0__init__Load(EOS(STATIC_9228), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9228_0__init__Load(EOS(STATIC_9228), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL) -> f9232_0__init__Load(EOS(STATIC_9232), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9232_0__init__Load(EOS(STATIC_9232), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9235_0__init__FieldAccess(EOS(STATIC_9235), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL) :|: TRUE
+f9235_0__init__FieldAccess(EOS(STATIC_9235), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL) -> f9238_0__init__Return(EOS(STATIC_9238), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9238_0__init__Return(EOS(STATIC_9238), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9242_0_sortedLow_InvokeMethod(EOS(STATIC_9242), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9242_0_sortedLow_InvokeMethod(EOS(STATIC_9242), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9245_0_quicksort_Load(EOS(STATIC_9245), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: i2066 <= i2267
+f9242_0_sortedLow_InvokeMethod(EOS(STATIC_9242), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9245_1_quicksort_Load(EOS(STATIC_9245), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: i2066 <= i2267
+f9245_0_quicksort_Load(EOS(STATIC_9245), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9249_0_quicksort_Load(EOS(STATIC_9249), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9249_0_quicksort_Load(EOS(STATIC_9249), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9263_0_quicksort_Load(EOS(STATIC_9263), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9263_0_quicksort_Load(EOS(STATIC_9263), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f7644_0_quicksort_Load(EOS(STATIC_7644), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f7644_0_quicksort_Load(EOS(STATIC_7644), o1095, o1095) -> f7659_0_quicksort_NONNULL(EOS(STATIC_7659), o1095, o1095, o1095) :|: TRUE
+f9188_0_sortedLow_Return(EOS(STATIC_9188), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2270)), i2066)), i2274, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9207_0_sortedLow_Return(EOS(STATIC_9207), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2270)), i2066)), i2274, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9207_0_sortedLow_Return(EOS(STATIC_9207), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9212_0_sortedLow_InvokeMethod(EOS(STATIC_9212), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9212_0_sortedLow_InvokeMethod(EOS(STATIC_9212), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9217_0__init__Load(EOS(STATIC_9217), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9217_0__init__Load(EOS(STATIC_9217), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9227_0__init__InvokeMethod(EOS(STATIC_9227), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9227_0__init__InvokeMethod(EOS(STATIC_9227), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9231_0__init__Load(EOS(STATIC_9231), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9231_0__init__Load(EOS(STATIC_9231), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9234_0__init__Load(EOS(STATIC_9234), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9234_0__init__Load(EOS(STATIC_9234), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9237_0__init__FieldAccess(EOS(STATIC_9237), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9237_0__init__FieldAccess(EOS(STATIC_9237), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3)), i2066) -> f9241_0__init__Load(EOS(STATIC_9241), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9241_0__init__Load(EOS(STATIC_9241), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL) -> f9244_0__init__Load(EOS(STATIC_9244), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9244_0__init__Load(EOS(STATIC_9244), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9248_0__init__FieldAccess(EOS(STATIC_9248), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL) :|: TRUE
+f9248_0__init__FieldAccess(EOS(STATIC_9248), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), NULL) -> f9252_0__init__Return(EOS(STATIC_9252), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9252_0__init__Return(EOS(STATIC_9252), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9255_0_sortedLow_InvokeMethod(EOS(STATIC_9255), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9255_0_sortedLow_InvokeMethod(EOS(STATIC_9255), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9258_0_quicksort_Load(EOS(STATIC_9258), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: i2066 <= i2326
+f9255_0_sortedLow_InvokeMethod(EOS(STATIC_9255), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9258_1_quicksort_Load(EOS(STATIC_9258), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702, i2325)), i2066)), i2326, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: i2066 <= i2326
+f9258_0_quicksort_Load(EOS(STATIC_9258), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9262_0_quicksort_Load(EOS(STATIC_9262), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9262_0_quicksort_Load(EOS(STATIC_9262), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f9282_0_quicksort_Load(EOS(STATIC_9282), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9282_0_quicksort_Load(EOS(STATIC_9282), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) -> f7644_0_quicksort_Load(EOS(STATIC_7644), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066))) :|: TRUE
+f9226_0_sortedLow_Return(EOS(STATIC_9226), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1754, i2355)), i2354)), i2066)), i2359, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9207_0_sortedLow_Return(EOS(STATIC_9207), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1754, i2355)), i2354)), i2066)), i2359, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9287_0_sortedLow_Return(EOS(STATIC_9287), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2451)), i2066)), i2455, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9313_0_sortedLow_Return(EOS(STATIC_9313), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2451)), i2066)), i2455, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9313_0_sortedLow_Return(EOS(STATIC_9313), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2079, i2537)), i2066)), i2538, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9321_0_sortedLow_InvokeMethod(EOS(STATIC_9321), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2079, i2537)), i2066)), i2538, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9321_0_sortedLow_InvokeMethod(EOS(STATIC_9321), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2079, i2537)), i2066)), i2538, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9212_0_sortedLow_InvokeMethod(EOS(STATIC_9212), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2079, i2537)), i2066)), i2538, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9312_0_sortedLow_Return(EOS(STATIC_9312), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2000, i2492)), i2491)), i2066)), i2496, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL) -> f9313_0_sortedLow_Return(EOS(STATIC_9313), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2000, i2492)), i2491)), i2066)), i2496, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f8286_0_sortedLow_Return(EOS(STATIC_8286), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL) -> f8310_0_quicksort_Store(EOS(STATIC_8310), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL) :|: TRUE
+f8310_0_quicksort_Store(EOS(STATIC_8310), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL) -> f8951_0_quicksort_Load(EOS(STATIC_8951), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL) :|: TRUE
+f8951_0_quicksort_Load(EOS(STATIC_8951), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL) -> f9103_0_quicksort_FieldAccess(EOS(STATIC_9103), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2084))) :|: TRUE
+f9103_0_quicksort_FieldAccess(EOS(STATIC_9103), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2084))) -> f9109_0_quicksort_Load(EOS(STATIC_9109), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, NULL) :|: TRUE
+f9109_0_quicksort_Load(EOS(STATIC_9109), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, NULL) -> f9114_0_quicksort_FieldAccess(EOS(STATIC_9114), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2084))) :|: TRUE
+f9114_0_quicksort_FieldAccess(EOS(STATIC_9114), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2084))) -> f9117_0_quicksort_InvokeMethod(EOS(STATIC_9117), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, NULL, i2084) :|: TRUE
+f9117_0_quicksort_InvokeMethod(EOS(STATIC_9117), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, NULL, i2084) -> f9120_0_sortedHigh_Load(EOS(STATIC_9120), NULL, i2084, NULL, i2084) :|: TRUE
+f9117_0_quicksort_InvokeMethod(EOS(STATIC_9117), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, NULL, i2084) -> f9120_1_sortedHigh_Load(EOS(STATIC_9120), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, NULL, i2084) :|: TRUE
+f9120_0_sortedHigh_Load(EOS(STATIC_9120), NULL, i2084, NULL, i2084) -> f9122_0_sortedHigh_Load(EOS(STATIC_9122), NULL, i2084, NULL, i2084) :|: TRUE
+f9122_0_sortedHigh_Load(EOS(STATIC_9122), NULL, i2084, NULL, i2084) -> f9446_0_sortedHigh_Load(EOS(STATIC_9446), NULL, i2084, NULL, i2084) :|: TRUE
+f9446_0_sortedHigh_Load(EOS(STATIC_9446), o2373, i2382, o2373, i2382) -> f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), o2373, i2382, o2373, i2382, o2373) :|: TRUE
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub)) -> f9448_0_sortedHigh_NONNULL(EOS(STATIC_9448), java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub)) :|: TRUE
+f9448_0_sortedHigh_NONNULL(EOS(STATIC_9448), java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub)) -> f9450_0_sortedHigh_Load(EOS(STATIC_9450), java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub), i2382) :|: TRUE
+f9450_0_sortedHigh_Load(EOS(STATIC_9450), java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub), i2382) -> f9452_0_sortedHigh_FieldAccess(EOS(STATIC_9452), java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub), i2382, java.lang.Object(o2378sub)) :|: TRUE
+f9452_0_sortedHigh_FieldAccess(EOS(STATIC_9452), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683))) -> f9454_0_sortedHigh_FieldAccess(EOS(STATIC_9454), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683))) :|: TRUE
+f9454_0_sortedHigh_FieldAccess(EOS(STATIC_9454), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683))) -> f9456_0_sortedHigh_Load(EOS(STATIC_9456), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2683) :|: TRUE
+f9456_0_sortedHigh_Load(EOS(STATIC_9456), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2683) -> f9457_0_sortedHigh_LE(EOS(STATIC_9457), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2683, i2382) :|: TRUE
+f9457_0_sortedHigh_LE(EOS(STATIC_9457), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2683, i2382) -> f9460_0_sortedHigh_LE(EOS(STATIC_9460), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2683, i2382) :|: i2683 <= i2382
+f9457_0_sortedHigh_LE(EOS(STATIC_9457), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2683, i2382) -> f9461_0_sortedHigh_LE(EOS(STATIC_9461), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2683, i2382) :|: i2683 > i2382
+f9460_0_sortedHigh_LE(EOS(STATIC_9460), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2683, i2382) -> f9462_0_sortedHigh_Load(EOS(STATIC_9462), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382) :|: i2683 <= i2382
+f9462_0_sortedHigh_Load(EOS(STATIC_9462), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382) -> f9464_0_sortedHigh_FieldAccess(EOS(STATIC_9464), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683))) :|: TRUE
+f9464_0_sortedHigh_FieldAccess(EOS(STATIC_9464), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683))) -> f9466_0_sortedHigh_Load(EOS(STATIC_9466), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2382, o2380) :|: TRUE
+f9466_0_sortedHigh_Load(EOS(STATIC_9466), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2382, o2380) -> f9468_0_sortedHigh_InvokeMethod(EOS(STATIC_9468), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, o2380, i2382) :|: TRUE
+f9468_0_sortedHigh_InvokeMethod(EOS(STATIC_9468), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, o2380, i2382) -> f9470_0_sortedHigh_Load(EOS(STATIC_9470), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) :|: i2683 <= i2382
+f9468_0_sortedHigh_InvokeMethod(EOS(STATIC_9468), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, o2380, i2382) -> f9470_1_sortedHigh_Load(EOS(STATIC_9470), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, o2380, i2382) :|: i2683 <= i2382
+f9470_0_sortedHigh_Load(EOS(STATIC_9470), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) -> f9472_0_sortedHigh_Load(EOS(STATIC_9472), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) :|: TRUE
+f9472_0_sortedHigh_Load(EOS(STATIC_9472), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) -> f9474_0_sortedHigh_Load(EOS(STATIC_9474), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) :|: TRUE
+f9474_0_sortedHigh_Load(EOS(STATIC_9474), o2402, i2382, o2407, o2402, i2382) -> f9478_0_sortedHigh_Load(EOS(STATIC_9478), o2402, i2382, o2402, i2382) :|: TRUE
+f9478_0_sortedHigh_Load(EOS(STATIC_9478), o2402, i2382, o2402, i2382) -> f9446_0_sortedHigh_Load(EOS(STATIC_9446), o2402, i2382, o2402, i2382) :|: TRUE
+f9461_0_sortedHigh_LE(EOS(STATIC_9461), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2683, i2382) -> f9463_0_sortedHigh_New(EOS(STATIC_9463), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382) :|: i2683 > i2382
+f9463_0_sortedHigh_New(EOS(STATIC_9463), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382) -> f9465_0_sortedHigh_Duplicate(EOS(STATIC_9465), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE
+f9465_0_sortedHigh_Duplicate(EOS(STATIC_9465), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1))) -> f9467_0_sortedHigh_Load(EOS(STATIC_9467), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0
+f9467_0_sortedHigh_Load(EOS(STATIC_9467), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2))) -> f9469_0_sortedHigh_FieldAccess(EOS(STATIC_9469), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9469_0_sortedHigh_FieldAccess(EOS(STATIC_9469), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683))) -> f9471_0_sortedHigh_Load(EOS(STATIC_9471), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683) :|: TRUE && matching1 = 0 && matching2 = 0
+f9471_0_sortedHigh_Load(EOS(STATIC_9471), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683) -> f9473_0_sortedHigh_FieldAccess(EOS(STATIC_9473), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9473_0_sortedHigh_FieldAccess(EOS(STATIC_9473), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683))) -> f9475_0_sortedHigh_Load(EOS(STATIC_9475), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, o2380) :|: TRUE && matching1 = 0 && matching2 = 0
+f9475_0_sortedHigh_Load(EOS(STATIC_9475), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, o2380) -> f9476_0_sortedHigh_InvokeMethod(EOS(STATIC_9476), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, o2380, i2382) :|: TRUE && matching1 = 0 && matching2 = 0
+f9476_0_sortedHigh_InvokeMethod(EOS(STATIC_9476), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, o2380, i2382) -> f9477_0_sortedHigh_Load(EOS(STATIC_9477), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) :|: i2683 > i2382 && matching1 = 0 && matching2 = 0
+f9476_0_sortedHigh_InvokeMethod(EOS(STATIC_9476), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, o2380, i2382) -> f9477_1_sortedHigh_Load(EOS(STATIC_9477), java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), i2382, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, o2380, i2382) :|: i2683 > i2382 && matching1 = 0 && matching2 = 0
+f9477_0_sortedHigh_Load(EOS(STATIC_9477), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) -> f9480_0_sortedHigh_Load(EOS(STATIC_9480), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) :|: TRUE
+f9480_0_sortedHigh_Load(EOS(STATIC_9480), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) -> f9482_0_sortedHigh_Load(EOS(STATIC_9482), o2380, i2382, java.lang.Object(QuicksortRec.List(EOC, o2380, i2683)), o2380, i2382) :|: TRUE
+f9482_0_sortedHigh_Load(EOS(STATIC_9482), o2432, i2382, o2437, o2432, i2382) -> f9487_0_sortedHigh_Load(EOS(STATIC_9487), o2432, i2382, o2432, i2382) :|: TRUE
+f9487_0_sortedHigh_Load(EOS(STATIC_9487), o2432, i2382, o2432, i2382) -> f9446_0_sortedHigh_Load(EOS(STATIC_9446), o2432, i2382, o2432, i2382) :|: TRUE
+f9488_0_sortedHigh_Return(EOS(STATIC_9488), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9491_0_sortedHigh_InvokeMethod(EOS(STATIC_9491), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9491_0_sortedHigh_InvokeMethod(EOS(STATIC_9491), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9494_0__init__Load(EOS(STATIC_9494), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9494_0__init__Load(EOS(STATIC_9494), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9502_0__init__InvokeMethod(EOS(STATIC_9502), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9502_0__init__InvokeMethod(EOS(STATIC_9502), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9505_0__init__Load(EOS(STATIC_9505), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9505_0__init__Load(EOS(STATIC_9505), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9508_0__init__Load(EOS(STATIC_9508), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9508_0__init__Load(EOS(STATIC_9508), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9509_0__init__FieldAccess(EOS(STATIC_9509), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9509_0__init__FieldAccess(EOS(STATIC_9509), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3)), i2683) -> f9515_0__init__Load(EOS(STATIC_9515), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9515_0__init__Load(EOS(STATIC_9515), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) -> f9517_0__init__Load(EOS(STATIC_9517), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9517_0__init__Load(EOS(STATIC_9517), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9519_0__init__FieldAccess(EOS(STATIC_9519), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) :|: TRUE
+f9519_0__init__FieldAccess(EOS(STATIC_9519), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) -> f9521_0__init__Return(EOS(STATIC_9521), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9521_0__init__Return(EOS(STATIC_9521), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9523_0_sortedHigh_InvokeMethod(EOS(STATIC_9523), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9523_0_sortedHigh_InvokeMethod(EOS(STATIC_9523), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9525_0_quicksort_Load(EOS(STATIC_9525), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: i2683 > i2732
+f9523_0_sortedHigh_InvokeMethod(EOS(STATIC_9523), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9525_1_quicksort_Load(EOS(STATIC_9525), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: i2683 > i2732
+f9525_0_quicksort_Load(EOS(STATIC_9525), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9527_0_quicksort_Load(EOS(STATIC_9527), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9527_0_quicksort_Load(EOS(STATIC_9527), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9532_0_quicksort_Load(EOS(STATIC_9532), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9532_0_quicksort_Load(EOS(STATIC_9532), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f7644_0_quicksort_Load(EOS(STATIC_7644), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9489_0_sortedHigh_Return(EOS(STATIC_9489), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2735)), i2683)), i2739, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9501_0_sortedHigh_Return(EOS(STATIC_9501), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2735)), i2683)), i2739, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9501_0_sortedHigh_Return(EOS(STATIC_9501), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9504_0_sortedHigh_InvokeMethod(EOS(STATIC_9504), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9504_0_sortedHigh_InvokeMethod(EOS(STATIC_9504), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9507_0__init__Load(EOS(STATIC_9507), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9507_0__init__Load(EOS(STATIC_9507), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9514_0__init__InvokeMethod(EOS(STATIC_9514), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9514_0__init__InvokeMethod(EOS(STATIC_9514), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9516_0__init__Load(EOS(STATIC_9516), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9516_0__init__Load(EOS(STATIC_9516), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9518_0__init__Load(EOS(STATIC_9518), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9518_0__init__Load(EOS(STATIC_9518), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9520_0__init__FieldAccess(EOS(STATIC_9520), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9520_0__init__FieldAccess(EOS(STATIC_9520), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3)), i2683) -> f9522_0__init__Load(EOS(STATIC_9522), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9522_0__init__Load(EOS(STATIC_9522), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) -> f9524_0__init__Load(EOS(STATIC_9524), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9524_0__init__Load(EOS(STATIC_9524), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9526_0__init__FieldAccess(EOS(STATIC_9526), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) :|: TRUE
+f9526_0__init__FieldAccess(EOS(STATIC_9526), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) -> f9528_0__init__Return(EOS(STATIC_9528), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9528_0__init__Return(EOS(STATIC_9528), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9529_0_sortedHigh_InvokeMethod(EOS(STATIC_9529), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9529_0_sortedHigh_InvokeMethod(EOS(STATIC_9529), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9530_0_quicksort_Load(EOS(STATIC_9530), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: i2683 > i2789
+f9529_0_sortedHigh_InvokeMethod(EOS(STATIC_9529), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9530_1_quicksort_Load(EOS(STATIC_9530), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604, i2788)), i2683)), i2789, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: i2683 > i2789
+f9530_0_quicksort_Load(EOS(STATIC_9530), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9531_0_quicksort_Load(EOS(STATIC_9531), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9531_0_quicksort_Load(EOS(STATIC_9531), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9539_0_quicksort_Load(EOS(STATIC_9539), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9539_0_quicksort_Load(EOS(STATIC_9539), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f7644_0_quicksort_Load(EOS(STATIC_7644), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9546_0_sortedHigh_Return(EOS(STATIC_9546), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2900)), i2683)), i2904, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9560_0_sortedHigh_Return(EOS(STATIC_9560), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2900)), i2683)), i2904, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9560_0_sortedHigh_Return(EOS(STATIC_9560), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9567_0_sortedHigh_InvokeMethod(EOS(STATIC_9567), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9567_0_sortedHigh_InvokeMethod(EOS(STATIC_9567), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9570_0__init__Load(EOS(STATIC_9570), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9570_0__init__Load(EOS(STATIC_9570), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9576_0__init__InvokeMethod(EOS(STATIC_9576), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9576_0__init__InvokeMethod(EOS(STATIC_9576), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9581_0__init__Load(EOS(STATIC_9581), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9581_0__init__Load(EOS(STATIC_9581), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9582_0__init__Load(EOS(STATIC_9582), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0))) :|: TRUE && matching1 = 0 && matching2 = 0
+f9582_0__init__Load(EOS(STATIC_9582), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3))) -> f9583_0__init__FieldAccess(EOS(STATIC_9583), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9583_0__init__FieldAccess(EOS(STATIC_9583), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, matching3)), i2683) -> f9584_0__init__Load(EOS(STATIC_9584), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f9584_0__init__Load(EOS(STATIC_9584), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) -> f9585_0__init__Load(EOS(STATIC_9585), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9585_0__init__Load(EOS(STATIC_9585), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9586_0__init__FieldAccess(EOS(STATIC_9586), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) :|: TRUE
+f9586_0__init__FieldAccess(EOS(STATIC_9586), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), NULL) -> f9587_0__init__Return(EOS(STATIC_9587), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9587_0__init__Return(EOS(STATIC_9587), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9588_0_sortedHigh_InvokeMethod(EOS(STATIC_9588), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9588_0_sortedHigh_InvokeMethod(EOS(STATIC_9588), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9589_0_quicksort_Load(EOS(STATIC_9589), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: i2683 > i2997
+f9588_0_sortedHigh_InvokeMethod(EOS(STATIC_9588), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9589_1_quicksort_Load(EOS(STATIC_9589), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042, i2996)), i2683)), i2997, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: i2683 > i2997
+f9589_0_quicksort_Load(EOS(STATIC_9589), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9590_0_quicksort_Load(EOS(STATIC_9590), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9590_0_quicksort_Load(EOS(STATIC_9590), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f9591_0_quicksort_Load(EOS(STATIC_9591), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9591_0_quicksort_Load(EOS(STATIC_9591), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) -> f7644_0_quicksort_Load(EOS(STATIC_7644), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683))) :|: TRUE
+f9559_0_sortedHigh_Return(EOS(STATIC_9559), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2947, i2948)), i2947)), i2683)), i2952, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9560_0_sortedHigh_Return(EOS(STATIC_9560), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2947, i2948)), i2947)), i2683)), i2952, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9575_0_sortedHigh_Return(EOS(STATIC_9575), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3179, i3061)), i3060)), i2683)), i3065, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9501_0_sortedHigh_Return(EOS(STATIC_9501), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3179, i3061)), i3060)), i2683)), i3065, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9580_0_sortedHigh_Return(EOS(STATIC_9580), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3241, i3095)), i3094)), i2683)), i3099, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9501_0_sortedHigh_Return(EOS(STATIC_9501), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3241, i3095)), i3094)), i2683)), i3099, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9601_0_sortedHigh_Return(EOS(STATIC_9601), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3520, i3205)), i3204)), i2683)), i3209, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL) -> f9560_0_sortedHigh_Return(EOS(STATIC_9560), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3520, i3205)), i3204)), i2683)), i3209, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9185_0_sortedLow_Return(EOS(STATIC_9185), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250)), i2254)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250)), i2254)), NULL) -> f9203_0_sortedLow_Return(EOS(STATIC_9203), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250)), i2254)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250)), i2254)), NULL) :|: TRUE
+f9203_0_sortedLow_Return(EOS(STATIC_9203), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL) -> f9210_0_quicksort_Store(EOS(STATIC_9210), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL) :|: TRUE
+f9210_0_quicksort_Store(EOS(STATIC_9210), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL) -> f9215_0_quicksort_Load(EOS(STATIC_9215), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL) :|: TRUE
+f9215_0_quicksort_Load(EOS(STATIC_9215), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL) -> f9220_0_quicksort_FieldAccess(EOS(STATIC_9220), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314))) :|: TRUE
+f9220_0_quicksort_FieldAccess(EOS(STATIC_9220), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314))) -> f9223_0_quicksort_Load(EOS(STATIC_9223), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313))) :|: TRUE
+f9223_0_quicksort_Load(EOS(STATIC_9223), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313))) -> f9230_0_quicksort_FieldAccess(EOS(STATIC_9230), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314))) :|: TRUE
+f9230_0_quicksort_FieldAccess(EOS(STATIC_9230), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314))) -> f9233_0_quicksort_InvokeMethod(EOS(STATIC_9233), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) :|: TRUE
+f9233_0_quicksort_InvokeMethod(EOS(STATIC_9233), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) -> f9236_0_sortedHigh_Load(EOS(STATIC_9236), java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) :|: TRUE
+f9233_0_quicksort_InvokeMethod(EOS(STATIC_9233), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) -> f9236_1_sortedHigh_Load(EOS(STATIC_9236), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) :|: TRUE
+f9236_0_sortedHigh_Load(EOS(STATIC_9236), java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) -> f9240_0_sortedHigh_Load(EOS(STATIC_9240), java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) :|: TRUE
+f9240_0_sortedHigh_Load(EOS(STATIC_9240), java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) -> f9247_0_sortedHigh_Load(EOS(STATIC_9247), java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) :|: TRUE
+f9247_0_sortedHigh_Load(EOS(STATIC_9247), java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) -> f9446_0_sortedHigh_Load(EOS(STATIC_9446), java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314, java.lang.Object(QuicksortRec.List(EOC, o1674, i2313)), i2314) :|: TRUE
+f9224_0_sortedLow_Return(EOS(STATIC_9224), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1732, i2339)), i2338)), i2343)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1732, i2339)), i2338)), i2343)), NULL) -> f9203_0_sortedLow_Return(EOS(STATIC_9203), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1732, i2339)), i2338)), i2343)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1732, i2339)), i2338)), i2343)), NULL) :|: TRUE
+f9285_0_sortedLow_Return(EOS(STATIC_9285), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2437)), i2441)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2437)), i2441)), NULL) -> f9309_0_sortedLow_Return(EOS(STATIC_9309), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2437)), i2441)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2437)), i2441)), NULL) :|: TRUE
+f9309_0_sortedLow_Return(EOS(STATIC_9309), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2051, i2525)), i2526)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2051, i2525)), i2526)), NULL) -> f9319_0_quicksort_Store(EOS(STATIC_9319), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2051, i2525)), i2526)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2051, i2525)), i2526)), NULL) :|: TRUE
+f9319_0_quicksort_Store(EOS(STATIC_9319), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2051, i2525)), i2526)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2051, i2525)), i2526)), NULL) -> f9210_0_quicksort_Store(EOS(STATIC_9210), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2051, i2525)), i2526)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2051, i2525)), i2526)), NULL) :|: TRUE
+f9308_0_sortedLow_Return(EOS(STATIC_9308), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978, i2476)), i2475)), i2480)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978, i2476)), i2475)), i2480)), NULL) -> f9309_0_sortedLow_Return(EOS(STATIC_9309), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978, i2476)), i2475)), i2480)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978, i2476)), i2475)), i2480)), NULL) :|: TRUE
+f8133_1_sortedLow_Load(EOS(STATIC_8133), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL, i2084) -> f8286_0_sortedLow_Return(EOS(STATIC_8286), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2084)), NULL) :|: TRUE
+f8133_1_sortedLow_Load(EOS(STATIC_8133), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250)), i2254)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250)), i2254)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2250)), i2254) -> f9185_0_sortedLow_Return(EOS(STATIC_9185), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250)), i2254)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250)), i2254)), NULL) :|: TRUE
+f8133_1_sortedLow_Load(EOS(STATIC_8133), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1732, i2339)), i2338)), i2343)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1732, i2339)), i2338)), i2343)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1732, i2339)), i2338)), i2343) -> f9224_0_sortedLow_Return(EOS(STATIC_9224), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1732, i2339)), i2338)), i2343)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1732, i2339)), i2338)), i2343)), NULL) :|: TRUE
+f8133_1_sortedLow_Load(EOS(STATIC_8133), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2437)), i2441)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2437)), i2441)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2437)), i2441) -> f9285_0_sortedLow_Return(EOS(STATIC_9285), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2437)), i2441)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2437)), i2441)), NULL) :|: TRUE
+f8133_1_sortedLow_Load(EOS(STATIC_8133), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978, i2476)), i2475)), i2480)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978, i2476)), i2475)), i2480)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978, i2476)), i2475)), i2480) -> f9308_0_sortedLow_Return(EOS(STATIC_9308), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978, i2476)), i2475)), i2480)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978, i2476)), i2475)), i2480)), NULL) :|: TRUE
+f9154_1_sortedLow_Load(EOS(STATIC_9154), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, NULL, i2267) -> f9187_0_sortedLow_Return(EOS(STATIC_9187), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066)), i2267, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9154_1_sortedLow_Load(EOS(STATIC_9154), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2270)), i2066)), i2274, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, java.lang.Object(QuicksortRec.List(EOC, NULL, i2270)), i2274) -> f9188_0_sortedLow_Return(EOS(STATIC_9188), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2270)), i2066)), i2274, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9154_1_sortedLow_Load(EOS(STATIC_9154), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1754, i2355)), i2354)), i2066)), i2359, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1754, i2355)), i2354)), i2359) -> f9226_0_sortedLow_Return(EOS(STATIC_9226), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1754, i2355)), i2354)), i2066)), i2359, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9154_1_sortedLow_Load(EOS(STATIC_9154), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2451)), i2066)), i2455, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, java.lang.Object(QuicksortRec.List(EOC, NULL, i2451)), i2455) -> f9287_0_sortedLow_Return(EOS(STATIC_9287), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2451)), i2066)), i2455, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9154_1_sortedLow_Load(EOS(STATIC_9154), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2000, i2492)), i2491)), i2066)), i2496, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2066, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2000, i2492)), i2491)), i2496) -> f9312_0_sortedLow_Return(EOS(STATIC_9312), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2000, i2492)), i2491)), i2066)), i2496, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2066, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9477_1_sortedHigh_Load(EOS(STATIC_9477), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, NULL, i2732) -> f9488_0_sortedHigh_Return(EOS(STATIC_9488), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683)), i2732, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9477_1_sortedHigh_Load(EOS(STATIC_9477), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2735)), i2683)), i2739, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, java.lang.Object(QuicksortRec.List(EOC, NULL, i2735)), i2739) -> f9489_0_sortedHigh_Return(EOS(STATIC_9489), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2735)), i2683)), i2739, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9477_1_sortedHigh_Load(EOS(STATIC_9477), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2900)), i2683)), i2904, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, java.lang.Object(QuicksortRec.List(EOC, NULL, i2900)), i2904) -> f9546_0_sortedHigh_Return(EOS(STATIC_9546), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2900)), i2683)), i2904, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9477_1_sortedHigh_Load(EOS(STATIC_9477), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2947, i2948)), i2947)), i2683)), i2952, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2947, i2948)), i2947)), i2952) -> f9559_0_sortedHigh_Return(EOS(STATIC_9559), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2947, i2948)), i2947)), i2683)), i2952, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9477_1_sortedHigh_Load(EOS(STATIC_9477), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3179, i3061)), i3060)), i2683)), i3065, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3179, i3061)), i3060)), i3065) -> f9575_0_sortedHigh_Return(EOS(STATIC_9575), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3179, i3061)), i3060)), i2683)), i3065, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9477_1_sortedHigh_Load(EOS(STATIC_9477), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3241, i3095)), i3094)), i2683)), i3099, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3241, i3095)), i3094)), i3099) -> f9580_0_sortedHigh_Return(EOS(STATIC_9580), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3241, i3095)), i3094)), i2683)), i3099, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f9477_1_sortedHigh_Load(EOS(STATIC_9477), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3520, i3205)), i3204)), i2683)), i3209, java.lang.Object(QuicksortRec.List(EOC, NULL, matching1)), java.lang.Object(QuicksortRec.List(EOC, NULL, matching2)), i2683, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3520, i3205)), i3204)), i3209) -> f9601_0_sortedHigh_Return(EOS(STATIC_9601), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3520, i3205)), i3204)), i2683)), i3209, java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), java.lang.Object(QuicksortRec.List(EOC, NULL, 0)), i2683, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+Combined rules. Obtained 29 IRulesP rules:
+f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2066:1)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2066:1)), i2003:0, i2066:1, i2003:0) -> f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2003:0, i2066:0, i2003:0) :|: i2066:1 > i2003:0
+f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978:0, i2476:0)), i2475:0)), i1724:0)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978:0, i2476:0)), i2475:0)), i1724:0)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978:0, i2476:0)), i2475:0)), i1724:0))) -> f9233_0_quicksort_InvokeMethod(EOS(STATIC_9233), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978:0, i2476:0)), i2475:0)), i1724:0)), NULL, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1978:0, i2476:0)), i2475:0)), i1724:0) :|: TRUE
+f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i1724:0)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i1724:0)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i1724:0))) -> f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i1724:0, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i1724:0, i2066:0, i1724:0) :|: TRUE
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2900:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2900:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2900:0)), i2683:0))) -> f9588_0_sortedHigh_InvokeMethod(EOS(STATIC_9588), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2900:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2683:0 > i2382:0
+f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2066:1)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2066:1)), i2003:0, i2066:1, i2003:0) -> f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2003:0, i2066:0, i2003:0) :|: i2066:1 <= i2003:0
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0))) -> f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), o2380:0, i2382:0, o2380:0, i2382:0, o2380:0) :|: i2683:0 <= i2382:0
+f9233_0_quicksort_InvokeMethod(EOS(STATIC_9233), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674:0, i2313:0)), i2314:0)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674:0, i2313:0)), i2314:0) -> f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, o1674:0, i2313:0)), i2314:0, java.lang.Object(QuicksortRec.List(EOC, o1674:0, i2313:0)), i2314:0, java.lang.Object(QuicksortRec.List(EOC, o1674:0, i2313:0))) :|: TRUE
+f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2000:0, i2492:0)), i2491:0)), i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2000:0, i2492:0)), i2491:0)), i2066:0)), i2003:0, i2066:0, i2003:0) -> f9255_0_sortedLow_InvokeMethod(EOS(STATIC_9255), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2000:0, i2492:0)), i2491:0)), i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0))) :|: i2066:0 <= i2003:0
+f9588_0_sortedHigh_InvokeMethod(EOS(STATIC_9588), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042:0, i2996:0)), i2683:0)), i2997:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) -> f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2997:0 < i2683:0
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2947:0, i2948:0)), i2947:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2947:0, i2948:0)), i2947:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2947:0, i2948:0)), i2947:0)), i2683:0))) -> f9588_0_sortedHigh_InvokeMethod(EOS(STATIC_9588), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2947:0, i2948:0)), i2947:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2683:0 > i2382:0
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2735:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2735:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2735:0)), i2683:0))) -> f9529_0_sortedHigh_InvokeMethod(EOS(STATIC_9529), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2735:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2683:0 > i2382:0
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0))) -> f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), o2380:0, i2382:0, o2380:0, i2382:0, o2380:0) :|: i2683:0 > i2382:0
+f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, NULL, i1724:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i1724:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i1724:0))) -> f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), NULL, i1724:0, NULL, i1724:0, NULL) :|: TRUE
+f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2451:0)), i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2451:0)), i2066:0)), i2003:0, i2066:0, i2003:0) -> f9255_0_sortedLow_InvokeMethod(EOS(STATIC_9255), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2451:0)), i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0))) :|: i2066:0 <= i2003:0
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3179:0, i3061:0)), i3060:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3179:0, i3061:0)), i3060:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3179:0, i3061:0)), i3060:0)), i2683:0))) -> f9529_0_sortedHigh_InvokeMethod(EOS(STATIC_9529), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3179:0, i3061:0)), i3060:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2683:0 > i2382:0
+f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250:0)), i1724:0)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250:0)), i1724:0)), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250:0)), i1724:0))) -> f9233_0_quicksort_InvokeMethod(EOS(STATIC_9233), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250:0)), i1724:0)), NULL, java.lang.Object(QuicksortRec.List(EOC, NULL, i2250:0)), i1724:0) :|: TRUE
+f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0)), i2003:0, i2066:0, i2003:0) -> f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0))) :|: i2066:0 <= i2003:0
+f9529_0_sortedHigh_InvokeMethod(EOS(STATIC_9529), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604:0, i2788:0)), i2683:0)), i2789:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) -> f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2789:0 < i2683:0
+f9255_0_sortedLow_InvokeMethod(EOS(STATIC_9255), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702:0, i2325:0)), i2066:0)), i2326:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0))) -> f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0))) :|: i2326:0 >= i2066:0
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) -> f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2683:0 > i2382:0
+Removed following non-SCC rules:
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0))) -> f9470_1_sortedHigh_Load(EOS(STATIC_9470), java.lang.Object(QuicksortRec.List(EOC, o2380:0, i2683:0)), i2382:0, o2380:0, i2382:0) :|: i2683:0 <= i2382:0
+f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0)), i2003:0, i2066:0, i2003:0) -> f9245_1_quicksort_Load(EOS(STATIC_9245), java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0))) :|: i2066:0 <= i2003:0
+f9447_0_sortedHigh_NONNULL(EOS(STATIC_9447), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) -> f9525_1_quicksort_Load(EOS(STATIC_9525), java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2683:0 > i2382:0
+f9529_0_sortedHigh_InvokeMethod(EOS(STATIC_9529), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604:0, i2788:0)), i2683:0)), i2789:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) -> f9530_1_quicksort_Load(EOS(STATIC_9530), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o2604:0, i2788:0)), i2683:0)), i2789:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2789:0 < i2683:0
+f9588_0_sortedHigh_InvokeMethod(EOS(STATIC_9588), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042:0, i2996:0)), i2683:0)), i2997:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) -> f9589_1_quicksort_Load(EOS(STATIC_9589), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o3042:0, i2996:0)), i2683:0)), i2997:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2683:0))) :|: i2997:0 < i2683:0
+f8285_0_sortedLow_GT(EOS(STATIC_8285), java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2003:0, i2066:0, i2003:0) -> f9115_1_sortedLow_Load(EOS(STATIC_9115), java.lang.Object(QuicksortRec.List(EOC, o1412:0, i2066:0)), i2003:0, o1412:0, i2003:0) :|: i2066:0 > i2003:0
+f9233_0_quicksort_InvokeMethod(EOS(STATIC_9233), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674:0, i2313:0)), i2314:0)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674:0, i2313:0)), i2314:0) -> f9236_1_sortedHigh_Load(EOS(STATIC_9236), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1674:0, i2313:0)), i2314:0)), NULL, java.lang.Object(QuicksortRec.List(EOC, o1674:0, i2313:0)), i2314:0) :|: TRUE
+f9255_0_sortedLow_InvokeMethod(EOS(STATIC_9255), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702:0, i2325:0)), i2066:0)), i2326:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0))) -> f9258_1_quicksort_Load(EOS(STATIC_9258), java.lang.Object(QuicksortRec.List(EOC, java.lang.Object(QuicksortRec.List(EOC, o1702:0, i2325:0)), i2066:0)), i2326:0, java.lang.Object(QuicksortRec.List(EOC, NULL, i2066:0))) :|: i2326:0 >= i2066:0
+f7659_0_quicksort_NONNULL(EOS(STATIC_7659), java.lang.Object(QuicksortRec.List(EOC, NULL, i1724:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i1724:0)), java.lang.Object(QuicksortRec.List(EOC, NULL, i1724:0))) -> f9120_1_sortedHigh_Load(EOS(STATIC_9120), java.lang.Object(QuicksortRec.List(EOC, NULL, i1724:0)), NULL, NULL, i1724:0) :|: TRUE
+Filtered constant ground arguments:
+   f8285_0_sortedLow_GT(x1, x2, x3, x4, x5, x6, x7) -> f8285_0_sortedLow_GT(x2, x3, x4, x5, x6, x7)
+   f7659_0_quicksort_NONNULL(x1, x2, x3, x4) -> f7659_0_quicksort_NONNULL(x2, x3, x4)
+   f9233_0_quicksort_InvokeMethod(x1, x2, x3, x4, x5) -> f9233_0_quicksort_InvokeMethod(x2, x4, x5)
+   f9447_0_sortedHigh_NONNULL(x1, x2, x3, x4, x5, x6) -> f9447_0_sortedHigh_NONNULL(x2, x3, x4, x5, x6)
+   f9588_0_sortedHigh_InvokeMethod(x1, x2, x3, x4) -> f9588_0_sortedHigh_InvokeMethod(x2, x3, x4)
+   f9255_0_sortedLow_InvokeMethod(x1, x2, x3, x4) -> f9255_0_sortedLow_InvokeMethod(x2, x3, x4)
+   f9529_0_sortedHigh_InvokeMethod(x1, x2, x3, x4) -> f9529_0_sortedHigh_InvokeMethod(x2, x3, x4)
+   QuicksortRec.List(x1, x2, x3) -> QuicksortRec.List(x2, x3)
+Filtered duplicate arguments:
+   f8285_0_sortedLow_GT(x1, x2, x3, x4, x5, x6) -> f8285_0_sortedLow_GT(x3, x5, x6)
+   f7659_0_quicksort_NONNULL(x1, x2, x3) -> f7659_0_quicksort_NONNULL(x3)
+   f9447_0_sortedHigh_NONNULL(x1, x2, x3, x4, x5) -> f9447_0_sortedHigh_NONNULL(x4, x5)
+Finished conversion. Obtained 20 rules.P rules:
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:1)), i2066:1, i2003:0, i2066:1) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:0, i2003:0, i2066:0) :|: i2066:1 > i2003:0
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0)), i1724:0) -> f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0)), java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0, i2475:0, i1724:0, i2475:0) :|: TRUE
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i1724:0)), i1724:0) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:0, i1724:0, i2066:0) :|: TRUE
+f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2900:0)), i2683:0))) -> f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2900:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2900:0, i2683:0, i2683:0) :|: i2683:0 > i2382:0
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:1)), i2066:1, i2003:0, i2066:1) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:0, i2003:0, i2066:0) :|: i2066:1 <= i2003:0
+f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(o2380:0, i2683:0))) -> f9447_0_sortedHigh_NONNULL(i2382:0, o2380:0) :|: i2683:0 <= i2382:0
+f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1674:0, i2313:0)), i2314:0)), java.lang.Object(QuicksortRec.List(o1674:0, i2313:0)), i2314:0, i2313:0, i2314:0, i2313:0) -> f9447_0_sortedHigh_NONNULL(i2314:0, java.lang.Object(QuicksortRec.List(o1674:0, i2313:0))) :|: TRUE
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o2000:0, i2492:0)), i2491:0)), i2066:0)), i2066:0, i2003:0, i2066:0) -> f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o2000:0, i2492:0)), i2491:0)), i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(NULL, i2066:0)), i2491:0, i2066:0, i2066:0) :|: i2066:0 <= i2003:0
+f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o3042:0, i2996:0)), i2683:0)), i2997:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2996:0, i2683:0, i2683:0) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2683:0) :|: i2997:0 < i2683:0
+f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o2947:0, i2948:0)), i2947:0)), i2683:0))) -> f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o2947:0, i2948:0)), i2947:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2947:0, i2683:0, i2683:0) :|: i2683:0 > i2382:0
+f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2735:0)), i2683:0))) -> f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2735:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2735:0, i2683:0, i2683:0) :|: i2683:0 > i2382:0
+f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(o2380:0, i2683:0))) -> f9447_0_sortedHigh_NONNULL(i2382:0, o2380:0) :|: i2683:0 > i2382:0
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, i1724:0)), i1724:0) -> f9447_0_sortedHigh_NONNULL(i1724:0, NULL) :|: TRUE
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2451:0)), i2066:0)), i2066:0, i2003:0, i2066:0) -> f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2451:0)), i2066:0)), i2003:0, java.lang.Object(QuicksortRec.List(NULL, i2066:0)), i2451:0, i2066:0, i2066:0) :|: i2066:0 <= i2003:0
+f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o3179:0, i3061:0)), i3060:0)), i2683:0))) -> f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o3179:0, i3061:0)), i3060:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i3060:0, i2683:0, i2683:0) :|: i2683:0 > i2382:0
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2250:0)), i1724:0)), i1724:0) -> f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2250:0)), i1724:0)), java.lang.Object(QuicksortRec.List(NULL, i2250:0)), i1724:0, i2250:0, i1724:0, i2250:0) :|: TRUE
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(NULL, i2066:0)), i2066:0, i2003:0, i2066:0) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, i2066:0)), i2066:0) :|: i2066:0 <= i2003:0
+f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o2604:0, i2788:0)), i2683:0)), i2789:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2788:0, i2683:0, i2683:0) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2683:0) :|: i2789:0 < i2683:0
+f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1702:0, i2325:0)), i2066:0)), i2326:0, java.lang.Object(QuicksortRec.List(NULL, i2066:0)), i2325:0, i2066:0, i2066:0) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, i2066:0)), i2066:0) :|: i2326:0 >= i2066:0
+f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0))) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2683:0) :|: i2683:0 > i2382:0
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:1)), i2066:1, i2003:0, i2066:1) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:0, i2003:0, i2066:0) :|: i2066:1 > i2003:0
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0)), i1724:0) -> f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0)), java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0, i2475:0, i1724:0, i2475:0) :|: TRUE
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x, x1)), x2)), x2) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x, x1)), x1, x2, x1) :|: TRUE
+f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2900:0)), i2683:0))) -> f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2900:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2900:0, i2683:0, i2683:0) :|: i2683:0 > i2382:0
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x3, x4)), x5)), x5, x6, x5) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x3, x4)), x4, x6, x4) :|: x5 <= x6
+f9447_0_sortedHigh_NONNULL(x7, java.lang.Object(QuicksortRec.List(x8, x9))) -> f9447_0_sortedHigh_NONNULL(x7, x8) :|: x9 <= x7
+f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1674:0, i2313:0)), i2314:0)), java.lang.Object(QuicksortRec.List(o1674:0, i2313:0)), i2314:0, i2313:0, i2314:0, i2313:0) -> f9447_0_sortedHigh_NONNULL(i2314:0, java.lang.Object(QuicksortRec.List(o1674:0, i2313:0))) :|: TRUE
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x10, x11)), x12)), x13)), x13, x14, x13) -> f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x10, x11)), x12)), x13)), x14, java.lang.Object(QuicksortRec.List(NULL, x13)), x12, x13, x13) :|: x13 <= x14
+f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x15, x16)), x17)), x18, java.lang.Object(QuicksortRec.List(NULL, x17)), x16, x17, x17) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x17)), x17) :|: x18 < x17
+f9447_0_sortedHigh_NONNULL(x19, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x20, x21)), x22)), x23))) -> f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x20, x21)), x22)), x23)), x19, java.lang.Object(QuicksortRec.List(NULL, x23)), x22, x23, x23) :|: x23 > x19
+f9447_0_sortedHigh_NONNULL(x24, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x25)), x26))) -> f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x25)), x26)), x24, java.lang.Object(QuicksortRec.List(NULL, x26)), x25, x26, x26) :|: x26 > x24
+f9447_0_sortedHigh_NONNULL(x27, java.lang.Object(QuicksortRec.List(x28, x29))) -> f9447_0_sortedHigh_NONNULL(x27, x28) :|: x29 > x27
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x30)), x30) -> f9447_0_sortedHigh_NONNULL(x30, NULL) :|: TRUE
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x31)), x32)), x32, x33, x32) -> f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x31)), x32)), x33, java.lang.Object(QuicksortRec.List(NULL, x32)), x31, x32, x32) :|: x32 <= x33
+f9447_0_sortedHigh_NONNULL(x34, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x35, x36)), x37)), x38))) -> f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x35, x36)), x37)), x38)), x34, java.lang.Object(QuicksortRec.List(NULL, x38)), x37, x38, x38) :|: x38 > x34
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x39)), x40)), x40) -> f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x39)), x40)), java.lang.Object(QuicksortRec.List(NULL, x39)), x40, x39, x40, x39) :|: TRUE
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(NULL, x41)), x41, x42, x41) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x41)), x41) :|: x41 <= x42
+f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x43, x44)), x45)), x46, java.lang.Object(QuicksortRec.List(NULL, x45)), x44, x45, x45) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x45)), x45) :|: x46 < x45
+f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x47, x48)), x49)), x50, java.lang.Object(QuicksortRec.List(NULL, x49)), x48, x49, x49) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x49)), x49) :|: x50 >= x49
+f9447_0_sortedHigh_NONNULL(x51, java.lang.Object(QuicksortRec.List(NULL, x52))) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x52)), x52) :|: x52 > x51
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:1)), i2066:1, i2003:0, i2066:1) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:0, i2003:0, i2066:0) :|: i2066:1 > i2003:0
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0)), i1724:0) -> f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0)), java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0, i2475:0, i1724:0, i2475:0) :|: TRUE
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x, x1)), x2)), x2) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x, x1)), x1, x2, x1) :|: TRUE
+f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2900:0)), i2683:0))) -> f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2900:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2900:0, i2683:0, i2683:0) :|: i2683:0 > i2382:0
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x3, x4)), x5)), x5, x6, x5) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x3, x4)), x4, x6, x4) :|: x5 <= x6
+f9447_0_sortedHigh_NONNULL(x7, java.lang.Object(QuicksortRec.List(x8, x9))) -> f9447_0_sortedHigh_NONNULL(x7, x8) :|: x9 <= x7
+f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1674:0, i2313:0)), i2314:0)), java.lang.Object(QuicksortRec.List(o1674:0, i2313:0)), i2314:0, i2313:0, i2314:0, i2313:0) -> f9447_0_sortedHigh_NONNULL(i2314:0, java.lang.Object(QuicksortRec.List(o1674:0, i2313:0))) :|: TRUE
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x10, x11)), x12)), x13)), x13, x14, x13) -> f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x10, x11)), x12)), x13)), x14, java.lang.Object(QuicksortRec.List(NULL, x13)), x12, x13, x13) :|: x13 <= x14
+f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x15, x16)), x17)), x18, java.lang.Object(QuicksortRec.List(NULL, x17)), x16, x17, x17) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x17)), x17) :|: x18 < x17
+f9447_0_sortedHigh_NONNULL(x19, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x20, x21)), x22)), x23))) -> f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x20, x21)), x22)), x23)), x19, java.lang.Object(QuicksortRec.List(NULL, x23)), x22, x23, x23) :|: x23 > x19
+f9447_0_sortedHigh_NONNULL(x24, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x25)), x26))) -> f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x25)), x26)), x24, java.lang.Object(QuicksortRec.List(NULL, x26)), x25, x26, x26) :|: x26 > x24
+f9447_0_sortedHigh_NONNULL(x27, java.lang.Object(QuicksortRec.List(x28, x29))) -> f9447_0_sortedHigh_NONNULL(x27, x28) :|: x29 > x27
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x30)), x30) -> f9447_0_sortedHigh_NONNULL(x30, NULL) :|: TRUE
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x31)), x32)), x32, x33, x32) -> f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x31)), x32)), x33, java.lang.Object(QuicksortRec.List(NULL, x32)), x31, x32, x32) :|: x32 <= x33
+f9447_0_sortedHigh_NONNULL(x34, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x35, x36)), x37)), x38))) -> f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x35, x36)), x37)), x38)), x34, java.lang.Object(QuicksortRec.List(NULL, x38)), x37, x38, x38) :|: x38 > x34
+f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x39)), x40)), x40) -> f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x39)), x40)), java.lang.Object(QuicksortRec.List(NULL, x39)), x40, x39, x40, x39) :|: TRUE
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(NULL, x41)), x41, x42, x41) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x41)), x41) :|: x41 <= x42
+f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x43, x44)), x45)), x46, java.lang.Object(QuicksortRec.List(NULL, x45)), x44, x45, x45) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x45)), x45) :|: x46 < x45
+f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x47, x48)), x49)), x50, java.lang.Object(QuicksortRec.List(NULL, x49)), x48, x49, x49) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x49)), x49) :|: x50 >= x49
+f9447_0_sortedHigh_NONNULL(x51, java.lang.Object(QuicksortRec.List(NULL, x52))) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x52)), x52) :|: x52 > x51
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:1)), i2066:1, i2003:0, i2066:1) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:0, i2003:0, i2066:0) :|: i2066:1 > i2003:0
+(2) f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0)), i1724:0) -> f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0)), java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1978:0, i2476:0)), i2475:0)), i1724:0, i2475:0, i1724:0, i2475:0) :|: TRUE
+(3) f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x, x1)), x2)), x2) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x, x1)), x1, x2, x1) :|: TRUE
+(4) f9447_0_sortedHigh_NONNULL(i2382:0, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2900:0)), i2683:0))) -> f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, i2900:0)), i2683:0)), i2382:0, java.lang.Object(QuicksortRec.List(NULL, i2683:0)), i2900:0, i2683:0, i2683:0) :|: i2683:0 > i2382:0
+(5) f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x3, x4)), x5)), x5, x6, x5) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x3, x4)), x4, x6, x4) :|: x5 <= x6
+(6) f9447_0_sortedHigh_NONNULL(x7, java.lang.Object(QuicksortRec.List(x8, x9))) -> f9447_0_sortedHigh_NONNULL(x7, x8) :|: x9 <= x7
+(7) f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1674:0, i2313:0)), i2314:0)), java.lang.Object(QuicksortRec.List(o1674:0, i2313:0)), i2314:0, i2313:0, i2314:0, i2313:0) -> f9447_0_sortedHigh_NONNULL(i2314:0, java.lang.Object(QuicksortRec.List(o1674:0, i2313:0))) :|: TRUE
+(8) f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x10, x11)), x12)), x13)), x13, x14, x13) -> f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x10, x11)), x12)), x13)), x14, java.lang.Object(QuicksortRec.List(NULL, x13)), x12, x13, x13) :|: x13 <= x14
+(9) f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x15, x16)), x17)), x18, java.lang.Object(QuicksortRec.List(NULL, x17)), x16, x17, x17) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x17)), x17) :|: x18 < x17
+(10) f9447_0_sortedHigh_NONNULL(x19, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x20, x21)), x22)), x23))) -> f9588_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x20, x21)), x22)), x23)), x19, java.lang.Object(QuicksortRec.List(NULL, x23)), x22, x23, x23) :|: x23 > x19
+(11) f9447_0_sortedHigh_NONNULL(x24, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x25)), x26))) -> f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x25)), x26)), x24, java.lang.Object(QuicksortRec.List(NULL, x26)), x25, x26, x26) :|: x26 > x24
+(12) f9447_0_sortedHigh_NONNULL(x27, java.lang.Object(QuicksortRec.List(x28, x29))) -> f9447_0_sortedHigh_NONNULL(x27, x28) :|: x29 > x27
+(13) f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x30)), x30) -> f9447_0_sortedHigh_NONNULL(x30, NULL) :|: TRUE
+(14) f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x31)), x32)), x32, x33, x32) -> f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x31)), x32)), x33, java.lang.Object(QuicksortRec.List(NULL, x32)), x31, x32, x32) :|: x32 <= x33
+(15) f9447_0_sortedHigh_NONNULL(x34, java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x35, x36)), x37)), x38))) -> f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x35, x36)), x37)), x38)), x34, java.lang.Object(QuicksortRec.List(NULL, x38)), x37, x38, x38) :|: x38 > x34
+(16) f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x39)), x40)), x40) -> f9233_0_quicksort_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(NULL, x39)), x40)), java.lang.Object(QuicksortRec.List(NULL, x39)), x40, x39, x40, x39) :|: TRUE
+(17) f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(NULL, x41)), x41, x42, x41) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x41)), x41) :|: x41 <= x42
+(18) f9529_0_sortedHigh_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x43, x44)), x45)), x46, java.lang.Object(QuicksortRec.List(NULL, x45)), x44, x45, x45) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x45)), x45) :|: x46 < x45
+(19) f9255_0_sortedLow_InvokeMethod(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x47, x48)), x49)), x50, java.lang.Object(QuicksortRec.List(NULL, x49)), x48, x49, x49) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x49)), x49) :|: x50 >= x49
+(20) f9447_0_sortedHigh_NONNULL(x51, java.lang.Object(QuicksortRec.List(NULL, x52))) -> f7659_0_quicksort_NONNULL(java.lang.Object(QuicksortRec.List(NULL, x52)), x52) :|: x52 > x51
+
+Arcs:
+(1) -> (1), (5), (8), (14), (17)
+(2) -> (7)
+(3) -> (1), (5), (8), (14), (17)
+(4) -> (9)
+(5) -> (1), (5), (8), (14), (17)
+(6) -> (4), (6), (10), (11), (12), (15), (20)
+(7) -> (4), (6), (10), (11), (12), (15), (20)
+(8) -> (19)
+(9) -> (13)
+(10) -> (9)
+(11) -> (18)
+(12) -> (4), (6), (10), (11), (12), (15), (20)
+(14) -> (19)
+(15) -> (18)
+(16) -> (7)
+(17) -> (13)
+(18) -> (13)
+(19) -> (13)
+(20) -> (13)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(14)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f9447_0_sortedHigh_NONNULL(x7, java.lang.Object(QuicksortRec.List(x8, x9))) -> f9447_0_sortedHigh_NONNULL(x7, x8) :|: x9 <= x7
+(2) f9447_0_sortedHigh_NONNULL(x27, java.lang.Object(QuicksortRec.List(x28, x29))) -> f9447_0_sortedHigh_NONNULL(x27, x28) :|: x29 > x27
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(15) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f9447_0_sortedHigh_NONNULL(INTEGER, VARIABLE)
+java.lang.Object(VARIABLE)
+QuicksortRec.List(VARIABLE, INTEGER)
+Removed predefined arithmetic.
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f9447_0_sortedHigh_NONNULL(java.lang.Object(QuicksortRec.List(x8))) -> f9447_0_sortedHigh_NONNULL(x8)
+
+----------------------------------------
+
+(17) IRSwTToQDPProof (SOUND)
+Removed the integers and created a QDP-Problem.
+----------------------------------------
+
+(18)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   f9447_0_sortedHigh_NONNULL(java.lang.Object(QuicksortRec.List(x8))) -> f9447_0_sortedHigh_NONNULL(x8)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(19) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*f9447_0_sortedHigh_NONNULL(java.lang.Object(QuicksortRec.List(x8))) -> f9447_0_sortedHigh_NONNULL(x8)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(20)
+YES
+
+----------------------------------------
+
+(21)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:1)), i2066:1, i2003:0, i2066:1) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(o1412:0, i2066:0)), i2066:0, i2003:0, i2066:0) :|: i2066:1 > i2003:0
+(2) f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x3, x4)), x5)), x5, x6, x5) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x3, x4)), x4, x6, x4) :|: x5 <= x6
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(22) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(23)
+Obligation:
+Rules:
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x3:0, x4:0)), x5:0)), x5:0, x6:0, x5:0) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x3:0, x4:0)), x4:0, x6:0, x4:0) :|: x6:0 >= x5:0
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(o1412:0:0, i2066:0:0)), i2066:1:0)), i2066:1:0, i2003:0:0, i2066:1:0) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(o1412:0:0, i2066:0:0)), i2066:0:0, i2003:0:0, i2066:0:0) :|: i2066:1:0 > i2003:0:0
+
+----------------------------------------
+
+(24) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f8285_0_sortedLow_GT(VARIABLE, VARIABLE, INTEGER, VARIABLE)
+java.lang.Object(VARIABLE)
+QuicksortRec.List(VARIABLE, VARIABLE)
+Removed predefined arithmetic.
+----------------------------------------
+
+(25)
+Obligation:
+Rules:
+f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x3:0, x4:0)), x5:0)), x5:0, x5:0) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x3:0, x4:0)), x4:0, x4:0)
+
+----------------------------------------
+
+(26) IRSwTToQDPProof (SOUND)
+Removed the integers and created a QDP-Problem.
+----------------------------------------
+
+(27)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x3:0, x4:0)), x5:0)), x5:0, x5:0) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x3:0, x4:0)), x4:0, x4:0)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(28) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(java.lang.Object(QuicksortRec.List(x3:0, x4:0)), x5:0)), x5:0, x5:0) -> f8285_0_sortedLow_GT(java.lang.Object(QuicksortRec.List(x3:0, x4:0)), x4:0, x4:0)
+The graph contains the following edges 1 > 1, 1 > 2, 1 > 3
+
+
+----------------------------------------
+
+(29)
+YES
+
+----------------------------------------
+
+(30)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: QuicksortRec.QuicksortRec.createList(I)LQuicksortRec/List;
+SCC calls the following helper methods: QuicksortRec.QuicksortRec.createList(I)LQuicksortRec/List;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(31) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 61 IRulesP rules:
+f1688_0_createList_GT(EOS(STATIC_1688(java.lang.Object(o113sub), i129)), i137, i137, i137) -> f1699_0_createList_GT(EOS(STATIC_1699(java.lang.Object(o113sub), i129)), i137, i137, i137) :|: TRUE
+f1699_0_createList_GT(EOS(STATIC_1699(java.lang.Object(o113sub), i129)), i137, i137, i137) -> f1719_0_createList_New(EOS(STATIC_1719(java.lang.Object(o113sub), i129)), i137, i137) :|: i137 > 0
+f1719_0_createList_New(EOS(STATIC_1719(java.lang.Object(o113sub), i129)), i137, i137) -> f2131_0_createList_Duplicate(EOS(STATIC_2131(java.lang.Object(o113sub), i129)), i137, i137) :|: TRUE
+f2131_0_createList_Duplicate(EOS(STATIC_2131(java.lang.Object(o113sub), i129)), i137, i137) -> f2140_0_createList_InvokeMethod(EOS(STATIC_2140(java.lang.Object(o113sub), i129)), i137, i137) :|: TRUE
+f2140_0_createList_InvokeMethod(EOS(STATIC_2140(java.lang.Object(o113sub), i129)), i137, i137) -> f2164_0_random_FieldAccess(EOS(STATIC_2164(java.lang.Object(o113sub), i129)), i137, i137) :|: TRUE
+f2164_0_random_FieldAccess(EOS(STATIC_2164(java.lang.Object(o113sub), i129)), i137, i137) -> f2291_0_random_ArrayLength(EOS(STATIC_2291(java.lang.Object(o113sub), i129)), i137, i137, java.lang.Object(o113sub)) :|: TRUE
+f2291_0_random_ArrayLength(EOS(STATIC_2291(java.lang.Object(ARRAY(i182)), i129)), i137, i137, java.lang.Object(ARRAY(i182))) -> f2295_0_random_ArrayLength(EOS(STATIC_2295(java.lang.Object(ARRAY(i182)), i129)), i137, i137, java.lang.Object(ARRAY(i182))) :|: i182 >= 0
+f2295_0_random_ArrayLength(EOS(STATIC_2295(java.lang.Object(ARRAY(i182)), i129)), i137, i137, java.lang.Object(ARRAY(i182))) -> f2299_0_random_FieldAccess(EOS(STATIC_2299(java.lang.Object(ARRAY(i182)), i129)), i137, i137, i182) :|: i182 >= 0
+f2299_0_random_FieldAccess(EOS(STATIC_2299(java.lang.Object(ARRAY(i182)), i129)), i137, i137, i182) -> f2303_0_random_GT(EOS(STATIC_2303(java.lang.Object(ARRAY(i182)), i129)), i137, i137, i182, i129) :|: TRUE
+f2303_0_random_GT(EOS(STATIC_2303(java.lang.Object(ARRAY(i182)), i129)), i137, i137, i182, i129) -> f2315_0_random_GT(EOS(STATIC_2315(java.lang.Object(ARRAY(i182)), i129)), i137, i137, i182, i129) :|: i182 > i129
+f2303_0_random_GT(EOS(STATIC_2303(java.lang.Object(ARRAY(i182)), i129)), i137, i137, i182, i129) -> f2316_0_random_GT(EOS(STATIC_2316(java.lang.Object(ARRAY(i182)), i129)), i137, i137, i182, i129) :|: i182 <= i129
+f2315_0_random_GT(EOS(STATIC_2315(java.lang.Object(ARRAY(i182)), i129)), i137, i137, i182, i129) -> f2329_0_random_FieldAccess(EOS(STATIC_2329(java.lang.Object(ARRAY(i182)), i129)), i137, i137) :|: i182 > i129
+f2329_0_random_FieldAccess(EOS(STATIC_2329(java.lang.Object(ARRAY(i182)), i129)), i137, i137) -> f2342_0_random_FieldAccess(EOS(STATIC_2342(java.lang.Object(ARRAY(i182)), i129)), i137, i137, java.lang.Object(ARRAY(i182))) :|: TRUE
+f2342_0_random_FieldAccess(EOS(STATIC_2342(java.lang.Object(ARRAY(i182)), i129)), i137, i137, java.lang.Object(ARRAY(i182))) -> f2380_0_random_ArrayAccess(EOS(STATIC_2380(java.lang.Object(ARRAY(i182)), i129)), i137, i137, java.lang.Object(ARRAY(i182)), i129) :|: TRUE
+f2380_0_random_ArrayAccess(EOS(STATIC_2380(java.lang.Object(ARRAY(i182)), i129)), i137, i137, java.lang.Object(ARRAY(i182)), i129) -> f4182_0_random_ArrayAccess(EOS(STATIC_4182(java.lang.Object(ARRAY(i182)), i129)), i137, i137, java.lang.Object(ARRAY(i182)), i129) :|: TRUE
+f4182_0_random_ArrayAccess(EOS(STATIC_4182(java.lang.Object(ARRAY(i182)), i129)), i137, i137, java.lang.Object(ARRAY(i182)), i129) -> f4192_0_random_Store(EOS(STATIC_4192(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258) :|: i129 < i182
+f4192_0_random_Store(EOS(STATIC_4192(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258) -> f4206_0_random_FieldAccess(EOS(STATIC_4206(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258) :|: TRUE
+f4206_0_random_FieldAccess(EOS(STATIC_4206(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258) -> f4211_0_random_ConstantStackPush(EOS(STATIC_4211(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258, i129) :|: TRUE
+f4211_0_random_ConstantStackPush(EOS(STATIC_4211(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258, i129) -> f4214_0_random_IntArithmetic(EOS(STATIC_4214(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258, i129, 1) :|: TRUE
+f4214_0_random_IntArithmetic(EOS(STATIC_4214(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258, i129, matching1) -> f4222_0_random_FieldAccess(EOS(STATIC_4222(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258, i129 + 1) :|: i129 >= 0 && matching1 = 1
+f4222_0_random_FieldAccess(EOS(STATIC_4222(java.lang.Object(ARRAY(i182)), i129)), i137, i137, o258, i301) -> f4227_0_random_Load(EOS(STATIC_4227(java.lang.Object(ARRAY(i182)), i301)), i137, i137, o258) :|: TRUE
+f4227_0_random_Load(EOS(STATIC_4227(java.lang.Object(ARRAY(i182)), i301)), i137, i137, o258) -> f4231_0_random_NONNULL(EOS(STATIC_4231(java.lang.Object(ARRAY(i182)), i301)), i137, i137, o258, o258) :|: TRUE
+f4231_0_random_NONNULL(EOS(STATIC_4231(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o268sub), java.lang.Object(o268sub)) -> f4267_0_random_NONNULL(EOS(STATIC_4267(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o268sub), java.lang.Object(o268sub)) :|: TRUE
+f4231_0_random_NONNULL(EOS(STATIC_4231(java.lang.Object(ARRAY(i182)), i301)), i137, i137, NULL, NULL) -> f4268_0_random_NONNULL(EOS(STATIC_4268(java.lang.Object(ARRAY(i182)), i301)), i137, i137, NULL, NULL) :|: TRUE
+f4267_0_random_NONNULL(EOS(STATIC_4267(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o268sub), java.lang.Object(o268sub)) -> f4272_0_random_Load(EOS(STATIC_4272(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o268sub)) :|: TRUE
+f4272_0_random_Load(EOS(STATIC_4272(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o268sub)) -> f4277_0_random_InvokeMethod(EOS(STATIC_4277(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o268sub)) :|: TRUE
+f4277_0_random_InvokeMethod(EOS(STATIC_4277(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o269sub)) -> f4281_0_random_InvokeMethod(EOS(STATIC_4281(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o269sub)) :|: TRUE
+f4281_0_random_InvokeMethod(EOS(STATIC_4281(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o269sub)) -> f4284_0_length_Load(EOS(STATIC_4284(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o269sub)) :|: TRUE
+f4284_0_length_Load(EOS(STATIC_4284(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o269sub)) -> f4297_0_length_FieldAccess(EOS(STATIC_4297(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(o269sub)) :|: TRUE
+f4297_0_length_FieldAccess(EOS(STATIC_4297(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(java.lang.String(EOC, i317))) -> f4306_0_length_FieldAccess(EOS(STATIC_4306(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(java.lang.String(EOC, i317))) :|: TRUE
+f4306_0_length_FieldAccess(EOS(STATIC_4306(java.lang.Object(ARRAY(i182)), i301)), i137, i137, java.lang.Object(java.lang.String(EOC, i317))) -> f4315_0_length_Return(EOS(STATIC_4315(java.lang.Object(ARRAY(i182)), i301)), i137, i137) :|: TRUE
+f4315_0_length_Return(EOS(STATIC_4315(java.lang.Object(ARRAY(i182)), i301)), i137, i137) -> f4327_0_random_Return(EOS(STATIC_4327(java.lang.Object(ARRAY(i182)), i301)), i137, i137) :|: TRUE
+f4327_0_random_Return(EOS(STATIC_4327(java.lang.Object(ARRAY(i182)), i301)), i137, i137) -> f4332_0_createList_Load(EOS(STATIC_4332(java.lang.Object(ARRAY(i182)), i301)), i137, i137) :|: TRUE
+f4332_0_createList_Load(EOS(STATIC_4332(java.lang.Object(ARRAY(i182)), i301)), i137, i137) -> f4336_0_createList_ConstantStackPush(EOS(STATIC_4336(java.lang.Object(ARRAY(i182)), i301)), i137, i137) :|: TRUE
+f4336_0_createList_ConstantStackPush(EOS(STATIC_4336(java.lang.Object(ARRAY(i182)), i301)), i137, i137) -> f4360_0_createList_IntArithmetic(EOS(STATIC_4360(java.lang.Object(ARRAY(i182)), i301)), i137, i137, 1) :|: TRUE
+f4360_0_createList_IntArithmetic(EOS(STATIC_4360(java.lang.Object(ARRAY(i182)), i301)), i137, i137, matching1) -> f4364_0_createList_InvokeMethod(EOS(STATIC_4364(java.lang.Object(ARRAY(i182)), i301)), i137, i137 - 1) :|: i137 > 0 && matching1 = 1
+f4364_0_createList_InvokeMethod(EOS(STATIC_4364(java.lang.Object(ARRAY(i182)), i301)), i137, i329) -> f4370_0_createList_Load(EOS(STATIC_4370(java.lang.Object(ARRAY(i182)), i301)), i329, i329) :|: i137 >= 1 && i301 >= 1 && i182 >= 1 && i301 <= i182 && i329 < i137
+f4364_0_createList_InvokeMethod(EOS(STATIC_4364(java.lang.Object(ARRAY(i182)), i301)), i137, i329) -> f4370_1_createList_Load(EOS(STATIC_4370(java.lang.Object(ARRAY(i182)), i301)), i137, i329) :|: i137 >= 1 && i301 >= 1 && i182 >= 1 && i301 <= i182 && i329 < i137
+f4370_0_createList_Load(EOS(STATIC_4370(java.lang.Object(ARRAY(i182)), i301)), i329, i329) -> f4415_0_createList_Load(EOS(STATIC_4415(java.lang.Object(ARRAY(i182)), i301)), i329, i329) :|: TRUE
+f4415_0_createList_Load(EOS(STATIC_4415(java.lang.Object(ARRAY(i182)), i301)), i329, i329) -> f1676_0_createList_Load(EOS(STATIC_1676(java.lang.Object(ARRAY(i182)), i301)), i329, i329) :|: TRUE
+f1676_0_createList_Load(EOS(STATIC_1676(java.lang.Object(o113sub), i129)), i130, i130) -> f1688_0_createList_GT(EOS(STATIC_1688(java.lang.Object(o113sub), i129)), i130, i130, i130) :|: TRUE
+f4268_0_random_NONNULL(EOS(STATIC_4268(java.lang.Object(ARRAY(i182)), i301)), i137, i137, NULL, NULL) -> f4274_0_random_ConstantStackPush(EOS(STATIC_4274(java.lang.Object(ARRAY(i182)), i301)), i137, i137) :|: TRUE
+f4274_0_random_ConstantStackPush(EOS(STATIC_4274(java.lang.Object(ARRAY(i182)), i301)), i137, i137) -> f4278_0_random_Return(EOS(STATIC_4278(java.lang.Object(ARRAY(i182)), i301)), i137, i137) :|: TRUE
+f4278_0_random_Return(EOS(STATIC_4278(java.lang.Object(ARRAY(i182)), i301)), i137, i137) -> f4282_0_createList_Load(EOS(STATIC_4282(java.lang.Object(ARRAY(i182)), i301)), i137, i137) :|: TRUE
+f4282_0_createList_Load(EOS(STATIC_4282(java.lang.Object(ARRAY(i182)), i301)), i137, i137) -> f4285_0_createList_ConstantStackPush(EOS(STATIC_4285(java.lang.Object(ARRAY(i182)), i301)), i137, i137) :|: TRUE
+f4285_0_createList_ConstantStackPush(EOS(STATIC_4285(java.lang.Object(ARRAY(i182)), i301)), i137, i137) -> f4290_0_createList_IntArithmetic(EOS(STATIC_4290(java.lang.Object(ARRAY(i182)), i301)), i137, i137, 1) :|: TRUE
+f4290_0_createList_IntArithmetic(EOS(STATIC_4290(java.lang.Object(ARRAY(i182)), i301)), i137, i137, matching1) -> f4301_0_createList_InvokeMethod(EOS(STATIC_4301(java.lang.Object(ARRAY(i182)), i301)), i137, i137 - 1) :|: i137 > 0 && matching1 = 1
+f4301_0_createList_InvokeMethod(EOS(STATIC_4301(java.lang.Object(ARRAY(i182)), i301)), i137, i312) -> f4309_0_createList_Load(EOS(STATIC_4309(java.lang.Object(ARRAY(i182)), i301)), i312, i312) :|: i137 >= 1 && i301 >= 1 && i182 >= 1 && i301 <= i182 && i312 < i137
+f4301_0_createList_InvokeMethod(EOS(STATIC_4301(java.lang.Object(ARRAY(i182)), i301)), i137, i312) -> f4309_1_createList_Load(EOS(STATIC_4309(java.lang.Object(ARRAY(i182)), i301)), i137, i312) :|: i137 >= 1 && i301 >= 1 && i182 >= 1 && i301 <= i182 && i312 < i137
+f4309_0_createList_Load(EOS(STATIC_4309(java.lang.Object(ARRAY(i182)), i301)), i312, i312) -> f4319_0_createList_Load(EOS(STATIC_4319(java.lang.Object(ARRAY(i182)), i301)), i312, i312) :|: TRUE
+f4319_0_createList_Load(EOS(STATIC_4319(java.lang.Object(ARRAY(i182)), i301)), i312, i312) -> f1676_0_createList_Load(EOS(STATIC_1676(java.lang.Object(ARRAY(i182)), i301)), i312, i312) :|: TRUE
+f2316_0_random_GT(EOS(STATIC_2316(java.lang.Object(ARRAY(i182)), i129)), i137, i137, i182, i129) -> f2338_0_random_ConstantStackPush(EOS(STATIC_2338(java.lang.Object(ARRAY(i182)), i129)), i137, i137) :|: i182 <= i129
+f2338_0_random_ConstantStackPush(EOS(STATIC_2338(java.lang.Object(ARRAY(i182)), i129)), i137, i137) -> f2343_0_random_Return(EOS(STATIC_2343(java.lang.Object(ARRAY(i182)), i129)), i137, i137) :|: TRUE
+f2343_0_random_Return(EOS(STATIC_2343(java.lang.Object(ARRAY(i182)), i129)), i137, i137) -> f2381_0_createList_Load(EOS(STATIC_2381(java.lang.Object(ARRAY(i182)), i129)), i137, i137) :|: TRUE
+f2381_0_createList_Load(EOS(STATIC_2381(java.lang.Object(ARRAY(i182)), i129)), i137, i137) -> f4186_0_createList_ConstantStackPush(EOS(STATIC_4186(java.lang.Object(ARRAY(i182)), i129)), i137, i137) :|: TRUE
+f4186_0_createList_ConstantStackPush(EOS(STATIC_4186(java.lang.Object(ARRAY(i182)), i129)), i137, i137) -> f4196_0_createList_IntArithmetic(EOS(STATIC_4196(java.lang.Object(ARRAY(i182)), i129)), i137, i137, 1) :|: TRUE
+f4196_0_createList_IntArithmetic(EOS(STATIC_4196(java.lang.Object(ARRAY(i182)), i129)), i137, i137, matching1) -> f4207_0_createList_InvokeMethod(EOS(STATIC_4207(java.lang.Object(ARRAY(i182)), i129)), i137, i137 - 1) :|: i137 > 0 && matching1 = 1
+f4207_0_createList_InvokeMethod(EOS(STATIC_4207(java.lang.Object(ARRAY(i182)), i129)), i137, i300) -> f4213_0_createList_Load(EOS(STATIC_4213(java.lang.Object(ARRAY(i182)), i129)), i300, i300) :|: i137 >= 1 && i182 <= i129 && i300 < i137
+f4207_0_createList_InvokeMethod(EOS(STATIC_4207(java.lang.Object(ARRAY(i182)), i129)), i137, i300) -> f4213_1_createList_Load(EOS(STATIC_4213(java.lang.Object(ARRAY(i182)), i129)), i137, i300) :|: i137 >= 1 && i182 <= i129 && i300 < i137
+f4213_0_createList_Load(EOS(STATIC_4213(java.lang.Object(ARRAY(i182)), i129)), i300, i300) -> f4218_0_createList_Load(EOS(STATIC_4218(java.lang.Object(ARRAY(i182)), i129)), i300, i300) :|: TRUE
+f4218_0_createList_Load(EOS(STATIC_4218(java.lang.Object(ARRAY(i182)), i129)), i300, i300) -> f1676_0_createList_Load(EOS(STATIC_1676(java.lang.Object(ARRAY(i182)), i129)), i300, i300) :|: TRUE
+Combined rules. Obtained 5 IRulesP rules:
+f1688_0_createList_GT(EOS(STATIC_1688(java.lang.Object(ARRAY(i182:0)), i129:0)), i137:0, i137:0, i137:0) -> f1688_0_createList_GT(EOS(STATIC_1688(java.lang.Object(ARRAY(i182:0)), i129:0 + 1)), i137:0 - 1, i137:0 - 1, i137:0 - 1) :|: i182:0 > 0 && i137:0 > 0 && i182:0 > i129:0 && i129:0 > -1 && i182:0 >= i129:0 + 1 && i137:0 - 1 < i137:0
+f1688_0_createList_GT(EOS(STATIC_1688(java.lang.Object(ARRAY(i182:0)), i129:0)), i137:0, i137:0, i137:0) -> f1688_0_createList_GT(EOS(STATIC_1688(java.lang.Object(ARRAY(i182:0)), i129:0)), i137:0 - 1, i137:0 - 1, i137:0 - 1) :|: i137:0 > 0 && i182:0 > -1 && i182:0 <= i129:0 && i137:0 - 1 < i137:0
+Removed following non-SCC rules:
+f1688_0_createList_GT(EOS(STATIC_1688(java.lang.Object(ARRAY(i182:0)), i129:0)), i137:0, i137:0, i137:0) -> f4370_1_createList_Load(EOS(STATIC_4370(java.lang.Object(ARRAY(i182:0)), i129:0 + 1)), i137:0, i137:0 - 1) :|: i182:0 > 0 && i137:0 > 0 && i182:0 > i129:0 && i129:0 > -1 && i182:0 >= i129:0 + 1 && i137:0 - 1 < i137:0
+f1688_0_createList_GT(EOS(STATIC_1688(java.lang.Object(ARRAY(i182:0)), i129:0)), i137:0, i137:0, i137:0) -> f4213_1_createList_Load(EOS(STATIC_4213(java.lang.Object(ARRAY(i182:0)), i129:0)), i137:0, i137:0 - 1) :|: i137:0 > 0 && i182:0 > -1 && i182:0 <= i129:0 && i137:0 - 1 < i137:0
+f1688_0_createList_GT(EOS(STATIC_1688(java.lang.Object(ARRAY(i182:0)), i129:0)), i137:0, i137:0, i137:0) -> f4309_1_createList_Load(EOS(STATIC_4309(java.lang.Object(ARRAY(i182:0)), i129:0 + 1)), i137:0, i137:0 - 1) :|: i182:0 > 0 && i137:0 > 0 && i182:0 > i129:0 && i129:0 > -1 && i182:0 >= i129:0 + 1 && i137:0 - 1 < i137:0
+Filtered duplicate arguments:
+   f1688_0_createList_GT(x1, x2, x3, x4) -> f1688_0_createList_GT(x1, x4)
+Finished conversion. Obtained 2 rules.P rules:
+f1688_0_createList_GT(i137:0, i182:0, i129:0) -> f1688_0_createList_GT(i137:0 - 1, i182:0, i129:0 + 1) :|: i137:0 > 0 && i182:0 > 0 && i182:0 > i129:0 && i129:0 > -1 && i137:0 - 1 < i137:0 && i182:0 >= i129:0 + 1
+f1688_0_createList_GT(i137:0, i182:0, i129:0) -> f1688_0_createList_GT(i137:0 - 1, i182:0, i129:0) :|: i182:0 > -1 && i137:0 > 0 && i137:0 - 1 < i137:0 && i182:0 <= i129:0
+
+----------------------------------------
+
+(32)
+Obligation:
+Rules:
+f1688_0_createList_GT(i137:0, i182:0, i129:0) -> f1688_0_createList_GT(i137:0 - 1, i182:0, i129:0 + 1) :|: i137:0 > 0 && i182:0 > 0 && i182:0 > i129:0 && i129:0 > -1 && i137:0 - 1 < i137:0 && i182:0 >= i129:0 + 1
+f1688_0_createList_GT(x, x1, x2) -> f1688_0_createList_GT(x - 1, x1, x2) :|: x1 > -1 && x > 0 && x - 1 < x && x1 <= x2
+
+----------------------------------------
+
+(33) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(34)
+Obligation:
+Rules:
+f1688_0_createList_GT(i137:0, i182:0, i129:0) -> f1688_0_createList_GT(arith, i182:0, arith1) :|: i137:0 > 0 && i182:0 > 0 && i182:0 > i129:0 && i129:0 > -1 && i137:0 - 1 < i137:0 && i182:0 >= i129:0 + 1 && arith = i137:0 - 1 && arith1 = i129:0 + 1
+f1688_0_createList_GT(x3, x4, x5) -> f1688_0_createList_GT(x6, x4, x5) :|: x4 > -1 && x3 > 0 && x3 - 1 < x3 && x4 <= x5 && x6 = x3 - 1
+
+----------------------------------------
+
+(35) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f1688_0_createList_GT(i137:0, i182:0, i129:0) -> f1688_0_createList_GT(arith, i182:0, arith1) :|: i137:0 > 0 && i182:0 > 0 && i182:0 > i129:0 && i129:0 > -1 && i137:0 - 1 < i137:0 && i182:0 >= i129:0 + 1 && arith = i137:0 - 1 && arith1 = i129:0 + 1
+(2) f1688_0_createList_GT(x3, x4, x5) -> f1688_0_createList_GT(x6, x4, x5) :|: x4 > -1 && x3 > 0 && x3 - 1 < x3 && x4 <= x5 && x6 = x3 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(36)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(37)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f1688_0_createList_GT(i137:0, i182:0, i129:0) -> f1688_0_createList_GT(arith, i182:0, arith1) :|: i137:0 > 0 && i182:0 > 0 && i182:0 > i129:0 && i129:0 > -1 && i137:0 - 1 < i137:0 && i182:0 >= i129:0 + 1 && arith = i137:0 - 1 && arith1 = i129:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(38) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(39)
+Obligation:
+Rules:
+f1688_0_createList_GT(i137:0:0, i182:0:0, i129:0:0) -> f1688_0_createList_GT(i137:0:0 - 1, i182:0:0, i129:0:0 + 1) :|: i137:0:0 - 1 < i137:0:0 && i182:0:0 >= i129:0:0 + 1 && i129:0:0 > -1 && i182:0:0 > i129:0:0 && i182:0:0 > 0 && i137:0:0 > 0
+
+----------------------------------------
+
+(40) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f1688_0_createList_GT(INTEGER, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(41)
+Obligation:
+Rules:
+f1688_0_createList_GT(i137:0:0, i182:0:0, i129:0:0) -> f1688_0_createList_GT(c, i182:0:0, c1) :|: c1 = i129:0:0 + 1 && c = i137:0:0 - 1 && (i137:0:0 - 1 < i137:0:0 && i182:0:0 >= i129:0:0 + 1 && i129:0:0 > -1 && i182:0:0 > i129:0:0 && i182:0:0 > 0 && i137:0:0 > 0)
+
+----------------------------------------
+
+(42) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f1688_0_createList_GT(x, x1, x2)] = x1 - x2
+
+The following rules are decreasing:
+f1688_0_createList_GT(i137:0:0, i182:0:0, i129:0:0) -> f1688_0_createList_GT(c, i182:0:0, c1) :|: c1 = i129:0:0 + 1 && c = i137:0:0 - 1 && (i137:0:0 - 1 < i137:0:0 && i182:0:0 >= i129:0:0 + 1 && i129:0:0 > -1 && i182:0:0 > i129:0:0 && i182:0:0 > 0 && i137:0:0 > 0)
+The following rules are bounded:
+f1688_0_createList_GT(i137:0:0, i182:0:0, i129:0:0) -> f1688_0_createList_GT(c, i182:0:0, c1) :|: c1 = i129:0:0 + 1 && c = i137:0:0 - 1 && (i137:0:0 - 1 < i137:0:0 && i182:0:0 >= i129:0:0 + 1 && i129:0:0 > -1 && i182:0:0 > i129:0:0 && i182:0:0 > 0 && i137:0:0 > 0)
+
+----------------------------------------
+
+(43)
+YES
+
+----------------------------------------
+
+(44)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f1688_0_createList_GT(x3, x4, x5) -> f1688_0_createList_GT(x6, x4, x5) :|: x4 > -1 && x3 > 0 && x3 - 1 < x3 && x4 <= x5 && x6 = x3 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(45) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(46)
+Obligation:
+Rules:
+f1688_0_createList_GT(x3:0, x4:0, x5:0) -> f1688_0_createList_GT(x3:0 - 1, x4:0, x5:0) :|: x3:0 - 1 < x3:0 && x5:0 >= x4:0 && x3:0 > 0 && x4:0 > -1
+
+----------------------------------------
+
+(47) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f1688_0_createList_GT(INTEGER, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(48)
+Obligation:
+Rules:
+f1688_0_createList_GT(x3:0, x4:0, x5:0) -> f1688_0_createList_GT(c, x4:0, x5:0) :|: c = x3:0 - 1 && (x3:0 - 1 < x3:0 && x5:0 >= x4:0 && x3:0 > 0 && x4:0 > -1)
+
+----------------------------------------
+
+(49) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f1688_0_createList_GT ] = f1688_0_createList_GT_1
+
+The following rules are decreasing:
+f1688_0_createList_GT(x3:0, x4:0, x5:0) -> f1688_0_createList_GT(c, x4:0, x5:0) :|: c = x3:0 - 1 && (x3:0 - 1 < x3:0 && x5:0 >= x4:0 && x3:0 > 0 && x4:0 > -1)
+
+The following rules are bounded:
+f1688_0_createList_GT(x3:0, x4:0, x5:0) -> f1688_0_createList_GT(c, x4:0, x5:0) :|: c = x3:0 - 1 && (x3:0 - 1 < x3:0 && x5:0 >= x4:0 && x3:0 > 0 && x4:0 > -1)
+
+
+----------------------------------------
+
+(50)
+YES

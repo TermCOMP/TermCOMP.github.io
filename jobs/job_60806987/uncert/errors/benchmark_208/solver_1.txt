@@ -1,0 +1,143 @@
+[Info] pool sizes (success) 14 seen 8 todo
+ @(pure-matchbox-1.1-76efd0ca7ed81445e0700c76a09ee684727edfd56408cc0b27b65ea5a40ad6b4:Matchbox.Closure.Simple src/Matchbox/Closure/Simple.hs:236:10)
+[Info] pool sizes (success) 4 seen 2 todo
+ @(pure-matchbox-1.1-76efd0ca7ed81445e0700c76a09ee684727edfd56408cc0b27b65ea5a40ad6b4:Matchbox.Closure.Simple src/Matchbox/Closure/Simple.hs:236:10)
+last 1106 length 4579
+CNF 1106 vars 4579 clauses
+last 1206 length 5031
+last 683 length 2719
+last 807 length 3283
+CNF 683 vars 2719 clauses
+CNF 807 vars 3283 clauses
+Matrix {monotone = Strict, domain = Natural, method = Direct, shape = Cornered, bits = 3, compress = True, remove = Any, constraint = And [], minimize = Nothing, encoding = Ersatz_Binary, dim = 3, solver = Stats (Kissatapi [Option "quiet" 1,Configuration "sat"]), verbose = False, tracing = False, briefing = False, log_level = 1, draw = False} vars: 2508, clauses: 9823
+last 2508 length 9823
+last 12053 length 51821
+CNF 12053 vars 51821 clauses
+last 9833 length 41292
+CNF 9833 vars 41292 clauses
+CNF 2508 vars 9823 clauses
+last 9833 length 41292
+CNF 9833 vars 41292 clauses
+Matrix {monotone = Strict, domain = Natural, method = Direct, shape = Cornered, bits = 3, compress = True, remove = Any, constraint = And [], minimize = Nothing, encoding = Ersatz_Binary, dim = 3, solver = Stats (Kissatapi [Option "quiet" 1,Configuration "sat"]), verbose = False, tracing = False, briefing = False, log_level = 1, draw = False} vars: 2508, clauses: 9823, status: Unsatisfied, time: 0.430887291s
+[Info] pool sizes (success) 53656 seen 32854 todo
+ @(pure-matchbox-1.1-76efd0ca7ed81445e0700c76a09ee684727edfd56408cc0b27b65ea5a40ad6b4:Matchbox.Closure.Simple src/Matchbox/Closure/Simple.hs:236:10)
+**************************************************
+summary
+**************************************************
+SRS with 4 strict rules and 2 weak rules on 3 letters       looping derivation
+from
+  [a, a, a, a, c, c, a, c, a, c]
+to
+  [a, a, a, a, c, c, a, c, a, c]
+via 9 steps
+
+**************************************************
+proof
+**************************************************
+property Termination
+has value Just False
+for SRS
+  [a, c, c] -> [c, c, a] {- Input 0 -}
+  [a, b, b] -> [b, b, a] {- Input 1 -}
+  [a, a, c] -> [b, b, a] {- Input 2 -}
+  [b, c, a] -> [a, c, c] {- Input 3 -}
+  [a, c, a] ->= [a, c, b] {- Input 4 -}
+  [b, a, a] ->= [a, a, a] {- Input 5 -}
+reason
+  Nontermination
+    Derive   { from = [a, a, a, a, c, c, a, c, a, c], via = [(Step   { rule = 2, position = 2}, [a, a, b, b, a, c, a, c, a, c]), (Step   { rule = 4, position = 4}, [a, a, b, b, a, c, b, c, a, c]), (Step   { rule = 3, position = 6}, [a, a, b, b, a, c, a, c, c, c]), (Step   { rule = 1, position = 1}, [a, b, b, a, a, c, a, c, c, c]), (Step   { rule = 1, position = 0}, [b, b, a, a, a, c, a, c, c, c]), (Step   { rule = 5, position = 1}, [b, a, a, a, a, c, a, c, c, c]), (Step   { rule = 0, position = 6}, [b, a, a, a, a, c, c, c, a, c]), (Step   { rule = 0, position = 4}, [b, a, a, a, c, c, a, c, a, c]), (Step   { rule = 5, position = 0}, [a, a, a, a, c, c, a, c, a, c])], to = [a, a, a, a, c, c, a, c, a, c]}
+
+**************************************************
+skeleton: (4/2,3)\Loop{9}[]
+**************************************************
+let {slowdown = 1.0}
+in let {verb ?= False;trac ?= False;cpf ?= False;slowdown = 3;uncertified = \ p -> Apply (Guard_Not cpf) p;uncertified_T = \ t -> And_Then (Guard_Not cpf) t;do = \ x -> x;dont = \ x -> Fail;done = Worker No_Strict_Rules;when_small = \ m -> And_Then (Worker (SizeAtmost 10000)) m;solver = Stats (Kissatapi [ Option "quiet" 1, Configuration "sat"]);mo = Pre (Or_Else Count GLPK);weight = Worker (Weight {modus = mo});wop = Or_Else weight Pass;weighted = \ m -> And_Then m wop;mirror = Worker Mirror;mirrored = \ m -> And_Then mirror m;cleaner = Or_Else (Worker (Cleaner {tracing = trac})) Pass;tiling = \ m w u -> weighted (Worker (Tiling {method = m,width = w,state_type = Best,map_type = Enum,unlabel = u,max_num_tiles = Just 10000,max_num_rules = Just 100000,cpf = cpf}));kbo = \ b -> weighted (Worker (KBO {direction = LR,bits = b,encoding = Ersatz_Bits,solver = solver}));okb = \ b -> weighted (Worker (KBO {direction = RL,bits = b,encoding = Ersatz_Bits,solver = solver}));kbom = \ b -> First_Of [ kbo b, okb b];qpi = \ dim bits -> weighted (Worker (QPI {tracing = trac,dim = dim,bits = bits,solver = solver,encoding = Ersatz_Binary}));matrix = \ mon dom dim bits enc -> weighted (Worker (Matrix {monotone = mon,domain = dom,dim = dim,bits = bits,shape = Cornered,encoding = enc,tracing = trac,verbose = verb,solver = solver}));ctx = Worker (Context {when = When_Empty,side = Right,close = Empty});simple = Seq [ weight, Timeout slowdown (when_small (kbom 1))];unlab = Worker (Unlabel {accept_null_strict = True,produce_null_strict = False});tileun = \ w -> And_Then (tiling All w Never) (Or_Else unlab (And_Then simple (Or_Else unlab (And_Then simple (Or_Else unlab (And_Then simple unlab))))));tileuns = Seq ([2..2] >>= (\ w -> [ tileun w]));preprocess = While_Fail_T (Worker No_Strict_Rules_T) tileuns;bin = Ersatz_Binary;una = Ersatz_Unary;tp = Worker (Transport {max_derivation_length = Just 2,max_tiers = Just 33,direction = Forward_Backward,tracing = False,cpf = cpf});nohs = let {noh = \ c w m -> Worker (Simple (Config {closure = c,max_closure_width = w,max_seen_size = m,max_inner_children = Just 8,max_outer_children = Just 2,intermediates = All,priority = Linear [ ( -7, Width_lhs), ( -1, Width_rhs), ( 7, Log2 Steps)],start_strict_only = True,print_sizes_finally = True}));f1w = 15;f1s = 1000000;nohs = [ tp, Seq [ noh Forward (Just f1w) (Just f1s), noh Forward Nothing Nothing], Seq [ noh Backward (Just f1w) (Just f1s), noh Backward Nothing Nothing]]}in nohs;relative = let {matrices = First_Of_Pool (Config {workers = 2,advice = Nothing,tracing = trac}) let {s = slowdown;matrix_strict_timeout = \ dom dim bits enc -> TimeoutSlowdown s dim (matrix Strict dom dim bits enc);kbobits = 1}in [ ] <> ([ Timeout s (kbo kbobits), Timeout s (okb kbobits)] <> ([ matrix_strict_timeout ArcticBZ 3 4 una, matrix_strict_timeout Natural 3 3 bin, matrix_strict_timeout ArcticBZ 4 4 una, matrix_strict_timeout Natural 4 3 bin] <> ([5..10] >>= (\ dim -> [ matrix_strict_timeout Arctic dim 3 una, matrix_strict_timeout Natural dim 2 bin]))));barr = \ h -> Worker (Matchbound {method = ROC,implementation = Approximate {at_bound = Merge},max_height = Just h});remove = Seq [ weight, First_Of [ when_small (weighted matrices), tileuns]];yeah = While_Fail done remove}in First_Of ([ ] <> ([ Apply ctx yeah, Apply preprocess (Apply ctx yeah)] <> (nohs <> [ do (Apply (tiling All 2 Never) yeah), dont (Apply (tiling All 3 Never) yeah), dont (Apply (tiling All 4 Never) yeah)])));standard = let {matrices = First_Of_Pool (Config {workers = 2,advice = Nothing,tracing = trac}) let {s = slowdown;matrix_weak_timeout = \ dom dim bits enc -> TimeoutSlowdown s dim (matrix Weak dom dim bits enc);kbobits = 1}in [ ] <> ([ Timeout s (kbo kbobits), Timeout s (okb kbobits)] <> ([ TimeoutSlowdown s 3 (qpi 3 3), matrix_weak_timeout ArcticBZ 3 4 una, matrix_weak_timeout Natural 3 3 bin, TimeoutSlowdown s 4 (qpi 4 3), matrix_weak_timeout Natural 4 3 bin] <> ([5..10] >>= (\ dim -> [ do (TimeoutSlowdown s dim (qpi dim 4)), do (matrix_weak_timeout Arctic dim 3 una), do (matrix_weak_timeout Natural dim 2 bin)]))));remove = Seq [ weight, when_small (weighted matrices)];dp = Apply ctx (Apply (Worker (DP {tracing = False})) (Apply wop (Branch (Worker (EDG {usable = True,tcap_inverse = True})) remove)));mbe = \ ms -> uncertified_T (Worker (Matchbound {method = RFC,implementation = Exact,max_size = ms}));mbeh = Apply (mbe (Just 100000)) done;mba = \ h -> uncertified_T (Worker (Matchbound {method = RFC,implementation = Approximate {at_bound = Merge},max_height = Just h}));mb_trans = Worker (Matchbound {method = RFC,max_size = Just 10000,max_height = Just 5});mb_proof = Apply mb_trans done;when_onerule = \ m -> Apply (Worker (Assert (Atmost 1 Rules))) m;dropped = \ y -> Or_Else (when_onerule (Dropped_Par (First_Of (nohs <> [ y])))) y;simple_yeah = Seq [ done, uncertified (Worker KKST01), uncertified (dropped (First_Of [ mb_proof, Apply (Worker Mirror) mb_proof]))];yeah = Seq [ done, simple_yeah, First_Of [ dp, Apply (Worker Mirror) dp]];preprocess = While_Fail_T (Worker No_Strict_Rules_T) (First_Of [ tileuns, Seq ([2..6] >>= (\ h -> [ mba h, And_Then (Worker Mirror) (mba h)]))])}in Apply wop (Or_Else done (First_Of ([ Apply preprocess yeah, yeah] <> (nohs <> [ do (Apply (tiling All 2 Never) yeah), dont (Apply (tiling All 3 Never) yeah), dont (Apply (tiling All 4 Never) yeah)]))));strictify = Worker (Strictify {});dropstrict = Worker (Dropstrict {})}
+  in Apply cleaner (Or_Else done (Apply wop (Or_Else done (Or_Else (Apply (When_True (Apply dropstrict (Apply strictify standard))) (Apply strictify standard)) relative))))**************************************************
+statistics on proof search (nodes types that (together) took more than 1.000000000000)
+**************************************************
+Success : "Simple (Config\n { tracing = False\n , verbose = False\n , closure = Backward\n , start_strict_only = True\n , max_closure_length = Nothing\n , max_closure_width = (Just 15)\n , max_closure_width_lhs = Nothing\n , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n , max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n , string_implementation = (ByteString Plain)\n , max_seen_size = (Just 1000000)\n , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally = True})"
+  total number 2
+  max duration 1.253358022000
+  min duration 0.006929274000
+  total durat. 1.260287296000
+  Info
+    { what = "Simple (Config\n  { tracing = False\n  , verbose = False\n  , closure = Backward\n  , start_strict_only = True\n  , max_closure_length = Nothing\n  , max_closure_width = (Just 15)\n  , max_closure_width_lhs = Nothing\n  , max_closure_width_rhs = Nothing\n  , max_inner_children = (Just 8)\n  , max_outer_children = (Just 2)\n  , intermediates = All\n  , priority = (Linear [ (-7.0, Width_lhs)\n                       , (-1.0, Width_rhs)\n                       , (7.0, Log2 Steps) ])\n  , string_implementation = (ByteString Plain)\n  , max_seen_size = (Just 1000000)\n  , max_todo_size = Nothing\n  , print_sizes = False\n  , print_sizes_finally = True})"
+    , input_size = Size
+      { num_rules = 6
+      , num_strict_rules = 4
+      , num_top_rules = 0
+      , num_weak_rules = 2
+      , alphabet_size = 3
+      , total_length = 36}
+    , self = 72
+    , parent = Nothing
+    , duration = 1.253358022000
+    , status = Success
+    , start = 2025-09-04 08:20:56.438624621 UTC
+    , finish = 2025-09-04 08:20:57.691982643 UTC
+    , thread_cap_info = ("ThreadId 98", 0, False)}
+**************************************************
+F          Info { what = "Matchbound\n { method = RFC\n , implementation = Exact\n
+F          , cpf_state_encoding = Encoding { base = 10, order = MSB_First}\n , max_size
+F          = Just 10000\n , max_height = Just 5\n , initial = Paths\n , verbose =
+F          False\n , tracing = False\n , draw = False\n , cpf = False}" , input_size
+F          = Size { num_rules = 6 , num_strict_rules = 6 , num_top_rules = 0 , num_weak_rules
+F          = 0 , alphabet_size = 6 , total_length = 48} , self = 65 , parent = Nothing
+F          , duration = 0.133235124000 , status = Fail , start = 2025-09-04 08:20:56.383914266
+F          UTC , finish = 2025-09-04 08:20:56.51714939 UTC , thread_cap_info = ("ThreadId
+F          68", 0, False)}
+F          
+| F        Info { what = "KBO\n { direction = LR\n , bits = 1\n , solver = Stats (Kissatapi
+| F        [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing
+| F        = False\n , verbose = False}" , input_size = Size { num_rules = 6 , num_strict_rules
+| F        = 4 , num_top_rules = 0 , num_weak_rules = 2 , alphabet_size = 3 , total_length
+| F        = 36} , self = 67 , parent = Nothing , duration = 0.154555178000 , status
+| F        = Fail , start = 2025-09-04 08:20:56.401569029 UTC , finish = 2025-09-04
+| F        08:20:56.556124207 UTC , thread_cap_info = ("ThreadId 95", 3, False)}
+| F        
+| | S      Info { what = "Simple (Config\n { tracing = False\n , verbose = False\n
+| | S      , closure = Backward\n , start_strict_only = True\n , max_closure_length
+| | S      = Nothing\n , max_closure_width = (Just 15)\n , max_closure_width_lhs =
+| | S      Nothing\n , max_closure_width_rhs = Nothing\n , max_inner_children = (Just
+| | S      8)\n , max_outer_children = (Just 2)\n , intermediates = All\n , priority
+| | S      = (Linear [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps)
+| | S      ])\n , string_implementation = (ByteString Plain)\n , max_seen_size = (Just
+| | S      1000000)\n , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally
+| | S      = True})" , input_size = Size { num_rules = 6 , num_strict_rules = 4 ,
+| | S      num_top_rules = 0 , num_weak_rules = 2 , alphabet_size = 3 , total_length
+| | S      = 36} , self = 72 , parent = Nothing , duration = 1.253358022000 , status
+| | S      = Success , start = 2025-09-04 08:20:56.438624621 UTC , finish = 2025-09-04
+| | S      08:20:57.691982643 UTC , thread_cap_info = ("ThreadId 98", 0, False)}
+| | S      
+| | | S    Info { what = "Tiling\n { method = All\n , width = 2\n , state_type = Best\n
+| | | S    , map_type = Enum\n , unlabel = Never\n , print_completion_steps = False\n
+| | | S    , print_tiles = False\n , max_num_tiles = Just 10000\n , max_num_rules
+| | | S    = Just 100000\n , verbose = False\n , tracing = False\n , draw = False\n
+| | | S    , cpf = False}" , input_size = Size { num_rules = 54 , num_strict_rules
+| | | S    = 36 , num_top_rules = 0 , num_weak_rules = 18 , alphabet_size = 9 , total_length
+| | | S    = 432} , self = 68 , parent = Nothing , duration = 0.176278909000 , status
+| | | S    = Success , start = 2025-09-04 08:20:56.462319226 UTC , finish = 2025-09-04
+| | | S    08:20:56.638598135 UTC , thread_cap_info = ("ThreadId 126", 0, False)}
+| | | S    
+| | | | F  Info { what = "KBO\n { direction = LR\n , bits = 1\n , solver = Stats (Kissatapi
+| | | | F  [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing
+| | | | F  = False\n , verbose = False}" , input_size = Size { num_rules = 54 , num_strict_rules
+| | | | F  = 36 , num_top_rules = 0 , num_weak_rules = 18 , alphabet_size = 9 , total_length
+| | | | F  = 432} , self = 70 , parent = Nothing , duration = 0.561434717000 , status
+| | | | F  = Fail , start = 2025-09-04 08:20:56.512913996 UTC , finish = 2025-09-04
+| | | | F  08:20:57.074348713 UTC , thread_cap_info = ("ThreadId 127", 0, False)}
+| | | | F  
+F | | | |  
+F | | | |  Info { what = "KBO\n { direction = RL\n , bits = 1\n , solver = Stats (Kissatapi
+F | | | |  [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing
+F | | | |  = False\n , verbose = False}" , input_size = Size { num_rules = 54 , num_strict_rules
+F | | | |  = 36 , num_top_rules = 0 , num_weak_rules = 18 , alphabet_size = 9 , total_length
+F | | | |  = 432} , self = 71 , parent = Nothing , duration = 0.786378432000 , status
+F | | | |  = Fail , start = 2025-09-04 08:20:56.530598124 UTC , finish = 2025-09-04
+F | | | |  08:20:57.316976556 UTC , thread_cap_info = ("ThreadId 134", 1, False)}
+F | | | |  
+| F | | |  
+|   | S |  
+|   |   F  
+F   |      
+    S      

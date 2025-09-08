@@ -1,0 +1,1067 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/ycpbL.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 668 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 187 ms]
+        (9) QDP
+        (10) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (11) QDP
+        (12) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (13) YES
+    (14) JBCTerminationSCC
+        (15) SCCToQDPProof [SOUND, 83 ms]
+        (16) QDP
+        (17) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (18) YES
+    (19) JBCTerminationSCC
+        (20) SCCToIRSProof [SOUND, 147 ms]
+        (21) IRSwT
+        (22) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (23) IRSwT
+        (24) IRSwTTerminationDigraphProof [EQUIVALENT, 93 ms]
+        (25) AND
+            (26) IRSwT
+                (27) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+                (28) IRSwT
+                (29) IntTRSUnneededArgumentFilterProof [EQUIVALENT, 0 ms]
+                (30) IRSwT
+                (31) TempFilterProof [SOUND, 7 ms]
+                (32) IntTRS
+                (33) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+                (34) YES
+            (35) IRSwT
+                (36) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+                (37) IRSwT
+                (38) IntTRSUnneededArgumentFilterProof [EQUIVALENT, 0 ms]
+                (39) IRSwT
+                (40) TempFilterProof [SOUND, 4 ms]
+                (41) IntTRS
+                (42) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+                (43) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package DoublyLinkedList;
+
+/**
+ * A linked list with pointers to the previous and next elements
+ * @author cotto
+ */
+public class DoublyLinkedList {
+    public int value;
+    public DoublyLinkedList prev;
+    public DoublyLinkedList next;
+
+    public DoublyLinkedList(final int v) {
+        this.value = v;
+    }
+
+    public DoublyLinkedList getFirst() {
+        if (this.prev == null) {
+            return this;
+        }
+        return this.prev.getFirst();
+    }
+
+    public void move(final int relativePosition) {
+        if (relativePosition == 0) {
+            return;
+        }
+        if (relativePosition > 0 && this.next != null) {
+            final DoublyLinkedList temp = this.next;
+            if (this.prev != null) {
+                this.prev.next = temp;
+            }
+            temp.prev = this.prev;
+            this.next = temp.next;
+            temp.next = this;
+            this.prev = temp;
+            move(relativePosition - 1);
+        }
+        if (relativePosition < 0 && this.prev != null) {
+            final DoublyLinkedList temp = this.prev;
+            if (this.next != null) {
+                this.next.prev = temp;
+            }
+            temp.next = this.next;
+            this.prev = temp.prev;
+            temp.prev = this;
+            this.next = temp;
+            move(relativePosition - 1);
+        }
+    }
+
+    public DoublyLinkedList get(final int index) {
+        DoublyLinkedList current = this.getFirst();
+        while (index > 0 && current != null) {
+            current = current.next;
+        }
+        return current;
+    }
+
+    public DoublyLinkedList find(final int v) {
+        final DoublyLinkedList first = this.getFirst();
+        return first.findR(v);
+    }
+
+    private DoublyLinkedList findR(final int v) {
+        if (this.value == v) {
+            return this;
+        }
+        if (this.next != null) {
+            return this.next.findR(v);
+        }
+        return null;
+    }
+
+    public void delete(final int v) {
+        final DoublyLinkedList elem = find(v);
+        if (elem != null) {
+            if (elem.prev != null) {
+                elem.prev.next = elem.next;
+            }
+            if (elem.next != null) {
+                elem.next.prev = elem.prev;
+            }
+        }
+    }
+
+    public DoublyLinkedList copy() {
+        final DoublyLinkedList first = this.getFirst();
+        return first.copyR(null);
+    }
+
+    private DoublyLinkedList copyR(final DoublyLinkedList p) {
+        final DoublyLinkedList copy = new DoublyLinkedList(this.value);
+        copy.prev = p;
+        if (p != null) {
+            p.next = copy;
+        }
+        if (this.next != null) {
+            this.next.copyR(copy);
+        }
+        return copy;
+    }
+
+    static DoublyLinkedList createList() {
+        final int count = Random.random();
+        DoublyLinkedList cur = null;
+        for (int i = 0; i < count; i++) {
+            final DoublyLinkedList old = cur;
+            cur = new DoublyLinkedList(Random.random());
+            cur.prev = old;
+            if (old != null) {
+              old.next = cur;
+            }
+        }
+
+        return cur;
+    }
+}
+
+
+package DoublyLinkedList;
+
+/**
+ *
+ * @author cotto
+ */
+public class MainCopy {
+    public static void main(final String[] args) {
+        Random.args = args;
+        final DoublyLinkedList list = DoublyLinkedList.createList();
+        list.copy();
+    }
+}
+
+
+package DoublyLinkedList;
+public class Random {
+    static String[] args;
+    static int index = 0;
+
+    public static int random() {
+        if (args.length <= index) {
+            return 0;
+        }
+        final String string = args[index];
+        index++;
+        if (string == null) {
+            return 0;
+        }
+        return string.length();
+    }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package DoublyLinkedList;
+
+/**
+ * A linked list with pointers to the previous and next elements
+ * @author cotto
+ */
+public class DoublyLinkedList {
+    public int value;
+    public DoublyLinkedList prev;
+    public DoublyLinkedList next;
+
+    public DoublyLinkedList(final int v) {
+        this.value = v;
+    }
+
+    public DoublyLinkedList getFirst() {
+        if (this.prev == null) {
+            return this;
+        }
+        return this.prev.getFirst();
+    }
+
+    public void move(final int relativePosition) {
+        if (relativePosition == 0) {
+            return;
+        }
+        if (relativePosition > 0 && this.next != null) {
+            final DoublyLinkedList temp = this.next;
+            if (this.prev != null) {
+                this.prev.next = temp;
+            }
+            temp.prev = this.prev;
+            this.next = temp.next;
+            temp.next = this;
+            this.prev = temp;
+            move(relativePosition - 1);
+        }
+        if (relativePosition < 0 && this.prev != null) {
+            final DoublyLinkedList temp = this.prev;
+            if (this.next != null) {
+                this.next.prev = temp;
+            }
+            temp.next = this.next;
+            this.prev = temp.prev;
+            temp.prev = this;
+            this.next = temp;
+            move(relativePosition - 1);
+        }
+    }
+
+    public DoublyLinkedList get(final int index) {
+        DoublyLinkedList current = this.getFirst();
+        while (index > 0 && current != null) {
+            current = current.next;
+        }
+        return current;
+    }
+
+    public DoublyLinkedList find(final int v) {
+        final DoublyLinkedList first = this.getFirst();
+        return first.findR(v);
+    }
+
+    private DoublyLinkedList findR(final int v) {
+        if (this.value == v) {
+            return this;
+        }
+        if (this.next != null) {
+            return this.next.findR(v);
+        }
+        return null;
+    }
+
+    public void delete(final int v) {
+        final DoublyLinkedList elem = find(v);
+        if (elem != null) {
+            if (elem.prev != null) {
+                elem.prev.next = elem.next;
+            }
+            if (elem.next != null) {
+                elem.next.prev = elem.prev;
+            }
+        }
+    }
+
+    public DoublyLinkedList copy() {
+        final DoublyLinkedList first = this.getFirst();
+        return first.copyR(null);
+    }
+
+    private DoublyLinkedList copyR(final DoublyLinkedList p) {
+        final DoublyLinkedList copy = new DoublyLinkedList(this.value);
+        copy.prev = p;
+        if (p != null) {
+            p.next = copy;
+        }
+        if (this.next != null) {
+            this.next.copyR(copy);
+        }
+        return copy;
+    }
+
+    static DoublyLinkedList createList() {
+        final int count = Random.random();
+        DoublyLinkedList cur = null;
+        for (int i = 0; i < count; i++) {
+            final DoublyLinkedList old = cur;
+            cur = new DoublyLinkedList(Random.random());
+            cur.prev = old;
+            if (old != null) {
+              old.next = cur;
+            }
+        }
+
+        return cur;
+    }
+}
+
+
+package DoublyLinkedList;
+
+/**
+ *
+ * @author cotto
+ */
+public class MainCopy {
+    public static void main(final String[] args) {
+        Random.args = args;
+        final DoublyLinkedList list = DoublyLinkedList.createList();
+        list.copy();
+    }
+}
+
+
+package DoublyLinkedList;
+public class Random {
+    static String[] args;
+    static int index = 0;
+
+    public static int random() {
+        if (args.length <= index) {
+            return 0;
+        }
+        final String string = args[index];
+        index++;
+        if (string == null) {
+            return 0;
+        }
+        return string.length();
+    }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+DoublyLinkedList.MainCopy.main([Ljava/lang/String;)V: Graph of 72 nodes with 0 SCCs.
+
+
+
+DoublyLinkedList.DoublyLinkedList.createList()LDoublyLinkedList/DoublyLinkedList;: Graph of 251 nodes with 1 SCC.
+
+
+
+DoublyLinkedList.DoublyLinkedList.getFirst()LDoublyLinkedList/DoublyLinkedList;: Graph of 19 nodes with 0 SCCs.
+
+
+
+DoublyLinkedList.DoublyLinkedList.copyR(LDoublyLinkedList/DoublyLinkedList;)LDoublyLinkedList/DoublyLinkedList;: Graph of 71 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 3 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: DoublyLinkedList.DoublyLinkedList.copyR(LDoublyLinkedList/DoublyLinkedList;)LDoublyLinkedList/DoublyLinkedList;
+SCC calls the following helper methods: DoublyLinkedList.DoublyLinkedList.copyR(LDoublyLinkedList/DoublyLinkedList;)LDoublyLinkedList/DoublyLinkedList;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*DoublyLinkedList.DoublyLinkedList: [value, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 49 rules for P and 70 rules for R.P rules:
+f8525_0_copyR_Duplicate(EOS(STATIC_8525), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL))) -> f8527_0_copyR_Load(EOS(STATIC_8527), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 0
+f8527_0_copyR_Load(EOS(STATIC_8527), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL))) -> f8528_0_copyR_FieldAccess(EOS(STATIC_8528), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(o1074sub)) :|: TRUE && matching1 = 0 && matching2 = 0
+f8528_0_copyR_FieldAccess(EOS(STATIC_8528), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) -> f8529_0_copyR_FieldAccess(EOS(STATIC_8529), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) :|: TRUE && matching1 = 0 && matching2 = 0
+f8529_0_copyR_FieldAccess(EOS(STATIC_8529), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) -> f8531_0_copyR_InvokeMethod(EOS(STATIC_8531), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962) :|: TRUE && matching1 = 0 && matching2 = 0
+f8531_0_copyR_InvokeMethod(EOS(STATIC_8531), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962) -> f8533_0__init__Load(EOS(STATIC_8533), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962) :|: TRUE && matching1 = 0 && matching2 = 0
+f8533_0__init__Load(EOS(STATIC_8533), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962) -> f8536_0__init__InvokeMethod(EOS(STATIC_8536), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f8536_0__init__InvokeMethod(EOS(STATIC_8536), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching3, NULL))) -> f8538_0__init__Load(EOS(STATIC_8538), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f8538_0__init__Load(EOS(STATIC_8538), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962) -> f8540_0__init__Load(EOS(STATIC_8540), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f8540_0__init__Load(EOS(STATIC_8540), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), i962, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL))) -> f8542_0__init__FieldAccess(EOS(STATIC_8542), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962) :|: TRUE && matching1 = 0 && matching2 = 0
+f8542_0__init__FieldAccess(EOS(STATIC_8542), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962) -> f8546_0__init__Return(EOS(STATIC_8546), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f8546_0__init__Return(EOS(STATIC_8546), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8548_0_copyR_Store(EOS(STATIC_8548), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8548_0_copyR_Store(EOS(STATIC_8548), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8550_0_copyR_Load(EOS(STATIC_8550), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8550_0_copyR_Load(EOS(STATIC_8550), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8553_0_copyR_Load(EOS(STATIC_8553), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8553_0_copyR_Load(EOS(STATIC_8553), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8555_0_copyR_FieldAccess(EOS(STATIC_8555), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1070) :|: TRUE
+f8555_0_copyR_FieldAccess(EOS(STATIC_8555), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1070) -> f8558_0_copyR_Load(EOS(STATIC_8558), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8558_0_copyR_Load(EOS(STATIC_8558), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8559_0_copyR_NULL(EOS(STATIC_8559), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1070) :|: TRUE
+f8559_0_copyR_NULL(EOS(STATIC_8559), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) -> f8560_0_copyR_NULL(EOS(STATIC_8560), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) :|: TRUE
+f8559_0_copyR_NULL(EOS(STATIC_8559), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) -> f8561_0_copyR_NULL(EOS(STATIC_8561), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) :|: TRUE
+f8560_0_copyR_NULL(EOS(STATIC_8560), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) -> f8563_0_copyR_Load(EOS(STATIC_8563), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8563_0_copyR_Load(EOS(STATIC_8563), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8566_0_copyR_Load(EOS(STATIC_8566), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) :|: TRUE
+f8566_0_copyR_Load(EOS(STATIC_8566), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) -> f8570_0_copyR_FieldAccess(EOS(STATIC_8570), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8570_0_copyR_FieldAccess(EOS(STATIC_8570), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8578_0_copyR_FieldAccess(EOS(STATIC_8578), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8578_0_copyR_FieldAccess(EOS(STATIC_8578), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8598_0_copyR_Load(EOS(STATIC_8598), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8598_0_copyR_Load(EOS(STATIC_8598), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8604_0_copyR_FieldAccess(EOS(STATIC_8604), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) :|: TRUE
+f8604_0_copyR_FieldAccess(EOS(STATIC_8604), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) -> f8618_0_copyR_NULL(EOS(STATIC_8618), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1080) :|: TRUE
+f8618_0_copyR_NULL(EOS(STATIC_8618), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) -> f8627_0_copyR_NULL(EOS(STATIC_8627), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) :|: TRUE
+f8627_0_copyR_NULL(EOS(STATIC_8627), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) -> f8662_0_copyR_Load(EOS(STATIC_8662), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8662_0_copyR_Load(EOS(STATIC_8662), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8680_0_copyR_FieldAccess(EOS(STATIC_8680), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub)))) :|: TRUE
+f8680_0_copyR_FieldAccess(EOS(STATIC_8680), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub)))) -> f8695_0_copyR_Load(EOS(STATIC_8695), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) :|: TRUE
+f8695_0_copyR_Load(EOS(STATIC_8695), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) -> f8703_0_copyR_InvokeMethod(EOS(STATIC_8703), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8703_0_copyR_InvokeMethod(EOS(STATIC_8703), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8729_1_copyR_InvokeMethod(f8729_0_copyR_New(EOS(STATIC_8729), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8729_0_copyR_New(EOS(STATIC_8729), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8804_0_copyR_New(EOS(STATIC_8804), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8804_0_copyR_New(EOS(STATIC_8804), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f9566_0_copyR_New(EOS(STATIC_9566), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1084[DoublyLinkedList.next]o1077) :|: o1084[DoublyLinkedList.next]o1077 = 1
+f9566_0_copyR_New(EOS(STATIC_9566), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1203, o1207, java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1203[DoublyLinkedList.next]o1202) -> f9575_0_copyR_New(EOS(STATIC_9575), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1207, o1203, java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f9575_0_copyR_New(EOS(STATIC_9575), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1207, o1209, java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f9679_0_copyR_New(EOS(STATIC_9679), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f9679_0_copyR_New(EOS(STATIC_9679), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8517_0_copyR_New(EOS(STATIC_8517), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8517_0_copyR_New(EOS(STATIC_8517), o1070, java.lang.Object(o1074sub), o1070) -> f8525_0_copyR_Duplicate(EOS(STATIC_8525), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) :|: TRUE
+f8561_0_copyR_NULL(EOS(STATIC_8561), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) -> f8564_0_copyR_Load(EOS(STATIC_8564), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8564_0_copyR_Load(EOS(STATIC_8564), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8568_0_copyR_FieldAccess(EOS(STATIC_8568), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) :|: TRUE
+f8568_0_copyR_FieldAccess(EOS(STATIC_8568), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) -> f8572_0_copyR_NULL(EOS(STATIC_8572), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1080) :|: TRUE
+f8572_0_copyR_NULL(EOS(STATIC_8572), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) -> f8581_0_copyR_NULL(EOS(STATIC_8581), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) :|: TRUE
+f8581_0_copyR_NULL(EOS(STATIC_8581), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) -> f8599_0_copyR_Load(EOS(STATIC_8599), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8599_0_copyR_Load(EOS(STATIC_8599), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8606_0_copyR_FieldAccess(EOS(STATIC_8606), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub)))) :|: TRUE
+f8606_0_copyR_FieldAccess(EOS(STATIC_8606), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub)))) -> f8620_0_copyR_Load(EOS(STATIC_8620), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) :|: TRUE
+f8620_0_copyR_Load(EOS(STATIC_8620), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) -> f8629_0_copyR_InvokeMethod(EOS(STATIC_8629), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8629_0_copyR_InvokeMethod(EOS(STATIC_8629), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8664_1_copyR_InvokeMethod(f8664_0_copyR_New(EOS(STATIC_8664), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8664_0_copyR_New(EOS(STATIC_8664), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8690_0_copyR_New(EOS(STATIC_8690), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8690_0_copyR_New(EOS(STATIC_8690), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8805_0_copyR_New(EOS(STATIC_8805), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8805_0_copyR_New(EOS(STATIC_8805), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8517_0_copyR_New(EOS(STATIC_8517), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+R rules:
+f8517_0_copyR_New(EOS(STATIC_8517), o1070, java.lang.Object(o1074sub), o1070) -> f8525_0_copyR_Duplicate(EOS(STATIC_8525), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) :|: TRUE
+f8525_0_copyR_Duplicate(EOS(STATIC_8525), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL))) -> f8527_0_copyR_Load(EOS(STATIC_8527), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 0
+f8527_0_copyR_Load(EOS(STATIC_8527), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL))) -> f8528_0_copyR_FieldAccess(EOS(STATIC_8528), o1070, java.lang.Object(o1074sub), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(o1074sub)) :|: TRUE && matching1 = 0 && matching2 = 0
+f8528_0_copyR_FieldAccess(EOS(STATIC_8528), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) -> f8529_0_copyR_FieldAccess(EOS(STATIC_8529), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) :|: TRUE && matching1 = 0 && matching2 = 0
+f8529_0_copyR_FieldAccess(EOS(STATIC_8529), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) -> f8531_0_copyR_InvokeMethod(EOS(STATIC_8531), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962) :|: TRUE && matching1 = 0 && matching2 = 0
+f8531_0_copyR_InvokeMethod(EOS(STATIC_8531), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962) -> f8533_0__init__Load(EOS(STATIC_8533), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962) :|: TRUE && matching1 = 0 && matching2 = 0
+f8533_0__init__Load(EOS(STATIC_8533), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962) -> f8536_0__init__InvokeMethod(EOS(STATIC_8536), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f8536_0__init__InvokeMethod(EOS(STATIC_8536), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching3, NULL))) -> f8538_0__init__Load(EOS(STATIC_8538), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f8538_0__init__Load(EOS(STATIC_8538), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962) -> f8540_0__init__Load(EOS(STATIC_8540), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f8540_0__init__Load(EOS(STATIC_8540), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), i962, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL))) -> f8542_0__init__FieldAccess(EOS(STATIC_8542), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL)), i962) :|: TRUE && matching1 = 0 && matching2 = 0
+f8542_0__init__FieldAccess(EOS(STATIC_8542), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching1, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, matching2, NULL)), i962) -> f8546_0__init__Return(EOS(STATIC_8546), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f8546_0__init__Return(EOS(STATIC_8546), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8548_0_copyR_Store(EOS(STATIC_8548), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8548_0_copyR_Store(EOS(STATIC_8548), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8550_0_copyR_Load(EOS(STATIC_8550), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8550_0_copyR_Load(EOS(STATIC_8550), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8553_0_copyR_Load(EOS(STATIC_8553), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8553_0_copyR_Load(EOS(STATIC_8553), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8555_0_copyR_FieldAccess(EOS(STATIC_8555), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1070) :|: TRUE
+f8555_0_copyR_FieldAccess(EOS(STATIC_8555), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1070) -> f8558_0_copyR_Load(EOS(STATIC_8558), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8558_0_copyR_Load(EOS(STATIC_8558), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8559_0_copyR_NULL(EOS(STATIC_8559), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), o1070, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1070) :|: TRUE
+f8559_0_copyR_NULL(EOS(STATIC_8559), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) -> f8560_0_copyR_NULL(EOS(STATIC_8560), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) :|: TRUE
+f8559_0_copyR_NULL(EOS(STATIC_8559), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) -> f8561_0_copyR_NULL(EOS(STATIC_8561), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) :|: TRUE
+f8560_0_copyR_NULL(EOS(STATIC_8560), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) -> f8563_0_copyR_Load(EOS(STATIC_8563), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8561_0_copyR_NULL(EOS(STATIC_8561), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) -> f8564_0_copyR_Load(EOS(STATIC_8564), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8563_0_copyR_Load(EOS(STATIC_8563), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8566_0_copyR_Load(EOS(STATIC_8566), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) :|: TRUE
+f8564_0_copyR_Load(EOS(STATIC_8564), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8568_0_copyR_FieldAccess(EOS(STATIC_8568), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) :|: TRUE
+f8566_0_copyR_Load(EOS(STATIC_8566), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub)) -> f8570_0_copyR_FieldAccess(EOS(STATIC_8570), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1083sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8568_0_copyR_FieldAccess(EOS(STATIC_8568), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) -> f8572_0_copyR_NULL(EOS(STATIC_8572), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1080) :|: TRUE
+f8570_0_copyR_FieldAccess(EOS(STATIC_8570), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8578_0_copyR_FieldAccess(EOS(STATIC_8578), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8572_0_copyR_NULL(EOS(STATIC_8572), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) -> f8581_0_copyR_NULL(EOS(STATIC_8581), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) :|: TRUE
+f8572_0_copyR_NULL(EOS(STATIC_8572), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) -> f8582_0_copyR_NULL(EOS(STATIC_8582), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) :|: TRUE
+f8578_0_copyR_FieldAccess(EOS(STATIC_8578), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, o1087)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8598_0_copyR_Load(EOS(STATIC_8598), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8581_0_copyR_NULL(EOS(STATIC_8581), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) -> f8599_0_copyR_Load(EOS(STATIC_8599), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8582_0_copyR_NULL(EOS(STATIC_8582), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) -> f8600_0_copyR_Load(EOS(STATIC_8600), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8598_0_copyR_Load(EOS(STATIC_8598), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8604_0_copyR_FieldAccess(EOS(STATIC_8604), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) :|: TRUE
+f8599_0_copyR_Load(EOS(STATIC_8599), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8606_0_copyR_FieldAccess(EOS(STATIC_8606), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub)))) :|: TRUE
+f8600_0_copyR_Load(EOS(STATIC_8600), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8609_0_copyR_Return(EOS(STATIC_8609), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8604_0_copyR_FieldAccess(EOS(STATIC_8604), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080))) -> f8618_0_copyR_NULL(EOS(STATIC_8618), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, o1080)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1080) :|: TRUE
+f8606_0_copyR_FieldAccess(EOS(STATIC_8606), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1088sub)))) -> f8620_0_copyR_Load(EOS(STATIC_8620), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) :|: TRUE
+f8618_0_copyR_NULL(EOS(STATIC_8618), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) -> f8627_0_copyR_NULL(EOS(STATIC_8627), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) :|: TRUE
+f8618_0_copyR_NULL(EOS(STATIC_8618), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) -> f8628_0_copyR_NULL(EOS(STATIC_8628), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) :|: TRUE
+f8620_0_copyR_Load(EOS(STATIC_8620), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub)) -> f8629_0_copyR_InvokeMethod(EOS(STATIC_8629), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8627_0_copyR_NULL(EOS(STATIC_8627), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) -> f8662_0_copyR_Load(EOS(STATIC_8662), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8628_0_copyR_NULL(EOS(STATIC_8628), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), NULL) -> f8663_0_copyR_Load(EOS(STATIC_8663), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8629_0_copyR_InvokeMethod(EOS(STATIC_8629), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8664_1_copyR_InvokeMethod(f8664_0_copyR_New(EOS(STATIC_8664), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8662_0_copyR_Load(EOS(STATIC_8662), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8680_0_copyR_FieldAccess(EOS(STATIC_8680), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub)))) :|: TRUE
+f8663_0_copyR_Load(EOS(STATIC_8663), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8683_0_copyR_Return(EOS(STATIC_8683), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8664_0_copyR_New(EOS(STATIC_8664), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8690_0_copyR_New(EOS(STATIC_8690), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8680_0_copyR_FieldAccess(EOS(STATIC_8680), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, java.lang.Object(o1102sub)))) -> f8695_0_copyR_Load(EOS(STATIC_8695), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) :|: TRUE
+f8690_0_copyR_New(EOS(STATIC_8690), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8805_0_copyR_New(EOS(STATIC_8805), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8695_0_copyR_Load(EOS(STATIC_8695), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub)) -> f8703_0_copyR_InvokeMethod(EOS(STATIC_8703), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8703_0_copyR_InvokeMethod(EOS(STATIC_8703), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8729_1_copyR_InvokeMethod(f8729_0_copyR_New(EOS(STATIC_8729), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8729_0_copyR_New(EOS(STATIC_8729), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8804_0_copyR_New(EOS(STATIC_8804), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8804_0_copyR_New(EOS(STATIC_8804), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f9566_0_copyR_New(EOS(STATIC_9566), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), o1086, java.lang.Object(o1102sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1084[DoublyLinkedList.next]o1077) :|: o1084[DoublyLinkedList.next]o1077 = 1
+f9534_0_copyR_Return(EOS(STATIC_9534), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i986, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987, NULL))) -> f10246_0_copyR_Return(EOS(STATIC_10246), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i986, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987, NULL))) :|: TRUE
+f9566_0_copyR_New(EOS(STATIC_9566), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1203, o1207, java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1203[DoublyLinkedList.next]o1202) -> f9575_0_copyR_New(EOS(STATIC_9575), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1207, o1203, java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f9575_0_copyR_New(EOS(STATIC_9575), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), o1207, o1209, java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f9679_0_copyR_New(EOS(STATIC_9679), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f9976_0_copyR_Return(EOS(STATIC_9976), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1035, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036, NULL))) -> f10452_0_copyR_Return(EOS(STATIC_10452), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1035, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036, NULL))) :|: TRUE
+f10246_0_copyR_Return(EOS(STATIC_10246), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1122, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1121, o1376)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1121, o1376))) -> f10454_0_copyR_StackPop(EOS(STATIC_10454), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1122, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1121, o1376)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1121, o1376))) :|: TRUE
+f10452_0_copyR_Return(EOS(STATIC_10452), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1131, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1130, o1402)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1130, o1402))) -> f10866_0_copyR_Return(EOS(STATIC_10866), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1131, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1130, o1402)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1130, o1402))) :|: TRUE
+f10454_0_copyR_StackPop(EOS(STATIC_10454), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1122, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1121, o1376)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1121, o1376))) -> f10456_0_copyR_Load(EOS(STATIC_10456), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1122, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1121, o1376))))) :|: TRUE
+f10456_0_copyR_Load(EOS(STATIC_10456), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1122, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1121, o1376))))) -> f10458_0_copyR_Return(EOS(STATIC_10458), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1122, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1121, o1376))))) :|: TRUE
+f10866_0_copyR_Return(EOS(STATIC_10866), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1203, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1202, o1568)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1202, o1568))) -> f10919_0_copyR_StackPop(EOS(STATIC_10919), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1203, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1202, o1568)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1202, o1568))) :|: TRUE
+f10919_0_copyR_StackPop(EOS(STATIC_10919), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1203, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1202, o1568)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1202, o1568))) -> f10921_0_copyR_Load(EOS(STATIC_10921), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1203, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1202, o1568))))) :|: TRUE
+f10921_0_copyR_Load(EOS(STATIC_10921), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1203, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1202, o1568))))) -> f10922_0_copyR_Return(EOS(STATIC_10922), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1203, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1202, o1568))))) :|: TRUE
+f11069_0_copyR_Return(EOS(STATIC_11069), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1235, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1236, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1237, o1641)))))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1236, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1237, o1641))))) -> f10246_0_copyR_Return(EOS(STATIC_10246), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1235, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1236, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1237, o1641)))))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1236, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1237, o1641))))) :|: TRUE
+f11177_0_copyR_Return(EOS(STATIC_11177), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1241, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1242, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1243, o1656)))))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1242, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1243, o1656))))) -> f10866_0_copyR_Return(EOS(STATIC_10866), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1241, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1242, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1243, o1656)))))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1242, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1243, o1656))))) :|: TRUE
+f8805_0_copyR_New(EOS(STATIC_8805), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8517_0_copyR_New(EOS(STATIC_8517), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1088sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f9679_0_copyR_New(EOS(STATIC_9679), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f8517_0_copyR_New(EOS(STATIC_8517), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)), java.lang.Object(o1208sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) :|: TRUE
+f8664_1_copyR_InvokeMethod(f8683_0_copyR_Return(EOS(STATIC_8683), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i986, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987, NULL))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f9534_0_copyR_Return(EOS(STATIC_9534), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i986, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987, NULL))) :|: TRUE
+f8664_1_copyR_InvokeMethod(f10922_0_copyR_Return(EOS(STATIC_10922), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1236, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1237, o1641))))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f11069_0_copyR_Return(EOS(STATIC_11069), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1235, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1236, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1237, o1641)))))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1236, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1237, o1641))))) :|: TRUE
+f8729_1_copyR_InvokeMethod(f8683_0_copyR_Return(EOS(STATIC_8683), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1035, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036, NULL))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f9976_0_copyR_Return(EOS(STATIC_9976), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1035, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036, NULL))) :|: TRUE
+f8729_1_copyR_InvokeMethod(f10922_0_copyR_Return(EOS(STATIC_10922), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1242, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1243, o1656))))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962, NULL))) -> f11177_0_copyR_Return(EOS(STATIC_11177), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1241, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1242, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1243, o1656)))))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1242, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1243, o1656))))) :|: TRUE
+Combined rules. Obtained 2 conditional rules for P and 8 conditional rules for R.P rules:
+f8525_0_copyR_Duplicate(EOS(STATIC_8525), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, java.lang.Object(o1088sub:0))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) -> f8664_1_copyR_InvokeMethod(f8525_0_copyR_Duplicate(EOS(STATIC_8525), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), java.lang.Object(o1088sub:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) :|: TRUE
+f8525_0_copyR_Duplicate(EOS(STATIC_8525), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, o1087:0)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, java.lang.Object(o1102sub:0))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, o1087:0)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) -> f8729_1_copyR_InvokeMethod(f8525_0_copyR_Duplicate(EOS(STATIC_8525), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), java.lang.Object(o1102sub:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) :|: TRUE
+R rules:
+f8664_1_copyR_InvokeMethod(f8683_0_copyR_Return(EOS(STATIC_8683), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i986:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987:0, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987:0, NULL))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) -> f10458_0_copyR_Return(EOS(STATIC_10458), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i986:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i987:0, NULL))))) :|: TRUE
+f8729_1_copyR_InvokeMethod(f8683_0_copyR_Return(EOS(STATIC_8683), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1035:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036:0, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036:0, NULL))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) -> f10922_0_copyR_Return(EOS(STATIC_10922), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1035:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1036:0, NULL))))) :|: TRUE
+f8525_0_copyR_Duplicate(EOS(STATIC_8525), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) -> f8609_0_copyR_Return(EOS(STATIC_8609), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) :|: TRUE
+f8525_0_copyR_Duplicate(EOS(STATIC_8525), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, o1087:0)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, java.lang.Object(o1102sub:0))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, o1087:0)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) -> f8729_1_copyR_InvokeMethod(f8525_0_copyR_Duplicate(EOS(STATIC_8525), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), java.lang.Object(o1102sub:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) :|: TRUE
+f8525_0_copyR_Duplicate(EOS(STATIC_8525), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, o1087:0)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, o1087:0)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) -> f8683_0_copyR_Return(EOS(STATIC_8683), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) :|: TRUE
+f8664_1_copyR_InvokeMethod(f10922_0_copyR_Return(EOS(STATIC_10922), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1236:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1237:0, o1641:0))))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) -> f10458_0_copyR_Return(EOS(STATIC_10458), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1235:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1236:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1237:0, o1641:0))))))) :|: TRUE
+f8729_1_copyR_InvokeMethod(f10922_0_copyR_Return(EOS(STATIC_10922), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1242:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1243:0, o1656:0))))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i963:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) -> f10922_0_copyR_Return(EOS(STATIC_10922), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1241:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1242:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i1243:0, o1656:0))))))) :|: TRUE
+f8525_0_copyR_Duplicate(EOS(STATIC_8525), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, java.lang.Object(o1088sub:0))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))) -> f8664_1_copyR_InvokeMethod(f8525_0_copyR_Duplicate(EOS(STATIC_8525), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), java.lang.Object(o1088sub:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, 0, NULL))), NULL, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, i962:0, NULL))) :|: TRUE
+Filtered ground terms:
+   f8525_0_copyR_Duplicate(x1, x2, x3, x4, x5) -> f8525_0_copyR_Duplicate(x2, x3, x4)
+   f8664_1_copyR_InvokeMethod(x1, x2, x3) -> f8664_1_copyR_InvokeMethod(x1, x3)
+   DoublyLinkedList.DoublyLinkedList(x1, x2, x3) -> DoublyLinkedList.DoublyLinkedList(x2, x3)
+   f10458_0_copyR_Return(x1, x2, x3) -> f10458_0_copyR_Return(x3)
+   f10922_0_copyR_Return(x1, x2) -> f10922_0_copyR_Return(x2)
+   f8609_0_copyR_Return(x1, x2, x3) -> f8609_0_copyR_Return(x3)
+   f8683_0_copyR_Return(x1, x2, x3) -> f8683_0_copyR_Return(x2, x3)
+Filtered unneeded arguments:
+   DoublyLinkedList.DoublyLinkedList(x1, x2) -> DoublyLinkedList.DoublyLinkedList(x2)
+   f8664_1_copyR_InvokeMethod(x1, x2) -> f8664_1_copyR_InvokeMethod(x1)
+   f8729_1_copyR_InvokeMethod(x1, x2, x3) -> f8729_1_copyR_InvokeMethod(x1)
+Filtered duplicate args:
+   f8525_0_copyR_Duplicate(x1, x2, x3) -> f8525_0_copyR_Duplicate(x2, x3)
+   f8683_0_copyR_Return(x1, x2) -> f8683_0_copyR_Return(x1)
+Combined rules. Obtained 2 conditional rules for P and 0 conditional rules for R.P rules:
+F8525_0_COPYR_DUPLICATE(java.lang.Object(DoublyLinkedList.DoublyLinkedList(java.lang.Object(o1102sub:0:0))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(o1087:0:0))) -> F8525_0_COPYR_DUPLICATE(java.lang.Object(o1102sub:0:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(NULL))) :|: TRUE
+F8525_0_COPYR_DUPLICATE(java.lang.Object(DoublyLinkedList.DoublyLinkedList(java.lang.Object(o1088sub:0:0))), NULL) -> F8525_0_COPYR_DUPLICATE(java.lang.Object(o1088sub:0:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(NULL))) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F8525_0_COPYR_DUPLICATE(java.lang.Object(DoublyLinkedList.DoublyLinkedList(java.lang.Object(o1102sub:0:0))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(o1087:0:0))) -> F8525_0_COPYR_DUPLICATE(java.lang.Object(o1102sub:0:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(NULL)))
+   F8525_0_COPYR_DUPLICATE(java.lang.Object(DoublyLinkedList.DoublyLinkedList(java.lang.Object(o1088sub:0:0))), NULL) -> F8525_0_COPYR_DUPLICATE(java.lang.Object(o1088sub:0:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(NULL)))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 1 SCC with 1 less node.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F8525_0_COPYR_DUPLICATE(java.lang.Object(DoublyLinkedList.DoublyLinkedList(java.lang.Object(o1102sub:0:0))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(o1087:0:0))) -> F8525_0_COPYR_DUPLICATE(java.lang.Object(o1102sub:0:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(NULL)))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(12) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F8525_0_COPYR_DUPLICATE(java.lang.Object(DoublyLinkedList.DoublyLinkedList(java.lang.Object(o1102sub:0:0))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(o1087:0:0))) -> F8525_0_COPYR_DUPLICATE(java.lang.Object(o1102sub:0:0), java.lang.Object(DoublyLinkedList.DoublyLinkedList(NULL)))
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(13)
+YES
+
+----------------------------------------
+
+(14)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: DoublyLinkedList.DoublyLinkedList.getFirst()LDoublyLinkedList/DoublyLinkedList;
+SCC calls the following helper methods: DoublyLinkedList.DoublyLinkedList.getFirst()LDoublyLinkedList/DoublyLinkedList;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*DoublyLinkedList.DoublyLinkedList: [prev]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(15) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 10 rules for P and 18 rules for R.P rules:
+f2122_0_getFirst_FieldAccess(EOS(STATIC_2122), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241))) -> f2130_0_getFirst_FieldAccess(EOS(STATIC_2130), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241))) :|: TRUE
+f2130_0_getFirst_FieldAccess(EOS(STATIC_2130), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241))) -> f2147_0_getFirst_NONNULL(EOS(STATIC_2147), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241)), o241) :|: TRUE
+f2147_0_getFirst_NONNULL(EOS(STATIC_2147), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub))), java.lang.Object(o243sub)) -> f2156_0_getFirst_NONNULL(EOS(STATIC_2156), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub))), java.lang.Object(o243sub)) :|: TRUE
+f2156_0_getFirst_NONNULL(EOS(STATIC_2156), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub))), java.lang.Object(o243sub)) -> f2165_0_getFirst_Load(EOS(STATIC_2165), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub)))) :|: TRUE
+f2165_0_getFirst_Load(EOS(STATIC_2165), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub)))) -> f2172_0_getFirst_FieldAccess(EOS(STATIC_2172), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub)))) :|: TRUE
+f2172_0_getFirst_FieldAccess(EOS(STATIC_2172), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub)))) -> f2178_0_getFirst_InvokeMethod(EOS(STATIC_2178), java.lang.Object(o243sub)) :|: TRUE
+f2178_0_getFirst_InvokeMethod(EOS(STATIC_2178), java.lang.Object(o243sub)) -> f2185_1_getFirst_InvokeMethod(f2185_0_getFirst_Load(EOS(STATIC_2185), java.lang.Object(o243sub))) :|: TRUE
+f2185_0_getFirst_Load(EOS(STATIC_2185), java.lang.Object(o243sub)) -> f2199_0_getFirst_Load(EOS(STATIC_2199), java.lang.Object(o243sub)) :|: TRUE
+f2199_0_getFirst_Load(EOS(STATIC_2199), java.lang.Object(o243sub)) -> f2108_0_getFirst_Load(EOS(STATIC_2108), java.lang.Object(o243sub)) :|: TRUE
+f2108_0_getFirst_Load(EOS(STATIC_2108), java.lang.Object(o239sub)) -> f2122_0_getFirst_FieldAccess(EOS(STATIC_2122), java.lang.Object(o239sub), java.lang.Object(o239sub)) :|: TRUE
+R rules:
+f2108_0_getFirst_Load(EOS(STATIC_2108), java.lang.Object(o239sub)) -> f2122_0_getFirst_FieldAccess(EOS(STATIC_2122), java.lang.Object(o239sub), java.lang.Object(o239sub)) :|: TRUE
+f2122_0_getFirst_FieldAccess(EOS(STATIC_2122), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241))) -> f2130_0_getFirst_FieldAccess(EOS(STATIC_2130), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241))) :|: TRUE
+f2130_0_getFirst_FieldAccess(EOS(STATIC_2130), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241))) -> f2147_0_getFirst_NONNULL(EOS(STATIC_2147), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, o241)), o241) :|: TRUE
+f2147_0_getFirst_NONNULL(EOS(STATIC_2147), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub))), java.lang.Object(o243sub)) -> f2156_0_getFirst_NONNULL(EOS(STATIC_2156), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub))), java.lang.Object(o243sub)) :|: TRUE
+f2147_0_getFirst_NONNULL(EOS(STATIC_2147), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL)), NULL) -> f2157_0_getFirst_NONNULL(EOS(STATIC_2157), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL)), NULL) :|: TRUE
+f2156_0_getFirst_NONNULL(EOS(STATIC_2156), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub))), java.lang.Object(o243sub)) -> f2165_0_getFirst_Load(EOS(STATIC_2165), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub)))) :|: TRUE
+f2157_0_getFirst_NONNULL(EOS(STATIC_2157), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL)), NULL) -> f2166_0_getFirst_Load(EOS(STATIC_2166), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+f2165_0_getFirst_Load(EOS(STATIC_2165), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub)))) -> f2172_0_getFirst_FieldAccess(EOS(STATIC_2172), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub)))) :|: TRUE
+f2166_0_getFirst_Load(EOS(STATIC_2166), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) -> f2173_0_getFirst_Return(EOS(STATIC_2173), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+f2172_0_getFirst_FieldAccess(EOS(STATIC_2172), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub)))) -> f2178_0_getFirst_InvokeMethod(EOS(STATIC_2178), java.lang.Object(o243sub)) :|: TRUE
+f2178_0_getFirst_InvokeMethod(EOS(STATIC_2178), java.lang.Object(o243sub)) -> f2185_1_getFirst_InvokeMethod(f2185_0_getFirst_Load(EOS(STATIC_2185), java.lang.Object(o243sub))) :|: TRUE
+f2185_0_getFirst_Load(EOS(STATIC_2185), java.lang.Object(o243sub)) -> f2199_0_getFirst_Load(EOS(STATIC_2199), java.lang.Object(o243sub)) :|: TRUE
+f4459_0_getFirst_Return(EOS(STATIC_4459), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) -> f4478_0_getFirst_Return(EOS(STATIC_4478), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+f4704_0_getFirst_Return(EOS(STATIC_4704), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) -> f4767_0_getFirst_Return(EOS(STATIC_4767), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+f4767_0_getFirst_Return(EOS(STATIC_4767), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) -> f4478_0_getFirst_Return(EOS(STATIC_4478), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+f2199_0_getFirst_Load(EOS(STATIC_2199), java.lang.Object(o243sub)) -> f2108_0_getFirst_Load(EOS(STATIC_2108), java.lang.Object(o243sub)) :|: TRUE
+f2185_1_getFirst_InvokeMethod(f2173_0_getFirst_Return(EOS(STATIC_2173), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL)))) -> f4459_0_getFirst_Return(EOS(STATIC_4459), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+f2185_1_getFirst_InvokeMethod(f4478_0_getFirst_Return(EOS(STATIC_4478), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL)))) -> f4704_0_getFirst_Return(EOS(STATIC_4704), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+Combined rules. Obtained 1 conditional rules for P and 4 conditional rules for R.P rules:
+f2122_0_getFirst_FieldAccess(EOS(STATIC_2122), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub:0))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub:0)))) -> f2185_1_getFirst_InvokeMethod(f2122_0_getFirst_FieldAccess(EOS(STATIC_2122), java.lang.Object(o243sub:0), java.lang.Object(o243sub:0))) :|: TRUE
+R rules:
+f2185_1_getFirst_InvokeMethod(f2173_0_getFirst_Return(EOS(STATIC_2173), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL)))) -> f4478_0_getFirst_Return(EOS(STATIC_4478), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+f2122_0_getFirst_FieldAccess(EOS(STATIC_2122), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub:0))), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, java.lang.Object(o243sub:0)))) -> f2185_1_getFirst_InvokeMethod(f2122_0_getFirst_FieldAccess(EOS(STATIC_2122), java.lang.Object(o243sub:0), java.lang.Object(o243sub:0))) :|: TRUE
+f2185_1_getFirst_InvokeMethod(f4478_0_getFirst_Return(EOS(STATIC_4478), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL)))) -> f4478_0_getFirst_Return(EOS(STATIC_4478), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+f2122_0_getFirst_FieldAccess(EOS(STATIC_2122), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) -> f2173_0_getFirst_Return(EOS(STATIC_2173), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC, NULL))) :|: TRUE
+Filtered ground terms:
+   f2122_0_getFirst_FieldAccess(x1, x2, x3) -> f2122_0_getFirst_FieldAccess(x2, x3)
+   DoublyLinkedList.DoublyLinkedList(x1, x2) -> DoublyLinkedList.DoublyLinkedList(x2)
+   f4478_0_getFirst_Return(x1, x2) -> f4478_0_getFirst_Return
+   f2173_0_getFirst_Return(x1, x2) -> f2173_0_getFirst_Return
+Filtered duplicate args:
+   f2122_0_getFirst_FieldAccess(x1, x2) -> f2122_0_getFirst_FieldAccess(x2)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F2122_0_GETFIRST_FIELDACCESS(java.lang.Object(DoublyLinkedList.DoublyLinkedList(java.lang.Object(o243sub:0:0)))) -> F2122_0_GETFIRST_FIELDACCESS(java.lang.Object(o243sub:0:0)) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(16)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F2122_0_GETFIRST_FIELDACCESS(java.lang.Object(DoublyLinkedList.DoublyLinkedList(java.lang.Object(o243sub:0:0)))) -> F2122_0_GETFIRST_FIELDACCESS(java.lang.Object(o243sub:0:0))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(17) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F2122_0_GETFIRST_FIELDACCESS(java.lang.Object(DoublyLinkedList.DoublyLinkedList(java.lang.Object(o243sub:0:0)))) -> F2122_0_GETFIRST_FIELDACCESS(java.lang.Object(o243sub:0:0))
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(18)
+YES
+
+----------------------------------------
+
+(19)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: DoublyLinkedList.DoublyLinkedList.createList()LDoublyLinkedList/DoublyLinkedList;
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(20) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 120 IRulesP rules:
+f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4)), i750)), i751, o685, i752, i752) -> f6194_0_createList_GE(EOS(STATIC_6194(java.lang.Object(ARRAY(i4)), i750)), i751, o685, i752, i752, i751) :|: TRUE
+f6194_0_createList_GE(EOS(STATIC_6194(java.lang.Object(ARRAY(i4)), i750)), i751, o685, i752, i752, i751) -> f6201_0_createList_GE(EOS(STATIC_6201(java.lang.Object(ARRAY(i4)), i750)), i751, o685, i752, i752, i751) :|: i752 < i751
+f6201_0_createList_GE(EOS(STATIC_6201(java.lang.Object(ARRAY(i4)), i750)), i751, o685, i752, i752, i751) -> f6208_0_createList_Load(EOS(STATIC_6208(java.lang.Object(ARRAY(i4)), i750)), i751, o685, i752) :|: i752 < i751
+f6208_0_createList_Load(EOS(STATIC_6208(java.lang.Object(ARRAY(i4)), i750)), i751, o685, i752) -> f6212_0_createList_Store(EOS(STATIC_6212(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685) :|: TRUE
+f6212_0_createList_Store(EOS(STATIC_6212(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685) -> f6219_0_createList_New(EOS(STATIC_6219(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685) :|: TRUE
+f6219_0_createList_New(EOS(STATIC_6219(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685) -> f6224_0_createList_Duplicate(EOS(STATIC_6224(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f6224_0_createList_Duplicate(EOS(STATIC_6224(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6243_0_createList_InvokeMethod(EOS(STATIC_6243(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f6243_0_createList_InvokeMethod(EOS(STATIC_6243(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6248_0_random_FieldAccess(EOS(STATIC_6248(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f6248_0_random_FieldAccess(EOS(STATIC_6248(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6255_0_random_ArrayLength(EOS(STATIC_6255(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(ARRAY(i4))) :|: TRUE
+f6255_0_random_ArrayLength(EOS(STATIC_6255(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(ARRAY(i4))) -> f6258_0_random_FieldAccess(EOS(STATIC_6258(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i4) :|: i4 >= 0
+f6258_0_random_FieldAccess(EOS(STATIC_6258(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i4) -> f6283_0_random_GT(EOS(STATIC_6283(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i4, i750) :|: TRUE
+f6283_0_random_GT(EOS(STATIC_6283(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i4, i750) -> f6303_0_random_GT(EOS(STATIC_6303(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i4, i750) :|: i4 > i750
+f6283_0_random_GT(EOS(STATIC_6283(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i4, i750) -> f6305_0_random_GT(EOS(STATIC_6305(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i4, i750) :|: i4 <= i750
+f6303_0_random_GT(EOS(STATIC_6303(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i4, i750) -> f6320_0_random_FieldAccess(EOS(STATIC_6320(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: i4 > i750
+f6320_0_random_FieldAccess(EOS(STATIC_6320(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6329_0_random_FieldAccess(EOS(STATIC_6329(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(ARRAY(i4))) :|: TRUE
+f6329_0_random_FieldAccess(EOS(STATIC_6329(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(ARRAY(i4))) -> f6339_0_random_ArrayAccess(EOS(STATIC_6339(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(ARRAY(i4)), i750) :|: TRUE
+f6339_0_random_ArrayAccess(EOS(STATIC_6339(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(ARRAY(i4)), i750) -> f6346_0_random_ArrayAccess(EOS(STATIC_6346(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(ARRAY(i4)), i750) :|: TRUE
+f6346_0_random_ArrayAccess(EOS(STATIC_6346(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(ARRAY(i4)), i750) -> f6357_0_random_Store(EOS(STATIC_6357(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704) :|: i750 < i4
+f6357_0_random_Store(EOS(STATIC_6357(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704) -> f6374_0_random_FieldAccess(EOS(STATIC_6374(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704) :|: TRUE
+f6374_0_random_FieldAccess(EOS(STATIC_6374(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704) -> f6387_0_random_ConstantStackPush(EOS(STATIC_6387(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704, i750) :|: TRUE
+f6387_0_random_ConstantStackPush(EOS(STATIC_6387(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704, i750) -> f6416_0_random_IntArithmetic(EOS(STATIC_6416(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704, i750, 1) :|: TRUE
+f6416_0_random_IntArithmetic(EOS(STATIC_6416(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704, i750, matching1) -> f6434_0_random_FieldAccess(EOS(STATIC_6434(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704, i750 + 1) :|: i750 >= 0 && matching1 = 1
+f6434_0_random_FieldAccess(EOS(STATIC_6434(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704, i785) -> f6439_0_random_Load(EOS(STATIC_6439(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704) :|: TRUE
+f6439_0_random_Load(EOS(STATIC_6439(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704) -> f6466_0_random_NONNULL(EOS(STATIC_6466(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o704, o704) :|: TRUE
+f6466_0_random_NONNULL(EOS(STATIC_6466(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o775sub), java.lang.Object(o775sub)) -> f6598_0_random_NONNULL(EOS(STATIC_6598(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o775sub), java.lang.Object(o775sub)) :|: TRUE
+f6466_0_random_NONNULL(EOS(STATIC_6466(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), NULL, NULL) -> f6599_0_random_NONNULL(EOS(STATIC_6599(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), NULL, NULL) :|: TRUE
+f6598_0_random_NONNULL(EOS(STATIC_6598(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o775sub), java.lang.Object(o775sub)) -> f6855_0_random_Load(EOS(STATIC_6855(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o775sub)) :|: TRUE
+f6855_0_random_Load(EOS(STATIC_6855(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o775sub)) -> f6875_0_random_InvokeMethod(EOS(STATIC_6875(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o775sub)) :|: TRUE
+f6875_0_random_InvokeMethod(EOS(STATIC_6875(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o806sub)) -> f6881_0_random_InvokeMethod(EOS(STATIC_6881(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o806sub)) :|: TRUE
+f6881_0_random_InvokeMethod(EOS(STATIC_6881(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o806sub)) -> f6892_0_length_Load(EOS(STATIC_6892(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o806sub)) :|: TRUE
+f6892_0_length_Load(EOS(STATIC_6892(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o806sub)) -> f6923_0_length_FieldAccess(EOS(STATIC_6923(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(o806sub)) :|: TRUE
+f6923_0_length_FieldAccess(EOS(STATIC_6923(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(java.lang.String(EOC, i828))) -> f6939_0_length_FieldAccess(EOS(STATIC_6939(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(java.lang.String(EOC, i828))) :|: i828 >= 0
+f6939_0_length_FieldAccess(EOS(STATIC_6939(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(java.lang.String(EOC, i828))) -> f7111_0_length_Return(EOS(STATIC_7111(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) :|: TRUE
+f7111_0_length_Return(EOS(STATIC_7111(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) -> f7147_0_random_Return(EOS(STATIC_7147(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) :|: TRUE
+f7147_0_random_Return(EOS(STATIC_7147(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) -> f7170_0_createList_InvokeMethod(EOS(STATIC_7170(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) :|: TRUE
+f7170_0_createList_InvokeMethod(EOS(STATIC_7170(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) -> f7203_0__init__Load(EOS(STATIC_7203(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) :|: TRUE
+f7203_0__init__Load(EOS(STATIC_7203(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) -> f7274_0__init__InvokeMethod(EOS(STATIC_7274(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7274_0__init__InvokeMethod(EOS(STATIC_7274(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7283_0__init__Load(EOS(STATIC_7283(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) :|: TRUE
+f7283_0__init__Load(EOS(STATIC_7283(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) -> f7296_0__init__Load(EOS(STATIC_7296(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7296_0__init__Load(EOS(STATIC_7296(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7307_0__init__FieldAccess(EOS(STATIC_7307(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) :|: TRUE
+f7307_0__init__FieldAccess(EOS(STATIC_7307(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i828) -> f7366_0__init__Return(EOS(STATIC_7366(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7366_0__init__Return(EOS(STATIC_7366(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7385_0_createList_Store(EOS(STATIC_7385(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7385_0_createList_Store(EOS(STATIC_7385(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7398_0_createList_Load(EOS(STATIC_7398(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) :|: TRUE
+f7398_0_createList_Load(EOS(STATIC_7398(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) -> f7403_0_createList_Load(EOS(STATIC_7403(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7403_0_createList_Load(EOS(STATIC_7403(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7470_0_createList_FieldAccess(EOS(STATIC_7470(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o685) :|: TRUE
+f7470_0_createList_FieldAccess(EOS(STATIC_7470(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o685) -> f7480_0_createList_Load(EOS(STATIC_7480(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) :|: TRUE
+f7480_0_createList_Load(EOS(STATIC_7480(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) -> f7528_0_createList_NULL(EOS(STATIC_7528(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, o685) :|: TRUE
+f7528_0_createList_NULL(EOS(STATIC_7528(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o912sub), java.lang.Object(o912sub)) -> f7554_0_createList_NULL(EOS(STATIC_7554(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o912sub), java.lang.Object(o912sub)) :|: TRUE
+f7528_0_createList_NULL(EOS(STATIC_7528(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, NULL, NULL) -> f7555_0_createList_NULL(EOS(STATIC_7555(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, NULL, NULL) :|: TRUE
+f7554_0_createList_NULL(EOS(STATIC_7554(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o912sub), java.lang.Object(o912sub)) -> f7604_0_createList_Load(EOS(STATIC_7604(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o912sub)) :|: TRUE
+f7604_0_createList_Load(EOS(STATIC_7604(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o912sub)) -> f7613_0_createList_Load(EOS(STATIC_7613(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o912sub)) :|: TRUE
+f7613_0_createList_Load(EOS(STATIC_7613(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o912sub)) -> f7637_0_createList_FieldAccess(EOS(STATIC_7637(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o912sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7637_0_createList_FieldAccess(EOS(STATIC_7637(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7763_0_createList_FieldAccess(EOS(STATIC_7763(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7763_0_createList_FieldAccess(EOS(STATIC_7763(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7783_0_createList_Inc(EOS(STATIC_7783(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) :|: TRUE
+f7783_0_createList_Inc(EOS(STATIC_7783(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) -> f7855_0_createList_JMP(EOS(STATIC_7855(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752 + 1) :|: TRUE
+f7855_0_createList_JMP(EOS(STATIC_7855(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i907) -> f8108_0_createList_Load(EOS(STATIC_8108(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i907) :|: TRUE
+f8108_0_createList_Load(EOS(STATIC_8108(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i907) -> f6185_0_createList_Load(EOS(STATIC_6185(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i907) :|: TRUE
+f6185_0_createList_Load(EOS(STATIC_6185(java.lang.Object(ARRAY(i4)), i750)), i751, o685, i752) -> f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4)), i750)), i751, o685, i752, i752) :|: TRUE
+f7555_0_createList_NULL(EOS(STATIC_7555(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, NULL, NULL) -> f7609_0_createList_Inc(EOS(STATIC_7609(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) :|: TRUE
+f7609_0_createList_Inc(EOS(STATIC_7609(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) -> f7615_0_createList_JMP(EOS(STATIC_7615(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752 + 1) :|: TRUE
+f7615_0_createList_JMP(EOS(STATIC_7615(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i888) -> f7731_0_createList_Load(EOS(STATIC_7731(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i888) :|: TRUE
+f7731_0_createList_Load(EOS(STATIC_7731(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i888) -> f6185_0_createList_Load(EOS(STATIC_6185(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i888) :|: TRUE
+f6599_0_random_NONNULL(EOS(STATIC_6599(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), NULL, NULL) -> f6857_0_random_ConstantStackPush(EOS(STATIC_6857(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f6857_0_random_ConstantStackPush(EOS(STATIC_6857(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6876_0_random_Return(EOS(STATIC_6876(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE
+f6876_0_random_Return(EOS(STATIC_6876(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f6882_0_createList_InvokeMethod(EOS(STATIC_6882(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE && matching1 = 0
+f6882_0_createList_InvokeMethod(EOS(STATIC_6882(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f6894_0__init__Load(EOS(STATIC_6894(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE && matching1 = 0
+f6894_0__init__Load(EOS(STATIC_6894(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f6927_0__init__InvokeMethod(EOS(STATIC_6927(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE && matching1 = 0
+f6927_0__init__InvokeMethod(EOS(STATIC_6927(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6940_0__init__Load(EOS(STATIC_6940(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE && matching1 = 0
+f6940_0__init__Load(EOS(STATIC_6940(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f7112_0__init__Load(EOS(STATIC_7112(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE && matching1 = 0
+f7112_0__init__Load(EOS(STATIC_7112(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7151_0__init__FieldAccess(EOS(STATIC_7151(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE && matching1 = 0
+f7151_0__init__FieldAccess(EOS(STATIC_7151(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f7173_0__init__Return(EOS(STATIC_7173(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE && matching1 = 0
+f7173_0__init__Return(EOS(STATIC_7173(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7207_0_createList_Store(EOS(STATIC_7207(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7207_0_createList_Store(EOS(STATIC_7207(java.lang.Object(ARRAY(i4)), i785)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7234_0_createList_Load(EOS(STATIC_7234(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) :|: TRUE
+f7234_0_createList_Load(EOS(STATIC_7234(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) -> f7277_0_createList_Load(EOS(STATIC_7277(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7277_0_createList_Load(EOS(STATIC_7277(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7284_0_createList_FieldAccess(EOS(STATIC_7284(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o685) :|: TRUE
+f7284_0_createList_FieldAccess(EOS(STATIC_7284(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o685) -> f7299_0_createList_Load(EOS(STATIC_7299(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) :|: TRUE
+f7299_0_createList_Load(EOS(STATIC_7299(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) -> f7350_0_createList_NULL(EOS(STATIC_7350(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, o685) :|: TRUE
+f7350_0_createList_NULL(EOS(STATIC_7350(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o880sub), java.lang.Object(o880sub)) -> f7371_0_createList_NULL(EOS(STATIC_7371(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o880sub), java.lang.Object(o880sub)) :|: TRUE
+f7350_0_createList_NULL(EOS(STATIC_7350(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, NULL, NULL) -> f7372_0_createList_NULL(EOS(STATIC_7372(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, NULL, NULL) :|: TRUE
+f7371_0_createList_NULL(EOS(STATIC_7371(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o880sub), java.lang.Object(o880sub)) -> f7388_0_createList_Load(EOS(STATIC_7388(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o880sub)) :|: TRUE
+f7388_0_createList_Load(EOS(STATIC_7388(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o880sub)) -> f7399_0_createList_Load(EOS(STATIC_7399(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o880sub)) :|: TRUE
+f7399_0_createList_Load(EOS(STATIC_7399(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o880sub)) -> f7451_0_createList_FieldAccess(EOS(STATIC_7451(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o880sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7451_0_createList_FieldAccess(EOS(STATIC_7451(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7471_0_createList_FieldAccess(EOS(STATIC_7471(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7471_0_createList_FieldAccess(EOS(STATIC_7471(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7486_0_createList_Inc(EOS(STATIC_7486(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) :|: TRUE
+f7486_0_createList_Inc(EOS(STATIC_7486(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) -> f7529_0_createList_JMP(EOS(STATIC_7529(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752 + 1) :|: TRUE
+f7529_0_createList_JMP(EOS(STATIC_7529(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i879) -> f7587_0_createList_Load(EOS(STATIC_7587(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i879) :|: TRUE
+f7587_0_createList_Load(EOS(STATIC_7587(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i879) -> f6185_0_createList_Load(EOS(STATIC_6185(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i879) :|: TRUE
+f7372_0_createList_NULL(EOS(STATIC_7372(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, NULL, NULL) -> f7391_0_createList_Inc(EOS(STATIC_7391(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) :|: TRUE
+f7391_0_createList_Inc(EOS(STATIC_7391(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) -> f7400_0_createList_JMP(EOS(STATIC_7400(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752 + 1) :|: TRUE
+f7400_0_createList_JMP(EOS(STATIC_7400(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i856) -> f7463_0_createList_Load(EOS(STATIC_7463(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i856) :|: TRUE
+f7463_0_createList_Load(EOS(STATIC_7463(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i856) -> f6185_0_createList_Load(EOS(STATIC_6185(java.lang.Object(ARRAY(i4)), i785)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i856) :|: TRUE
+f6305_0_random_GT(EOS(STATIC_6305(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i4, i750) -> f6324_0_random_ConstantStackPush(EOS(STATIC_6324(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: i4 <= i750
+f6324_0_random_ConstantStackPush(EOS(STATIC_6324(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6330_0_random_Return(EOS(STATIC_6330(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE
+f6330_0_random_Return(EOS(STATIC_6330(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f6340_0_createList_InvokeMethod(EOS(STATIC_6340(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE && matching1 = 0
+f6340_0_createList_InvokeMethod(EOS(STATIC_6340(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f6348_0__init__Load(EOS(STATIC_6348(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE && matching1 = 0
+f6348_0__init__Load(EOS(STATIC_6348(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f6375_0__init__InvokeMethod(EOS(STATIC_6375(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE && matching1 = 0
+f6375_0__init__InvokeMethod(EOS(STATIC_6375(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6393_0__init__Load(EOS(STATIC_6393(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE && matching1 = 0
+f6393_0__init__Load(EOS(STATIC_6393(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f6420_0__init__Load(EOS(STATIC_6420(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE && matching1 = 0
+f6420_0__init__Load(EOS(STATIC_6420(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6435_0__init__FieldAccess(EOS(STATIC_6435(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), 0) :|: TRUE && matching1 = 0
+f6435_0__init__FieldAccess(EOS(STATIC_6435(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), matching1) -> f6444_0__init__Return(EOS(STATIC_6444(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE && matching1 = 0
+f6444_0__init__Return(EOS(STATIC_6444(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6472_0_createList_Store(EOS(STATIC_6472(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f6472_0_createList_Store(EOS(STATIC_6472(java.lang.Object(ARRAY(i4)), i750)), i751, i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6601_0_createList_Load(EOS(STATIC_6601(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) :|: TRUE
+f6601_0_createList_Load(EOS(STATIC_6601(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) -> f6861_0_createList_Load(EOS(STATIC_6861(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f6861_0_createList_Load(EOS(STATIC_6861(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f6878_0_createList_FieldAccess(EOS(STATIC_6878(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o685) :|: TRUE
+f6878_0_createList_FieldAccess(EOS(STATIC_6878(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), o685) -> f6883_0_createList_Load(EOS(STATIC_6883(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) :|: TRUE
+f6883_0_createList_Load(EOS(STATIC_6883(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685) -> f6897_0_createList_NULL(EOS(STATIC_6897(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, o685, o685) :|: TRUE
+f6897_0_createList_NULL(EOS(STATIC_6897(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o819sub), java.lang.Object(o819sub)) -> f6909_0_createList_NULL(EOS(STATIC_6909(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o819sub), java.lang.Object(o819sub)) :|: TRUE
+f6897_0_createList_NULL(EOS(STATIC_6897(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, NULL, NULL) -> f6911_0_createList_NULL(EOS(STATIC_6911(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, NULL, NULL) :|: TRUE
+f6909_0_createList_NULL(EOS(STATIC_6909(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o819sub), java.lang.Object(o819sub)) -> f6931_0_createList_Load(EOS(STATIC_6931(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o819sub)) :|: TRUE
+f6931_0_createList_Load(EOS(STATIC_6931(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o819sub)) -> f6943_0_createList_Load(EOS(STATIC_6943(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o819sub)) :|: TRUE
+f6943_0_createList_Load(EOS(STATIC_6943(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o819sub)) -> f7114_0_createList_FieldAccess(EOS(STATIC_7114(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(o819sub), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7114_0_createList_FieldAccess(EOS(STATIC_7114(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7163_0_createList_FieldAccess(EOS(STATIC_7163(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) :|: TRUE
+f7163_0_createList_FieldAccess(EOS(STATIC_7163(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC))) -> f7200_0_createList_Inc(EOS(STATIC_7200(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) :|: TRUE
+f7200_0_createList_Inc(EOS(STATIC_7200(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) -> f7226_0_createList_JMP(EOS(STATIC_7226(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752 + 1) :|: TRUE
+f7226_0_createList_JMP(EOS(STATIC_7226(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i840) -> f7265_0_createList_Load(EOS(STATIC_7265(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i840) :|: TRUE
+f7265_0_createList_Load(EOS(STATIC_7265(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i840) -> f6185_0_createList_Load(EOS(STATIC_6185(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i840) :|: TRUE
+f6911_0_createList_NULL(EOS(STATIC_6911(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752, NULL, NULL) -> f6933_0_createList_Inc(EOS(STATIC_6933(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) :|: TRUE
+f6933_0_createList_Inc(EOS(STATIC_6933(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752) -> f7104_0_createList_JMP(EOS(STATIC_7104(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752 + 1) :|: TRUE
+f7104_0_createList_JMP(EOS(STATIC_7104(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i830) -> f7138_0_createList_Load(EOS(STATIC_7138(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i830) :|: TRUE
+f7138_0_createList_Load(EOS(STATIC_7138(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i830) -> f6185_0_createList_Load(EOS(STATIC_6185(java.lang.Object(ARRAY(i4)), i750)), i751, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i830) :|: TRUE
+Combined rules. Obtained 6 IRulesP rules:
+f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0)), i751:0, NULL, i752:0, i752:0) -> f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0 + 1)), i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752:0 + 1, i752:0 + 1) :|: i752:0 < i751:0 && i4:0 > -1 && i750:0 < i4:0 && i828:0 > -1 && i750:0 > -1
+f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0)), i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752:0, i752:0) -> f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0)), i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752:0 + 1, i752:0 + 1) :|: i752:0 < i751:0 && i4:0 > -1 && i750:0 >= i4:0
+f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0)), i751:0, NULL, i752:0, i752:0) -> f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0 + 1)), i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752:0 + 1, i752:0 + 1) :|: i752:0 < i751:0 && i4:0 > -1 && i750:0 < i4:0 && i750:0 > -1
+f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0)), i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752:0, i752:0) -> f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0 + 1)), i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752:0 + 1, i752:0 + 1) :|: i752:0 < i751:0 && i4:0 > -1 && i750:0 < i4:0 && i828:0 > -1 && i750:0 > -1
+f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0)), i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752:0, i752:0) -> f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0 + 1)), i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752:0 + 1, i752:0 + 1) :|: i752:0 < i751:0 && i4:0 > -1 && i750:0 < i4:0 && i750:0 > -1
+f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0)), i751:0, NULL, i752:0, i752:0) -> f6192_0_createList_Load(EOS(STATIC_6192(java.lang.Object(ARRAY(i4:0)), i750:0)), i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList(EOC)), i752:0 + 1, i752:0 + 1) :|: i752:0 < i751:0 && i4:0 > -1 && i750:0 >= i4:0
+Filtered constant ground arguments:
+   DoublyLinkedList.DoublyLinkedList(x1) -> DoublyLinkedList.DoublyLinkedList
+Filtered duplicate arguments:
+   f6192_0_createList_Load(x1, x2, x3, x4, x5) -> f6192_0_createList_Load(x1, x2, x3, x5)
+Finished conversion. Obtained 6 rules.P rules:
+f6192_0_createList_Load(i751:0, NULL, i752:0, i4:0, i750:0) -> f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0 + 1, i4:0, i750:0 + 1) :|: i4:0 > -1 && i752:0 < i751:0 && i750:0 < i4:0 && i750:0 > -1 && i828:0 > -1
+f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0, i4:0, i750:0) -> f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0 + 1, i4:0, i750:0) :|: i4:0 > -1 && i750:0 >= i4:0 && i752:0 < i751:0
+f6192_0_createList_Load(i751:0, NULL, i752:0, i4:0, i750:0) -> f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0 + 1, i4:0, i750:0 + 1) :|: i4:0 > -1 && i752:0 < i751:0 && i750:0 > -1 && i750:0 < i4:0
+f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0, i4:0, i750:0) -> f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0 + 1, i4:0, i750:0 + 1) :|: i4:0 > -1 && i752:0 < i751:0 && i750:0 < i4:0 && i750:0 > -1 && i828:0 > -1
+f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0, i4:0, i750:0) -> f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0 + 1, i4:0, i750:0 + 1) :|: i4:0 > -1 && i752:0 < i751:0 && i750:0 > -1 && i750:0 < i4:0
+f6192_0_createList_Load(i751:0, NULL, i752:0, i4:0, i750:0) -> f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0 + 1, i4:0, i750:0) :|: i4:0 > -1 && i750:0 >= i4:0 && i752:0 < i751:0
+
+----------------------------------------
+
+(21)
+Obligation:
+Rules:
+f6192_0_createList_Load(i751:0, NULL, i752:0, i4:0, i750:0) -> f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), i752:0 + 1, i4:0, i750:0 + 1) :|: i4:0 > -1 && i752:0 < i751:0 && i750:0 < i4:0 && i750:0 > -1 && i828:0 > -1
+f6192_0_createList_Load(x, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x1, x2, x3) -> f6192_0_createList_Load(x, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x1 + 1, x2, x3) :|: x2 > -1 && x3 >= x2 && x1 < x
+f6192_0_createList_Load(x4, NULL, x5, x6, x7) -> f6192_0_createList_Load(x4, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x5 + 1, x6, x7 + 1) :|: x6 > -1 && x5 < x4 && x7 > -1 && x7 < x6
+f6192_0_createList_Load(x8, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x9, x10, x11) -> f6192_0_createList_Load(x8, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x9 + 1, x10, x11 + 1) :|: x10 > -1 && x9 < x8 && x11 < x10 && x11 > -1 && x12 > -1
+f6192_0_createList_Load(x13, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x14, x15, x16) -> f6192_0_createList_Load(x13, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x14 + 1, x15, x16 + 1) :|: x15 > -1 && x14 < x13 && x16 > -1 && x16 < x15
+f6192_0_createList_Load(x17, NULL, x18, x19, x20) -> f6192_0_createList_Load(x17, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x18 + 1, x19, x20) :|: x19 > -1 && x20 >= x19 && x18 < x17
+
+----------------------------------------
+
+(22) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(23)
+Obligation:
+Rules:
+f6192_0_createList_Load(i751:0, NULL, i752:0, i4:0, i750:0) -> f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), arith, i4:0, arith1) :|: i4:0 > -1 && i752:0 < i751:0 && i750:0 < i4:0 && i750:0 > -1 && i828:0 > -1 && arith = i752:0 + 1 && arith1 = i750:0 + 1
+f6192_0_createList_Load(x21, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x22, x23, x24) -> f6192_0_createList_Load(x21, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x25, x23, x24) :|: x23 > -1 && x24 >= x23 && x22 < x21 && x25 = x22 + 1
+f6192_0_createList_Load(x26, NULL, x27, x28, x29) -> f6192_0_createList_Load(x26, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x30, x28, x31) :|: x28 > -1 && x27 < x26 && x29 > -1 && x29 < x28 && x30 = x27 + 1 && x31 = x29 + 1
+f6192_0_createList_Load(x32, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x33, x34, x35) -> f6192_0_createList_Load(x32, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x36, x34, x37) :|: x34 > -1 && x33 < x32 && x35 < x34 && x35 > -1 && x38 > -1 && x36 = x33 + 1 && x37 = x35 + 1
+f6192_0_createList_Load(x39, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x40, x41, x42) -> f6192_0_createList_Load(x39, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x43, x41, x44) :|: x41 > -1 && x40 < x39 && x42 > -1 && x42 < x41 && x43 = x40 + 1 && x44 = x42 + 1
+f6192_0_createList_Load(x45, NULL, x46, x47, x48) -> f6192_0_createList_Load(x45, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x49, x47, x48) :|: x47 > -1 && x48 >= x47 && x46 < x45 && x49 = x46 + 1
+
+----------------------------------------
+
+(24) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f6192_0_createList_Load(i751:0, NULL, i752:0, i4:0, i750:0) -> f6192_0_createList_Load(i751:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), arith, i4:0, arith1) :|: i4:0 > -1 && i752:0 < i751:0 && i750:0 < i4:0 && i750:0 > -1 && i828:0 > -1 && arith = i752:0 + 1 && arith1 = i750:0 + 1
+(2) f6192_0_createList_Load(x21, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x22, x23, x24) -> f6192_0_createList_Load(x21, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x25, x23, x24) :|: x23 > -1 && x24 >= x23 && x22 < x21 && x25 = x22 + 1
+(3) f6192_0_createList_Load(x26, NULL, x27, x28, x29) -> f6192_0_createList_Load(x26, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x30, x28, x31) :|: x28 > -1 && x27 < x26 && x29 > -1 && x29 < x28 && x30 = x27 + 1 && x31 = x29 + 1
+(4) f6192_0_createList_Load(x32, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x33, x34, x35) -> f6192_0_createList_Load(x32, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x36, x34, x37) :|: x34 > -1 && x33 < x32 && x35 < x34 && x35 > -1 && x38 > -1 && x36 = x33 + 1 && x37 = x35 + 1
+(5) f6192_0_createList_Load(x39, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x40, x41, x42) -> f6192_0_createList_Load(x39, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x43, x41, x44) :|: x41 > -1 && x40 < x39 && x42 > -1 && x42 < x41 && x43 = x40 + 1 && x44 = x42 + 1
+(6) f6192_0_createList_Load(x45, NULL, x46, x47, x48) -> f6192_0_createList_Load(x45, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x49, x47, x48) :|: x47 > -1 && x48 >= x47 && x46 < x45 && x49 = x46 + 1
+
+Arcs:
+(1) -> (2), (4), (5)
+(2) -> (2)
+(3) -> (2), (4), (5)
+(4) -> (2), (4), (5)
+(5) -> (2), (4), (5)
+(6) -> (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(25)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(26)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f6192_0_createList_Load(x32, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x33, x34, x35) -> f6192_0_createList_Load(x32, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x36, x34, x37) :|: x34 > -1 && x33 < x32 && x35 < x34 && x35 > -1 && x38 > -1 && x36 = x33 + 1 && x37 = x35 + 1
+(2) f6192_0_createList_Load(x39, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x40, x41, x42) -> f6192_0_createList_Load(x39, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x43, x41, x44) :|: x41 > -1 && x40 < x39 && x42 > -1 && x42 < x41 && x43 = x40 + 1 && x44 = x42 + 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(27) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(28)
+Obligation:
+Rules:
+f6192_0_createList_Load(x32:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x33:0, x34:0, x35:0) -> f6192_0_createList_Load(x32:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x33:0 + 1, x34:0, x35:0 + 1) :|: x35:0 > -1 && x38:0 > -1 && x35:0 < x34:0 && x33:0 < x32:0 && x34:0 > -1
+f6192_0_createList_Load(x39:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x40:0, x41:0, x42:0) -> f6192_0_createList_Load(x39:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x40:0 + 1, x41:0, x42:0 + 1) :|: x42:0 > -1 && x42:0 < x41:0 && x40:0 < x39:0 && x41:0 > -1
+
+----------------------------------------
+
+(29) IntTRSUnneededArgumentFilterProof (EQUIVALENT)
+Some arguments are removed because they cannot influence termination. We removed arguments according to the following replacements:
+
+   f6192_0_createList_Load(x1, x2, x3, x4, x5) -> f6192_0_createList_Load(x1, x3, x4, x5)
+
+----------------------------------------
+
+(30)
+Obligation:
+Rules:
+f6192_0_createList_Load(x32:0, x33:0, x34:0, x35:0) -> f6192_0_createList_Load(x32:0, x33:0 + 1, x34:0, x35:0 + 1) :|: x35:0 > -1 && x38:0 > -1 && x35:0 < x34:0 && x33:0 < x32:0 && x34:0 > -1
+f6192_0_createList_Load(x39:0, x40:0, x41:0, x42:0) -> f6192_0_createList_Load(x39:0, x40:0 + 1, x41:0, x42:0 + 1) :|: x42:0 > -1 && x42:0 < x41:0 && x40:0 < x39:0 && x41:0 > -1
+
+----------------------------------------
+
+(31) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f6192_0_createList_Load(INTEGER, INTEGER, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(32)
+Obligation:
+Rules:
+f6192_0_createList_Load(x32:0, x33:0, x34:0, x35:0) -> f6192_0_createList_Load(x32:0, c, x34:0, c1) :|: c1 = x35:0 + 1 && c = x33:0 + 1 && (x35:0 > -1 && x38:0 > -1 && x35:0 < x34:0 && x33:0 < x32:0 && x34:0 > -1)
+f6192_0_createList_Load(x39:0, x40:0, x41:0, x42:0) -> f6192_0_createList_Load(x39:0, c2, x41:0, c3) :|: c3 = x42:0 + 1 && c2 = x40:0 + 1 && (x42:0 > -1 && x42:0 < x41:0 && x40:0 < x39:0 && x41:0 > -1)
+
+----------------------------------------
+
+(33) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f6192_0_createList_Load(x, x1, x2, x3)] = x2 - x3
+
+The following rules are decreasing:
+f6192_0_createList_Load(x32:0, x33:0, x34:0, x35:0) -> f6192_0_createList_Load(x32:0, c, x34:0, c1) :|: c1 = x35:0 + 1 && c = x33:0 + 1 && (x35:0 > -1 && x38:0 > -1 && x35:0 < x34:0 && x33:0 < x32:0 && x34:0 > -1)
+f6192_0_createList_Load(x39:0, x40:0, x41:0, x42:0) -> f6192_0_createList_Load(x39:0, c2, x41:0, c3) :|: c3 = x42:0 + 1 && c2 = x40:0 + 1 && (x42:0 > -1 && x42:0 < x41:0 && x40:0 < x39:0 && x41:0 > -1)
+The following rules are bounded:
+f6192_0_createList_Load(x32:0, x33:0, x34:0, x35:0) -> f6192_0_createList_Load(x32:0, c, x34:0, c1) :|: c1 = x35:0 + 1 && c = x33:0 + 1 && (x35:0 > -1 && x38:0 > -1 && x35:0 < x34:0 && x33:0 < x32:0 && x34:0 > -1)
+f6192_0_createList_Load(x39:0, x40:0, x41:0, x42:0) -> f6192_0_createList_Load(x39:0, c2, x41:0, c3) :|: c3 = x42:0 + 1 && c2 = x40:0 + 1 && (x42:0 > -1 && x42:0 < x41:0 && x40:0 < x39:0 && x41:0 > -1)
+
+----------------------------------------
+
+(34)
+YES
+
+----------------------------------------
+
+(35)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f6192_0_createList_Load(x21, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x22, x23, x24) -> f6192_0_createList_Load(x21, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x25, x23, x24) :|: x23 > -1 && x24 >= x23 && x22 < x21 && x25 = x22 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(36) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(37)
+Obligation:
+Rules:
+f6192_0_createList_Load(x21:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x22:0, x23:0, x24:0) -> f6192_0_createList_Load(x21:0, java.lang.Object(DoublyLinkedList.DoublyLinkedList), x22:0 + 1, x23:0, x24:0) :|: x23:0 > -1 && x24:0 >= x23:0 && x22:0 < x21:0
+
+----------------------------------------
+
+(38) IntTRSUnneededArgumentFilterProof (EQUIVALENT)
+Some arguments are removed because they cannot influence termination. We removed arguments according to the following replacements:
+
+   f6192_0_createList_Load(x1, x2, x3, x4, x5) -> f6192_0_createList_Load(x1, x3, x4, x5)
+
+----------------------------------------
+
+(39)
+Obligation:
+Rules:
+f6192_0_createList_Load(x21:0, x22:0, x23:0, x24:0) -> f6192_0_createList_Load(x21:0, x22:0 + 1, x23:0, x24:0) :|: x23:0 > -1 && x24:0 >= x23:0 && x22:0 < x21:0
+
+----------------------------------------
+
+(40) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f6192_0_createList_Load(INTEGER, INTEGER, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(41)
+Obligation:
+Rules:
+f6192_0_createList_Load(x21:0, x22:0, x23:0, x24:0) -> f6192_0_createList_Load(x21:0, c, x23:0, x24:0) :|: c = x22:0 + 1 && (x23:0 > -1 && x24:0 >= x23:0 && x22:0 < x21:0)
+
+----------------------------------------
+
+(42) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f6192_0_createList_Load(x, x1, x2, x3)] = x - x1
+
+The following rules are decreasing:
+f6192_0_createList_Load(x21:0, x22:0, x23:0, x24:0) -> f6192_0_createList_Load(x21:0, c, x23:0, x24:0) :|: c = x22:0 + 1 && (x23:0 > -1 && x24:0 >= x23:0 && x22:0 < x21:0)
+The following rules are bounded:
+f6192_0_createList_Load(x21:0, x22:0, x23:0, x24:0) -> f6192_0_createList_Load(x21:0, c, x23:0, x24:0) :|: c = x22:0 + 1 && (x23:0 > -1 && x24:0 >= x23:0 && x22:0 < x21:0)
+
+----------------------------------------
+
+(43)
+YES

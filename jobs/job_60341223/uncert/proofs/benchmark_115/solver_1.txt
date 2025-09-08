@@ -1,0 +1,275 @@
+YES
+We consider the system YEPtz.
+
+  Alphabet:
+
+    chain : [N -> N * list] --> list 
+    cons : [N * list] --> list 
+    false : [] --> B 
+    from : [N * list] --> list 
+    if : [B * list * list] --> list 
+    incch : [list] --> list 
+    lteq : [N * N] --> B 
+    nil : [] --> list 
+    o : [] --> N 
+    s : [N] --> N 
+    true : [] --> B 
+
+  Rules:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    lteq(s(X), o) => false 
+    lteq(o, X) => true 
+    lteq(s(X), s(Y)) => lteq(X, Y) 
+    from(X, nil) => nil 
+    from(X, cons(Y, Z)) => if(lteq(X, Y), cons(Y, Z), from(X, Z)) 
+    chain(F, nil) => nil 
+    chain(F, cons(X, Y)) => cons(F X, chain(F, from(F X, Y))) 
+    incch(X) => chain(/\x.s(x), X) 
+
+We observe that the rules contain a first-order subset:
+
+  if(true, X, Y) => X 
+  if(false, X, Y) => Y 
+  lteq(s(X), o) => false 
+  lteq(o, X) => true 
+  lteq(s(X), s(Y)) => lteq(X, Y) 
+  from(X, nil) => nil 
+  from(X, cons(Y, Z)) => if(lteq(X, Y), cons(Y, Z), from(X, Z)) 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: if(true(),PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     2: if(false(),PeRCenTX,PeRCenTY) -> PeRCenTY
+ ||     3: lteq(s(PeRCenTX),o()) -> false()
+ ||     4: lteq(o(),PeRCenTX) -> true()
+ ||     5: lteq(s(PeRCenTX),s(PeRCenTY)) -> lteq(PeRCenTX,PeRCenTY)
+ ||     6: from(PeRCenTX,nil()) -> nil()
+ ||     7: from(PeRCenTX,cons(PeRCenTY,PeRCenTZ)) -> if(lteq(PeRCenTX,PeRCenTY),cons(PeRCenTY,PeRCenTZ),from(PeRCenTX,PeRCenTZ))
+ || Number of strict rules: 7
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #from(PeRCenTX,cons(PeRCenTY,PeRCenTZ)) -> #if(lteq(PeRCenTX,PeRCenTY),cons(PeRCenTY,PeRCenTZ),from(PeRCenTX,PeRCenTZ))
+ ||    #2: #from(PeRCenTX,cons(PeRCenTY,PeRCenTZ)) -> #lteq(PeRCenTX,PeRCenTY)
+ ||    #3: #from(PeRCenTX,cons(PeRCenTY,PeRCenTZ)) -> #from(PeRCenTX,PeRCenTZ)
+ ||    #4: #lteq(s(PeRCenTX),s(PeRCenTY)) -> #lteq(PeRCenTX,PeRCenTY)
+ || Number of SCCs: 2, DPs: 2
+ ||   SCC { #3 }
+ || POLO(Sum)... succeeded.
+ ||       s 	w: 0
+ ||       #lteq	w: 0
+ ||       false	w: 0
+ ||       true	w: 0
+ ||       o 	w: 0
+ ||       lteq	w: 0
+ ||       if	w: 0
+ ||       from	w: 0
+ ||       nil	w: 0
+ ||       #from	w: x2
+ ||       cons	w: x2 + 1
+ ||       #if	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #3
+ || Number of SCCs: 1, DPs: 1
+ ||   SCC { #4 }
+ || POLO(Sum)... succeeded.
+ ||       s 	w: x1 + 1
+ ||       #lteq	w: x1
+ ||       false	w: 0
+ ||       true	w: 0
+ ||       o 	w: 0
+ ||       lteq	w: 0
+ ||       if	w: 0
+ ||       from	w: 0
+ ||       nil	w: 0
+ ||       #from	w: 0
+ ||       cons	w: 1
+ ||       #if	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #4
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] chain#(F, cons(X, Y)) =#> chain#(F, from(F X, Y))   
+    1] chain#(F, cons(X, Y)) =#> from#(F X, Y)   
+    2] incch#(X) =#> chain#(/\x.s(x), X)   
+
+  Rules R_0:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    lteq(s(X), o) => false 
+    lteq(o, X) => true 
+    lteq(s(X), s(Y)) => lteq(X, Y) 
+    from(X, nil) => nil 
+    from(X, cons(Y, Z)) => if(lteq(X, Y), cons(Y, Z), from(X, Z)) 
+    chain(F, nil) => nil 
+    chain(F, cons(X, Y)) => cons(F X, chain(F, from(F X, Y))) 
+    incch(X) => chain(/\x.s(x), X) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0, 1 
+    * 1 :  
+    * 2 : 0, 1 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    chain#(F, cons(X, Y)) =#> chain#(F, from(F X, Y))   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+The formative rules of (P_1, R_0) are R_1 ::=
+
+  if(true, X, Y) => X 
+  if(false, X, Y) => Y 
+  lteq(s(X), o) => false 
+  lteq(o, X) => true 
+  lteq(s(X), s(Y)) => lteq(X, Y) 
+  from(X, cons(Y, Z)) => if(lteq(X, Y), cons(Y, Z), from(X, Z)) 
+  chain(F, cons(X, Y)) => cons(F X, chain(F, from(F X, Y))) 
+  incch(X) => chain(/\x.s(x), X) 
+
+By [Kop12, Thm. 7.17], we may replace the dependency pair problem (P_1, R_0, computable, formative) by (P_1, R_1, computable, formative).
+
+Thus, the original system is terminating if (P_1, R_1, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_1, computable, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  It suffices to find a standard reduction pair [Kop12, Def. 6.69].  Thus, we must orient:
+
+  chain#(F, cons(X, Y)) >? chain#(F, from(F X, Y)) 
+  if(true, X, Y) >= X 
+  if(false, X, Y) >= Y 
+  lteq(s(X), o) >= false 
+  lteq(o, X) >= true 
+  lteq(s(X), s(Y)) >= lteq(X, Y) 
+  from(X, cons(Y, Z)) >= if(lteq(X, Y), cons(Y, Z), from(X, Z)) 
+  chain(F, cons(X, Y)) >= cons(F X, chain(F, from(F X, Y))) 
+  incch(X) >= chain(/\x.s(x), X) 
+
+We apply [Kop12, Thm. 6.75] and use the following argument functions:
+
+  pi( incch(X) ) = #argfun-incch#(chain(/\x.s(x), X)) 
+
+Since this representation is not advantageous for the higher-order recursive path ordering, we present the strict requirements in their unextended form, which is not problematic since for any F, s and substituion gamma: (F s)gamma beta-reduces to F(s)gamma.)
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[chain#(x_1, x_2)]] = chain#(x_2, x_1) 
+  [[from(x_1, x_2)]] = from(x_2) 
+  [[if(x_1, x_2, x_3)]] = if(x_2, x_3) 
+  [[incch(x_1)]] = x_1 
+  [[lteq(x_1, x_2)]] = x_1 
+  [[true]] = _|_ 
+
+We choose Lex = {chain#} and Mul = {#argfun-incch#, @_{o -> o}, chain, cons, false, from, if, o, s}, and the following precedence: chain# > #argfun-incch# > chain > s > cons > @_{o -> o} > from > if > o > false
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  chain#(F, cons(X, Y)) > chain#(F, from(Y)) 
+  if(X, Y) >= X 
+  if(X, Y) >= Y 
+  s(X) >= false 
+  o >= _|_ 
+  s(X) >= X 
+  from(cons(X, Y)) >= if(cons(X, Y), from(Y)) 
+  chain(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), chain(F, from(Y))) 
+  #argfun-incch#(chain(/\x.s(x), X)) >= chain(/\x.s(x), X) 
+
+With these choices, we have:
+
+  1] chain#(F, cons(X, Y)) > chain#(F, from(Y))  because [2], by definition 
+  2] chain#*(F, cons(X, Y)) >= chain#(F, from(Y))  because chain# in Lex, [3], [7] and [9], by (Stat) 
+  3] cons(X, Y) > from(Y)  because [4], by definition 
+  4] cons*(X, Y) >= from(Y)  because cons > from and [5], by (Copy) 
+  5] cons*(X, Y) >= Y  because [6], by (Select) 
+  6] Y >= Y  by (Meta) 
+  7] chain#*(F, cons(X, Y)) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] chain#*(F, cons(X, Y)) >= from(Y)  because chain# > from and [10], by (Copy) 
+  10] chain#*(F, cons(X, Y)) >= Y  because [11], by (Select) 
+  11] cons(X, Y) >= Y  because [5], by (Star) 
+
+  12] if(X, Y) >= X  because [13], by (Star) 
+  13] if*(X, Y) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+
+  15] if(X, Y) >= Y  because [16], by (Star) 
+  16] if*(X, Y) >= Y  because [17], by (Select) 
+  17] Y >= Y  by (Meta) 
+
+  18] s(X) >= false  because [19], by (Star) 
+  19] s*(X) >= false  because s > false, by (Copy) 
+
+  20] o >= _|_  by (Bot) 
+
+  21] s(X) >= X  because [22], by (Star) 
+  22] s*(X) >= X  because [23], by (Select) 
+  23] X >= X  by (Meta) 
+
+  24] from(cons(X, Y)) >= if(cons(X, Y), from(Y))  because [25], by (Star) 
+  25] from*(cons(X, Y)) >= if(cons(X, Y), from(Y))  because from > if, [26] and [30], by (Copy) 
+  26] from*(cons(X, Y)) >= cons(X, Y)  because [27], by (Select) 
+  27] cons(X, Y) >= cons(X, Y)  because cons in Mul, [28] and [29], by (Fun) 
+  28] X >= X  by (Meta) 
+  29] Y >= Y  by (Meta) 
+  30] from*(cons(X, Y)) >= from(Y)  because [31], by (Select) 
+  31] cons(X, Y) >= from(Y)  because [32], by (Star) 
+  32] cons*(X, Y) >= from(Y)  because cons > from and [33], by (Copy) 
+  33] cons*(X, Y) >= Y  because [29], by (Select) 
+
+  34] chain(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), chain(F, from(Y)))  because [35], by (Star) 
+  35] chain*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), chain(F, from(Y)))  because chain > cons, [36] and [42], by (Copy) 
+  36] chain*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because chain > @_{o -> o}, [37] and [38], by (Copy) 
+  37] chain*(F, cons(X, Y)) >= F  because [8], by (Select) 
+  38] chain*(F, cons(X, Y)) >= X  because [39], by (Select) 
+  39] cons(X, Y) >= X  because [40], by (Star) 
+  40] cons*(X, Y) >= X  because [41], by (Select) 
+  41] X >= X  by (Meta) 
+  42] chain*(F, cons(X, Y)) >= chain(F, from(Y))  because chain in Mul, [43] and [3], by (Stat) 
+  43] F >= F  by (Meta) 
+
+  44] #argfun-incch#(chain(/\x.s(x), X)) >= chain(/\x.s(x), X)  because [45], by (Star) 
+  45] #argfun-incch#*(chain(/\x.s(x), X)) >= chain(/\x.s(x), X)  because #argfun-incch# > chain, [46] and [50], by (Copy) 
+  46] #argfun-incch#*(chain(/\x.s(x), X)) >= /\x.s(x)  because [47], by (F-Abs) 
+  47] #argfun-incch#*(chain(/\x.s(x), X), y) >= s(y)  because #argfun-incch# > s and [48], by (Copy) 
+  48] #argfun-incch#*(chain(/\x.s(x), X), y) >= y  because [49], by (Select) 
+  49] y >= y  by (Var) 
+  50] #argfun-incch#*(chain(/\x.s(x), X)) >= X  because [51], by (Select) 
+  51] chain(/\x.s(x), X) >= X  because [52], by (Star) 
+  52] chain*(/\x.s(x), X) >= X  because [53], by (Select) 
+  53] X >= X  by (Meta) 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace a dependency pair problem (P_1, R_1) by ({}, R_1).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

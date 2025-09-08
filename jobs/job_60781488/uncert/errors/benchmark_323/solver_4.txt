@@ -1,0 +1,912 @@
+Input TRS:
+    1: 0(\#()) -> \#()
+    2: +(x,\#()) -> x
+    3: +(\#(),x) -> x
+    4: +(0(x),0(y)) -> 0(+(x,y))
+    5: +(0(x),1(y)) -> 1(+(x,y))
+    6: +(1(x),0(y)) -> 1(+(x,y))
+    7: +(1(x),1(y)) -> 0(+(+(x,y),1(\#())))
+    8: +(+(x,y),z) -> +(x,+(y,z))
+    9: -(\#(),x) -> \#()
+    10: -(x,\#()) -> x
+    11: -(0(x),0(y)) -> 0(-(x,y))
+    12: -(0(x),1(y)) -> 1(-(-(x,y),1(\#())))
+    13: -(1(x),0(y)) -> 1(-(x,y))
+    14: -(1(x),1(y)) -> 0(-(x,y))
+    15: not(true()) -> false()
+    16: not(false()) -> true()
+    17: if(true(),x,y) -> x
+    18: if(false(),x,y) -> y
+    19: eq(\#(),\#()) -> true()
+    20: eq(\#(),1(y)) -> false()
+    21: eq(1(x),\#()) -> false()
+    22: eq(\#(),0(y)) -> eq(\#(),y)
+    23: eq(0(x),\#()) -> eq(x,\#())
+    24: eq(1(x),1(y)) -> eq(x,y)
+    25: eq(0(x),1(y)) -> false()
+    26: eq(1(x),0(y)) -> false()
+    27: eq(0(x),0(y)) -> eq(x,y)
+    28: ge(0(x),0(y)) -> ge(x,y)
+    29: ge(0(x),1(y)) -> not(ge(y,x))
+    30: ge(1(x),0(y)) -> ge(x,y)
+    31: ge(1(x),1(y)) -> ge(x,y)
+    32: ge(x,\#()) -> true()
+    33: ge(\#(),0(x)) -> ge(\#(),x)
+    34: ge(\#(),1(x)) -> false()
+    35: log(x) -> -(log'(x),1(\#()))
+    36: log'(\#()) -> \#()
+    37: log'(1(x)) -> +(log'(x),1(\#()))
+    38: log'(0(x)) -> if(ge(x,1(\#())),+(log'(x),1(\#())),\#())
+    39: *(\#(),x) -> \#()
+    40: *(0(x),y) -> 0(*(x,y))
+    41: *(1(x),y) -> +(0(*(x,y)),y)
+    42: *(*(x,y),z) -> *(x,*(y,z))
+    43: *(x,+(y,z)) -> +(*(x,y),*(x,z))
+    44: app(nil(),l) -> l
+    45: app(cons(x,l1),l2) -> cons(x,app(l1,l2))
+    46: sum(nil()) -> 0(\#())
+    47: sum(cons(x,l)) -> +(x,sum(l))
+    48: sum(app(l1,l2)) -> +(sum(l1),sum(l2))
+    49: prod(nil()) -> 1(\#())
+    50: prod(cons(x,l)) -> *(x,prod(l))
+    51: prod(app(l1,l2)) -> *(prod(l1),prod(l2))
+    52: mem(x,nil()) -> false()
+    53: mem(x,cons(y,l)) -> if(eq(x,y),true(),mem(x,l))
+    54: inter(x,nil()) -> nil()
+    55: inter(nil(),x) -> nil()
+    56: inter(app(l1,l2),l3) -> app(inter(l1,l3),inter(l2,l3))
+    57: inter(l1,app(l2,l3)) -> app(inter(l1,l2),inter(l1,l3))
+    58: inter(cons(x,l1),l2) -> ifinter(mem(x,l2),x,l1,l2)
+    59: inter(l1,cons(x,l2)) -> ifinter(mem(x,l1),x,l2,l1)
+    60: ifinter(true(),x,l1,l2) -> cons(x,inter(l1,l2))
+    61: ifinter(false(),x,l1,l2) -> inter(l1,l2)
+Number of strict rules: 61
+Direct Order(PosReal,>,Poly) ... failed.
+Freezing ... failed.
+Dependency Pairs:
+   #1: #*(x,+(y,z)) -> #+(*(x,y),*(x,z))
+   #2: #*(x,+(y,z)) -> #*(x,y)
+   #3: #*(x,+(y,z)) -> #*(x,z)
+   #4: #ge(0(x),1(y)) -> #not(ge(y,x))
+   #5: #ge(0(x),1(y)) -> #ge(y,x)
+   #6: #log(x) -> #-(log'(x),1(\#()))
+   #7: #log(x) -> #log'(x)
+   #8: #sum(nil()) -> #0(\#())
+   #9: #*(*(x,y),z) -> #*(x,*(y,z))
+   #10: #*(*(x,y),z) -> #*(y,z)
+   #11: #*(1(x),y) -> #+(0(*(x,y)),y)
+   #12: #*(1(x),y) -> #0(*(x,y))
+   #13: #*(1(x),y) -> #*(x,y)
+   #14: #log'(1(x)) -> #+(log'(x),1(\#()))
+   #15: #log'(1(x)) -> #log'(x)
+   #16: #sum(cons(x,l)) -> #+(x,sum(l))
+   #17: #sum(cons(x,l)) -> #sum(l)
+   #18: #mem(x,cons(y,l)) -> #if(eq(x,y),true(),mem(x,l))
+   #19: #mem(x,cons(y,l)) -> #eq(x,y)
+   #20: #mem(x,cons(y,l)) -> #mem(x,l)
+   #21: #sum(app(l1,l2)) -> #+(sum(l1),sum(l2))
+   #22: #sum(app(l1,l2)) -> #sum(l1)
+   #23: #sum(app(l1,l2)) -> #sum(l2)
+   #24: #inter(cons(x,l1),l2) -> #ifinter(mem(x,l2),x,l1,l2)
+   #25: #inter(cons(x,l1),l2) -> #mem(x,l2)
+   #26: #ifinter(false(),x,l1,l2) -> #inter(l1,l2)
+   #27: #log'(0(x)) -> #if(ge(x,1(\#())),+(log'(x),1(\#())),\#())
+   #28: #log'(0(x)) -> #ge(x,1(\#()))
+   #29: #log'(0(x)) -> #+(log'(x),1(\#()))
+   #30: #log'(0(x)) -> #log'(x)
+   #31: #+(1(x),0(y)) -> #+(x,y)
+   #32: #inter(l1,cons(x,l2)) -> #ifinter(mem(x,l1),x,l2,l1)
+   #33: #inter(l1,cons(x,l2)) -> #mem(x,l1)
+   #34: #*(0(x),y) -> #0(*(x,y))
+   #35: #*(0(x),y) -> #*(x,y)
+   #36: #prod(app(l1,l2)) -> #*(prod(l1),prod(l2))
+   #37: #prod(app(l1,l2)) -> #prod(l1)
+   #38: #prod(app(l1,l2)) -> #prod(l2)
+   #39: #-(1(x),0(y)) -> #-(x,y)
+   #40: #-(0(x),0(y)) -> #0(-(x,y))
+   #41: #-(0(x),0(y)) -> #-(x,y)
+   #42: #inter(l1,app(l2,l3)) -> #app(inter(l1,l2),inter(l1,l3))
+   #43: #inter(l1,app(l2,l3)) -> #inter(l1,l2)
+   #44: #inter(l1,app(l2,l3)) -> #inter(l1,l3)
+   #45: #eq(1(x),1(y)) -> #eq(x,y)
+   #46: #eq(0(x),\#()) -> #eq(x,\#())
+   #47: #app(cons(x,l1),l2) -> #app(l1,l2)
+   #48: #-(0(x),1(y)) -> #-(-(x,y),1(\#()))
+   #49: #-(0(x),1(y)) -> #-(x,y)
+   #50: #ge(1(x),1(y)) -> #ge(x,y)
+   #51: #inter(app(l1,l2),l3) -> #app(inter(l1,l3),inter(l2,l3))
+   #52: #inter(app(l1,l2),l3) -> #inter(l1,l3)
+   #53: #inter(app(l1,l2),l3) -> #inter(l2,l3)
+   #54: #-(1(x),1(y)) -> #0(-(x,y))
+   #55: #-(1(x),1(y)) -> #-(x,y)
+   #56: #ge(1(x),0(y)) -> #ge(x,y)
+   #57: #+(1(x),1(y)) -> #0(+(+(x,y),1(\#())))
+   #58: #+(1(x),1(y)) -> #+(+(x,y),1(\#()))
+   #59: #+(1(x),1(y)) -> #+(x,y)
+   #60: #ge(\#(),0(x)) -> #ge(\#(),x)
+   #61: #+(0(x),1(y)) -> #+(x,y)
+   #62: #ge(0(x),0(y)) -> #ge(x,y)
+   #63: #eq(\#(),0(y)) -> #eq(\#(),y)
+   #64: #eq(0(x),0(y)) -> #eq(x,y)
+   #65: #ifinter(true(),x,l1,l2) -> #inter(l1,l2)
+   #66: #+(+(x,y),z) -> #+(x,+(y,z))
+   #67: #+(+(x,y),z) -> #+(y,z)
+   #68: #+(0(x),0(y)) -> #0(+(x,y))
+   #69: #+(0(x),0(y)) -> #+(x,y)
+   #70: #prod(cons(x,l)) -> #*(x,prod(l))
+   #71: #prod(cons(x,l)) -> #prod(l)
+Number of SCCs: 14, DPs: 45, edges: 193
+	SCC { #63 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: 0
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: x2
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: 0
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #63
+Number of SCCs: 13, DPs: 44, edges: 192
+	SCC { #46 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: 0
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: x1
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: 0
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #46
+Number of SCCs: 12, DPs: 43, edges: 191
+	SCC { #60 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: 0
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: x2
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: 0
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #60
+Number of SCCs: 11, DPs: 42, edges: 190
+	SCC { #20 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: 0
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: x2
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2)
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 2) + x2
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #20
+Number of SCCs: 10, DPs: 41, edges: 189
+	SCC { #47 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: 0
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2)
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: x1
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 2) + x2
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #47
+Number of SCCs: 9, DPs: 40, edges: 188
+	SCC { #15 #30 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 2) + x1
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: x1
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 2)
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #15 #30
+Number of SCCs: 8, DPs: 38, edges: 184
+	SCC { #45 #64 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 2) + x1
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: x2
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 2)
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #45 #64
+Number of SCCs: 7, DPs: 36, edges: 180
+	SCC { #37 #38 #71 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 2)
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: x1
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2)
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 2) + x2
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: (/ 1 2) + x1 + x2
+    Usable rules: { }
+    Removed DPs: #37 #38 #71
+Number of SCCs: 6, DPs: 33, edges: 171
+	SCC { #17 #22 #23 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 2)
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2)
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 2) + x2
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: x1
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: (/ 1 2) + x1 + x2
+    Usable rules: { }
+    Removed DPs: #17 #22 #23
+Number of SCCs: 5, DPs: 30, edges: 162
+	SCC { #5 #50 #56 #62 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 4) + x1
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: x1 + x2
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 4) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 4)
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: (/ 1 4)
+    Usable rules: { }
+    Removed DPs: #5 #50 #56 #62
+Number of SCCs: 4, DPs: 26, edges: 146
+	SCC { #39 #41 #48 #49 #55 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 2) + x1
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: (/ 1 2)
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: x2
+  cons(x1,x2)	weight: (/ 1 2)
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: (/ 1 2)
+    Usable rules: { }
+    Removed DPs: #39 #41 #49 #55
+Number of SCCs: 4, DPs: 22, edges: 124
+	SCC { #48 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 2) + x1
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 2) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: x1
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: x1 + x2
+  cons(x1,x2)	weight: (/ 1 2)
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: 0
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: (/ 1 2)
+    Usable rules: { 1 9..14 }
+    Removed DPs: #48
+Number of SCCs: 3, DPs: 21, edges: 123
+	SCC { #2 #3 #9 #10 #13 #35 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 4) + x1
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: x1
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 4) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: x1
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: x1
+  cons(x1,x2)	weight: (/ 1 4)
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: (/ 3 4)
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: (/ 1 4) + x1 + x2
+   app(x1,x2)	weight: (/ 1 4)
+    Usable rules: { 1 }
+    Removed DPs: #9 #10 #13 #35
+Number of SCCs: 4, DPs: 17, edges: 91
+	SCC { #2 #3 }
+Removing DPs: Order(PosReal,>,Sum)... Order(PosReal,>,Max)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: 0
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: max{0, (/ 1 4) + x2}
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: 0
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: 0
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: max{(/ 1 4) + x2, x1}
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #3
+Number of SCCs: 4, DPs: 16, edges: 88
+	SCC { #2 }
+Removing DPs: Order(PosReal,>,Sum)... Order(PosReal,>,Max)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: 0
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: max{0, (/ 1 4) + x2}
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: 0
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: 0
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: 0
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: max{0, (/ 1 4) + x1}
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: 0
+   not(x1)	weight: 0
+     *(x1,x2)	weight: 0
+   app(x1,x2)	weight: 0
+    Usable rules: { }
+    Removed DPs: #2
+Number of SCCs: 3, DPs: 15, edges: 87
+	SCC { #31 #58 #59 #61 #66 #67 #69 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 4) + x1
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 8) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: (/ 1 8)
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 8)
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: (/ 1 8) + x1 + x2
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: x1 + x2
+   not(x1)	weight: 0
+     *(x1,x2)	weight: (/ 1 8) + x1
+   app(x1,x2)	weight: (/ 1 8)
+    Usable rules: { 1..8 }
+    Removed DPs: #31 #58 #59 #61 #67 #69
+Number of SCCs: 4, DPs: 9, edges: 41
+	SCC { #66 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 4) + x1
+   mem(x1,x2)	weight: 0
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: 0
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: 0
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 8) + x1
+    if(x1,x2,x3)	weight: 0
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: (/ 1 8)
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 8)
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: 0
+     +(x1,x2)	weight: (/ 1 8) + x1 + x2
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: x1
+   not(x1)	weight: 0
+     *(x1,x2)	weight: (/ 1 8) + x1
+   app(x1,x2)	weight: (/ 1 8)
+    Usable rules: { 1..8 }
+    Removed DPs: #66
+Number of SCCs: 3, DPs: 8, edges: 40
+	SCC { #24 #26 #32 #43 #44 #52 #53 #65 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+   #0(x1)	weight: 0
+     1(x1)	weight: (/ 1 4) + x1
+   mem(x1,x2)	weight: (/ 1 8) + x1
+  prod(x1)	weight: 0
+#prod(x1)	weight: 0
+ifinter(x1,x2,x3,x4)	weight: 0
+    eq(x1,x2)	weight: (/ 1 8) + x1
+ false()	weight: 0
+  #ge(x1,x2)	weight: 0
+ #mem(x1,x2)	weight: 0
+   #*(x1,x2)	weight: 0
+ #log(x1)	weight: 0
+     \#()	weight: 0
+#ifinter(x1,x2,x3,x4)	weight: (/ 1 8) + x3 + x4
+  true()	weight: 0
+  #eq(x1,x2)	weight: 0
+   sum(x1)	weight: 0
+ #not(x1)	weight: 0
+   log(x1)	weight: 0
+     0(x1)	weight: (/ 1 8) + x1
+    if(x1,x2,x3)	weight: x1 + x3
+    ge(x1,x2)	weight: 0
+   nil()	weight: 0
+#log'(x1)	weight: 0
+     -(x1,x2)	weight: (/ 1 8)
+ #app(x1,x2)	weight: 0
+   #-(x1,x2)	weight: 0
+  cons(x1,x2)	weight: (/ 1 4) + x1 + x2
+  #if(x1,x2,x3)	weight: 0
+ inter(x1,x2)	weight: 0
+#inter(x1,x2)	weight: x1 + x2
+     +(x1,x2)	weight: (/ 1 8) + x1 + x2
+  log'(x1)	weight: 0
+ #sum(x1)	weight: 0
+   #+(x1,x2)	weight: x1
+   not(x1)	weight: 0
+     *(x1,x2)	weight: (/ 1 8) + x1
+   app(x1,x2)	weight: (/ 1 8) + x1 + x2
+    Usable rules: { }
+    Removed DPs: #24 #26 #32 #43 #44 #52 #53 #65
+Number of SCCs: 3, DPs: 0, edges: 0

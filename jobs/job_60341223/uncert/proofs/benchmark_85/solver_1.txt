@@ -1,0 +1,82 @@
+YES
+We consider the system BKQId.
+
+  Alphabet:
+
+    cons : [nat * list] --> list 
+    map : [nat -> nat * list] --> list 
+    merge : [list * list * list] --> list 
+    nil : [] --> list 
+
+  Rules:
+
+    merge(nil, nil, X) => X 
+    merge(nil, cons(X, Y), Z) => merge(Y, nil, cons(X, Z)) 
+    merge(cons(X, Y), Z, U) => merge(Z, Y, cons(X, U)) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  merge(nil, nil, X) >? X 
+  merge(nil, cons(X, Y), Z) >? merge(Y, nil, cons(X, Z)) 
+  merge(cons(X, Y), Z, U) >? merge(Z, Y, cons(X, U)) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  cons = Lam[y0;y1].1 + y0 + y1 
+  map = Lam[G0;y1].3*y1 + G0(0) + 2*y1*G0(y1) 
+  merge = Lam[y0;y1;y2].3 + y0 + y1 + y2 
+  nil = 2 
+
+Using this interpretation, the requirements translate to:
+
+  [[merge(nil, nil, _x0)]] = 7 + x0 > x0 = [[_x0]] 
+  [[merge(nil, cons(_x0, _x1), _x2)]] = 6 + x0 + x1 + x2 >= 6 + x0 + x1 + x2 = [[merge(_x1, nil, cons(_x0, _x2))]] 
+  [[merge(cons(_x0, _x1), _x2, _x3)]] = 4 + x0 + x1 + x2 + x3 >= 4 + x0 + x1 + x2 + x3 = [[merge(_x2, _x1, cons(_x0, _x3))]] 
+  [[map(_F0, nil)]] = 6 + F0(0) + 4*F0(2) > 2 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 3 + 3*x1 + 3*x2 + F0(0) + 2*x1*F0(1 + x1 + x2) + 2*x2*F0(1 + x1 + x2) + 2*F0(1 + x1 + x2) > 1 + x1 + 3*x2 + F0(0) + F0(x1) + 2*x2*F0(x2) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+
+We can thus remove the following rules:
+
+  merge(nil, nil, X) => X 
+  map(F, nil) => nil 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  merge(nil, cons(X, Y), Z) >? merge(Y, nil, cons(X, Z)) 
+  merge(cons(X, Y), Z, U) >? merge(Z, Y, cons(X, U)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  cons = Lam[y0;y1].3 + y1 + 3*y0 
+  merge = Lam[y0;y1;y2].2*y2 + 3*y0 + 3*y1 
+  nil = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[merge(nil, cons(_x0, _x1), _x2)]] = 9 + 2*x2 + 3*x1 + 9*x0 > 6 + 2*x2 + 3*x1 + 6*x0 = [[merge(_x1, nil, cons(_x0, _x2))]] 
+  [[merge(cons(_x0, _x1), _x2, _x3)]] = 9 + 2*x3 + 3*x1 + 3*x2 + 9*x0 > 6 + 2*x3 + 3*x1 + 3*x2 + 6*x0 = [[merge(_x2, _x1, cons(_x0, _x3))]] 
+
+We can thus remove the following rules:
+
+  merge(nil, cons(X, Y), Z) => merge(Y, nil, cons(X, Z)) 
+  merge(cons(X, Y), Z, U) => merge(Z, Y, cons(X, U)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

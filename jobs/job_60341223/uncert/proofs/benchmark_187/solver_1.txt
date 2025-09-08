@@ -1,0 +1,229 @@
+YES
+We consider the system 5QEmD.
+
+  Alphabet:
+
+    O : [] --> a 
+    cons : [b * c] --> c 
+    d : [a * a] --> c 
+    false : [] --> c 
+    filter : [b -> c * c] --> c 
+    gtr : [a * a] --> c 
+    if : [c * c * c] --> c 
+    len : [c] --> a 
+    nil : [] --> c 
+    s : [a] --> a 
+    sub : [a * a] --> a 
+    true : [] --> c 
+
+  Rules:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    sub(X, O) => X 
+    sub(s(X), s(Y)) => sub(X, Y) 
+    gtr(O, X) => false 
+    gtr(s(X), O) => true 
+    gtr(s(X), s(Y)) => gtr(X, Y) 
+    d(X, O) => true 
+    d(s(X), s(Y)) => if(gtr(X, Y), false, d(s(X), sub(Y, X))) 
+    len(nil) => O 
+    len(cons(X, Y)) => s(len(Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+
+We observe that the rules contain a first-order subset:
+
+  if(true, X, Y) => X 
+  if(false, X, Y) => Y 
+  sub(X, O) => X 
+  sub(s(X), s(Y)) => sub(X, Y) 
+  gtr(O, X) => false 
+  gtr(s(X), O) => true 
+  gtr(s(X), s(Y)) => gtr(X, Y) 
+  d(X, O) => true 
+  d(s(X), s(Y)) => if(gtr(X, Y), false, d(s(X), sub(Y, X))) 
+  len(nil) => O 
+  len(cons(X, Y)) => s(len(Y)) 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: if(true(),PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     2: if(false(),PeRCenTX,PeRCenTY) -> PeRCenTY
+ ||     3: sub(PeRCenTX,O()) -> PeRCenTX
+ ||     4: sub(s(PeRCenTX),s(PeRCenTY)) -> sub(PeRCenTX,PeRCenTY)
+ ||     5: gtr(O(),PeRCenTX) -> false()
+ ||     6: gtr(s(PeRCenTX),O()) -> true()
+ ||     7: gtr(s(PeRCenTX),s(PeRCenTY)) -> gtr(PeRCenTX,PeRCenTY)
+ ||     8: d(PeRCenTX,O()) -> true()
+ ||     9: d(s(PeRCenTX),s(PeRCenTY)) -> if(gtr(PeRCenTX,PeRCenTY),false(),d(s(PeRCenTX),sub(PeRCenTY,PeRCenTX)))
+ ||     10: len(nil()) -> O()
+ ||     11: len(cons(PeRCenTX,PeRCenTY)) -> s(len(PeRCenTY))
+ || Number of strict rules: 11
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #d(s(PeRCenTX),s(PeRCenTY)) -> #if(gtr(PeRCenTX,PeRCenTY),false(),d(s(PeRCenTX),sub(PeRCenTY,PeRCenTX)))
+ ||    #2: #d(s(PeRCenTX),s(PeRCenTY)) -> #gtr(PeRCenTX,PeRCenTY)
+ ||    #3: #d(s(PeRCenTX),s(PeRCenTY)) -> #d(s(PeRCenTX),sub(PeRCenTY,PeRCenTX))
+ ||    #4: #d(s(PeRCenTX),s(PeRCenTY)) -> #sub(PeRCenTY,PeRCenTX)
+ ||    #5: #len(cons(PeRCenTX,PeRCenTY)) -> #len(PeRCenTY)
+ ||    #6: #gtr(s(PeRCenTX),s(PeRCenTY)) -> #gtr(PeRCenTX,PeRCenTY)
+ ||    #7: #sub(s(PeRCenTX),s(PeRCenTY)) -> #sub(PeRCenTX,PeRCenTY)
+ || Number of SCCs: 4, DPs: 4
+ ||   SCC { #5 }
+ || POLO(Sum)... succeeded.
+ ||       d 	w: 0
+ ||       #len	w: x1
+ ||       s 	w: 0
+ ||       #gtr	w: 0
+ ||       false	w: 0
+ ||       gtr	w: 0
+ ||       sub	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       #sub	w: 0
+ ||       if	w: 0
+ ||       nil	w: 0
+ ||       #d 	w: 0
+ ||       cons	w: x2 + 1
+ ||       #if	w: 0
+ ||       len	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #5
+ || Number of SCCs: 3, DPs: 3
+ ||   SCC { #7 }
+ || POLO(Sum)... succeeded.
+ ||       d 	w: 0
+ ||       #len	w: 0
+ ||       s 	w: x1 + 1
+ ||       #gtr	w: 0
+ ||       false	w: 0
+ ||       gtr	w: 0
+ ||       sub	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       #sub	w: x1
+ ||       if	w: 0
+ ||       nil	w: 0
+ ||       #d 	w: 0
+ ||       cons	w: 1
+ ||       #if	w: 0
+ ||       len	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #7
+ || Number of SCCs: 2, DPs: 2
+ ||   SCC { #6 }
+ || POLO(Sum)... succeeded.
+ ||       d 	w: 0
+ ||       #len	w: 0
+ ||       s 	w: x1 + 1
+ ||       #gtr	w: x1
+ ||       false	w: 0
+ ||       gtr	w: 0
+ ||       sub	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       #sub	w: 0
+ ||       if	w: 0
+ ||       nil	w: 0
+ ||       #d 	w: 0
+ ||       cons	w: 1
+ ||       #if	w: 0
+ ||       len	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #6
+ || Number of SCCs: 1, DPs: 1
+ ||   SCC { #3 }
+ || POLO(Sum)... succeeded.
+ ||       d 	w: 0
+ ||       #len	w: 0
+ ||       s 	w: x1 + 2
+ ||       #gtr	w: 0
+ ||       false	w: 0
+ ||       gtr	w: 0
+ ||       sub	w: x1 + 1
+ ||       O 	w: 1
+ ||       true	w: 0
+ ||       #sub	w: 0
+ ||       if	w: 0
+ ||       nil	w: 0
+ ||       #d 	w: x2
+ ||       cons	w: 1
+ ||       #if	w: 0
+ ||       len	w: 0
+ ||     USABLE RULES: { 3 4 }
+ ||     Removed DPs: #3
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] filter#(F, cons(X, Y)) =#> if#(F X, cons(X, filter(F, Y)), filter(F, Y))   
+    1] filter#(F, cons(X, Y)) =#> filter#(F, Y)   
+    2] filter#(F, cons(X, Y)) =#> filter#(F, Y)   
+
+  Rules R_0:
+
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    sub(X, O) => X 
+    sub(s(X), s(Y)) => sub(X, Y) 
+    gtr(O, X) => false 
+    gtr(s(X), O) => true 
+    gtr(s(X), s(Y)) => gtr(X, Y) 
+    d(X, O) => true 
+    d(s(X), s(Y)) => if(gtr(X, Y), false, d(s(X), sub(Y, X))) 
+    len(nil) => O 
+    len(cons(X, Y)) => s(len(Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => if(F X, cons(X, filter(F, Y)), filter(F, Y)) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+    * 1 : 0, 1, 2 
+    * 2 : 0, 1, 2 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    filter#(F, cons(X, Y)) =#> filter#(F, Y)   
+    filter#(F, cons(X, Y)) =#> filter#(F, Y)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(filter#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(filter#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(filter#(F, Y)) 
+  nu(filter#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(filter#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

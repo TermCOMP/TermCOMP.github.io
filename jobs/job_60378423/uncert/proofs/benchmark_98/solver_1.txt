@@ -1,0 +1,415 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/Je16d.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 184 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 2 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 62 ms]
+        (9) QDP
+        (10) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (11) YES
+    (12) JBCTerminationSCC
+        (13) SCCToIRSProof [SOUND, 52 ms]
+        (14) IRSwT
+        (15) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (16) IRSwT
+        (17) IRSwTTerminationDigraphProof [EQUIVALENT, 29 ms]
+        (18) IRSwT
+        (19) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (20) IRSwT
+        (21) TempFilterProof [SOUND, 9 ms]
+        (22) IntTRS
+        (23) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (24) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package SharingAnalysis;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package SharingAnalysis;
+
+public class SharingAnalysis {
+	int val;
+	SharingAnalysis field;
+
+	public static void main(String[] args) {
+		Random.args = args;
+		SharingAnalysis t1 = new SharingAnalysis();
+		SharingAnalysis t2 = t1.appendNewList(1);
+		SharingAnalysis t3 = t2.appendNewList(Random.random());
+		t2.field = null;
+		copy(t1, t3);
+	}
+
+	public static void copy(SharingAnalysis source, SharingAnalysis target) {
+		while (source != null) {
+			SharingAnalysis newEle = new SharingAnalysis();
+			newEle.val = source.val;
+			target.field = newEle;
+			source = source.field;
+			target = target.field;
+		}
+	}
+
+	/**
+ 	 * @param i number of elements to append
+ 	 * @return the last list element appended
+ 	 */
+	private SharingAnalysis appendNewList(int i) {
+		this.field = new SharingAnalysis();
+		SharingAnalysis cur = this.field;
+		while (i > 1) {
+			i--;
+			cur = cur.field = new SharingAnalysis();
+		}
+		return cur;
+	}
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package SharingAnalysis;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package SharingAnalysis;
+
+public class SharingAnalysis {
+	int val;
+	SharingAnalysis field;
+
+	public static void main(String[] args) {
+		Random.args = args;
+		SharingAnalysis t1 = new SharingAnalysis();
+		SharingAnalysis t2 = t1.appendNewList(1);
+		SharingAnalysis t3 = t2.appendNewList(Random.random());
+		t2.field = null;
+		copy(t1, t3);
+	}
+
+	public static void copy(SharingAnalysis source, SharingAnalysis target) {
+		while (source != null) {
+			SharingAnalysis newEle = new SharingAnalysis();
+			newEle.val = source.val;
+			target.field = newEle;
+			source = source.field;
+			target = target.field;
+		}
+	}
+
+	/**
+ 	 * @param i number of elements to append
+ 	 * @return the last list element appended
+ 	 */
+	private SharingAnalysis appendNewList(int i) {
+		this.field = new SharingAnalysis();
+		SharingAnalysis cur = this.field;
+		while (i > 1) {
+			i--;
+			cur = cur.field = new SharingAnalysis();
+		}
+		return cur;
+	}
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+SharingAnalysis.SharingAnalysis.main([Ljava/lang/String;)V: Graph of 203 nodes with 2 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: SharingAnalysis.SharingAnalysis.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*SharingAnalysis.SharingAnalysis: [val, field]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 26 rules for P and 0 rules for R.P rules:
+f1258_0_copy_NULL(EOS(STATIC_1258), java.lang.Object(o144sub), java.lang.Object(o144sub)) -> f1259_0_copy_NULL(EOS(STATIC_1259), java.lang.Object(o144sub), java.lang.Object(o144sub)) :|: TRUE
+f1259_0_copy_NULL(EOS(STATIC_1259), java.lang.Object(o144sub), java.lang.Object(o144sub)) -> f1261_0_copy_New(EOS(STATIC_1261), java.lang.Object(o144sub)) :|: TRUE
+f1261_0_copy_New(EOS(STATIC_1261), java.lang.Object(o144sub)) -> f1265_0_copy_Duplicate(EOS(STATIC_1265), java.lang.Object(o144sub)) :|: TRUE
+f1265_0_copy_Duplicate(EOS(STATIC_1265), java.lang.Object(o144sub)) -> f1267_0_copy_InvokeMethod(EOS(STATIC_1267), java.lang.Object(o144sub)) :|: TRUE
+f1267_0_copy_InvokeMethod(EOS(STATIC_1267), java.lang.Object(o144sub)) -> f1269_0__init__Load(EOS(STATIC_1269), java.lang.Object(o144sub)) :|: TRUE
+f1269_0__init__Load(EOS(STATIC_1269), java.lang.Object(o144sub)) -> f1273_0__init__InvokeMethod(EOS(STATIC_1273), java.lang.Object(o144sub)) :|: TRUE
+f1273_0__init__InvokeMethod(EOS(STATIC_1273), java.lang.Object(o144sub)) -> f1274_0__init__Return(EOS(STATIC_1274), java.lang.Object(o144sub)) :|: TRUE
+f1274_0__init__Return(EOS(STATIC_1274), java.lang.Object(o144sub)) -> f1276_0_copy_Store(EOS(STATIC_1276), java.lang.Object(o144sub)) :|: TRUE
+f1276_0_copy_Store(EOS(STATIC_1276), java.lang.Object(o144sub)) -> f1277_0_copy_Load(EOS(STATIC_1277), java.lang.Object(o144sub)) :|: TRUE
+f1277_0_copy_Load(EOS(STATIC_1277), java.lang.Object(o144sub)) -> f1278_0_copy_Load(EOS(STATIC_1278), java.lang.Object(o144sub)) :|: TRUE
+f1278_0_copy_Load(EOS(STATIC_1278), java.lang.Object(o144sub)) -> f1279_0_copy_FieldAccess(EOS(STATIC_1279), java.lang.Object(o144sub), java.lang.Object(o144sub)) :|: TRUE
+f1279_0_copy_FieldAccess(EOS(STATIC_1279), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149)), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) -> f1285_0_copy_FieldAccess(EOS(STATIC_1285), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149)), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) :|: TRUE
+f1285_0_copy_FieldAccess(EOS(STATIC_1285), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149)), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) -> f1287_0_copy_FieldAccess(EOS(STATIC_1287), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) :|: TRUE
+f1287_0_copy_FieldAccess(EOS(STATIC_1287), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) -> f1293_0_copy_Load(EOS(STATIC_1293), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) :|: TRUE
+f1293_0_copy_Load(EOS(STATIC_1293), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) -> f1295_0_copy_Load(EOS(STATIC_1295), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) :|: TRUE
+f1295_0_copy_Load(EOS(STATIC_1295), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) -> f1297_0_copy_FieldAccess(EOS(STATIC_1297), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) :|: TRUE
+f1297_0_copy_FieldAccess(EOS(STATIC_1297), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) -> f1306_0_copy_Load(EOS(STATIC_1306), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) :|: TRUE
+f1306_0_copy_Load(EOS(STATIC_1306), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) -> f1308_0_copy_FieldAccess(EOS(STATIC_1308), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) :|: TRUE
+f1308_0_copy_FieldAccess(EOS(STATIC_1308), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75, o149))) -> f1311_0_copy_Store(EOS(STATIC_1311), o149) :|: TRUE
+f1311_0_copy_Store(EOS(STATIC_1311), o149) -> f1313_0_copy_Load(EOS(STATIC_1313), o149) :|: TRUE
+f1313_0_copy_Load(EOS(STATIC_1313), o149) -> f1316_0_copy_FieldAccess(EOS(STATIC_1316), o149) :|: TRUE
+f1316_0_copy_FieldAccess(EOS(STATIC_1316), o149) -> f1318_0_copy_Store(EOS(STATIC_1318), o149) :|: TRUE
+f1318_0_copy_Store(EOS(STATIC_1318), o149) -> f1319_0_copy_JMP(EOS(STATIC_1319), o149) :|: TRUE
+f1319_0_copy_JMP(EOS(STATIC_1319), o149) -> f1336_0_copy_Load(EOS(STATIC_1336), o149) :|: TRUE
+f1336_0_copy_Load(EOS(STATIC_1336), o149) -> f1257_0_copy_Load(EOS(STATIC_1257), o149) :|: TRUE
+f1257_0_copy_Load(EOS(STATIC_1257), o134) -> f1258_0_copy_NULL(EOS(STATIC_1258), o134, o134) :|: TRUE
+R rules:
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+f1258_0_copy_NULL(EOS(STATIC_1258), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75:0, o149:0)), java.lang.Object(SharingAnalysis.SharingAnalysis(EOC, i75:0, o149:0))) -> f1258_0_copy_NULL(EOS(STATIC_1258), o149:0, o149:0) :|: TRUE
+R rules:
+Filtered ground terms:
+   f1258_0_copy_NULL(x1, x2, x3) -> f1258_0_copy_NULL(x2, x3)
+   EOS(x1) -> EOS
+   SharingAnalysis.SharingAnalysis(x1, x2, x3) -> SharingAnalysis.SharingAnalysis(x2, x3)
+Filtered unneeded arguments:
+   SharingAnalysis.SharingAnalysis(x1, x2) -> SharingAnalysis.SharingAnalysis(x2)
+Filtered duplicate args:
+   f1258_0_copy_NULL(x1, x2) -> f1258_0_copy_NULL(x2)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F1258_0_COPY_NULL(java.lang.Object(SharingAnalysis.SharingAnalysis(o149:0:0))) -> F1258_0_COPY_NULL(o149:0:0) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F1258_0_COPY_NULL(java.lang.Object(SharingAnalysis.SharingAnalysis(o149:0:0))) -> F1258_0_COPY_NULL(o149:0:0)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F1258_0_COPY_NULL(java.lang.Object(SharingAnalysis.SharingAnalysis(o149:0:0))) -> F1258_0_COPY_NULL(o149:0:0)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(11)
+YES
+
+----------------------------------------
+
+(12)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: SharingAnalysis.SharingAnalysis.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(13) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 24 IRulesP rules:
+f575_0_appendNewList_ConstantStackPush(EOS(STATIC_575), i40, i40, o50[SharingAnalysis.field]o45) -> f592_0_appendNewList_LE(EOS(STATIC_592), i40, i40, 1, o50[SharingAnalysis.field]o45) :|: TRUE
+f592_0_appendNewList_LE(EOS(STATIC_592), i51, i51, matching1, o50[SharingAnalysis.field]o45) -> f607_0_appendNewList_LE(EOS(STATIC_607), i51, i51, 1, o50[SharingAnalysis.field]o45) :|: TRUE && matching1 = 1
+f607_0_appendNewList_LE(EOS(STATIC_607), i51, i51, matching1, o50[SharingAnalysis.field]o45) -> f618_0_appendNewList_Inc(EOS(STATIC_618), i51, o50[SharingAnalysis.field]o45) :|: i51 > 1 && matching1 = 1
+f618_0_appendNewList_Inc(EOS(STATIC_618), i51, o50[SharingAnalysis.field]o45) -> f620_0_appendNewList_Load(EOS(STATIC_620), i51 + -1, o50[SharingAnalysis.field]o45) :|: TRUE
+f620_0_appendNewList_Load(EOS(STATIC_620), i53, o50[SharingAnalysis.field]o45) -> f622_0_appendNewList_New(EOS(STATIC_622), i53, o50[SharingAnalysis.field]o45) :|: TRUE
+f622_0_appendNewList_New(EOS(STATIC_622), i53, o50[SharingAnalysis.field]o45) -> f625_0_appendNewList_Duplicate(EOS(STATIC_625), i53, o50[SharingAnalysis.field]o45) :|: TRUE
+f625_0_appendNewList_Duplicate(EOS(STATIC_625), i53, o50[SharingAnalysis.field]o45) -> f627_0_appendNewList_InvokeMethod(EOS(STATIC_627), i53, o50[SharingAnalysis.field]o45) :|: TRUE
+f627_0_appendNewList_InvokeMethod(EOS(STATIC_627), i53, o50[SharingAnalysis.field]o45) -> f629_0__init__Load(EOS(STATIC_629), i53, o50[SharingAnalysis.field]o45) :|: TRUE
+f629_0__init__Load(EOS(STATIC_629), i53, o50[SharingAnalysis.field]o45) -> f640_0__init__InvokeMethod(EOS(STATIC_640), i53, o50[SharingAnalysis.field]o45) :|: TRUE
+f640_0__init__InvokeMethod(EOS(STATIC_640), i53, o50[SharingAnalysis.field]o45) -> f647_0__init__Return(EOS(STATIC_647), i53, o50[SharingAnalysis.field]o45) :|: TRUE
+f647_0__init__Return(EOS(STATIC_647), i53, o50[SharingAnalysis.field]o45) -> f652_0_appendNewList_Duplicate(EOS(STATIC_652), i53, o50[SharingAnalysis.field]o45) :|: TRUE
+f652_0_appendNewList_Duplicate(EOS(STATIC_652), i53, o50[SharingAnalysis.field]o45) -> f655_0_appendNewList_FieldAccess(EOS(STATIC_655), i53, o50[SharingAnalysis.field]o45) :|: TRUE
+f655_0_appendNewList_FieldAccess(EOS(STATIC_655), i53, o50[SharingAnalysis.field]o45) -> f755_0_appendNewList_FieldAccess(EOS(STATIC_755), i53, o50[SharingAnalysis.field]o45) :|: o50[SharingAnalysis.field]o45 > 0
+f655_0_appendNewList_FieldAccess(EOS(STATIC_655), i53, o68[SharingAnalysis.field]o68) -> f757_0_appendNewList_FieldAccess(EOS(STATIC_757), i53) :|: TRUE
+f755_0_appendNewList_FieldAccess(EOS(STATIC_755), i53, o50[SharingAnalysis.field]o45) -> f771_0_appendNewList_Store(EOS(STATIC_771), i53, o50[SharingAnalysis.field]o62) :|: o50[SharingAnalysis.field]o62 > o50[SharingAnalysis.field]o45 && o50[SharingAnalysis.field]o45 >= 0
+f771_0_appendNewList_Store(EOS(STATIC_771), i53, o50[SharingAnalysis.field]o62) -> f776_0_appendNewList_JMP(EOS(STATIC_776), i53, o50[SharingAnalysis.field]o62) :|: TRUE
+f776_0_appendNewList_JMP(EOS(STATIC_776), i53, o50[SharingAnalysis.field]o62) -> f888_0_appendNewList_Load(EOS(STATIC_888), i53, o50[SharingAnalysis.field]o62) :|: TRUE
+f888_0_appendNewList_Load(EOS(STATIC_888), i53, o50[SharingAnalysis.field]o62) -> f536_0_appendNewList_Load(EOS(STATIC_536), i53, o50[SharingAnalysis.field]o62) :|: TRUE
+f536_0_appendNewList_Load(EOS(STATIC_536), i40, o50[SharingAnalysis.field]o45) -> f575_0_appendNewList_ConstantStackPush(EOS(STATIC_575), i40, i40, o50[SharingAnalysis.field]o45) :|: TRUE
+f757_0_appendNewList_FieldAccess(EOS(STATIC_757), i53) -> f772_0_appendNewList_FieldAccess(EOS(STATIC_772), i53) :|: TRUE
+f772_0_appendNewList_FieldAccess(EOS(STATIC_772), i53) -> f787_0_appendNewList_Store(EOS(STATIC_787), i53) :|: TRUE
+f787_0_appendNewList_Store(EOS(STATIC_787), i53) -> f899_0_appendNewList_JMP(EOS(STATIC_899), i53) :|: TRUE
+f899_0_appendNewList_JMP(EOS(STATIC_899), i53) -> f934_0_appendNewList_Load(EOS(STATIC_934), i53) :|: TRUE
+f934_0_appendNewList_Load(EOS(STATIC_934), i53) -> f536_0_appendNewList_Load(EOS(STATIC_536), i53, o72[SharingAnalysis.field]o62) :|: o72[SharingAnalysis.field]o62 = 1
+Combined rules. Obtained 2 IRulesP rules:
+f575_0_appendNewList_ConstantStackPush(EOS(STATIC_575), i40:0, i40:0, o50[SharingAnalysis.field]o45:0) -> f575_0_appendNewList_ConstantStackPush(EOS(STATIC_575), i40:0 - 1, i40:0 - 1, o50[SharingAnalysis.field]o62:0) :|: o50[SharingAnalysis.field]o45:0 > 0 && o50[SharingAnalysis.field]o62:0 > o50[SharingAnalysis.field]o45:0 && i40:0 > 1
+f575_0_appendNewList_ConstantStackPush(EOS(STATIC_575), i40:0, i40:0, o50[SharingAnalysis.field]o45:0) -> f575_0_appendNewList_ConstantStackPush(EOS(STATIC_575), i40:0 - 1, i40:0 - 1, 1) :|: i40:0 > 1
+Filtered constant ground arguments:
+   f575_0_appendNewList_ConstantStackPush(x1, x2, x3, x4) -> f575_0_appendNewList_ConstantStackPush(x2, x3, x4)
+   EOS(x1) -> EOS
+Filtered duplicate arguments:
+   f575_0_appendNewList_ConstantStackPush(x1, x2, x3) -> f575_0_appendNewList_ConstantStackPush(x2, x3)
+Finished conversion. Obtained 2 rules.P rules:
+f575_0_appendNewList_ConstantStackPush(i40:0, o50[SharingAnalysis.field]o45:0) -> f575_0_appendNewList_ConstantStackPush(i40:0 - 1, o50[SharingAnalysis.field]o62:0) :|: o50[SharingAnalysis.field]o62:0 > o50[SharingAnalysis.field]o45:0 && i40:0 > 1 && o50[SharingAnalysis.field]o45:0 > 0
+f575_0_appendNewList_ConstantStackPush(i40:0, o50[SharingAnalysis.field]o45:0) -> f575_0_appendNewList_ConstantStackPush(i40:0 - 1, 1) :|: i40:0 > 1
+
+----------------------------------------
+
+(14)
+Obligation:
+Rules:
+f575_0_appendNewList_ConstantStackPush(i40:0, o50[SharingAnalysis.field]o45:0) -> f575_0_appendNewList_ConstantStackPush(i40:0 - 1, o50[SharingAnalysis.field]o62:0) :|: o50[SharingAnalysis.field]o62:0 > o50[SharingAnalysis.field]o45:0 && i40:0 > 1 && o50[SharingAnalysis.field]o45:0 > 0
+f575_0_appendNewList_ConstantStackPush(x, x1) -> f575_0_appendNewList_ConstantStackPush(x - 1, 1) :|: x > 1
+
+----------------------------------------
+
+(15) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f575_0_appendNewList_ConstantStackPush(i40:0, o50[SharingAnalysis.field]o45:0) -> f575_0_appendNewList_ConstantStackPush(arith, o50[SharingAnalysis.field]o62:0) :|: o50[SharingAnalysis.field]o62:0 > o50[SharingAnalysis.field]o45:0 && i40:0 > 1 && o50[SharingAnalysis.field]o45:0 > 0 && arith = i40:0 - 1
+f575_0_appendNewList_ConstantStackPush(x2, x3) -> f575_0_appendNewList_ConstantStackPush(x4, 1) :|: x2 > 1 && x4 = x2 - 1
+
+----------------------------------------
+
+(17) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f575_0_appendNewList_ConstantStackPush(i40:0, o50[SharingAnalysis.field]o45:0) -> f575_0_appendNewList_ConstantStackPush(arith, o50[SharingAnalysis.field]o62:0) :|: o50[SharingAnalysis.field]o62:0 > o50[SharingAnalysis.field]o45:0 && i40:0 > 1 && o50[SharingAnalysis.field]o45:0 > 0 && arith = i40:0 - 1
+(2) f575_0_appendNewList_ConstantStackPush(x2, x3) -> f575_0_appendNewList_ConstantStackPush(x4, 1) :|: x2 > 1 && x4 = x2 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(18)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f575_0_appendNewList_ConstantStackPush(i40:0, o50[SharingAnalysis.field]o45:0) -> f575_0_appendNewList_ConstantStackPush(arith, o50[SharingAnalysis.field]o62:0) :|: o50[SharingAnalysis.field]o62:0 > o50[SharingAnalysis.field]o45:0 && i40:0 > 1 && o50[SharingAnalysis.field]o45:0 > 0 && arith = i40:0 - 1
+(2) f575_0_appendNewList_ConstantStackPush(x2, x3) -> f575_0_appendNewList_ConstantStackPush(x4, 1) :|: x2 > 1 && x4 = x2 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(19) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(20)
+Obligation:
+Rules:
+f575_0_appendNewList_ConstantStackPush(i40:0:0, o50[SharingAnalysis.field]o45:0:0) -> f575_0_appendNewList_ConstantStackPush(i40:0:0 - 1, o50[SharingAnalysis.field]o62:0:0) :|: o50[SharingAnalysis.field]o62:0:0 > o50[SharingAnalysis.field]o45:0:0 && i40:0:0 > 1 && o50[SharingAnalysis.field]o45:0:0 > 0
+f575_0_appendNewList_ConstantStackPush(x2:0, x3:0) -> f575_0_appendNewList_ConstantStackPush(x2:0 - 1, 1) :|: x2:0 > 1
+
+----------------------------------------
+
+(21) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f575_0_appendNewList_ConstantStackPush(INTEGER, VARIABLE)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f575_0_appendNewList_ConstantStackPush(i40:0:0, o50[SharingAnalysis.field]o45:0:0) -> f575_0_appendNewList_ConstantStackPush(c, o50[SharingAnalysis.field]o62:0:0) :|: c = i40:0:0 - 1 && (o50[SharingAnalysis.field]o62:0:0 > o50[SharingAnalysis.field]o45:0:0 && i40:0:0 > 1 && o50[SharingAnalysis.field]o45:0:0 > 0)
+f575_0_appendNewList_ConstantStackPush(x2:0, x3:0) -> f575_0_appendNewList_ConstantStackPush(c1, c2) :|: c2 = 1 && c1 = x2:0 - 1 && x2:0 > 1
+
+----------------------------------------
+
+(23) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f575_0_appendNewList_ConstantStackPush(x, x1)] = x
+
+The following rules are decreasing:
+f575_0_appendNewList_ConstantStackPush(i40:0:0, o50[SharingAnalysis.field]o45:0:0) -> f575_0_appendNewList_ConstantStackPush(c, o50[SharingAnalysis.field]o62:0:0) :|: c = i40:0:0 - 1 && (o50[SharingAnalysis.field]o62:0:0 > o50[SharingAnalysis.field]o45:0:0 && i40:0:0 > 1 && o50[SharingAnalysis.field]o45:0:0 > 0)
+f575_0_appendNewList_ConstantStackPush(x2:0, x3:0) -> f575_0_appendNewList_ConstantStackPush(c1, c2) :|: c2 = 1 && c1 = x2:0 - 1 && x2:0 > 1
+The following rules are bounded:
+f575_0_appendNewList_ConstantStackPush(i40:0:0, o50[SharingAnalysis.field]o45:0:0) -> f575_0_appendNewList_ConstantStackPush(c, o50[SharingAnalysis.field]o62:0:0) :|: c = i40:0:0 - 1 && (o50[SharingAnalysis.field]o62:0:0 > o50[SharingAnalysis.field]o45:0:0 && i40:0:0 > 1 && o50[SharingAnalysis.field]o45:0:0 > 0)
+f575_0_appendNewList_ConstantStackPush(x2:0, x3:0) -> f575_0_appendNewList_ConstantStackPush(c1, c2) :|: c2 = 1 && c1 = x2:0 - 1 && x2:0 > 1
+
+----------------------------------------
+
+(24)
+YES

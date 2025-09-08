@@ -1,0 +1,199 @@
+YES
+We consider the system Yl956.
+
+  Alphabet:
+
+    O : [] --> nat 
+    build : [nat] --> list 
+    collapse : [list] --> nat 
+    cons : [nat -> nat * list] --> list 
+    diff : [nat * nat] --> nat 
+    gcd : [nat * nat] --> nat 
+    min : [nat * nat] --> nat 
+    nil : [] --> list 
+    s : [nat] --> nat 
+
+  Rules:
+
+    min(X, O) => O 
+    min(O, X) => O 
+    min(s(X), s(Y)) => s(min(X, Y)) 
+    diff(X, O) => X 
+    diff(O, X) => X 
+    diff(s(X), s(Y)) => diff(X, Y) 
+    gcd(s(X), O) => s(X) 
+    gcd(O, s(X)) => s(X) 
+    gcd(s(X), s(Y)) => gcd(diff(X, Y), s(min(X, Y))) 
+    collapse(nil) => O 
+    collapse(cons(F, X)) => F collapse(X) 
+    build(O) => nil 
+    build(s(X)) => cons(/\x.gcd(x, X), build(X)) 
+
+We observe that the rules contain a first-order subset:
+
+  min(X, O) => O 
+  min(O, X) => O 
+  min(s(X), s(Y)) => s(min(X, Y)) 
+  diff(X, O) => X 
+  diff(O, X) => X 
+  diff(s(X), s(Y)) => diff(X, Y) 
+  gcd(s(X), O) => s(X) 
+  gcd(O, s(X)) => s(X) 
+  gcd(s(X), s(Y)) => gcd(diff(X, Y), s(min(X, Y))) 
+
+Moreover, the system is finitely branching.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is Ce-terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed Ce-terminating:
+
+ || Input TRS:
+ ||     1: min(PeRCenTX,O()) -> O()
+ ||     2: min(O(),PeRCenTX) -> O()
+ ||     3: min(s(PeRCenTX),s(PeRCenTY)) -> s(min(PeRCenTX,PeRCenTY))
+ ||     4: diff(PeRCenTX,O()) -> PeRCenTX
+ ||     5: diff(O(),PeRCenTX) -> PeRCenTX
+ ||     6: diff(s(PeRCenTX),s(PeRCenTY)) -> diff(PeRCenTX,PeRCenTY)
+ ||     7: gcd(s(PeRCenTX),O()) -> s(PeRCenTX)
+ ||     8: gcd(O(),s(PeRCenTX)) -> s(PeRCenTX)
+ ||     9: gcd(s(PeRCenTX),s(PeRCenTY)) -> gcd(diff(PeRCenTX,PeRCenTY),s(min(PeRCenTX,PeRCenTY)))
+ ||     10: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     11: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 11
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #diff(s(PeRCenTX),s(PeRCenTY)) -> #diff(PeRCenTX,PeRCenTY)
+ ||    #2: #gcd(s(PeRCenTX),s(PeRCenTY)) -> #gcd(diff(PeRCenTX,PeRCenTY),s(min(PeRCenTX,PeRCenTY)))
+ ||    #3: #gcd(s(PeRCenTX),s(PeRCenTY)) -> #diff(PeRCenTX,PeRCenTY)
+ ||    #4: #gcd(s(PeRCenTX),s(PeRCenTY)) -> #min(PeRCenTX,PeRCenTY)
+ ||    #5: #min(s(PeRCenTX),s(PeRCenTY)) -> #min(PeRCenTX,PeRCenTY)
+ || Number of SCCs: 3, DPs: 3
+ ||   SCC { #1 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       diff	w: 0
+ ||       s 	w: x1 + 1
+ ||       gcd	w: 0
+ ||       #min	w: 0
+ ||       O 	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #diff	w: x1 + x2
+ ||       min	w: 0
+ ||       #gcd	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #1
+ || Number of SCCs: 2, DPs: 2
+ ||   SCC { #5 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       diff	w: 0
+ ||       s 	w: x1 + 1
+ ||       gcd	w: 0
+ ||       #min	w: x1
+ ||       O 	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #diff	w: 0
+ ||       min	w: 0
+ ||       #gcd	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #5
+ || Number of SCCs: 1, DPs: 1
+ ||   SCC { #2 }
+ || POLO(Sum)... POLO(max)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       diff	w: max(x1 + 1, x2 + 1)
+ ||       s 	w: x1 + 4
+ ||       gcd	w: 0
+ ||       #min	w: 0
+ ||       O 	w: 1
+ ||       #TIlDePAIR	w: 0
+ ||       #diff	w: 0
+ ||       min	w: max(x1 + 1)
+ ||       #gcd	w: max(x1 + 2, x2)
+ ||     USABLE RULES: { 1..6 }
+ ||     Removed DPs: #2
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] collapse#(cons(F, X)) =#> collapse#(X)   
+    1] build#(s(X)) =#> gcd#(Y, X)   
+    2] build#(s(X)) =#> build#(X)   
+
+  Rules R_0:
+
+    min(X, O) => O 
+    min(O, X) => O 
+    min(s(X), s(Y)) => s(min(X, Y)) 
+    diff(X, O) => X 
+    diff(O, X) => X 
+    diff(s(X), s(Y)) => diff(X, Y) 
+    gcd(s(X), O) => s(X) 
+    gcd(O, s(X)) => s(X) 
+    gcd(s(X), s(Y)) => gcd(diff(X, Y), s(min(X, Y))) 
+    collapse(nil) => O 
+    collapse(cons(F, X)) => F collapse(X) 
+    build(O) => nil 
+    build(s(X)) => cons(/\x.gcd(x, X), build(X)) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0 
+    * 1 :  
+    * 2 : 1, 2 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    collapse#(cons(F, X)) =#> collapse#(X)   
+
+  P_2:
+
+    build#(s(X)) =#> build#(X)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f) and (P_2, R_0, m, f).
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_2, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(build#) = 1 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(build#(s(X))) = s(X) |> X = nu(build#(X)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_2, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(collapse#) = 1 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(collapse#(cons(F, X))) = cons(F, X) |> X = nu(collapse#(X)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

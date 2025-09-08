@@ -1,0 +1,95 @@
+YES
+We consider the system nIxrJ.
+
+  Alphabet:
+
+    and : [c * c] --> c 
+    cons : [a * b] --> b 
+    false : [] --> c 
+    forall : [a -> c * b] --> c 
+    forsome : [a -> c * b] --> c 
+    nil : [] --> b 
+    or : [c * c] --> c 
+    true : [] --> c 
+
+  Rules:
+
+    and(true, true) => true 
+    and(true, false) => false 
+    and(false, true) => false 
+    and(false, false) => false 
+    or(true, true) => true 
+    or(true, false) => true 
+    or(false, true) => true 
+    or(false, false) => false 
+    forall(F, nil) => true 
+    forall(F, cons(X, Y)) => and(F X, forall(F, Y)) 
+    forsome(F, nil) => false 
+    forsome(F, cons(X, Y)) => or(F X, forsome(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  and(true, true) >? true 
+  and(true, false) >? false 
+  and(false, true) >? false 
+  and(false, false) >? false 
+  or(true, true) >? true 
+  or(true, false) >? true 
+  or(false, true) >? true 
+  or(false, false) >? false 
+  forall(F, nil) >? true 
+  forall(F, cons(X, Y)) >? and(F X, forall(F, Y)) 
+  forsome(F, nil) >? false 
+  forsome(F, cons(X, Y)) >? or(F X, forsome(F, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  and = Lam[y0;y1].2 + y0 + y1 
+  cons = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  false = 0 
+  forall = Lam[G0;y1].3*y1 + G0(0) + G0(y1) + 3*y1*G0(y1) 
+  forsome = Lam[G0;y1].3*y1 + 3*y1*G0(y1) + 3*G0(y1) 
+  nil = 3 
+  or = Lam[y0;y1].2 + y0 + 2*y1 
+  true = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[and(true, true)]] = 2 > 0 = [[true]] 
+  [[and(true, false)]] = 2 > 0 = [[false]] 
+  [[and(false, true)]] = 2 > 0 = [[false]] 
+  [[and(false, false)]] = 2 > 0 = [[false]] 
+  [[or(true, true)]] = 2 > 0 = [[true]] 
+  [[or(true, false)]] = 2 > 0 = [[true]] 
+  [[or(false, true)]] = 2 > 0 = [[true]] 
+  [[or(false, false)]] = 2 > 0 = [[false]] 
+  [[forall(_F0, nil)]] = 9 + F0(0) + 10*F0(3) > 0 = [[true]] 
+  [[forall(_F0, cons(_x1, _x2))]] = 9 + 9*x1 + 9*x2 + F0(0) + 9*x1*F0(3 + 3*x1 + 3*x2) + 9*x2*F0(3 + 3*x1 + 3*x2) + 10*F0(3 + 3*x1 + 3*x2) > 2 + x1 + 3*x2 + F0(0) + F0(x1) + F0(x2) + 3*x2*F0(x2) = [[and(_F0 _x1, forall(_F0, _x2))]] 
+  [[forsome(_F0, nil)]] = 9 + 12*F0(3) > 0 = [[false]] 
+  [[forsome(_F0, cons(_x1, _x2))]] = 9 + 9*x1 + 9*x2 + 9*x1*F0(3 + 3*x1 + 3*x2) + 9*x2*F0(3 + 3*x1 + 3*x2) + 12*F0(3 + 3*x1 + 3*x2) > 2 + x1 + 6*x2 + F0(x1) + 6*x2*F0(x2) + 6*F0(x2) = [[or(_F0 _x1, forsome(_F0, _x2))]] 
+
+We can thus remove the following rules:
+
+  and(true, true) => true 
+  and(true, false) => false 
+  and(false, true) => false 
+  and(false, false) => false 
+  or(true, true) => true 
+  or(true, false) => true 
+  or(false, true) => true 
+  or(false, false) => false 
+  forall(F, nil) => true 
+  forall(F, cons(X, Y)) => and(F X, forall(F, Y)) 
+  forsome(F, nil) => false 
+  forsome(F, cons(X, Y)) => or(F X, forsome(F, Y)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

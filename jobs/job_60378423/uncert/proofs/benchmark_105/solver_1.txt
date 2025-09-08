@@ -1,0 +1,579 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/QUXiv.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 236 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 69 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 0 ms]
+        (13) IRSwT
+        (14) TempFilterProof [SOUND, 7 ms]
+        (15) IRSwT
+        (16) IRSwTToQDPProof [SOUND, 0 ms]
+        (17) QDP
+        (18) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (19) YES
+    (20) JBCTerminationSCC
+        (21) SCCToIRSProof [SOUND, 24 ms]
+        (22) IRSwT
+        (23) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (24) IRSwT
+        (25) IRSwTTerminationDigraphProof [EQUIVALENT, 7 ms]
+        (26) IRSwT
+        (27) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (28) IRSwT
+        (29) FilterProof [EQUIVALENT, 0 ms]
+        (30) IntTRS
+        (31) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (32) IntTRS
+        (33) PolynomialOrderProcessor [EQUIVALENT, 3 ms]
+        (34) YES
+    (35) JBCTerminationSCC
+        (36) SCCToIRSProof [SOUND, 24 ms]
+        (37) IRSwT
+        (38) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (39) IRSwT
+        (40) IRSwTTerminationDigraphProof [EQUIVALENT, 8 ms]
+        (41) IRSwT
+        (42) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (43) IRSwT
+        (44) TempFilterProof [SOUND, 20 ms]
+        (45) IntTRS
+        (46) PolynomialOrderProcessor [EQUIVALENT, 6 ms]
+        (47) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+public class ListReverseCyclicList {
+	public static void main(String... args) {
+		List x = List.createCycle(args[0].length());
+		List.reverse(x);
+	}
+}
+
+class List {
+	List n;
+
+	public List(List next) {
+		this.n = next;
+	}
+
+	public static void reverse(List x) {		
+		List y = null;
+		while (x != null) {
+			List z = x;
+			x = x.n;
+			z.n = y;
+			y = z;
+		}
+	}
+
+	public static List createList(int l, List end) {
+		while (--l > 0) {
+			end = new List(end);
+		}
+		return end;
+	}
+
+	public static List createCycle(int l) {
+		List last = new List(null);
+		List first = createList(l - 1, last);
+		last.n = first;
+		return first;
+	}
+
+	public static List createPanhandleList(int pl, int cl) {
+		return createList(pl, createCycle(cl));
+	}
+
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+public class ListReverseCyclicList {
+	public static void main(String... args) {
+		List x = List.createCycle(args[0].length());
+		List.reverse(x);
+	}
+}
+
+class List {
+	List n;
+
+	public List(List next) {
+		this.n = next;
+	}
+
+	public static void reverse(List x) {		
+		List y = null;
+		while (x != null) {
+			List z = x;
+			x = x.n;
+			z.n = y;
+			y = z;
+		}
+	}
+
+	public static List createList(int l, List end) {
+		while (--l > 0) {
+			end = new List(end);
+		}
+		return end;
+	}
+
+	public static List createCycle(int l) {
+		List last = new List(null);
+		List first = createList(l - 1, last);
+		last.n = first;
+		return first;
+	}
+
+	public static List createPanhandleList(int pl, int cl) {
+		return createList(pl, createCycle(cl));
+	}
+
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+ListReverseCyclicList.main([Ljava/lang/String;)V: Graph of 261 nodes with 3 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 3 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: ListReverseCyclicList.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*List: [n]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 16 IRulesP rules:
+f5062_0_reverse_NULL(EOS(STATIC_5062), java.lang.Object(o1021sub), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(o1021sub)) -> f5100_0_reverse_Load(EOS(STATIC_5100), java.lang.Object(o1021sub), java.lang.Object(List(EOC, o930401205879))) :|: TRUE
+f5100_0_reverse_Load(EOS(STATIC_5100), java.lang.Object(o1021sub), java.lang.Object(List(EOC, o930401205879))) -> f5207_0_reverse_Store(EOS(STATIC_5207), java.lang.Object(o1021sub), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(o1021sub)) :|: TRUE
+f5207_0_reverse_Store(EOS(STATIC_5207), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100))) -> f5247_0_reverse_Store(EOS(STATIC_5247), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100))) :|: TRUE
+f5247_0_reverse_Store(EOS(STATIC_5247), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100))) -> f5258_0_reverse_Load(EOS(STATIC_5258), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100))) :|: TRUE
+f5258_0_reverse_Load(EOS(STATIC_5258), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100))) -> f5269_0_reverse_FieldAccess(EOS(STATIC_5269), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o1100))) :|: TRUE
+f5269_0_reverse_FieldAccess(EOS(STATIC_5269), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o1100))) -> f5279_0_reverse_Store(EOS(STATIC_5279), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100)), o1100) :|: TRUE
+f5279_0_reverse_Store(EOS(STATIC_5279), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100)), o1100) -> f5281_0_reverse_Load(EOS(STATIC_5281), o1100, java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100))) :|: TRUE
+f5281_0_reverse_Load(EOS(STATIC_5281), o1100, java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100))) -> f5283_0_reverse_Load(EOS(STATIC_5283), o1100, java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o1100))) :|: TRUE
+f5283_0_reverse_Load(EOS(STATIC_5283), o1100, java.lang.Object(List(EOC, o930401205879)), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o1100))) -> f5298_0_reverse_FieldAccess(EOS(STATIC_5298), o1100, java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o930401205879))) :|: TRUE
+f5298_0_reverse_FieldAccess(EOS(STATIC_5298), o1100, java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o1100)), java.lang.Object(List(EOC, o930401205879))) -> f5341_0_reverse_Load(EOS(STATIC_5341), o1100, java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930put-372239471))))) :|: TRUE
+f5341_0_reverse_Load(EOS(STATIC_5341), o1100, java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930-372239471))))) -> f5377_0_reverse_Store(EOS(STATIC_5377), o1100, java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930-372239471))))) :|: TRUE
+f5377_0_reverse_Store(EOS(STATIC_5377), o1100, java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930-372239471))))) -> f5381_0_reverse_JMP(EOS(STATIC_5381), o1100, java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930-372239471))))) :|: TRUE
+f5381_0_reverse_JMP(EOS(STATIC_5381), o1100, java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930-372239471))))) -> f5492_0_reverse_Load(EOS(STATIC_5492), o1100, java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930-372239471))))) :|: TRUE
+f5492_0_reverse_Load(EOS(STATIC_5492), o1100, java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930-372239471))))) -> f4813_0_reverse_Load(EOS(STATIC_4813), o1100, java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930-372239471))))) :|: TRUE
+f4813_0_reverse_Load(EOS(STATIC_4813), o928, java.lang.Object(List(EOC, o930401205879))) -> f4998_0_reverse_NULL(EOS(STATIC_4998), o928, java.lang.Object(List(EOC, o930401205879)), o928) :|: TRUE
+f4998_0_reverse_NULL(EOS(STATIC_4998), java.lang.Object(o1021sub), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(o1021sub)) -> f5062_0_reverse_NULL(EOS(STATIC_5062), java.lang.Object(o1021sub), java.lang.Object(List(EOC, o930401205879)), java.lang.Object(o1021sub)) :|: TRUE
+Combined rules. Obtained 1 IRulesP rules:
+f5062_0_reverse_NULL(EOS(STATIC_5062), java.lang.Object(List(EOC, java.lang.Object(o1021sub:0))), java.lang.Object(List(EOC, o930401205879:0)), java.lang.Object(List(EOC, java.lang.Object(o1021sub:0)))) -> f5062_0_reverse_NULL(EOS(STATIC_5062), java.lang.Object(o1021sub:0), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o930put-372239471:0)))), java.lang.Object(o1021sub:0)) :|: TRUE
+Filtered constant ground arguments:
+   f5062_0_reverse_NULL(x1, x2, x3, x4) -> f5062_0_reverse_NULL(x2, x3, x4)
+   EOS(x1) -> EOS
+   List(x1, x2) -> List(x2)
+Filtered duplicate arguments:
+   f5062_0_reverse_NULL(x1, x2, x3) -> f5062_0_reverse_NULL(x2, x3)
+Finished conversion. Obtained 1 rules.P rules:
+f5062_0_reverse_NULL(java.lang.Object(List(o930401205879:0)), java.lang.Object(List(java.lang.Object(o1021sub:0)))) -> f5062_0_reverse_NULL(java.lang.Object(List(java.lang.Object(List(o930put-372239471:0)))), java.lang.Object(o1021sub:0)) :|: TRUE
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f5062_0_reverse_NULL(java.lang.Object(List(o930401205879:0)), java.lang.Object(List(java.lang.Object(o1021sub:0)))) -> f5062_0_reverse_NULL(java.lang.Object(List(java.lang.Object(List(o930put-372239471:0)))), java.lang.Object(o1021sub:0)) :|: TRUE
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f5062_0_reverse_NULL(java.lang.Object(List(o930401205879:0)), java.lang.Object(List(java.lang.Object(o1021sub:0)))) -> f5062_0_reverse_NULL(java.lang.Object(List(java.lang.Object(List(o930put-372239471:0)))), java.lang.Object(o1021sub:0)) :|: TRUE
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f5062_0_reverse_NULL(java.lang.Object(List(o930401205879:0)), java.lang.Object(List(java.lang.Object(o1021sub:0)))) -> f5062_0_reverse_NULL(java.lang.Object(List(java.lang.Object(List(o930put-372239471:0)))), java.lang.Object(o1021sub:0)) :|: TRUE
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f5062_0_reverse_NULL(java.lang.Object(List(o930401205879:0)), java.lang.Object(List(java.lang.Object(o1021sub:0)))) -> f5062_0_reverse_NULL(java.lang.Object(List(java.lang.Object(List(o930put-372239471:0)))), java.lang.Object(o1021sub:0)) :|: TRUE
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(14) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f5062_0_reverse_NULL(VARIABLE, VARIABLE)
+java.lang.Object(VARIABLE)
+List(VARIABLE)
+Removed predefined arithmetic.
+----------------------------------------
+
+(15)
+Obligation:
+Rules:
+f5062_0_reverse_NULL(java.lang.Object(List(java.lang.Object(o1021sub:0)))) -> f5062_0_reverse_NULL(java.lang.Object(o1021sub:0)) :|: TRUE
+
+----------------------------------------
+
+(16) IRSwTToQDPProof (SOUND)
+Removed the integers and created a QDP-Problem.
+----------------------------------------
+
+(17)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   f5062_0_reverse_NULL(java.lang.Object(List(java.lang.Object(o1021sub:0)))) -> f5062_0_reverse_NULL(java.lang.Object(o1021sub:0))
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(18) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*f5062_0_reverse_NULL(java.lang.Object(List(java.lang.Object(o1021sub:0)))) -> f5062_0_reverse_NULL(java.lang.Object(o1021sub:0))
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(19)
+YES
+
+----------------------------------------
+
+(20)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: ListReverseCyclicList.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*List: [n]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(21) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 16 IRulesP rules:
+f4381_0_reverse_FieldAccess(EOS(STATIC_4381), o586[List.n]o586, o700[List.n]o586) -> f4395_0_reverse_FieldAccess(EOS(STATIC_4395), o586[List.n]o586, o701[List.n]o586) :|: o701[List.n]o586 < o700[List.n]o586 && o700[List.n]o586 >= 0
+f4395_0_reverse_FieldAccess(EOS(STATIC_4395), o586[List.n]o586, o701[List.n]o586) -> f4422_0_reverse_Store(EOS(STATIC_4422), o586[List.n]o586, o701[List.n]o586) :|: TRUE
+f4422_0_reverse_Store(EOS(STATIC_4422), o586[List.n]o586, o701[List.n]o586) -> f4450_0_reverse_Load(EOS(STATIC_4450), o586[List.n]o586, o701[List.n]o586) :|: TRUE
+f4450_0_reverse_Load(EOS(STATIC_4450), o586[List.n]o586, o701[List.n]o586) -> f4485_0_reverse_Load(EOS(STATIC_4485), o586[List.n]o586, o701[List.n]o586) :|: TRUE
+f4485_0_reverse_Load(EOS(STATIC_4485), o586[List.n]o586, o701[List.n]o586) -> f4511_0_reverse_FieldAccess(EOS(STATIC_4511), o586[List.n]o586, o701[List.n]o586) :|: TRUE
+f4511_0_reverse_FieldAccess(EOS(STATIC_4511), o586[List.n]o586, o701[List.n]o586) -> f4760_0_reverse_Load(EOS(STATIC_4760), o586[List.n]o586, o701[List.n]o586) :|: TRUE
+f4760_0_reverse_Load(EOS(STATIC_4760), o586[List.n]o586, o701[List.n]o586) -> f4764_0_reverse_Store(EOS(STATIC_4764), o586[List.n]o586, o701[List.n]o586) :|: TRUE
+f4764_0_reverse_Store(EOS(STATIC_4764), o586[List.n]o586, o701[List.n]o586) -> f4768_0_reverse_JMP(EOS(STATIC_4768), o586[List.n]o586, o701[List.n]o586) :|: TRUE
+f4768_0_reverse_JMP(EOS(STATIC_4768), o586[List.n]o586, o701[List.n]o586) -> f4899_0_reverse_Load(EOS(STATIC_4899), o586[List.n]o586, o701[List.n]o586) :|: TRUE
+f4899_0_reverse_Load(EOS(STATIC_4899), o586[List.n]o586, o701[List.n]o586) -> f4265_0_reverse_Load(EOS(STATIC_4265), o586[List.n]o586, o701[List.n]o586) :|: TRUE
+f4265_0_reverse_Load(EOS(STATIC_4265), o586[List.n]o586, o585[List.n]o586) -> f4282_0_reverse_NULL(EOS(STATIC_4282), o586[List.n]o586, o585[List.n]o586) :|: TRUE
+f4282_0_reverse_NULL(EOS(STATIC_4282), o586[List.n]o586, o585[List.n]o586) -> f4294_0_reverse_Load(EOS(STATIC_4294), o586[List.n]o586, o585[List.n]o586) :|: TRUE
+f4294_0_reverse_Load(EOS(STATIC_4294), o586[List.n]o586, o585[List.n]o586) -> f4308_0_reverse_Store(EOS(STATIC_4308), o586[List.n]o586, o585[List.n]o586) :|: TRUE
+f4308_0_reverse_Store(EOS(STATIC_4308), o586[List.n]o586, o585[List.n]o586) -> f4332_0_reverse_Load(EOS(STATIC_4332), o586[List.n]o586, o585[List.n]o586) :|: TRUE
+f4332_0_reverse_Load(EOS(STATIC_4332), o586[List.n]o586, o585[List.n]o586) -> f4353_0_reverse_FieldAccess(EOS(STATIC_4353), o586[List.n]o586, o585[List.n]o586) :|: TRUE
+f4353_0_reverse_FieldAccess(EOS(STATIC_4353), o586[List.n]o586, o585[List.n]o586) -> f4381_0_reverse_FieldAccess(EOS(STATIC_4381), o586[List.n]o586, o585[List.n]o586) :|: o586[List.n]o586 > 0 && o585[List.n]o586 > 0
+Combined rules. Obtained 1 IRulesP rules:
+f4381_0_reverse_FieldAccess(EOS(STATIC_4381), o586[List.n]o586:0, o700[List.n]o586:0) -> f4381_0_reverse_FieldAccess(EOS(STATIC_4381), o586[List.n]o586:0, o701[List.n]o586:0) :|: o700[List.n]o586:0 > -1 && o701[List.n]o586:0 < o700[List.n]o586:0 && o586[List.n]o586:0 > 0 && o701[List.n]o586:0 > 0
+Filtered constant ground arguments:
+   f4381_0_reverse_FieldAccess(x1, x2, x3) -> f4381_0_reverse_FieldAccess(x2, x3)
+   EOS(x1) -> EOS
+Finished conversion. Obtained 1 rules.P rules:
+f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o700[List.n]o586:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o701[List.n]o586:0) :|: o701[List.n]o586:0 < o700[List.n]o586:0 && o700[List.n]o586:0 > -1 && o701[List.n]o586:0 > 0 && o586[List.n]o586:0 > 0
+
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o700[List.n]o586:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o701[List.n]o586:0) :|: o701[List.n]o586:0 < o700[List.n]o586:0 && o700[List.n]o586:0 > -1 && o701[List.n]o586:0 > 0 && o586[List.n]o586:0 > 0
+
+----------------------------------------
+
+(23) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(24)
+Obligation:
+Rules:
+f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o700[List.n]o586:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o701[List.n]o586:0) :|: o701[List.n]o586:0 < o700[List.n]o586:0 && o700[List.n]o586:0 > -1 && o701[List.n]o586:0 > 0 && o586[List.n]o586:0 > 0
+
+----------------------------------------
+
+(25) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o700[List.n]o586:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o701[List.n]o586:0) :|: o701[List.n]o586:0 < o700[List.n]o586:0 && o700[List.n]o586:0 > -1 && o701[List.n]o586:0 > 0 && o586[List.n]o586:0 > 0
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(26)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o700[List.n]o586:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0, o701[List.n]o586:0) :|: o701[List.n]o586:0 < o700[List.n]o586:0 && o700[List.n]o586:0 > -1 && o701[List.n]o586:0 > 0 && o586[List.n]o586:0 > 0
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(27) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(28)
+Obligation:
+Rules:
+f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0, o700[List.n]o586:0:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0, o701[List.n]o586:0:0) :|: o701[List.n]o586:0:0 > 0 && o586[List.n]o586:0:0 > 0 && o700[List.n]o586:0:0 > -1 && o701[List.n]o586:0:0 < o700[List.n]o586:0:0
+
+----------------------------------------
+
+(29) FilterProof (EQUIVALENT)
+Used the following sort dictionary for filtering: 
+f4381_0_reverse_FieldAccess(INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(30)
+Obligation:
+Rules:
+f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0, o700[List.n]o586:0:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0, o701[List.n]o586:0:0) :|: o701[List.n]o586:0:0 > 0 && o586[List.n]o586:0:0 > 0 && o700[List.n]o586:0:0 > -1 && o701[List.n]o586:0:0 < o700[List.n]o586:0:0
+
+----------------------------------------
+
+(31) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(32)
+Obligation:
+Rules:
+f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0:0, o700[List.n]o586:0:0:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0:0, o701[List.n]o586:0:0:0) :|: o700[List.n]o586:0:0:0 > -1 && o701[List.n]o586:0:0:0 < o700[List.n]o586:0:0:0 && o586[List.n]o586:0:0:0 > 0 && o701[List.n]o586:0:0:0 > 0
+
+----------------------------------------
+
+(33) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f4381_0_reverse_FieldAccess(x, x1)] = x1
+
+The following rules are decreasing:
+f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0:0, o700[List.n]o586:0:0:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0:0, o701[List.n]o586:0:0:0) :|: o700[List.n]o586:0:0:0 > -1 && o701[List.n]o586:0:0:0 < o700[List.n]o586:0:0:0 && o586[List.n]o586:0:0:0 > 0 && o701[List.n]o586:0:0:0 > 0
+The following rules are bounded:
+f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0:0, o700[List.n]o586:0:0:0) -> f4381_0_reverse_FieldAccess(o586[List.n]o586:0:0:0, o701[List.n]o586:0:0:0) :|: o700[List.n]o586:0:0:0 > -1 && o701[List.n]o586:0:0:0 < o700[List.n]o586:0:0:0 && o586[List.n]o586:0:0:0 > 0 && o701[List.n]o586:0:0:0 > 0
+
+----------------------------------------
+
+(34)
+YES
+
+----------------------------------------
+
+(35)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: ListReverseCyclicList.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(36) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 17 IRulesP rules:
+f404_0_createList_Load(EOS(STATIC_404), i40) -> f407_0_createList_LE(EOS(STATIC_407), i40, i40) :|: TRUE
+f407_0_createList_LE(EOS(STATIC_407), i42, i42) -> f411_0_createList_LE(EOS(STATIC_411), i42, i42) :|: TRUE
+f411_0_createList_LE(EOS(STATIC_411), i42, i42) -> f415_0_createList_New(EOS(STATIC_415), i42) :|: i42 > 0
+f415_0_createList_New(EOS(STATIC_415), i42) -> f419_0_createList_Duplicate(EOS(STATIC_419), i42) :|: TRUE
+f419_0_createList_Duplicate(EOS(STATIC_419), i42) -> f421_0_createList_Load(EOS(STATIC_421), i42) :|: TRUE
+f421_0_createList_Load(EOS(STATIC_421), i42) -> f423_0_createList_InvokeMethod(EOS(STATIC_423), i42) :|: TRUE
+f423_0_createList_InvokeMethod(EOS(STATIC_423), i42) -> f425_0__init__Load(EOS(STATIC_425), i42) :|: TRUE
+f425_0__init__Load(EOS(STATIC_425), i42) -> f428_0__init__InvokeMethod(EOS(STATIC_428), i42) :|: TRUE
+f428_0__init__InvokeMethod(EOS(STATIC_428), i42) -> f445_0__init__Load(EOS(STATIC_445), i42) :|: TRUE
+f445_0__init__Load(EOS(STATIC_445), i42) -> f458_0__init__Load(EOS(STATIC_458), i42) :|: TRUE
+f458_0__init__Load(EOS(STATIC_458), i42) -> f467_0__init__FieldAccess(EOS(STATIC_467), i42) :|: TRUE
+f467_0__init__FieldAccess(EOS(STATIC_467), i42) -> f478_0__init__Return(EOS(STATIC_478), i42) :|: TRUE
+f478_0__init__Return(EOS(STATIC_478), i42) -> f484_0_createList_Store(EOS(STATIC_484), i42) :|: TRUE
+f484_0_createList_Store(EOS(STATIC_484), i42) -> f490_0_createList_JMP(EOS(STATIC_490), i42) :|: TRUE
+f490_0_createList_JMP(EOS(STATIC_490), i42) -> f517_0_createList_Inc(EOS(STATIC_517), i42) :|: TRUE
+f517_0_createList_Inc(EOS(STATIC_517), i42) -> f393_0_createList_Inc(EOS(STATIC_393), i42) :|: TRUE
+f393_0_createList_Inc(EOS(STATIC_393), i37) -> f404_0_createList_Load(EOS(STATIC_404), i37 + -1) :|: TRUE
+Combined rules. Obtained 1 IRulesP rules:
+f404_0_createList_Load(EOS(STATIC_404), i40:0) -> f404_0_createList_Load(EOS(STATIC_404), i40:0 - 1) :|: i40:0 > 0
+Filtered constant ground arguments:
+   f404_0_createList_Load(x1, x2) -> f404_0_createList_Load(x2)
+   EOS(x1) -> EOS
+Finished conversion. Obtained 1 rules.P rules:
+f404_0_createList_Load(i40:0) -> f404_0_createList_Load(i40:0 - 1) :|: i40:0 > 0
+
+----------------------------------------
+
+(37)
+Obligation:
+Rules:
+f404_0_createList_Load(i40:0) -> f404_0_createList_Load(i40:0 - 1) :|: i40:0 > 0
+
+----------------------------------------
+
+(38) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(39)
+Obligation:
+Rules:
+f404_0_createList_Load(i40:0) -> f404_0_createList_Load(arith) :|: i40:0 > 0 && arith = i40:0 - 1
+
+----------------------------------------
+
+(40) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f404_0_createList_Load(i40:0) -> f404_0_createList_Load(arith) :|: i40:0 > 0 && arith = i40:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(41)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f404_0_createList_Load(i40:0) -> f404_0_createList_Load(arith) :|: i40:0 > 0 && arith = i40:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(42) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(43)
+Obligation:
+Rules:
+f404_0_createList_Load(i40:0:0) -> f404_0_createList_Load(i40:0:0 - 1) :|: i40:0:0 > 0
+
+----------------------------------------
+
+(44) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f404_0_createList_Load(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(45)
+Obligation:
+Rules:
+f404_0_createList_Load(i40:0:0) -> f404_0_createList_Load(c) :|: c = i40:0:0 - 1 && i40:0:0 > 0
+
+----------------------------------------
+
+(46) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f404_0_createList_Load(x)] = x
+
+The following rules are decreasing:
+f404_0_createList_Load(i40:0:0) -> f404_0_createList_Load(c) :|: c = i40:0:0 - 1 && i40:0:0 > 0
+The following rules are bounded:
+f404_0_createList_Load(i40:0:0) -> f404_0_createList_Load(c) :|: c = i40:0:0 - 1 && i40:0:0 > 0
+
+----------------------------------------
+
+(47)
+YES

@@ -1,0 +1,910 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/oxAXN.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 53 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 557 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 268 ms]
+        (9) QDP
+        (10) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (11) QDP
+        (12) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (13) YES
+    (14) JBCTerminationSCC
+        (15) SCCToIRSProof [SOUND, 51 ms]
+        (16) IRSwT
+        (17) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (18) IRSwT
+        (19) IRSwTTerminationDigraphProof [EQUIVALENT, 79 ms]
+        (20) IRSwT
+        (21) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (22) IRSwT
+        (23) TempFilterProof [SOUND, 60 ms]
+        (24) IntTRS
+        (25) PolynomialOrderProcessor [EQUIVALENT, 17 ms]
+        (26) IntTRS
+        (27) RankingReductionPairProof [EQUIVALENT, 0 ms]
+        (28) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package GrowTreeR;
+
+public class GrowTreeR {
+  public static void main(final String[] args) {
+    Random.args = args;
+
+    final Tree t = Tree.createTree(Random.random());
+    growList(t.children);
+  }
+
+  public static void growTree(final Tree t) {
+      if (t == null) {
+          return;
+      } else if (t.children == null) {
+          t.children = new TreeList(new Tree(), null);
+      } else {
+          growList(t.children);
+      }
+  }
+
+  public static void growList(final TreeList l) {
+      if (l == null) {
+          return;
+      } else {
+          growTree(l.value);
+          growList(l.next);
+      }
+  }
+}
+
+
+package GrowTreeR;
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package GrowTreeR;
+public class Tree {
+    TreeList children;
+
+    public Tree() {
+        this.children = null;
+    }
+
+    public void addChild(final Tree t) {
+        this.children = new TreeList(t, this.children);
+    }
+
+    public static Tree createNode() {
+        final Tree result = new Tree();
+        return result;
+    }
+
+    public static Tree createTree(int depth) {
+        if (depth <= 0) {
+            return null;
+        }
+        depth = depth - 1;
+
+        final Tree result = new Tree();
+        final int numberOfChildren = Random.random();
+
+        for (int i = 0; i < numberOfChildren; i++) {
+            result.addChild(createTree(depth - 1));
+        }
+
+        return result;
+    }
+}
+
+
+package GrowTreeR;
+public class TreeList {
+  Tree value;
+  TreeList next;
+
+  public TreeList(final Tree value, final TreeList next) {
+    this.value = value;
+    this.next = next;
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package GrowTreeR;
+
+public class GrowTreeR {
+  public static void main(final String[] args) {
+    Random.args = args;
+
+    final Tree t = Tree.createTree(Random.random());
+    growList(t.children);
+  }
+
+  public static void growTree(final Tree t) {
+      if (t == null) {
+          return;
+      } else if (t.children == null) {
+          t.children = new TreeList(new Tree(), null);
+      } else {
+          growList(t.children);
+      }
+  }
+
+  public static void growList(final TreeList l) {
+      if (l == null) {
+          return;
+      } else {
+          growTree(l.value);
+          growList(l.next);
+      }
+  }
+}
+
+
+package GrowTreeR;
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package GrowTreeR;
+public class Tree {
+    TreeList children;
+
+    public Tree() {
+        this.children = null;
+    }
+
+    public void addChild(final Tree t) {
+        this.children = new TreeList(t, this.children);
+    }
+
+    public static Tree createNode() {
+        final Tree result = new Tree();
+        return result;
+    }
+
+    public static Tree createTree(int depth) {
+        if (depth <= 0) {
+            return null;
+        }
+        depth = depth - 1;
+
+        final Tree result = new Tree();
+        final int numberOfChildren = Random.random();
+
+        for (int i = 0; i < numberOfChildren; i++) {
+            result.addChild(createTree(depth - 1));
+        }
+
+        return result;
+    }
+}
+
+
+package GrowTreeR;
+public class TreeList {
+  Tree value;
+  TreeList next;
+
+  public TreeList(final Tree value, final TreeList next) {
+    this.value = value;
+    this.next = next;
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+GrowTreeR.GrowTreeR.main([Ljava/lang/String;)V: Graph of 155 nodes with 0 SCCs.
+
+
+
+GrowTreeR.Tree.createTree(I)LGrowTreeR/Tree;: Graph of 163 nodes with 1 SCC.
+
+
+
+GrowTreeR.GrowTreeR.growList(LGrowTreeR/TreeList;)V: Graph of 49 nodes with 0 SCCs.
+
+
+
+GrowTreeR.GrowTreeR.growTree(LGrowTreeR/Tree;)V: Graph of 52 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: GrowTreeR.GrowTreeR.growList(LGrowTreeR/TreeList;)V, GrowTreeR.GrowTreeR.growTree(LGrowTreeR/Tree;)V
+SCC calls the following helper methods: GrowTreeR.GrowTreeR.growList(LGrowTreeR/TreeList;)V, GrowTreeR.GrowTreeR.growTree(LGrowTreeR/Tree;)V
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*GrowTreeR.TreeList: [value, next]
+*GrowTreeR.Tree: [children]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 40 rules for P and 105 rules for R.P rules:
+f10748_0_growList_NONNULL(EOS(STATIC_10748), java.lang.Object(o1430sub), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) -> f10777_0_growList_NONNULL(EOS(STATIC_10777), java.lang.Object(o1430sub), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) :|: TRUE
+f10777_0_growList_NONNULL(EOS(STATIC_10777), java.lang.Object(o1430sub), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) -> f10806_0_growList_Load(EOS(STATIC_10806), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) :|: TRUE
+f10806_0_growList_Load(EOS(STATIC_10806), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) -> f10814_0_growList_FieldAccess(EOS(STATIC_10814), java.lang.Object(o1430sub), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) :|: TRUE
+f10814_0_growList_FieldAccess(EOS(STATIC_10814), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) -> f10828_0_growList_FieldAccess(EOS(STATIC_10828), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) :|: TRUE
+f10828_0_growList_FieldAccess(EOS(STATIC_10828), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) -> f10839_0_growList_InvokeMethod(EOS(STATIC_10839), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), o1452) :|: TRUE
+f10839_0_growList_InvokeMethod(EOS(STATIC_10839), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), o1452) -> f10846_1_growList_InvokeMethod(f10846_0_growTree_Load(EOS(STATIC_10846), o1452, o1452), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) :|: TRUE
+f10846_0_growTree_Load(EOS(STATIC_10846), o1452, o1452) -> f10855_0_growTree_Load(EOS(STATIC_10855), o1452, o1452) :|: TRUE
+f10855_0_growTree_Load(EOS(STATIC_10855), o1452, o1452) -> f10862_0_growTree_Load(EOS(STATIC_10862), o1452, o1452) :|: TRUE
+f10862_0_growTree_Load(EOS(STATIC_10862), o1472, o1472) -> f10865_0_growTree_NONNULL(EOS(STATIC_10865), o1472, o1472, o1472) :|: TRUE
+f10865_0_growTree_NONNULL(EOS(STATIC_10865), java.lang.Object(o1479sub), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) -> f10869_0_growTree_NONNULL(EOS(STATIC_10869), java.lang.Object(o1479sub), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) :|: TRUE
+f10869_0_growTree_NONNULL(EOS(STATIC_10869), java.lang.Object(o1479sub), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) -> f10884_0_growTree_Load(EOS(STATIC_10884), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) :|: TRUE
+f10884_0_growTree_Load(EOS(STATIC_10884), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) -> f10891_0_growTree_FieldAccess(EOS(STATIC_10891), java.lang.Object(o1479sub), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) :|: TRUE
+f10891_0_growTree_FieldAccess(EOS(STATIC_10891), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490))) -> f10895_0_growTree_FieldAccess(EOS(STATIC_10895), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490))) :|: TRUE
+f10895_0_growTree_FieldAccess(EOS(STATIC_10895), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490))) -> f10904_0_growTree_NONNULL(EOS(STATIC_10904), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), o1490) :|: TRUE
+f10904_0_growTree_NONNULL(EOS(STATIC_10904), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) -> f10908_0_growTree_NONNULL(EOS(STATIC_10908), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) :|: TRUE
+f10908_0_growTree_NONNULL(EOS(STATIC_10908), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) -> f10914_0_growTree_Load(EOS(STATIC_10914), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) :|: TRUE
+f10914_0_growTree_Load(EOS(STATIC_10914), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) -> f10920_0_growTree_FieldAccess(EOS(STATIC_10920), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) :|: TRUE
+f10920_0_growTree_FieldAccess(EOS(STATIC_10920), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) -> f10928_0_growTree_InvokeMethod(EOS(STATIC_10928), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) :|: TRUE
+f10928_0_growTree_InvokeMethod(EOS(STATIC_10928), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) -> f10957_1_growTree_InvokeMethod(f10957_0_growList_Load(EOS(STATIC_10957), java.lang.Object(o1503sub), java.lang.Object(o1503sub)), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) :|: TRUE
+f10957_0_growList_Load(EOS(STATIC_10957), java.lang.Object(o1503sub), java.lang.Object(o1503sub)) -> f10964_0_growList_Load(EOS(STATIC_10964), java.lang.Object(o1503sub), java.lang.Object(o1503sub)) :|: TRUE
+f10964_0_growList_Load(EOS(STATIC_10964), java.lang.Object(o1503sub), java.lang.Object(o1503sub)) -> f10622_0_growList_Load(EOS(STATIC_10622), java.lang.Object(o1503sub), java.lang.Object(o1503sub)) :|: TRUE
+f10622_0_growList_Load(EOS(STATIC_10622), o1386, o1386) -> f10748_0_growList_NONNULL(EOS(STATIC_10748), o1386, o1386, o1386) :|: TRUE
+f10905_0_growTree_Return(EOS(STATIC_10905), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f10910_0_growList_Load(EOS(STATIC_10910), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) :|: TRUE
+f10910_0_growList_Load(EOS(STATIC_10910), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f10916_0_growList_FieldAccess(EOS(STATIC_10916), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) :|: TRUE
+f10916_0_growList_FieldAccess(EOS(STATIC_10916), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f10922_0_growList_InvokeMethod(EOS(STATIC_10922), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), o1453) :|: TRUE
+f10922_0_growList_InvokeMethod(EOS(STATIC_10922), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), o1453) -> f10932_1_growList_InvokeMethod(f10932_0_growList_Load(EOS(STATIC_10932), o1453, o1453), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) :|: TRUE
+f10932_0_growList_Load(EOS(STATIC_10932), o1453, o1453) -> f10961_0_growList_Load(EOS(STATIC_10961), o1453, o1453) :|: TRUE
+f10961_0_growList_Load(EOS(STATIC_10961), o1453, o1453) -> f10622_0_growList_Load(EOS(STATIC_10622), o1453, o1453) :|: TRUE
+f11701_0_growTree_Return(EOS(STATIC_11701), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453))) -> f11702_0_growTree_Return(EOS(STATIC_11702), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453))) :|: TRUE
+f11702_0_growTree_Return(EOS(STATIC_11702), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o1863, o1862)))), o1859)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o1863, o1862)))), o1859))) -> f12119_0_growTree_Return(EOS(STATIC_12119), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o1863, o1862)))), o1859)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o1863, o1862)))), o1859))) :|: TRUE
+f12119_0_growTree_Return(EOS(STATIC_12119), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) -> f12123_0_growList_Load(EOS(STATIC_12123), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) :|: TRUE
+f12123_0_growList_Load(EOS(STATIC_12123), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) -> f12124_0_growList_FieldAccess(EOS(STATIC_12124), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) :|: TRUE
+f12124_0_growList_FieldAccess(EOS(STATIC_12124), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) -> f12125_0_growList_InvokeMethod(EOS(STATIC_12125), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), o2377) :|: TRUE
+f12125_0_growList_InvokeMethod(EOS(STATIC_12125), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), o2377) -> f12126_1_growList_InvokeMethod(f12126_0_growList_Load(EOS(STATIC_12126), o2377, o2377), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) :|: TRUE
+f12126_0_growList_Load(EOS(STATIC_12126), o2377, o2377) -> f12127_0_growList_Load(EOS(STATIC_12127), o2377, o2377) :|: TRUE
+f12127_0_growList_Load(EOS(STATIC_12127), o2377, o2377) -> f10622_0_growList_Load(EOS(STATIC_10622), o2377, o2377) :|: TRUE
+f12118_0_growTree_Return(EOS(STATIC_12118), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453))) -> f12119_0_growTree_Return(EOS(STATIC_12119), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453))) :|: TRUE
+f10846_1_growList_InvokeMethod(f10886_0_growTree_Return(EOS(STATIC_10886), NULL), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f10905_0_growTree_Return(EOS(STATIC_10905), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) :|: TRUE
+f10846_1_growList_InvokeMethod(f11582_0_growTree_Return(EOS(STATIC_11582), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))))), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) -> f11701_0_growTree_Return(EOS(STATIC_11701), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453))) :|: TRUE
+f10846_1_growList_InvokeMethod(f12109_0_growTree_Return(EOS(STATIC_12109), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287))))), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) -> f12118_0_growTree_Return(EOS(STATIC_12118), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453))) :|: TRUE
+R rules:
+f10622_0_growList_Load(EOS(STATIC_10622), o1386, o1386) -> f10748_0_growList_NONNULL(EOS(STATIC_10748), o1386, o1386, o1386) :|: TRUE
+f10748_0_growList_NONNULL(EOS(STATIC_10748), java.lang.Object(o1430sub), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) -> f10777_0_growList_NONNULL(EOS(STATIC_10777), java.lang.Object(o1430sub), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) :|: TRUE
+f10748_0_growList_NONNULL(EOS(STATIC_10748), NULL, NULL, NULL) -> f10778_0_growList_NONNULL(EOS(STATIC_10778), NULL, NULL, NULL) :|: TRUE
+f10777_0_growList_NONNULL(EOS(STATIC_10777), java.lang.Object(o1430sub), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) -> f10806_0_growList_Load(EOS(STATIC_10806), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) :|: TRUE
+f10778_0_growList_NONNULL(EOS(STATIC_10778), NULL, NULL, NULL) -> f10807_0_growList_Return(EOS(STATIC_10807), NULL) :|: TRUE
+f10806_0_growList_Load(EOS(STATIC_10806), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) -> f10814_0_growList_FieldAccess(EOS(STATIC_10814), java.lang.Object(o1430sub), java.lang.Object(o1430sub), java.lang.Object(o1430sub)) :|: TRUE
+f10814_0_growList_FieldAccess(EOS(STATIC_10814), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) -> f10828_0_growList_FieldAccess(EOS(STATIC_10828), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) :|: TRUE
+f10828_0_growList_FieldAccess(EOS(STATIC_10828), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) -> f10839_0_growList_InvokeMethod(EOS(STATIC_10839), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), o1452) :|: TRUE
+f10839_0_growList_InvokeMethod(EOS(STATIC_10839), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), o1452) -> f10846_1_growList_InvokeMethod(f10846_0_growTree_Load(EOS(STATIC_10846), o1452, o1452), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) :|: TRUE
+f10846_0_growTree_Load(EOS(STATIC_10846), o1452, o1452) -> f10855_0_growTree_Load(EOS(STATIC_10855), o1452, o1452) :|: TRUE
+f10905_0_growTree_Return(EOS(STATIC_10905), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f10910_0_growList_Load(EOS(STATIC_10910), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) :|: TRUE
+f10910_0_growList_Load(EOS(STATIC_10910), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f10916_0_growList_FieldAccess(EOS(STATIC_10916), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) :|: TRUE
+f10916_0_growList_FieldAccess(EOS(STATIC_10916), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f10922_0_growList_InvokeMethod(EOS(STATIC_10922), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), o1453) :|: TRUE
+f10922_0_growList_InvokeMethod(EOS(STATIC_10922), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), o1453) -> f10932_1_growList_InvokeMethod(f10932_0_growList_Load(EOS(STATIC_10932), o1453, o1453), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) :|: TRUE
+f10932_0_growList_Load(EOS(STATIC_10932), o1453, o1453) -> f10961_0_growList_Load(EOS(STATIC_10961), o1453, o1453) :|: TRUE
+f10980_0_growList_Return(EOS(STATIC_10980), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) -> f10983_0_growList_Return(EOS(STATIC_10983), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) :|: TRUE
+f11130_0_growList_Return(EOS(STATIC_11130), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) -> f11202_0_growList_Return(EOS(STATIC_11202), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) :|: TRUE
+f11202_0_growList_Return(EOS(STATIC_11202), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1630))))) -> f12046_0_growList_Return(EOS(STATIC_12046), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1630))))) :|: TRUE
+f11701_0_growTree_Return(EOS(STATIC_11701), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453))) -> f11702_0_growTree_Return(EOS(STATIC_11702), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453))) :|: TRUE
+f11702_0_growTree_Return(EOS(STATIC_11702), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o1863, o1862)))), o1859)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o1863, o1862)))), o1859))) -> f12119_0_growTree_Return(EOS(STATIC_12119), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o1863, o1862)))), o1859)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o1863, o1862)))), o1859))) :|: TRUE
+f12046_0_growList_Return(EOS(STATIC_12046), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2107, o2106))))) -> f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2107, o2106))))) :|: TRUE
+f12115_0_growList_Return(EOS(STATIC_12115), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2258, o2257))))))) -> f12046_0_growList_Return(EOS(STATIC_12046), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2258, o2257))))))) :|: TRUE
+f12118_0_growTree_Return(EOS(STATIC_12118), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453))) -> f12119_0_growTree_Return(EOS(STATIC_12119), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453))) :|: TRUE
+f12119_0_growTree_Return(EOS(STATIC_12119), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) -> f12123_0_growList_Load(EOS(STATIC_12123), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) :|: TRUE
+f12123_0_growList_Load(EOS(STATIC_12123), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) -> f12124_0_growList_FieldAccess(EOS(STATIC_12124), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) :|: TRUE
+f12124_0_growList_FieldAccess(EOS(STATIC_12124), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) -> f12125_0_growList_InvokeMethod(EOS(STATIC_12125), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), o2377) :|: TRUE
+f12125_0_growList_InvokeMethod(EOS(STATIC_12125), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377)), o2377) -> f12126_1_growList_InvokeMethod(f12126_0_growList_Load(EOS(STATIC_12126), o2377, o2377), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) :|: TRUE
+f12126_0_growList_Load(EOS(STATIC_12126), o2377, o2377) -> f12127_0_growList_Load(EOS(STATIC_12127), o2377, o2377) :|: TRUE
+f12128_0_growList_Return(EOS(STATIC_12128), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), NULL))) -> f12132_0_growList_Return(EOS(STATIC_12132), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), NULL))) :|: TRUE
+f12129_0_growList_Return(EOS(STATIC_12129), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) -> f12131_0_growList_Return(EOS(STATIC_12131), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) :|: TRUE
+f12130_0_growList_Return(EOS(STATIC_12130), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2448, o2447))))))) -> f12131_0_growList_Return(EOS(STATIC_12131), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2448, o2447))))))) :|: TRUE
+f12131_0_growList_Return(EOS(STATIC_12131), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2464, o2463)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o2460))))) -> f12140_0_growList_Return(EOS(STATIC_12140), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2464, o2463)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o2460))))) :|: TRUE
+f12137_0_growList_Return(EOS(STATIC_12137), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2511, o2510)))), NULL))))) -> f12046_0_growList_Return(EOS(STATIC_12046), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2511, o2510)))), NULL))))) :|: TRUE
+f12139_0_growList_Return(EOS(STATIC_12139), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2533, o2532)))), NULL))))) -> f12140_0_growList_Return(EOS(STATIC_12140), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2533, o2532)))), NULL))))) :|: TRUE
+f12140_0_growList_Return(EOS(STATIC_12140), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2611, o2610)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2607, o2606))))) -> f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2611, o2610)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2607, o2606))))) :|: TRUE
+f12148_0_growList_Return(EOS(STATIC_12148), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2693, o2692)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2690, o2689))))))) -> f12046_0_growList_Return(EOS(STATIC_12046), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2693, o2692)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2690, o2689))))))) :|: TRUE
+f12150_0_growList_Return(EOS(STATIC_12150), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2721, o2720)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2718, o2717))))))) -> f12140_0_growList_Return(EOS(STATIC_12140), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2721, o2720)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2718, o2717))))))) :|: TRUE
+f10961_0_growList_Load(EOS(STATIC_10961), o1453, o1453) -> f10622_0_growList_Load(EOS(STATIC_10622), o1453, o1453) :|: TRUE
+f10964_0_growList_Load(EOS(STATIC_10964), java.lang.Object(o1503sub), java.lang.Object(o1503sub)) -> f10622_0_growList_Load(EOS(STATIC_10622), java.lang.Object(o1503sub), java.lang.Object(o1503sub)) :|: TRUE
+f12127_0_growList_Load(EOS(STATIC_12127), o2377, o2377) -> f10622_0_growList_Load(EOS(STATIC_10622), o2377, o2377) :|: TRUE
+f10862_0_growTree_Load(EOS(STATIC_10862), o1472, o1472) -> f10865_0_growTree_NONNULL(EOS(STATIC_10865), o1472, o1472, o1472) :|: TRUE
+f10865_0_growTree_NONNULL(EOS(STATIC_10865), java.lang.Object(o1479sub), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) -> f10869_0_growTree_NONNULL(EOS(STATIC_10869), java.lang.Object(o1479sub), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) :|: TRUE
+f10865_0_growTree_NONNULL(EOS(STATIC_10865), NULL, NULL, NULL) -> f10871_0_growTree_NONNULL(EOS(STATIC_10871), NULL, NULL, NULL) :|: TRUE
+f10869_0_growTree_NONNULL(EOS(STATIC_10869), java.lang.Object(o1479sub), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) -> f10884_0_growTree_Load(EOS(STATIC_10884), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) :|: TRUE
+f10871_0_growTree_NONNULL(EOS(STATIC_10871), NULL, NULL, NULL) -> f10886_0_growTree_Return(EOS(STATIC_10886), NULL) :|: TRUE
+f10884_0_growTree_Load(EOS(STATIC_10884), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) -> f10891_0_growTree_FieldAccess(EOS(STATIC_10891), java.lang.Object(o1479sub), java.lang.Object(o1479sub), java.lang.Object(o1479sub)) :|: TRUE
+f10891_0_growTree_FieldAccess(EOS(STATIC_10891), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490))) -> f10895_0_growTree_FieldAccess(EOS(STATIC_10895), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490))) :|: TRUE
+f10895_0_growTree_FieldAccess(EOS(STATIC_10895), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490))) -> f10904_0_growTree_NONNULL(EOS(STATIC_10904), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), java.lang.Object(GrowTreeR.Tree(EOC, o1490)), o1490) :|: TRUE
+f10904_0_growTree_NONNULL(EOS(STATIC_10904), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) -> f10908_0_growTree_NONNULL(EOS(STATIC_10908), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) :|: TRUE
+f10904_0_growTree_NONNULL(EOS(STATIC_10904), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) -> f10909_0_growTree_NONNULL(EOS(STATIC_10909), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) :|: TRUE
+f10908_0_growTree_NONNULL(EOS(STATIC_10908), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) -> f10914_0_growTree_Load(EOS(STATIC_10914), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) :|: TRUE
+f10909_0_growTree_NONNULL(EOS(STATIC_10909), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) -> f10915_0_growTree_Load(EOS(STATIC_10915), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f10914_0_growTree_Load(EOS(STATIC_10914), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) -> f10920_0_growTree_FieldAccess(EOS(STATIC_10920), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) :|: TRUE
+f10915_0_growTree_Load(EOS(STATIC_10915), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f10921_0_growTree_New(EOS(STATIC_10921), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f10920_0_growTree_FieldAccess(EOS(STATIC_10920), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) -> f10928_0_growTree_InvokeMethod(EOS(STATIC_10928), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) :|: TRUE
+f10921_0_growTree_New(EOS(STATIC_10921), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f10930_0_growTree_Duplicate(EOS(STATIC_10930), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) :|: TRUE
+f10928_0_growTree_InvokeMethod(EOS(STATIC_10928), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub))), java.lang.Object(o1503sub)) -> f10957_1_growTree_InvokeMethod(f10957_0_growList_Load(EOS(STATIC_10957), java.lang.Object(o1503sub), java.lang.Object(o1503sub)), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) :|: TRUE
+f10930_0_growTree_Duplicate(EOS(STATIC_10930), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) -> f10958_0_growTree_New(EOS(STATIC_10958), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) :|: TRUE
+f10957_0_growList_Load(EOS(STATIC_10957), java.lang.Object(o1503sub), java.lang.Object(o1503sub)) -> f10964_0_growList_Load(EOS(STATIC_10964), java.lang.Object(o1503sub), java.lang.Object(o1503sub)) :|: TRUE
+f10958_0_growTree_New(EOS(STATIC_10958), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) -> f10966_0_growTree_Duplicate(EOS(STATIC_10966), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f10966_0_growTree_Duplicate(EOS(STATIC_10966), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f10967_0_growTree_InvokeMethod(EOS(STATIC_10967), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f10967_0_growTree_InvokeMethod(EOS(STATIC_10967), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f10968_0__init__Load(EOS(STATIC_10968), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f10968_0__init__Load(EOS(STATIC_10968), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f10982_0__init__InvokeMethod(EOS(STATIC_10982), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f10982_0__init__InvokeMethod(EOS(STATIC_10982), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f10984_0__init__Load(EOS(STATIC_10984), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f10984_0__init__Load(EOS(STATIC_10984), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f10986_0__init__ConstantStackPush(EOS(STATIC_10986), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f10986_0__init__ConstantStackPush(EOS(STATIC_10986), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f11128_0__init__FieldAccess(EOS(STATIC_11128), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) :|: TRUE
+f11128_0__init__FieldAccess(EOS(STATIC_11128), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) -> f11132_0__init__Return(EOS(STATIC_11132), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f11131_0_growList_Return(EOS(STATIC_11131), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) -> f11220_0_growList_Return(EOS(STATIC_11220), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) :|: TRUE
+f11132_0__init__Return(EOS(STATIC_11132), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f11138_0_growTree_ConstantStackPush(EOS(STATIC_11138), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f11138_0_growTree_ConstantStackPush(EOS(STATIC_11138), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f11141_0_growTree_InvokeMethod(EOS(STATIC_11141), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) :|: TRUE
+f11141_0_growTree_InvokeMethod(EOS(STATIC_11141), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) -> f11179_0__init__Load(EOS(STATIC_11179), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) :|: TRUE
+f11179_0__init__Load(EOS(STATIC_11179), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) -> f11235_0__init__InvokeMethod(EOS(STATIC_11235), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) :|: TRUE
+f11220_0_growList_Return(EOS(STATIC_11220), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1646))))) -> f12056_0_growList_Return(EOS(STATIC_12056), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1646))))) :|: TRUE
+f11235_0__init__InvokeMethod(EOS(STATIC_11235), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) -> f11244_0__init__Load(EOS(STATIC_11244), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) :|: TRUE
+f11244_0__init__Load(EOS(STATIC_11244), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL) -> f11380_0__init__Load(EOS(STATIC_11380), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) :|: TRUE
+f11380_0__init__Load(EOS(STATIC_11380), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) -> f11548_0__init__FieldAccess(EOS(STATIC_11548), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) :|: TRUE
+f11548_0__init__FieldAccess(EOS(STATIC_11548), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL))) -> f11552_0__init__Load(EOS(STATIC_11552), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), NULL) :|: TRUE
+f11552_0__init__Load(EOS(STATIC_11552), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), NULL) -> f11557_0__init__Load(EOS(STATIC_11557), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))) :|: TRUE
+f11557_0__init__Load(EOS(STATIC_11557), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))) -> f11563_0__init__FieldAccess(EOS(STATIC_11563), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), NULL) :|: TRUE
+f11563_0__init__FieldAccess(EOS(STATIC_11563), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)), NULL) -> f11566_0__init__Return(EOS(STATIC_11566), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))) :|: TRUE
+f11566_0__init__Return(EOS(STATIC_11566), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))) -> f11573_0_growTree_FieldAccess(EOS(STATIC_11573), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))) :|: TRUE
+f11573_0_growTree_FieldAccess(EOS(STATIC_11573), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.Tree(EOC, NULL)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))) -> f11578_0_growTree_JMP(EOS(STATIC_11578), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))))) :|: TRUE
+f11578_0_growTree_JMP(EOS(STATIC_11578), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))))) -> f11582_0_growTree_Return(EOS(STATIC_11582), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))))) :|: TRUE
+f12056_0_growList_Return(EOS(STATIC_12056), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2141, o2140))))) -> f12109_0_growTree_Return(EOS(STATIC_12109), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2141, o2140))))) :|: TRUE
+f12116_0_growList_Return(EOS(STATIC_12116), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2268, o2267))))))) -> f12056_0_growList_Return(EOS(STATIC_12056), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2268, o2267))))))) :|: TRUE
+f12138_0_growList_Return(EOS(STATIC_12138), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2522, o2521)))), NULL))))) -> f12056_0_growList_Return(EOS(STATIC_12056), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2522, o2521)))), NULL))))) :|: TRUE
+f12149_0_growList_Return(EOS(STATIC_12149), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2707, o2706)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2704, o2703))))))) -> f12056_0_growList_Return(EOS(STATIC_12056), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2707, o2706)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2704, o2703))))))) :|: TRUE
+f10855_0_growTree_Load(EOS(STATIC_10855), o1452, o1452) -> f10862_0_growTree_Load(EOS(STATIC_10862), o1452, o1452) :|: TRUE
+f10846_1_growList_InvokeMethod(f10886_0_growTree_Return(EOS(STATIC_10886), NULL), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f10905_0_growTree_Return(EOS(STATIC_10905), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) :|: TRUE
+f10846_1_growList_InvokeMethod(f11582_0_growTree_Return(EOS(STATIC_11582), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))))), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) -> f11701_0_growTree_Return(EOS(STATIC_11701), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453))) :|: TRUE
+f10846_1_growList_InvokeMethod(f12109_0_growTree_Return(EOS(STATIC_12109), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287))))), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452, o1453))) -> f12118_0_growTree_Return(EOS(STATIC_12118), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288, o2287)))), o1453))) :|: TRUE
+f10932_1_growList_InvokeMethod(f10807_0_growList_Return(EOS(STATIC_10807), NULL), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) -> f10980_0_growList_Return(EOS(STATIC_10980), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) :|: TRUE
+f10932_1_growList_InvokeMethod(f10983_0_growList_Return(EOS(STATIC_10983), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) -> f11130_0_growList_Return(EOS(STATIC_11130), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) :|: TRUE
+f10932_1_growList_InvokeMethod(f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2258, o2257))))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f12115_0_growList_Return(EOS(STATIC_12115), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2258, o2257))))))) :|: TRUE
+f10932_1_growList_InvokeMethod(f12132_0_growList_Return(EOS(STATIC_12132), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2511, o2510)))), NULL))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f12137_0_growList_Return(EOS(STATIC_12137), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2511, o2510)))), NULL))))) :|: TRUE
+f10932_1_growList_InvokeMethod(f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2693, o2692)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2690, o2689))))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453))) -> f12148_0_growList_Return(EOS(STATIC_12148), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2693, o2692)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2690, o2689))))))) :|: TRUE
+f12126_1_growList_InvokeMethod(f10807_0_growList_Return(EOS(STATIC_10807), NULL), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), NULL))) -> f12128_0_growList_Return(EOS(STATIC_12128), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), NULL))) :|: TRUE
+f12126_1_growList_InvokeMethod(f10983_0_growList_Return(EOS(STATIC_10983), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) -> f12129_0_growList_Return(EOS(STATIC_12129), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) :|: TRUE
+f12126_1_growList_InvokeMethod(f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2448, o2447))))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) -> f12130_0_growList_Return(EOS(STATIC_12130), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2448, o2447))))))) :|: TRUE
+f12126_1_growList_InvokeMethod(f12132_0_growList_Return(EOS(STATIC_12132), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2533, o2532)))), NULL))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) -> f12139_0_growList_Return(EOS(STATIC_12139), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2533, o2532)))), NULL))))) :|: TRUE
+f12126_1_growList_InvokeMethod(f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2721, o2720)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2718, o2717))))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), o2377))) -> f12150_0_growList_Return(EOS(STATIC_12150), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381, o2380)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2721, o2720)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2718, o2717))))))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f10983_0_growList_Return(EOS(STATIC_10983), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) -> f11131_0_growList_Return(EOS(STATIC_11131), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2268, o2267))))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) -> f12116_0_growList_Return(EOS(STATIC_12116), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2268, o2267))))))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f12132_0_growList_Return(EOS(STATIC_12132), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2522, o2521)))), NULL))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) -> f12138_0_growList_Return(EOS(STATIC_12138), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2522, o2521)))), NULL))))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2707, o2706)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2704, o2703))))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub)))) -> f12149_0_growList_Return(EOS(STATIC_12149), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2707, o2706)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2704, o2703))))))) :|: TRUE
+Combined rules. Obtained 4 conditional rules for P and 21 conditional rules for R.P rules:
+f10846_1_growList_InvokeMethod(f11582_0_growTree_Return(EOS(STATIC_11582), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))))), java.lang.Object(GrowTreeR.TreeList(EOC, o1452:0, o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452:0, o1453:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(EOS(STATIC_10748), o1453:0, o1453:0, o1453:0), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453:0))) :|: TRUE
+f10748_0_growList_NONNULL(EOS(STATIC_10748), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0))) -> f10846_1_growList_InvokeMethod(f10957_1_growTree_InvokeMethod(f10748_0_growList_NONNULL(EOS(STATIC_10748), java.lang.Object(o1503sub:0), java.lang.Object(o1503sub:0), java.lang.Object(o1503sub:0)), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0))) :|: TRUE
+f10846_1_growList_InvokeMethod(f10886_0_growTree_Return(EOS(STATIC_10886), NULL), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0))) -> f10932_1_growList_InvokeMethod(f10748_0_growList_NONNULL(EOS(STATIC_10748), o1453:0, o1453:0, o1453:0), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0))) :|: TRUE
+f10846_1_growList_InvokeMethod(f12109_0_growTree_Return(EOS(STATIC_12109), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288:0, o2287:0))))), java.lang.Object(GrowTreeR.TreeList(EOC, o1452:0, o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452:0, o1453:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(EOS(STATIC_10748), o1453:0, o1453:0, o1453:0), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288:0, o2287:0)))), o1453:0))) :|: TRUE
+R rules:
+f10846_1_growList_InvokeMethod(f10886_0_growTree_Return(EOS(STATIC_10886), NULL), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0))) -> f10932_1_growList_InvokeMethod(f10748_0_growList_NONNULL(EOS(STATIC_10748), o1453:0, o1453:0, o1453:0), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0))) :|: TRUE
+f10932_1_growList_InvokeMethod(f10807_0_growList_Return(EOS(STATIC_10807), NULL), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) -> f10983_0_growList_Return(EOS(STATIC_10983), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))) :|: TRUE
+f10748_0_growList_NONNULL(EOS(STATIC_10748), NULL, NULL, NULL) -> f10807_0_growList_Return(EOS(STATIC_10807), NULL) :|: TRUE
+f10957_1_growTree_InvokeMethod(f10983_0_growList_Return(EOS(STATIC_10983), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) -> f12109_0_growTree_Return(EOS(STATIC_12109), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) :|: TRUE
+f10748_0_growList_NONNULL(EOS(STATIC_10748), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0))) -> f10846_1_growList_InvokeMethod(f10957_1_growTree_InvokeMethod(f10748_0_growList_NONNULL(EOS(STATIC_10748), java.lang.Object(o1503sub:0), java.lang.Object(o1503sub:0), java.lang.Object(o1503sub:0)), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0))), o1453:0))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2268:0, o2267:0))))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0)))) -> f12109_0_growTree_Return(EOS(STATIC_12109), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2268:0, o2267:0))))))) :|: TRUE
+f10748_0_growList_NONNULL(EOS(STATIC_10748), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0))) -> f10846_1_growList_InvokeMethod(f10886_0_growTree_Return(EOS(STATIC_10886), NULL), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0))) :|: TRUE
+f10932_1_growList_InvokeMethod(f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2693:0, o2692:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2690:0, o2689:0))))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0))) -> f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2693:0, o2692:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2690:0, o2689:0))))))) :|: TRUE
+f10846_1_growList_InvokeMethod(f11582_0_growTree_Return(EOS(STATIC_11582), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))))), java.lang.Object(GrowTreeR.TreeList(EOC, o1452:0, o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452:0, o1453:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(EOS(STATIC_10748), o1453:0, o1453:0, o1453:0), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL)))), o1453:0))) :|: TRUE
+f12126_1_growList_InvokeMethod(f12132_0_growList_Return(EOS(STATIC_12132), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2533:0, o2532:0)))), NULL))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), o2377:0))) -> f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2533:0, o2532:0)))), NULL))))) :|: TRUE
+f12126_1_growList_InvokeMethod(f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2721:0, o2720:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2718:0, o2717:0))))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), o2377:0))) -> f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2721:0, o2720:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2718:0, o2717:0))))))) :|: TRUE
+f10932_1_growList_InvokeMethod(f10983_0_growList_Return(EOS(STATIC_10983), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) -> f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) :|: TRUE
+f12126_1_growList_InvokeMethod(f10807_0_growList_Return(EOS(STATIC_10807), NULL), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), NULL))) -> f12132_0_growList_Return(EOS(STATIC_12132), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), NULL))) :|: TRUE
+f12126_1_growList_InvokeMethod(f10983_0_growList_Return(EOS(STATIC_10983), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) -> f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, NULL))))) :|: TRUE
+f12126_1_growList_InvokeMethod(f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2448:0, o2447:0))))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), o2377:0))) -> f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2381:0, o2380:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2448:0, o2447:0))))))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f12132_0_growList_Return(EOS(STATIC_12132), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2522:0, o2521:0)))), NULL))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0)))) -> f12109_0_growTree_Return(EOS(STATIC_12109), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2522:0, o2521:0)))), NULL))))) :|: TRUE
+f10748_0_growList_NONNULL(EOS(STATIC_10748), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), o1453:0))) -> f10846_1_growList_InvokeMethod(f11582_0_growTree_Return(EOS(STATIC_11582), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), NULL))))), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, NULL)), o1453:0))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f12145_0_growList_Return(EOS(STATIC_12145), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2707:0, o2706:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2704:0, o2703:0))))), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(o1503sub:0)))) -> f12109_0_growTree_Return(EOS(STATIC_12109), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2707:0, o2706:0)))), java.lang.Object(GrowTreeR.TreeList(EOC, o2704:0, o2703:0))))))) :|: TRUE
+f10932_1_growList_InvokeMethod(f12132_0_growList_Return(EOS(STATIC_12132), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2511:0, o2510:0)))), NULL))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0))) -> f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2511:0, o2510:0)))), NULL))))) :|: TRUE
+f10846_1_growList_InvokeMethod(f12109_0_growTree_Return(EOS(STATIC_12109), java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288:0, o2287:0))))), java.lang.Object(GrowTreeR.TreeList(EOC, o1452:0, o1453:0)), java.lang.Object(GrowTreeR.TreeList(EOC, o1452:0, o1453:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(EOS(STATIC_10748), o1453:0, o1453:0, o1453:0), java.lang.Object(GrowTreeR.TreeList(EOC, java.lang.Object(GrowTreeR.Tree(EOC, java.lang.Object(GrowTreeR.TreeList(EOC, o2288:0, o2287:0)))), o1453:0))) :|: TRUE
+f10932_1_growList_InvokeMethod(f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2258:0, o2257:0))))), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, o1453:0))) -> f12108_0_growList_Return(EOS(STATIC_12108), java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, NULL, java.lang.Object(GrowTreeR.TreeList(EOC, o2258:0, o2257:0))))))) :|: TRUE
+Filtered ground terms:
+   f10748_0_growList_NONNULL(x1, x2, x3, x4) -> f10748_0_growList_NONNULL(x2, x3, x4)
+   f11582_0_growTree_Return(x1, x2) -> f11582_0_growTree_Return
+   f10886_0_growTree_Return(x1, x2) -> f10886_0_growTree_Return
+   f12109_0_growTree_Return(x1, x2) -> f12109_0_growTree_Return(x2)
+   GrowTreeR.TreeList(x1, x2, x3) -> GrowTreeR.TreeList(x2, x3)
+   GrowTreeR.Tree(x1, x2) -> GrowTreeR.Tree(x2)
+   f10983_0_growList_Return(x1, x2) -> f10983_0_growList_Return
+   f10807_0_growList_Return(x1, x2) -> f10807_0_growList_Return
+   f12108_0_growList_Return(x1, x2) -> f12108_0_growList_Return(x2)
+   f12145_0_growList_Return(x1, x2) -> f12145_0_growList_Return(x2)
+   f12132_0_growList_Return(x1, x2) -> f12132_0_growList_Return(x2)
+Filtered duplicate args:
+   f10846_1_growList_InvokeMethod(x1, x2, x3) -> f10846_1_growList_InvokeMethod(x1, x3)
+   f10748_0_growList_NONNULL(x1, x2, x3) -> f10748_0_growList_NONNULL(x3)
+Combined rules. Obtained 5 conditional rules for P and 21 conditional rules for R.P rules:
+F10748_0_GROWLIST_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(java.lang.Object(o1503sub:0:0)) :|: TRUE
+F10846_1_GROWLIST_INVOKEMETHOD(f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0))))), java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(o1453:0:0) :|: TRUE
+F10846_1_GROWLIST_INVOKEMETHOD(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(o1453:0:0) :|: TRUE
+F10748_0_GROWLIST_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> F10846_1_GROWLIST_INVOKEMETHOD(f10957_1_growTree_InvokeMethod(f10748_0_growList_NONNULL(java.lang.Object(o1503sub:0:0)), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) :|: TRUE
+F10846_1_GROWLIST_INVOKEMETHOD(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(o1453:0:0) :|: TRUE
+R rules:
+f10957_1_growTree_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2707:0:0, o2706:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2704:0:0, o2703:0:0))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2707:0:0, o2706:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2704:0:0, o2703:0:0))))))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) :|: TRUE
+f12126_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), NULL))) -> f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), NULL))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2522:0:0, o2521:0:0)))), NULL))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2522:0:0, o2521:0:0)))), NULL))))) :|: TRUE
+f10846_1_growList_InvokeMethod(f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0))))), java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(o1453:0:0), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0)))), o1453:0:0))) :|: TRUE
+f12126_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2533:0:0, o2532:0:0)))), NULL))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), o2377:0:0))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2533:0:0, o2532:0:0)))), NULL))))) :|: TRUE
+f10932_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) :|: TRUE
+f10932_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2258:0:0, o2257:0:0))))), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2258:0:0, o2257:0:0))))))) :|: TRUE
+f10932_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, NULL))) -> f10983_0_growList_Return :|: TRUE
+f10932_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2693:0:0, o2692:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2690:0:0, o2689:0:0))))), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2693:0:0, o2692:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2690:0:0, o2689:0:0))))))) :|: TRUE
+f10932_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2511:0:0, o2510:0:0)))), NULL))), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2511:0:0, o2510:0:0)))), NULL))))) :|: TRUE
+f10957_1_growTree_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2268:0:0, o2267:0:0))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2268:0:0, o2267:0:0))))))) :|: TRUE
+f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), o1453:0:0))) -> f10846_1_growList_InvokeMethod(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), o1453:0:0))) :|: TRUE
+f10846_1_growList_InvokeMethod(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f10932_1_growList_InvokeMethod(f10748_0_growList_NONNULL(o1453:0:0), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) :|: TRUE
+f12126_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) :|: TRUE
+f12126_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2448:0:0, o2447:0:0))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), o2377:0:0))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2448:0:0, o2447:0:0))))))) :|: TRUE
+f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f10846_1_growList_InvokeMethod(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) :|: TRUE
+f10846_1_growList_InvokeMethod(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(o1453:0:0), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), NULL)))), o1453:0:0))) :|: TRUE
+f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> f10846_1_growList_InvokeMethod(f10957_1_growTree_InvokeMethod(f10748_0_growList_NONNULL(java.lang.Object(o1503sub:0:0)), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) :|: TRUE
+f10748_0_growList_NONNULL(NULL) -> f10807_0_growList_Return :|: TRUE
+f12126_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2721:0:0, o2720:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2718:0:0, o2717:0:0))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), o2377:0:0))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2721:0:0, o2720:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2718:0:0, o2717:0:0))))))) :|: TRUE
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F10748_0_GROWLIST_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(java.lang.Object(o1503sub:0:0))
+   F10846_1_GROWLIST_INVOKEMETHOD(f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0))))), java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(o1453:0:0)
+   F10846_1_GROWLIST_INVOKEMETHOD(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(o1453:0:0)
+   F10748_0_GROWLIST_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> F10846_1_GROWLIST_INVOKEMETHOD(f10957_1_growTree_InvokeMethod(f10748_0_growList_NONNULL(java.lang.Object(o1503sub:0:0)), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0)))
+   F10846_1_GROWLIST_INVOKEMETHOD(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(o1453:0:0)
+
+The TRS R consists of the following rules:
+
+   f10957_1_growTree_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2707:0:0, o2706:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2704:0:0, o2703:0:0))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2707:0:0, o2706:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2704:0:0, o2703:0:0)))))))
+   f10957_1_growTree_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f12126_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), NULL))) -> f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), NULL)))
+   f10957_1_growTree_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2522:0:0, o2521:0:0)))), NULL))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2522:0:0, o2521:0:0)))), NULL)))))
+   f10846_1_growList_InvokeMethod(f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0))))), java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(o1453:0:0), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0)))), o1453:0:0)))
+   f12126_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2533:0:0, o2532:0:0)))), NULL))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), o2377:0:0))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2533:0:0, o2532:0:0)))), NULL)))))
+   f10932_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f10932_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2258:0:0, o2257:0:0))))), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2258:0:0, o2257:0:0)))))))
+   f10932_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, NULL))) -> f10983_0_growList_Return
+   f10932_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2693:0:0, o2692:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2690:0:0, o2689:0:0))))), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2693:0:0, o2692:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2690:0:0, o2689:0:0)))))))
+   f10932_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2511:0:0, o2510:0:0)))), NULL))), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2511:0:0, o2510:0:0)))), NULL)))))
+   f10957_1_growTree_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2268:0:0, o2267:0:0))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2268:0:0, o2267:0:0)))))))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), o1453:0:0))) -> f10846_1_growList_InvokeMethod(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), o1453:0:0)))
+   f10846_1_growList_InvokeMethod(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f10932_1_growList_InvokeMethod(f10748_0_growList_NONNULL(o1453:0:0), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0)))
+   f12126_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f12126_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2448:0:0, o2447:0:0))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), o2377:0:0))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2448:0:0, o2447:0:0)))))))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f10846_1_growList_InvokeMethod(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0)))
+   f10846_1_growList_InvokeMethod(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(o1453:0:0), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), NULL)))), o1453:0:0)))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> f10846_1_growList_InvokeMethod(f10957_1_growTree_InvokeMethod(f10748_0_growList_NONNULL(java.lang.Object(o1503sub:0:0)), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0)))
+   f10748_0_growList_NONNULL(NULL) -> f10807_0_growList_Return
+   f12126_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2721:0:0, o2720:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2718:0:0, o2717:0:0))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), o2377:0:0))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2721:0:0, o2720:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2718:0:0, o2717:0:0)))))))
+
+The set Q consists of the following terms:
+
+   f10957_1_growTree_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), java.lang.Object(GrowTreeR.TreeList(x2, x3))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(x4))))
+   f10957_1_growTree_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f12126_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), NULL)))
+   f10957_1_growTree_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), NULL))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(x2))))
+   f10846_1_growList_InvokeMethod(f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1))))), java.lang.Object(GrowTreeR.TreeList(x2, x3)))
+   f12126_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), NULL))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x2, x3)))), x4)))
+   f10932_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f10932_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(x0, x1))))), java.lang.Object(GrowTreeR.TreeList(NULL, x2)))
+   f10932_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))
+   f10932_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), java.lang.Object(GrowTreeR.TreeList(x2, x3))))), java.lang.Object(GrowTreeR.TreeList(NULL, x4)))
+   f10932_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), NULL))), java.lang.Object(GrowTreeR.TreeList(NULL, x2)))
+   f10957_1_growTree_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(x0, x1))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(x2))))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), x0)))
+   f10846_1_growList_InvokeMethod(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, x0)))
+   f12126_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f12126_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(x0, x1))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x2, x3)))), x4)))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(NULL, x0)))
+   f10846_1_growList_InvokeMethod(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(x0, x1)))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(x0))), x1)))
+   f10748_0_growList_NONNULL(NULL)
+   f12126_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), java.lang.Object(GrowTreeR.TreeList(x2, x3))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x4, x5)))), x6)))
+
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 1 SCC with 2 less nodes.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F10748_0_GROWLIST_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> F10846_1_GROWLIST_INVOKEMETHOD(f10957_1_growTree_InvokeMethod(f10748_0_growList_NONNULL(java.lang.Object(o1503sub:0:0)), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0)))
+   F10846_1_GROWLIST_INVOKEMETHOD(f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0))))), java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(o1453:0:0)
+   F10748_0_GROWLIST_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(java.lang.Object(o1503sub:0:0))
+
+The TRS R consists of the following rules:
+
+   f10957_1_growTree_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2707:0:0, o2706:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2704:0:0, o2703:0:0))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2707:0:0, o2706:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2704:0:0, o2703:0:0)))))))
+   f10957_1_growTree_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f12126_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), NULL))) -> f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), NULL)))
+   f10957_1_growTree_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2522:0:0, o2521:0:0)))), NULL))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2522:0:0, o2521:0:0)))), NULL)))))
+   f10846_1_growList_InvokeMethod(f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0))))), java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(o1453:0:0), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0)))), o1453:0:0)))
+   f12126_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2533:0:0, o2532:0:0)))), NULL))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), o2377:0:0))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2533:0:0, o2532:0:0)))), NULL)))))
+   f10932_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f10932_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2258:0:0, o2257:0:0))))), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2258:0:0, o2257:0:0)))))))
+   f10932_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, NULL))) -> f10983_0_growList_Return
+   f10932_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2693:0:0, o2692:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2690:0:0, o2689:0:0))))), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2693:0:0, o2692:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2690:0:0, o2689:0:0)))))))
+   f10932_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2511:0:0, o2510:0:0)))), NULL))), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2511:0:0, o2510:0:0)))), NULL)))))
+   f10957_1_growTree_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2268:0:0, o2267:0:0))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))) -> f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2268:0:0, o2267:0:0)))))))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), o1453:0:0))) -> f10846_1_growList_InvokeMethod(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), o1453:0:0)))
+   f10846_1_growList_InvokeMethod(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f10932_1_growList_InvokeMethod(f10748_0_growList_NONNULL(o1453:0:0), java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0)))
+   f12126_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(NULL, NULL))))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f12126_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2448:0:0, o2447:0:0))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), o2377:0:0))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(o2448:0:0, o2447:0:0)))))))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0))) -> f10846_1_growList_InvokeMethod(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, o1453:0:0)))
+   f10846_1_growList_InvokeMethod(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> f12126_1_growList_InvokeMethod(f10748_0_growList_NONNULL(o1453:0:0), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), NULL)))), o1453:0:0)))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> f10846_1_growList_InvokeMethod(f10957_1_growTree_InvokeMethod(f10748_0_growList_NONNULL(java.lang.Object(o1503sub:0:0)), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0)))
+   f10748_0_growList_NONNULL(NULL) -> f10807_0_growList_Return
+   f12126_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2721:0:0, o2720:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2718:0:0, o2717:0:0))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), o2377:0:0))) -> f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2381:0:0, o2380:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2721:0:0, o2720:0:0)))), java.lang.Object(GrowTreeR.TreeList(o2718:0:0, o2717:0:0)))))))
+
+The set Q consists of the following terms:
+
+   f10957_1_growTree_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), java.lang.Object(GrowTreeR.TreeList(x2, x3))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(x4))))
+   f10957_1_growTree_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f12126_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), NULL)))
+   f10957_1_growTree_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), NULL))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(x2))))
+   f10846_1_growList_InvokeMethod(f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1))))), java.lang.Object(GrowTreeR.TreeList(x2, x3)))
+   f12126_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), NULL))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x2, x3)))), x4)))
+   f10932_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f10932_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(x0, x1))))), java.lang.Object(GrowTreeR.TreeList(NULL, x2)))
+   f10932_1_growList_InvokeMethod(f10807_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))
+   f10932_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), java.lang.Object(GrowTreeR.TreeList(x2, x3))))), java.lang.Object(GrowTreeR.TreeList(NULL, x4)))
+   f10932_1_growList_InvokeMethod(f12132_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), NULL))), java.lang.Object(GrowTreeR.TreeList(NULL, x2)))
+   f10957_1_growTree_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(x0, x1))))), java.lang.Object(GrowTreeR.Tree(java.lang.Object(x2))))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(NULL)), x0)))
+   f10846_1_growList_InvokeMethod(f10886_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(NULL, x0)))
+   f12126_1_growList_InvokeMethod(f10983_0_growList_Return, java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), java.lang.Object(GrowTreeR.TreeList(NULL, NULL)))))
+   f12126_1_growList_InvokeMethod(f12108_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(NULL, java.lang.Object(GrowTreeR.TreeList(x0, x1))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x2, x3)))), x4)))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(NULL, x0)))
+   f10846_1_growList_InvokeMethod(f11582_0_growTree_Return, java.lang.Object(GrowTreeR.TreeList(x0, x1)))
+   f10748_0_growList_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(x0))), x1)))
+   f10748_0_growList_NONNULL(NULL)
+   f12126_1_growList_InvokeMethod(f12145_0_growList_Return(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x0, x1)))), java.lang.Object(GrowTreeR.TreeList(x2, x3))))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(x4, x5)))), x6)))
+
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(12) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F10846_1_GROWLIST_INVOKEMETHOD(f12109_0_growTree_Return(java.lang.Object(GrowTreeR.Tree(java.lang.Object(GrowTreeR.TreeList(o2288:0:0, o2287:0:0))))), java.lang.Object(GrowTreeR.TreeList(o1452:0:0, o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(o1453:0:0)
+The graph contains the following edges 2 > 1
+
+
+*F10748_0_GROWLIST_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> F10748_0_GROWLIST_NONNULL(java.lang.Object(o1503sub:0:0))
+The graph contains the following edges 1 > 1
+
+
+*F10748_0_GROWLIST_NONNULL(java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0))) -> F10846_1_GROWLIST_INVOKEMETHOD(f10957_1_growTree_InvokeMethod(f10748_0_growList_NONNULL(java.lang.Object(o1503sub:0:0)), java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0)))), java.lang.Object(GrowTreeR.TreeList(java.lang.Object(GrowTreeR.Tree(java.lang.Object(o1503sub:0:0))), o1453:0:0)))
+The graph contains the following edges 1 >= 2
+
+
+----------------------------------------
+
+(13)
+YES
+
+----------------------------------------
+
+(14)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: GrowTreeR.Tree.createTree(I)LGrowTreeR/Tree;
+SCC calls the following helper methods: GrowTreeR.Tree.createTree(I)LGrowTreeR/Tree;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*GrowTreeR.Tree: [children]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(15) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 104 IRulesP rules:
+f504_0_createTree_GT(EOS(STATIC_504(java.lang.Object(o52sub), i85)), i88, i88, i88) -> f511_0_createTree_GT(EOS(STATIC_511(java.lang.Object(o52sub), i85)), i88, i88, i88) :|: TRUE
+f511_0_createTree_GT(EOS(STATIC_511(java.lang.Object(o52sub), i85)), i88, i88, i88) -> f516_0_createTree_Load(EOS(STATIC_516(java.lang.Object(o52sub), i85)), i88, i88) :|: i88 > 0
+f516_0_createTree_Load(EOS(STATIC_516(java.lang.Object(o52sub), i85)), i88, i88) -> f521_0_createTree_ConstantStackPush(EOS(STATIC_521(java.lang.Object(o52sub), i85)), i88, i88) :|: TRUE
+f521_0_createTree_ConstantStackPush(EOS(STATIC_521(java.lang.Object(o52sub), i85)), i88, i88) -> f528_0_createTree_IntArithmetic(EOS(STATIC_528(java.lang.Object(o52sub), i85)), i88, i88, 1) :|: TRUE
+f528_0_createTree_IntArithmetic(EOS(STATIC_528(java.lang.Object(o52sub), i85)), i88, i88, matching1) -> f539_0_createTree_Store(EOS(STATIC_539(java.lang.Object(o52sub), i85)), i88, i88 - 1) :|: i88 > 0 && matching1 = 1
+f539_0_createTree_Store(EOS(STATIC_539(java.lang.Object(o52sub), i85)), i88, i95) -> f605_0_createTree_New(EOS(STATIC_605(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f605_0_createTree_New(EOS(STATIC_605(java.lang.Object(o52sub), i85)), i88, i95) -> f618_0_createTree_Duplicate(EOS(STATIC_618(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f618_0_createTree_Duplicate(EOS(STATIC_618(java.lang.Object(o52sub), i85)), i88, i95) -> f624_0_createTree_InvokeMethod(EOS(STATIC_624(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f624_0_createTree_InvokeMethod(EOS(STATIC_624(java.lang.Object(o52sub), i85)), i88, i95) -> f627_0__init__Load(EOS(STATIC_627(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f627_0__init__Load(EOS(STATIC_627(java.lang.Object(o52sub), i85)), i88, i95) -> f630_0__init__InvokeMethod(EOS(STATIC_630(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f630_0__init__InvokeMethod(EOS(STATIC_630(java.lang.Object(o52sub), i85)), i88, i95) -> f632_0__init__Load(EOS(STATIC_632(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f632_0__init__Load(EOS(STATIC_632(java.lang.Object(o52sub), i85)), i88, i95) -> f635_0__init__ConstantStackPush(EOS(STATIC_635(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f635_0__init__ConstantStackPush(EOS(STATIC_635(java.lang.Object(o52sub), i85)), i88, i95) -> f638_0__init__FieldAccess(EOS(STATIC_638(java.lang.Object(o52sub), i85)), i88, i95, NULL) :|: TRUE
+f638_0__init__FieldAccess(EOS(STATIC_638(java.lang.Object(o52sub), i85)), i88, i95, NULL) -> f644_0__init__Return(EOS(STATIC_644(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f644_0__init__Return(EOS(STATIC_644(java.lang.Object(o52sub), i85)), i88, i95) -> f646_0_createTree_Store(EOS(STATIC_646(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f646_0_createTree_Store(EOS(STATIC_646(java.lang.Object(o52sub), i85)), i88, i95) -> f647_0_createTree_InvokeMethod(EOS(STATIC_647(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f647_0_createTree_InvokeMethod(EOS(STATIC_647(java.lang.Object(o52sub), i85)), i88, i95) -> f649_0_random_FieldAccess(EOS(STATIC_649(java.lang.Object(o52sub), i85)), i88, i95) :|: TRUE
+f649_0_random_FieldAccess(EOS(STATIC_649(java.lang.Object(o52sub), i85)), i88, i95) -> f651_0_random_FieldAccess(EOS(STATIC_651(java.lang.Object(o52sub), i85)), i88, i95, java.lang.Object(o52sub)) :|: TRUE
+f651_0_random_FieldAccess(EOS(STATIC_651(java.lang.Object(o52sub), i85)), i88, i95, java.lang.Object(o52sub)) -> f654_0_random_ArrayAccess(EOS(STATIC_654(java.lang.Object(o52sub), i85)), i88, i95, java.lang.Object(o52sub), i85) :|: TRUE
+f654_0_random_ArrayAccess(EOS(STATIC_654(java.lang.Object(ARRAY(i126)), i85)), i88, i95, java.lang.Object(ARRAY(i126)), i85) -> f656_0_random_ArrayAccess(EOS(STATIC_656(java.lang.Object(ARRAY(i126)), i85)), i88, i95, java.lang.Object(ARRAY(i126)), i85) :|: i126 >= 0
+f656_0_random_ArrayAccess(EOS(STATIC_656(java.lang.Object(ARRAY(i126)), i85)), i88, i95, java.lang.Object(ARRAY(i126)), i85) -> f658_0_random_ArrayAccess(EOS(STATIC_658(java.lang.Object(ARRAY(i126)), i85)), i88, i95, java.lang.Object(ARRAY(i126)), i85) :|: TRUE
+f658_0_random_ArrayAccess(EOS(STATIC_658(java.lang.Object(ARRAY(i126)), i85)), i88, i95, java.lang.Object(ARRAY(i126)), i85) -> f667_0_random_Store(EOS(STATIC_667(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75) :|: i85 < i126
+f667_0_random_Store(EOS(STATIC_667(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75) -> f676_0_random_FieldAccess(EOS(STATIC_676(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75) :|: TRUE
+f676_0_random_FieldAccess(EOS(STATIC_676(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75) -> f684_0_random_ConstantStackPush(EOS(STATIC_684(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75, i85) :|: TRUE
+f684_0_random_ConstantStackPush(EOS(STATIC_684(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75, i85) -> f692_0_random_IntArithmetic(EOS(STATIC_692(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75, i85, 1) :|: TRUE
+f692_0_random_IntArithmetic(EOS(STATIC_692(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75, i85, matching1) -> f701_0_random_FieldAccess(EOS(STATIC_701(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75, i85 + 1) :|: i85 > 0 && matching1 = 1
+f701_0_random_FieldAccess(EOS(STATIC_701(java.lang.Object(ARRAY(i126)), i85)), i88, i95, o75, i134) -> f708_0_random_Load(EOS(STATIC_708(java.lang.Object(ARRAY(i126)), i134)), i88, i95, o75) :|: TRUE
+f708_0_random_Load(EOS(STATIC_708(java.lang.Object(ARRAY(i126)), i134)), i88, i95, o75) -> f754_0_random_InvokeMethod(EOS(STATIC_754(java.lang.Object(ARRAY(i126)), i134)), i88, i95, o75) :|: TRUE
+f754_0_random_InvokeMethod(EOS(STATIC_754(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(o78sub)) -> f760_0_random_InvokeMethod(EOS(STATIC_760(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(o78sub)) :|: TRUE
+f760_0_random_InvokeMethod(EOS(STATIC_760(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(o79sub)) -> f768_0_random_InvokeMethod(EOS(STATIC_768(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(o79sub)) :|: TRUE
+f768_0_random_InvokeMethod(EOS(STATIC_768(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(o79sub)) -> f776_0_length_Load(EOS(STATIC_776(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(o79sub)) :|: TRUE
+f776_0_length_Load(EOS(STATIC_776(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(o79sub)) -> f780_0_length_FieldAccess(EOS(STATIC_780(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(o79sub)) :|: TRUE
+f780_0_length_FieldAccess(EOS(STATIC_780(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(java.lang.String(EOC, i145))) -> f783_0_length_FieldAccess(EOS(STATIC_783(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(java.lang.String(EOC, i145))) :|: i145 >= 0
+f783_0_length_FieldAccess(EOS(STATIC_783(java.lang.Object(ARRAY(i126)), i134)), i88, i95, java.lang.Object(java.lang.String(EOC, i145))) -> f785_0_length_Return(EOS(STATIC_785(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145) :|: TRUE
+f785_0_length_Return(EOS(STATIC_785(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145) -> f790_0_random_Return(EOS(STATIC_790(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145) :|: TRUE
+f790_0_random_Return(EOS(STATIC_790(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145) -> f796_0_createTree_Store(EOS(STATIC_796(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145) :|: TRUE
+f796_0_createTree_Store(EOS(STATIC_796(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145) -> f801_0_createTree_ConstantStackPush(EOS(STATIC_801(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145) :|: TRUE
+f801_0_createTree_ConstantStackPush(EOS(STATIC_801(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145) -> f806_0_createTree_Store(EOS(STATIC_806(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145, 0) :|: TRUE
+f806_0_createTree_Store(EOS(STATIC_806(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145, matching1) -> f810_0_createTree_Load(EOS(STATIC_810(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145, 0) :|: TRUE && matching1 = 0
+f810_0_createTree_Load(EOS(STATIC_810(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145, matching1) -> f4202_0_createTree_Load(EOS(STATIC_4202(java.lang.Object(ARRAY(i126)), i134)), i88, i95, i145, 0) :|: TRUE && matching1 = 0
+f4202_0_createTree_Load(EOS(STATIC_4202(java.lang.Object(ARRAY(i126)), i576)), i88, i95, i578, i579) -> f6222_0_createTree_Load(EOS(STATIC_6222(java.lang.Object(ARRAY(i126)), i576)), i88, i95, i578, i579) :|: TRUE
+f6222_0_createTree_Load(EOS(STATIC_6222(java.lang.Object(ARRAY(i126)), i887)), i88, i95, i888, i889) -> f9013_0_createTree_Load(EOS(STATIC_9013(java.lang.Object(ARRAY(i126)), i887)), i88, i95, i888, i889) :|: TRUE
+f9013_0_createTree_Load(EOS(STATIC_9013(java.lang.Object(ARRAY(i126)), i1309)), i88, i95, i1310, i1311) -> f10274_0_createTree_Load(EOS(STATIC_10274(java.lang.Object(ARRAY(i126)), i1309)), i88, i95, i1310, i1311) :|: TRUE
+f10274_0_createTree_Load(EOS(STATIC_10274(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565) -> f10286_0_createTree_Load(EOS(STATIC_10286(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i1565) :|: TRUE
+f10286_0_createTree_Load(EOS(STATIC_10286(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i1565) -> f10287_0_createTree_GE(EOS(STATIC_10287(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i1565, i1564) :|: TRUE
+f10287_0_createTree_GE(EOS(STATIC_10287(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i1565, i1564) -> f10298_0_createTree_GE(EOS(STATIC_10298(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i1565, i1564) :|: i1565 < i1564
+f10298_0_createTree_GE(EOS(STATIC_10298(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i1565, i1564) -> f10310_0_createTree_Load(EOS(STATIC_10310(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565) :|: i1565 < i1564
+f10310_0_createTree_Load(EOS(STATIC_10310(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565) -> f10313_0_createTree_Load(EOS(STATIC_10313(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565) :|: TRUE
+f10313_0_createTree_Load(EOS(STATIC_10313(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565) -> f10317_0_createTree_ConstantStackPush(EOS(STATIC_10317(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i95) :|: TRUE
+f10317_0_createTree_ConstantStackPush(EOS(STATIC_10317(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i95) -> f10335_0_createTree_IntArithmetic(EOS(STATIC_10335(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i95, 1) :|: TRUE
+f10335_0_createTree_IntArithmetic(EOS(STATIC_10335(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i95, matching1) -> f10358_0_createTree_InvokeMethod(EOS(STATIC_10358(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i95 - 1) :|: i95 >= 0 && matching1 = 1
+f10358_0_createTree_InvokeMethod(EOS(STATIC_10358(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i1610) -> f10362_0_createTree_Load(EOS(STATIC_10362(java.lang.Object(ARRAY(i1562)), i1563)), i1610, i1610) :|: i88 >= 1 && i1564 >= 1 && i1563 > 1 && i95 < i88 && i1565 < i1564 && i1610 < i95 && i1610 < i88
+f10358_0_createTree_InvokeMethod(EOS(STATIC_10358(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i1610) -> f10362_1_createTree_Load(EOS(STATIC_10362(java.lang.Object(ARRAY(i1562)), i1563)), i88, i95, i1564, i1565, i1610) :|: i88 >= 1 && i1564 >= 1 && i1563 > 1 && i95 < i88 && i1565 < i1564 && i1610 < i95 && i1610 < i88
+f10362_0_createTree_Load(EOS(STATIC_10362(java.lang.Object(ARRAY(i1562)), i1563)), i1610, i1610) -> f10368_0_createTree_Load(EOS(STATIC_10368(java.lang.Object(ARRAY(i1562)), i1563)), i1610, i1610) :|: TRUE
+f10368_0_createTree_Load(EOS(STATIC_10368(java.lang.Object(ARRAY(i1562)), i1563)), i1610, i1610) -> f500_0_createTree_Load(EOS(STATIC_500(java.lang.Object(ARRAY(i1562)), i1563)), i1610, i1610) :|: TRUE
+f500_0_createTree_Load(EOS(STATIC_500(java.lang.Object(o52sub), i85)), i86, i86) -> f504_0_createTree_GT(EOS(STATIC_504(java.lang.Object(o52sub), i85)), i86, i86, i86) :|: TRUE
+f10423_0_createTree_Return(EOS(STATIC_10423(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10519_0_createTree_InvokeMethod(EOS(STATIC_10519(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10519_0_createTree_InvokeMethod(EOS(STATIC_10519(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10533_0_addChild_Load(EOS(STATIC_10533(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10533_0_addChild_Load(EOS(STATIC_10533(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10765_0_addChild_New(EOS(STATIC_10765(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10765_0_addChild_New(EOS(STATIC_10765(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10779_0_addChild_Duplicate(EOS(STATIC_10779(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10779_0_addChild_Duplicate(EOS(STATIC_10779(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10808_0_addChild_Load(EOS(STATIC_10808(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10808_0_addChild_Load(EOS(STATIC_10808(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10818_0_addChild_Load(EOS(STATIC_10818(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10818_0_addChild_Load(EOS(STATIC_10818(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10833_0_addChild_FieldAccess(EOS(STATIC_10833(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10833_0_addChild_FieldAccess(EOS(STATIC_10833(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10841_0_addChild_InvokeMethod(EOS(STATIC_10841(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10841_0_addChild_InvokeMethod(EOS(STATIC_10841(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10849_0__init__Load(EOS(STATIC_10849(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10849_0__init__Load(EOS(STATIC_10849(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10857_0__init__InvokeMethod(EOS(STATIC_10857(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10857_0__init__InvokeMethod(EOS(STATIC_10857(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10859_0__init__Load(EOS(STATIC_10859(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10859_0__init__Load(EOS(STATIC_10859(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10863_0__init__Load(EOS(STATIC_10863(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10863_0__init__Load(EOS(STATIC_10863(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10866_0__init__FieldAccess(EOS(STATIC_10866(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10866_0__init__FieldAccess(EOS(STATIC_10866(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10873_0__init__Load(EOS(STATIC_10873(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10873_0__init__Load(EOS(STATIC_10873(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10888_0__init__Load(EOS(STATIC_10888(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10888_0__init__Load(EOS(STATIC_10888(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10893_0__init__FieldAccess(EOS(STATIC_10893(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10893_0__init__FieldAccess(EOS(STATIC_10893(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10898_0__init__Return(EOS(STATIC_10898(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10898_0__init__Return(EOS(STATIC_10898(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10906_0_addChild_FieldAccess(EOS(STATIC_10906(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10906_0_addChild_FieldAccess(EOS(STATIC_10906(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10911_0_addChild_Return(EOS(STATIC_10911(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10911_0_addChild_Return(EOS(STATIC_10911(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10917_0_createTree_Inc(EOS(STATIC_10917(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10917_0_createTree_Inc(EOS(STATIC_10917(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) -> f10923_0_createTree_JMP(EOS(STATIC_10923(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565 + 1) :|: TRUE
+f10923_0_createTree_JMP(EOS(STATIC_10923(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1785) -> f10953_0_createTree_Load(EOS(STATIC_10953(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1785) :|: TRUE
+f10953_0_createTree_Load(EOS(STATIC_10953(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1785) -> f10274_0_createTree_Load(EOS(STATIC_10274(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1785) :|: TRUE
+f10515_0_createTree_Return(EOS(STATIC_10515(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10530_0_createTree_InvokeMethod(EOS(STATIC_10530(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10530_0_createTree_InvokeMethod(EOS(STATIC_10530(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10536_0_addChild_Load(EOS(STATIC_10536(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10536_0_addChild_Load(EOS(STATIC_10536(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10776_0_addChild_New(EOS(STATIC_10776(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10776_0_addChild_New(EOS(STATIC_10776(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10805_0_addChild_Duplicate(EOS(STATIC_10805(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10805_0_addChild_Duplicate(EOS(STATIC_10805(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10812_0_addChild_Load(EOS(STATIC_10812(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10812_0_addChild_Load(EOS(STATIC_10812(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10821_0_addChild_Load(EOS(STATIC_10821(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10821_0_addChild_Load(EOS(STATIC_10821(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10837_0_addChild_FieldAccess(EOS(STATIC_10837(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10837_0_addChild_FieldAccess(EOS(STATIC_10837(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10844_0_addChild_InvokeMethod(EOS(STATIC_10844(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10844_0_addChild_InvokeMethod(EOS(STATIC_10844(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10851_0__init__Load(EOS(STATIC_10851(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10851_0__init__Load(EOS(STATIC_10851(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10858_0__init__InvokeMethod(EOS(STATIC_10858(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10858_0__init__InvokeMethod(EOS(STATIC_10858(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10860_0__init__Load(EOS(STATIC_10860(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10860_0__init__Load(EOS(STATIC_10860(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10864_0__init__Load(EOS(STATIC_10864(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10864_0__init__Load(EOS(STATIC_10864(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10868_0__init__FieldAccess(EOS(STATIC_10868(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10868_0__init__FieldAccess(EOS(STATIC_10868(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10882_0__init__Load(EOS(STATIC_10882(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10882_0__init__Load(EOS(STATIC_10882(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10890_0__init__Load(EOS(STATIC_10890(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10890_0__init__Load(EOS(STATIC_10890(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10894_0__init__FieldAccess(EOS(STATIC_10894(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10894_0__init__FieldAccess(EOS(STATIC_10894(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10903_0__init__Return(EOS(STATIC_10903(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10903_0__init__Return(EOS(STATIC_10903(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10907_0_addChild_FieldAccess(EOS(STATIC_10907(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10907_0_addChild_FieldAccess(EOS(STATIC_10907(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10913_0_addChild_Return(EOS(STATIC_10913(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10913_0_addChild_Return(EOS(STATIC_10913(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10919_0_createTree_Inc(EOS(STATIC_10919(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+f10919_0_createTree_Inc(EOS(STATIC_10919(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) -> f10926_0_createTree_JMP(EOS(STATIC_10926(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565 + 1) :|: TRUE
+f10926_0_createTree_JMP(EOS(STATIC_10926(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1786) -> f10956_0_createTree_Load(EOS(STATIC_10956(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1786) :|: TRUE
+f10956_0_createTree_Load(EOS(STATIC_10956(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1786) -> f10274_0_createTree_Load(EOS(STATIC_10274(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1786) :|: TRUE
+f10362_1_createTree_Load(EOS(STATIC_10362(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565, i1610) -> f10423_0_createTree_Return(EOS(STATIC_10423(java.lang.Object(ARRAY(i1562)), i1626)), i88, i95, i1564, i1565) :|: TRUE
+f10362_1_createTree_Load(EOS(STATIC_10362(java.lang.Object(ARRAY(i1655)), i1563)), i88, i95, i1564, i1565, i1610) -> f10515_0_createTree_Return(EOS(STATIC_10515(java.lang.Object(ARRAY(i1655)), i1652)), i88, i95, i1564, i1565) :|: TRUE
+Combined rules. Obtained 3 IRulesP rules:
+f10358_0_createTree_InvokeMethod(EOS(STATIC_10358(java.lang.Object(ARRAY(i1562:0)), i1563:0)), i88:0, i95:0, i1564:0, i1565:0, i1610:0) -> f10358_0_createTree_InvokeMethod(EOS(STATIC_10358(java.lang.Object(ARRAY(i1562:0)), i1652:0)), i88:0, i95:0, i1564:0, i1565:0 + 1, i95:0 - 1) :|: i1565:0 + 1 < i1564:0 && i1564:0 > 0 && i88:0 > 0 && i1563:0 > 1 && i95:0 < i88:0 && i95:0 > -1 && i88:0 > i1610:0 && i95:0 > i1610:0
+f10358_0_createTree_InvokeMethod(EOS(STATIC_10358(java.lang.Object(ARRAY(i1562:0)), i1563:0)), i88:0, i95:0, i1564:0, i1565:0, i1610:0) -> f10358_0_createTree_InvokeMethod(EOS(STATIC_10358(java.lang.Object(ARRAY(i1562:0)), i1563:0 + 1)), i1610:0, i1610:0 - 1, i145:0, 0, i1610:0 - 2) :|: i1563:0 > 1 && i145:0 > 0 && i1610:0 > 0 && i1562:0 > -1 && i1563:0 < i1562:0 && i1564:0 > 0 && i88:0 > 0 && i95:0 < i88:0 && i1565:0 < i1564:0 && i95:0 > i1610:0 && i88:0 > i1610:0
+f10358_0_createTree_InvokeMethod(EOS(STATIC_10358(java.lang.Object(ARRAY(i1562:0)), i1563:0)), i88:0, i95:0, i1564:0, i1565:0, i1610:0) -> f10358_0_createTree_InvokeMethod(EOS(STATIC_10358(java.lang.Object(ARRAY(i1562:0)), i1563:0)), i88:0, i95:0, i1564:0, i1565:0 + 1, i95:0 - 1) :|: i1565:0 + 1 < i1564:0 && i1564:0 > 0 && i88:0 > 0 && i1563:0 > 1 && i95:0 < i88:0 && i95:0 > -1 && i88:0 > i1610:0 && i95:0 > i1610:0
+Finished conversion. Obtained 3 rules.P rules:
+f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0, i1610:0, i1562:0, i1563:0) -> f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0 + 1, i95:0 - 1, i1562:0, i1652:0) :|: i1564:0 > 0 && i1565:0 + 1 < i1564:0 && i88:0 > 0 && i1563:0 > 1 && i95:0 < i88:0 && i95:0 > -1 && i95:0 > i1610:0 && i88:0 > i1610:0
+f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0, i1610:0, i1562:0, i1563:0) -> f10358_0_createTree_InvokeMethod(i1610:0, i1610:0 - 1, i145:0, 0, i1610:0 - 2, i1562:0, i1563:0 + 1) :|: i145:0 > 0 && i1563:0 > 1 && i1610:0 > 0 && i1562:0 > -1 && i1563:0 < i1562:0 && i1564:0 > 0 && i88:0 > 0 && i95:0 < i88:0 && i1565:0 < i1564:0 && i88:0 > i1610:0 && i95:0 > i1610:0
+f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0, i1610:0, i1562:0, i1563:0) -> f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0 + 1, i95:0 - 1, i1562:0, i1563:0) :|: i1564:0 > 0 && i1565:0 + 1 < i1564:0 && i88:0 > 0 && i1563:0 > 1 && i95:0 < i88:0 && i95:0 > -1 && i95:0 > i1610:0 && i88:0 > i1610:0
+
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0, i1610:0, i1562:0, i1563:0) -> f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0 + 1, i95:0 - 1, i1562:0, i1652:0) :|: i1564:0 > 0 && i1565:0 + 1 < i1564:0 && i88:0 > 0 && i1563:0 > 1 && i95:0 < i88:0 && i95:0 > -1 && i95:0 > i1610:0 && i88:0 > i1610:0
+f10358_0_createTree_InvokeMethod(x, x1, x2, x3, x4, x5, x6) -> f10358_0_createTree_InvokeMethod(x4, x4 - 1, x7, 0, x4 - 2, x5, x6 + 1) :|: x7 > 0 && x6 > 1 && x4 > 0 && x5 > -1 && x6 < x5 && x2 > 0 && x > 0 && x1 < x && x3 < x2 && x > x4 && x1 > x4
+f10358_0_createTree_InvokeMethod(x8, x9, x10, x11, x12, x13, x14) -> f10358_0_createTree_InvokeMethod(x8, x9, x10, x11 + 1, x9 - 1, x13, x14) :|: x10 > 0 && x11 + 1 < x10 && x8 > 0 && x14 > 1 && x9 < x8 && x9 > -1 && x9 > x12 && x8 > x12
+
+----------------------------------------
+
+(17) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(18)
+Obligation:
+Rules:
+f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0, i1610:0, i1562:0, i1563:0) -> f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, arith, arith1, i1562:0, i1652:0) :|: i1564:0 > 0 && i1565:0 + 1 < i1564:0 && i88:0 > 0 && i1563:0 > 1 && i95:0 < i88:0 && i95:0 > -1 && i95:0 > i1610:0 && i88:0 > i1610:0 && arith = i1565:0 + 1 && arith1 = i95:0 - 1
+f10358_0_createTree_InvokeMethod(x15, x16, x17, x18, x19, x20, x21) -> f10358_0_createTree_InvokeMethod(x19, x22, x23, 0, x24, x20, x25) :|: x23 > 0 && x21 > 1 && x19 > 0 && x20 > -1 && x21 < x20 && x17 > 0 && x15 > 0 && x16 < x15 && x18 < x17 && x15 > x19 && x16 > x19 && x22 = x19 - 1 && x24 = x19 - 2 && x25 = x21 + 1
+f10358_0_createTree_InvokeMethod(x26, x27, x28, x29, x30, x31, x32) -> f10358_0_createTree_InvokeMethod(x26, x27, x28, x33, x34, x31, x32) :|: x28 > 0 && x29 + 1 < x28 && x26 > 0 && x32 > 1 && x27 < x26 && x27 > -1 && x27 > x30 && x26 > x30 && x33 = x29 + 1 && x34 = x27 - 1
+
+----------------------------------------
+
+(19) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0, i1610:0, i1562:0, i1563:0) -> f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, arith, arith1, i1562:0, i1652:0) :|: i1564:0 > 0 && i1565:0 + 1 < i1564:0 && i88:0 > 0 && i1563:0 > 1 && i95:0 < i88:0 && i95:0 > -1 && i95:0 > i1610:0 && i88:0 > i1610:0 && arith = i1565:0 + 1 && arith1 = i95:0 - 1
+(2) f10358_0_createTree_InvokeMethod(x15, x16, x17, x18, x19, x20, x21) -> f10358_0_createTree_InvokeMethod(x19, x22, x23, 0, x24, x20, x25) :|: x23 > 0 && x21 > 1 && x19 > 0 && x20 > -1 && x21 < x20 && x17 > 0 && x15 > 0 && x16 < x15 && x18 < x17 && x15 > x19 && x16 > x19 && x22 = x19 - 1 && x24 = x19 - 2 && x25 = x21 + 1
+(3) f10358_0_createTree_InvokeMethod(x26, x27, x28, x29, x30, x31, x32) -> f10358_0_createTree_InvokeMethod(x26, x27, x28, x33, x34, x31, x32) :|: x28 > 0 && x29 + 1 < x28 && x26 > 0 && x32 > 1 && x27 < x26 && x27 > -1 && x27 > x30 && x26 > x30 && x33 = x29 + 1 && x34 = x27 - 1
+
+Arcs:
+(1) -> (1), (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (1), (2), (3)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(20)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, i1565:0, i1610:0, i1562:0, i1563:0) -> f10358_0_createTree_InvokeMethod(i88:0, i95:0, i1564:0, arith, arith1, i1562:0, i1652:0) :|: i1564:0 > 0 && i1565:0 + 1 < i1564:0 && i88:0 > 0 && i1563:0 > 1 && i95:0 < i88:0 && i95:0 > -1 && i95:0 > i1610:0 && i88:0 > i1610:0 && arith = i1565:0 + 1 && arith1 = i95:0 - 1
+(2) f10358_0_createTree_InvokeMethod(x15, x16, x17, x18, x19, x20, x21) -> f10358_0_createTree_InvokeMethod(x19, x22, x23, 0, x24, x20, x25) :|: x23 > 0 && x21 > 1 && x19 > 0 && x20 > -1 && x21 < x20 && x17 > 0 && x15 > 0 && x16 < x15 && x18 < x17 && x15 > x19 && x16 > x19 && x22 = x19 - 1 && x24 = x19 - 2 && x25 = x21 + 1
+(3) f10358_0_createTree_InvokeMethod(x26, x27, x28, x29, x30, x31, x32) -> f10358_0_createTree_InvokeMethod(x26, x27, x28, x33, x34, x31, x32) :|: x28 > 0 && x29 + 1 < x28 && x26 > 0 && x32 > 1 && x27 < x26 && x27 > -1 && x27 > x30 && x26 > x30 && x33 = x29 + 1 && x34 = x27 - 1
+
+Arcs:
+(1) -> (1), (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (1), (2), (3)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(21) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0 + 1, x27:0 - 1, x31:0, x32:0) :|: x30:0 < x27:0 && x30:0 < x26:0 && x27:0 > -1 && x27:0 < x26:0 && x32:0 > 1 && x26:0 > 0 && x29:0 + 1 < x28:0 && x28:0 > 0
+f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, i1565:0:0, i1610:0:0, i1562:0:0, i1563:0:0) -> f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, i1565:0:0 + 1, i95:0:0 - 1, i1562:0:0, i1652:0:0) :|: i95:0:0 > i1610:0:0 && i88:0:0 > i1610:0:0 && i95:0:0 > -1 && i95:0:0 < i88:0:0 && i1563:0:0 > 1 && i88:0:0 > 0 && i1565:0:0 + 1 < i1564:0:0 && i1564:0:0 > 0
+f10358_0_createTree_InvokeMethod(x15:0, x16:0, x17:0, x18:0, x19:0, x20:0, x21:0) -> f10358_0_createTree_InvokeMethod(x19:0, x19:0 - 1, x23:0, 0, x19:0 - 2, x20:0, x21:0 + 1) :|: x19:0 < x15:0 && x19:0 < x16:0 && x18:0 < x17:0 && x16:0 < x15:0 && x15:0 > 0 && x17:0 > 0 && x21:0 < x20:0 && x20:0 > -1 && x19:0 > 0 && x21:0 > 1 && x23:0 > 0
+
+----------------------------------------
+
+(23) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f10358_0_createTree_InvokeMethod(INTEGER, INTEGER, INTEGER, VARIABLE, INTEGER, VARIABLE, VARIABLE)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(24)
+Obligation:
+Rules:
+f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, c, c1, x31:0, x32:0) :|: c1 = x27:0 - 1 && c = x29:0 + 1 && (x30:0 < x27:0 && x30:0 < x26:0 && x27:0 > -1 && x27:0 < x26:0 && x32:0 > 1 && x26:0 > 0 && x29:0 + 1 < x28:0 && x28:0 > 0)
+f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, i1565:0:0, i1610:0:0, i1562:0:0, i1563:0:0) -> f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, c2, c3, i1562:0:0, i1652:0:0) :|: c3 = i95:0:0 - 1 && c2 = i1565:0:0 + 1 && (i95:0:0 > i1610:0:0 && i88:0:0 > i1610:0:0 && i95:0:0 > -1 && i95:0:0 < i88:0:0 && i1563:0:0 > 1 && i88:0:0 > 0 && i1565:0:0 + 1 < i1564:0:0 && i1564:0:0 > 0)
+f10358_0_createTree_InvokeMethod(x15:0, x16:0, x17:0, x18:0, x19:0, x20:0, x21:0) -> f10358_0_createTree_InvokeMethod(x19:0, c4, x23:0, c5, c6, x20:0, c7) :|: c7 = x21:0 + 1 && (c6 = x19:0 - 2 && (c5 = 0 && c4 = x19:0 - 1)) && (x19:0 < x15:0 && x19:0 < x16:0 && x18:0 < x17:0 && x16:0 < x15:0 && x15:0 > 0 && x17:0 > 0 && x21:0 < x20:0 && x20:0 > -1 && x19:0 > 0 && x21:0 > 1 && x23:0 > 0)
+
+----------------------------------------
+
+(25) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f10358_0_createTree_InvokeMethod(x, x1, x2, x3, x4, x5, x6)] = -1 + x
+
+The following rules are decreasing:
+f10358_0_createTree_InvokeMethod(x15:0, x16:0, x17:0, x18:0, x19:0, x20:0, x21:0) -> f10358_0_createTree_InvokeMethod(x19:0, c4, x23:0, c5, c6, x20:0, c7) :|: c7 = x21:0 + 1 && (c6 = x19:0 - 2 && (c5 = 0 && c4 = x19:0 - 1)) && (x19:0 < x15:0 && x19:0 < x16:0 && x18:0 < x17:0 && x16:0 < x15:0 && x15:0 > 0 && x17:0 > 0 && x21:0 < x20:0 && x20:0 > -1 && x19:0 > 0 && x21:0 > 1 && x23:0 > 0)
+The following rules are bounded:
+f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, c, c1, x31:0, x32:0) :|: c1 = x27:0 - 1 && c = x29:0 + 1 && (x30:0 < x27:0 && x30:0 < x26:0 && x27:0 > -1 && x27:0 < x26:0 && x32:0 > 1 && x26:0 > 0 && x29:0 + 1 < x28:0 && x28:0 > 0)
+f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, i1565:0:0, i1610:0:0, i1562:0:0, i1563:0:0) -> f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, c2, c3, i1562:0:0, i1652:0:0) :|: c3 = i95:0:0 - 1 && c2 = i1565:0:0 + 1 && (i95:0:0 > i1610:0:0 && i88:0:0 > i1610:0:0 && i95:0:0 > -1 && i95:0:0 < i88:0:0 && i1563:0:0 > 1 && i88:0:0 > 0 && i1565:0:0 + 1 < i1564:0:0 && i1564:0:0 > 0)
+f10358_0_createTree_InvokeMethod(x15:0, x16:0, x17:0, x18:0, x19:0, x20:0, x21:0) -> f10358_0_createTree_InvokeMethod(x19:0, c4, x23:0, c5, c6, x20:0, c7) :|: c7 = x21:0 + 1 && (c6 = x19:0 - 2 && (c5 = 0 && c4 = x19:0 - 1)) && (x19:0 < x15:0 && x19:0 < x16:0 && x18:0 < x17:0 && x16:0 < x15:0 && x15:0 > 0 && x17:0 > 0 && x21:0 < x20:0 && x20:0 > -1 && x19:0 > 0 && x21:0 > 1 && x23:0 > 0)
+
+----------------------------------------
+
+(26)
+Obligation:
+Rules:
+f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, c, c1, x31:0, x32:0) :|: c1 = x27:0 - 1 && c = x29:0 + 1 && (x30:0 < x27:0 && x30:0 < x26:0 && x27:0 > -1 && x27:0 < x26:0 && x32:0 > 1 && x26:0 > 0 && x29:0 + 1 < x28:0 && x28:0 > 0)
+f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, i1565:0:0, i1610:0:0, i1562:0:0, i1563:0:0) -> f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, c2, c3, i1562:0:0, i1652:0:0) :|: c3 = i95:0:0 - 1 && c2 = i1565:0:0 + 1 && (i95:0:0 > i1610:0:0 && i88:0:0 > i1610:0:0 && i95:0:0 > -1 && i95:0:0 < i88:0:0 && i1563:0:0 > 1 && i88:0:0 > 0 && i1565:0:0 + 1 < i1564:0:0 && i1564:0:0 > 0)
+
+----------------------------------------
+
+(27) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f10358_0_createTree_InvokeMethod ] = -1*f10358_0_createTree_InvokeMethod_4 + f10358_0_createTree_InvokeMethod_3
+
+The following rules are decreasing:
+f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, c, c1, x31:0, x32:0) :|: c1 = x27:0 - 1 && c = x29:0 + 1 && (x30:0 < x27:0 && x30:0 < x26:0 && x27:0 > -1 && x27:0 < x26:0 && x32:0 > 1 && x26:0 > 0 && x29:0 + 1 < x28:0 && x28:0 > 0)
+f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, i1565:0:0, i1610:0:0, i1562:0:0, i1563:0:0) -> f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, c2, c3, i1562:0:0, i1652:0:0) :|: c3 = i95:0:0 - 1 && c2 = i1565:0:0 + 1 && (i95:0:0 > i1610:0:0 && i88:0:0 > i1610:0:0 && i95:0:0 > -1 && i95:0:0 < i88:0:0 && i1563:0:0 > 1 && i88:0:0 > 0 && i1565:0:0 + 1 < i1564:0:0 && i1564:0:0 > 0)
+
+The following rules are bounded:
+f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f10358_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, c, c1, x31:0, x32:0) :|: c1 = x27:0 - 1 && c = x29:0 + 1 && (x30:0 < x27:0 && x30:0 < x26:0 && x27:0 > -1 && x27:0 < x26:0 && x32:0 > 1 && x26:0 > 0 && x29:0 + 1 < x28:0 && x28:0 > 0)
+f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, i1565:0:0, i1610:0:0, i1562:0:0, i1563:0:0) -> f10358_0_createTree_InvokeMethod(i88:0:0, i95:0:0, i1564:0:0, c2, c3, i1562:0:0, i1652:0:0) :|: c3 = i95:0:0 - 1 && c2 = i1565:0:0 + 1 && (i95:0:0 > i1610:0:0 && i88:0:0 > i1610:0:0 && i95:0:0 > -1 && i95:0:0 < i88:0:0 && i1563:0:0 > 1 && i88:0:0 > 0 && i1565:0:0 + 1 < i1564:0:0 && i1564:0:0 > 0)
+
+
+----------------------------------------
+
+(28)
+YES

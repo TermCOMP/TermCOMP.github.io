@@ -1,0 +1,312 @@
+YES
+We consider the system gD7QT.
+
+  Alphabet:
+
+    O : [] --> nat 
+    findO : [nat -> nat * nat * nat] --> nat 
+    if : [nat * nat * nat] --> nat 
+    min : [nat * nat] --> nat 
+    nul : [nat -> nat * nat] --> nat 
+    s : [nat] --> nat 
+
+  Rules:
+
+    min(s(X), s(Y)) => min(X, Y) 
+    min(X, O) => O 
+    min(O, X) => O 
+    min(nul(F, X), Y) => nul(F, min(X, Y)) 
+    nul(F, X) => findO(F, O, X) 
+    findO(F, X, O) => X 
+    findO(F, X, s(Y)) => if(F X, findO(F, s(X), Y), X) 
+    if(s(X), Y, Z) => Y 
+    if(O, X, Y) => Y 
+
+We observe that the rules contain a first-order subset:
+
+  if(s(X), Y, Z) => Y 
+  if(O, X, Y) => Y 
+
+Moreover, the system is finitely branching.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is Ce-terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed Ce-terminating:
+
+ || Input TRS:
+ ||     1: if(s(PeRCenTX),PeRCenTY,PeRCenTZ) -> PeRCenTY
+ ||     2: if(O(),PeRCenTX,PeRCenTY) -> PeRCenTY
+ ||     3: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     4: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 4
+ || Direct POLO(bPol) ... removes: 4 1 3 2
+ ||       TIlDePAIR	w: x1 + 2 * x2 + 1
+ ||       s 	w: x1 + 1
+ ||       O 	w: 1
+ ||       if	w: 2 * x1 + 2 * x2 + 2 * x3
+ || Number of strict rules: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with dynamic dependency pairs.
+
+After applying [Kop12, Thm. 7.22] to denote collapsing dependency pairs in an extended form, we thus obtain the following dependency pair problem (P_0, R_0, minimal, formative):
+
+  Dependency Pairs P_0:
+
+    0] min#(s(X), s(Y)) =#> min#(X, Y)   
+    1] min#(nul(F, X), Y) =#> nul#(F, min(X, Y))   
+    2] min#(nul(F, X), Y) =#> min#(X, Y)   
+    3] nul#(F, X) =#> findO#(F, O, X)   
+    4] findO#(F, X, s(Y)) =#> if#(F X, findO(F, s(X), Y), X)   
+    5] findO#(F, X, s(Y)) =#> F[X]   
+    6] findO#(F, X, s(Y)) =#> findO#(F, s(X), Y)   
+
+  Rules R_0:
+
+    min(s(X), s(Y)) => min(X, Y) 
+    min(X, O) => O 
+    min(O, X) => O 
+    min(nul(F, X), Y) => nul(F, min(X, Y)) 
+    nul(F, X) => findO(F, O, X) 
+    findO(F, X, O) => X 
+    findO(F, X, s(Y)) => if(F X, findO(F, s(X), Y), X) 
+    if(s(X), Y, Z) => Y 
+    if(O, X, Y) => Y 
+
+Thus, the original system is terminating if (P_0, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, minimal, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0, 1, 2 
+    * 1 : 3 
+    * 2 : 0, 1, 2 
+    * 3 : 4, 5, 6 
+    * 4 :  
+    * 5 : 0, 1, 2, 3, 4, 5, 6 
+    * 6 : 4, 5, 6 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    min#(s(X), s(Y)) =#> min#(X, Y)   
+    min#(nul(F, X), Y) =#> nul#(F, min(X, Y))   
+    min#(nul(F, X), Y) =#> min#(X, Y)   
+    nul#(F, X) =#> findO#(F, O, X)   
+    findO#(F, X, s(Y)) =#> F[X]   
+    findO#(F, X, s(Y)) =#> findO#(F, s(X), Y)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, minimal, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  As the system is abstraction-simple and the formative flag is set, it suffices to find a tagged reduction pair [Kop12, Def. 6.70].  Thus, we must orient:
+
+  min#(s(X), s(Y)) >? min#(X, Y) 
+  min#(nul(F, X), Y) >? nul#(F, min(X, Y)) 
+  min#(nul(F, X), Y) >? min#(X, Y) 
+  nul#(F, X) >? findO#(F, O, X) 
+  findO#(F, X, s(Y)) >? F[X] 
+  findO#(F, X, s(Y)) >? findO#(F, s(X), Y) 
+  min(s(X), s(Y)) >= min(X, Y) 
+  min(X, O) >= O 
+  min(O, X) >= O 
+  min(nul(F, X), Y) >= nul(F, min(X, Y)) 
+  nul(F, X) >= findO(F, O, X) 
+  findO(F, X, O) >= X 
+  findO(F, X, s(Y)) >= if(F X, findO(F, s(X), Y), X) 
+  if(s(X), Y, Z) >= Y 
+  if(O, X, Y) >= Y 
+
+We apply [Kop12, Thm. 6.75] and use the following argument functions:
+
+  pi( nul#(F, X) ) = #argfun-nul##(findO#(F, O, X)) 
+
+Since this representation is not advantageous for the higher-order recursive path ordering, we present the strict requirements in their unextended form, which is not problematic since for any F, s and substituion gamma: (F s)gamma beta-reduces to F(s)gamma.)
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[findO(x_1, x_2, x_3)]] = findO(x_1, x_3, x_2) 
+  [[findO#(x_1, x_2, x_3)]] = findO#(x_3, x_1, x_2) 
+  [[min(x_1, x_2)]] = x_1 
+
+We choose Lex = {findO, findO#} and Mul = {#argfun-nul##, @_{o -> o}, if, min#, nul, nul#, s}, and the following precedence: nul > findO > findO# > @_{o -> o} > min# > #argfun-nul## > if > nul# > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  min#(s(X), s(Y)) >= min#(X, Y) 
+  min#(nul(F, X), Y) >= #argfun-nul##(findO#(F, _|_, X)) 
+  min#(nul(F, X), Y) >= min#(X, Y) 
+  #argfun-nul##(findO#(F, _|_, X)) >= findO#(F, _|_, X) 
+  findO#(F, X, s(Y)) > @_{o -> o}(F, X) 
+  findO#(F, X, s(Y)) >= findO#(F, s(X), Y) 
+  s(X) >= X 
+  X >= _|_ 
+  _|_ >= _|_ 
+  nul(F, X) >= nul(F, X) 
+  nul(F, X) >= findO(F, _|_, X) 
+  findO(F, X, _|_) >= X 
+  findO(F, X, s(Y)) >= if(@_{o -> o}(F, X), findO(F, s(X), Y), X) 
+  if(s(X), Y, Z) >= Y 
+  if(_|_, X, Y) >= Y 
+
+With these choices, we have:
+
+  1] min#(s(X), s(Y)) >= min#(X, Y)  because [2], by (Star) 
+  2] min#*(s(X), s(Y)) >= min#(X, Y)  because min# in Mul, [3] and [6], by (Stat) 
+  3] s(X) >= X  because [4], by (Star) 
+  4] s*(X) >= X  because [5], by (Select) 
+  5] X >= X  by (Meta) 
+  6] s(Y) > Y  because [7], by definition 
+  7] s*(Y) >= Y  because [8], by (Select) 
+  8] Y >= Y  by (Meta) 
+
+  9] min#(nul(F, X), Y) >= #argfun-nul##(findO#(F, _|_, X))  because [10], by (Star) 
+  10] min#*(nul(F, X), Y) >= #argfun-nul##(findO#(F, _|_, X))  because min# > #argfun-nul## and [11], by (Copy) 
+  11] min#*(nul(F, X), Y) >= findO#(F, _|_, X)  because [12], by (Select) 
+  12] nul(F, X) >= findO#(F, _|_, X)  because [13], by (Star) 
+  13] nul*(F, X) >= findO#(F, _|_, X)  because nul > findO#, [14], [16] and [17], by (Copy) 
+  14] nul*(F, X) >= F  because [15], by (Select) 
+  15] F >= F  by (Meta) 
+  16] nul*(F, X) >= _|_  by (Bot) 
+  17] nul*(F, X) >= X  because [18], by (Select) 
+  18] X >= X  by (Meta) 
+
+  19] min#(nul(F, X), Y) >= min#(X, Y)  because min# in Mul, [20] and [21], by (Fun) 
+  20] nul(F, X) >= X  because [17], by (Star) 
+  21] Y >= Y  by (Meta) 
+
+  22] #argfun-nul##(findO#(F, _|_, X)) >= findO#(F, _|_, X)  because [23], by (Star) 
+  23] #argfun-nul##*(findO#(F, _|_, X)) >= findO#(F, _|_, X)  because [24], by (Select) 
+  24] findO#(F, _|_, X) >= findO#(F, _|_, X)  because findO# in Lex, [25], [26] and [27], by (Fun) 
+  25] F >= F  by (Meta) 
+  26] _|_ >= _|_  by (Bot) 
+  27] X >= X  by (Meta) 
+
+  28] findO#(F, X, s(Y)) > @_{o -> o}(F, X)  because [29], by definition 
+  29] findO#*(F, X, s(Y)) >= @_{o -> o}(F, X)  because findO# > @_{o -> o}, [30] and [32], by (Copy) 
+  30] findO#*(F, X, s(Y)) >= F  because [31], by (Select) 
+  31] F >= F  by (Meta) 
+  32] findO#*(F, X, s(Y)) >= X  because [33], by (Select) 
+  33] X >= X  by (Meta) 
+
+  34] findO#(F, X, s(Y)) >= findO#(F, s(X), Y)  because [35], by (Star) 
+  35] findO#*(F, X, s(Y)) >= findO#(F, s(X), Y)  because findO# in Lex, [36], [30], [39] and [40], by (Stat) 
+  36] s(Y) > Y  because [37], by definition 
+  37] s*(Y) >= Y  because [38], by (Select) 
+  38] Y >= Y  by (Meta) 
+  39] findO#*(F, X, s(Y)) >= s(X)  because findO# > s and [32], by (Copy) 
+  40] findO#*(F, X, s(Y)) >= Y  because [41], by (Select) 
+  41] s(Y) >= Y  because [37], by (Star) 
+
+  42] s(X) >= X  because [4], by (Star) 
+
+  43] X >= _|_  by (Bot) 
+
+  44] _|_ >= _|_  by (Bot) 
+
+  45] nul(F, X) >= nul(F, X)  because nul in Mul, [46] and [47], by (Fun) 
+  46] F >= F  by (Meta) 
+  47] X >= X  by (Meta) 
+
+  48] nul(F, X) >= findO(F, _|_, X)  because [49], by (Star) 
+  49] nul*(F, X) >= findO(F, _|_, X)  because nul > findO, [50], [51] and [52], by (Copy) 
+  50] nul*(F, X) >= F  because [25], by (Select) 
+  51] nul*(F, X) >= _|_  by (Bot) 
+  52] nul*(F, X) >= X  because [27], by (Select) 
+
+  53] findO(F, X, _|_) >= X  because [54], by (Star) 
+  54] findO*(F, X, _|_) >= X  because [55], by (Select) 
+  55] X >= X  by (Meta) 
+
+  56] findO(F, X, s(Y)) >= if(@_{o -> o}(F, X), findO(F, s(X), Y), X)  because [57], by (Star) 
+  57] findO*(F, X, s(Y)) >= if(@_{o -> o}(F, X), findO(F, s(X), Y), X)  because findO > if, [58], [61] and [60], by (Copy) 
+  58] findO*(F, X, s(Y)) >= @_{o -> o}(F, X)  because findO > @_{o -> o}, [59] and [60], by (Copy) 
+  59] findO*(F, X, s(Y)) >= F  because [31], by (Select) 
+  60] findO*(F, X, s(Y)) >= X  because [33], by (Select) 
+  61] findO*(F, X, s(Y)) >= findO(F, s(X), Y)  because findO in Lex, [62], [36], [59], [63] and [64], by (Stat) 
+  62] F >= F  by (Meta) 
+  63] findO*(F, X, s(Y)) >= s(X)  because findO > s and [60], by (Copy) 
+  64] findO*(F, X, s(Y)) >= Y  because [41], by (Select) 
+
+  65] if(s(X), Y, Z) >= Y  because [66], by (Star) 
+  66] if*(s(X), Y, Z) >= Y  because [67], by (Select) 
+  67] Y >= Y  by (Meta) 
+
+  68] if(_|_, X, Y) >= Y  because [69], by (Star) 
+  69] if*(_|_, X, Y) >= Y  because [70], by (Select) 
+  70] Y >= Y  by (Meta) 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace the dependency pair problem (P_1, R_0, minimal, formative) by (P_2, R_0, minimal, formative), where P_2 consists of:
+
+  min#(s(X), s(Y)) =#> min#(X, Y)   
+  min#(nul(F, X), Y) =#> nul#(F, min(X, Y))   
+  min#(nul(F, X), Y) =#> min#(X, Y)   
+  nul#(F, X) =#> findO#(F, O, X)   
+  findO#(F, X, s(Y)) =#> findO#(F, s(X), Y)   
+
+Thus, the original system is terminating if (P_2, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_0, minimal, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0, 1, 2 
+    * 1 : 3 
+    * 2 : 0, 1, 2 
+    * 3 : 4 
+    * 4 : 4 
+
+This graph has the following strongly connected components:
+
+  P_3:
+
+    min#(s(X), s(Y)) =#> min#(X, Y)   
+    min#(nul(F, X), Y) =#> min#(X, Y)   
+
+  P_4:
+
+    findO#(F, X, s(Y)) =#> findO#(F, s(X), Y)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_2, R_0, m, f) by (P_3, R_0, m, f) and (P_4, R_0, m, f).
+
+Thus, the original system is terminating if each of (P_3, R_0, minimal, formative) and (P_4, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_4, R_0, minimal, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(findO#) = 3 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(findO#(F, X, s(Y))) = s(Y) |> Y = nu(findO#(F, s(X), Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_4, R_0, minimal, f) by ({}, R_0, minimal, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+Thus, the original system is terminating if (P_3, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_3, R_0, minimal, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(min#) = 1 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(min#(s(X), s(Y))) = s(X) |> X = nu(min#(X, Y)) 
+  nu(min#(nul(F, X), Y)) = nul(F, X) |> X = nu(min#(X, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_3, R_0, minimal, f) by ({}, R_0, minimal, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

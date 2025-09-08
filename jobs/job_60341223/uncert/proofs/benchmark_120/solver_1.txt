@@ -1,0 +1,128 @@
+YES
+We consider the system 8GXrj.
+
+  Alphabet:
+
+    a : [] --> o 
+    b : [] --> o 
+    f : [o * o -> o] --> o 
+    g : [o * o * o -> o] --> o 
+
+  Rules:
+
+    g(X, Y, F) => f(f(X, F), F) 
+    f(X, F) => b 
+    b => a 
+    f(b, /\x.g(x, x, F)) => g(f(a, /\y.g(y, y, F)), f(b, /\z.b), F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  g(X, Y, F) >? f(f(X, F), F) 
+  f(X, F) >? b 
+  b >? a 
+  f(b, /\x.g(x, x, F)) >? g(f(a, /\y.g(y, y, F)), f(b, /\z.b), F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[a]] = _|_ 
+
+We choose Lex = {} and Mul = {b, f, g}, and the following precedence: g > f > b
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  g(X, Y, F) >= f(f(X, F), F) 
+  f(X, F) >= b 
+  b > _|_ 
+  f(b, /\x.g(x, x, F)) > g(f(_|_, /\x.g(x, x, F)), f(b, /\y.b), F) 
+
+With these choices, we have:
+
+  1] g(X, Y, F) >= f(f(X, F), F)  because [2], by (Star) 
+  2] g*(X, Y, F) >= f(f(X, F), F)  because g > f, [3] and [6], by (Copy) 
+  3] g*(X, Y, F) >= f(X, F)  because g > f, [4] and [6], by (Copy) 
+  4] g*(X, Y, F) >= X  because [5], by (Select) 
+  5] X >= X  by (Meta) 
+  6] g*(X, Y, F) >= F  because [7], by (Select) 
+  7] F >= F  by (Meta) 
+
+  8] f(X, F) >= b  because [9], by (Star) 
+  9] f*(X, F) >= b  because f > b, by (Copy) 
+
+  10] b > _|_  because [11], by definition 
+  11] b* >= _|_  by (Bot) 
+
+  12] f(b, /\x.g(x, x, F)) > g(f(_|_, /\x.g(x, x, F)), f(b, /\y.b), F)  because [13], by definition 
+  13] f*(b, /\x.g(x, x, F)) >= g(f(_|_, /\x.g(x, x, F)), f(b, /\y.b), F)  because [14], by (Select) 
+  14] g(f*(b, /\x.g(x, x, F)), f*(b, /\y.g(y, y, F)), F) >= g(f(_|_, /\x.g(x, x, F)), f(b, /\y.b), F)  because g in Mul, [15], [20] and [19], by (Fun) 
+  15] f*(b, /\x.g(x, x, F)) >= f(_|_, /\x.g(x, x, F))  because f in Mul, [10] and [16], by (Stat) 
+  16] /\y.g(y, y, F) >= /\y.g(y, y, F)  because [17], by (Abs) 
+  17] g(x, x, F) >= g(x, x, F)  because g in Mul, [18], [18] and [19], by (Fun) 
+  18] x >= x  by (Var) 
+  19] F >= F  by (Meta) 
+  20] f*(b, /\y.g(y, y, F)) >= f(b, /\y.b)  because [21], by (Select) 
+  21] g(f*(b, /\y.g(y, y, F)), f*(b, /\z.g(z, z, F)), F) >= f(b, /\y.b)  because [22], by (Star) 
+  22] g*(f*(b, /\y.g(y, y, F)), f*(b, /\z.g(z, z, F)), F) >= f(b, /\y.b)  because g > f, [23] and [24], by (Copy) 
+  23] g*(f*(b, /\y.g(y, y, F)), f*(b, /\z.g(z, z, F)), F) >= b  because g > b, by (Copy) 
+  24] g*(f*(b, /\y.g(y, y, F)), f*(b, /\z.g(z, z, F)), F) >= /\y.b  because [25], by (F-Abs) 
+  25] g*(f*(b, /\y.g(y, y, F)), f*(b, /\z.g(z, z, F)), F, u) >= b  because g > b, by (Copy) 
+
+We can thus remove the following rules:
+
+  b => a 
+  f(b, /\x.g(x, x, F)) => g(f(a, /\y.g(y, y, F)), f(b, /\z.b), F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  g(X, Y, F) >? f(f(X, F), F) 
+  f(X, F) >? b 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  b = 0 
+  f = Lam[y0;G1].y0 + G1(0) 
+  g = Lam[y0;y1;G2].3 + y1 + 3*y0 + G2(y0) + 2*G2(0) + 2*G2(y1) 
+
+Using this interpretation, the requirements translate to:
+
+  [[g(_x0, _x1, _F2)]] = 3 + x1 + 3*x0 + F2(x0) + 2*F2(0) + 2*F2(x1) > x0 + 2*F2(0) = [[f(f(_x0, _F2), _F2)]] 
+  [[f(_x0, _F1)]] = x0 + F1(0) >= 0 = [[b]] 
+
+We can thus remove the following rules:
+
+  g(X, Y, F) => f(f(X, F), F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  f(X, F) >? b 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  b = 0 
+  f = Lam[y0;G1].3 + y0 + G1(0) 
+
+Using this interpretation, the requirements translate to:
+
+  [[f(_x0, _F1)]] = 3 + x0 + F1(0) > 0 = [[b]] 
+
+We can thus remove the following rules:
+
+  f(X, F) => b 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

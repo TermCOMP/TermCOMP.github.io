@@ -1,0 +1,278 @@
+NO
+proof of /hpcwork/ff862203/termcomp25/benchmarks/kZMIs.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be disproven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCNonTerm [COMPLETE, 92 ms]
+(4) NO
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package example_5;
+
+public class Loops2 {
+	
+	int i;
+	
+	/**
+	 * Same simple arithmetic loop, but now the loop counter
+	 * is a numeric field.
+	 */
+	public void m(int n) {
+		while (i < n) {
+			i++;
+		}
+	}
+	
+}
+
+
+package example_5;
+
+public class Loops3 extends Loops2 {
+	
+	/**
+	 * A loop involving two numeric fields
+	 * which are modified in the body of the loop
+	 */
+	public void m(int n, Loops3 x) {
+		while (i < n) {
+			i++;
+			x.i--;
+		}
+		
+	}
+	
+}
+
+
+package example_5;
+
+public class Test {
+	/** 
+	 * Execution of the main method does not terminate because in the call to
+	 * m, the objects o1 and o2 are aliased and therefore by decrementing x.i we are 
+	 * also decrementing this.i in the loop in method m.
+	 */
+	public static void main(String[] args) {
+		Loops3 o1 = new Loops3();
+		Loops3 o2 = o1;
+		o1.m(10, o2);
+	}
+
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package example_5;
+
+public class Loops2 {
+	
+	int i;
+	
+	/**
+	 * Same simple arithmetic loop, but now the loop counter
+	 * is a numeric field.
+	 */
+	public void m(int n) {
+		while (i < n) {
+			i++;
+		}
+	}
+	
+}
+
+
+package example_5;
+
+public class Loops3 extends Loops2 {
+	
+	/**
+	 * A loop involving two numeric fields
+	 * which are modified in the body of the loop
+	 */
+	public void m(int n, Loops3 x) {
+		while (i < n) {
+			i++;
+			x.i--;
+		}
+		
+	}
+	
+}
+
+
+package example_5;
+
+public class Test {
+	/** 
+	 * Execution of the main method does not terminate because in the call to
+	 * m, the objects o1 and o2 are aliased and therefore by decrementing x.i we are 
+	 * also decrementing this.i in the loop in method m.
+	 */
+	public static void main(String[] args) {
+		Loops3 o1 = new Loops3();
+		Loops3 o2 = o1;
+		o1.m(10, o2);
+	}
+
+}
+
+
+
+----------------------------------------
+
+(3) JBCNonTerm (COMPLETE)
+Constructed a run with a repetition. States 16 and 33 are repetitions (when considering only the interesting positions []).
+
+0:<example_5.Test.main||0: New example_5.Loops3|| - || ->
+YES:  (JL1)
+1:<example_5.Test.main||3: DUP|| - ||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+2:<example_5.Test.main||4: example_5.Loops3.<init>()V|| - ||o40, o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+3:<example_5.Loops3.<init>||0: load ADDR #0||#0: o40|| ->
+<example_5.Test.main||4: example_5.Loops3.<init>|| - ||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+4:<example_5.Loops3.<init>||1: example_5.Loops2.<init>()V|| - ||o40>
+<example_5.Test.main||4: example_5.Loops3.<init>|| - ||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+5:<example_5.Loops2.<init>||0: load ADDR #0||#0: o40|| ->
+<example_5.Loops3.<init>||1: example_5.Loops2.<init>|| - || ->
+<example_5.Test.main||4: example_5.Loops3.<init>|| - ||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+6:<example_5.Loops2.<init>||1: java.lang.Object.<init>()V|| - ||o40>
+<example_5.Loops3.<init>||1: example_5.Loops2.<init>|| - || ->
+<example_5.Test.main||4: example_5.Loops3.<init>|| - ||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+7:<example_5.Loops2.<init>||4: return|| - || ->
+<example_5.Loops3.<init>||1: example_5.Loops2.<init>|| - || ->
+<example_5.Test.main||4: example_5.Loops3.<init>|| - ||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+8:<example_5.Loops3.<init>||4: return|| - || ->
+<example_5.Test.main||4: example_5.Loops3.<init>|| - ||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+9:<example_5.Test.main||7: store ADDR to #1|| - ||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+10:<example_5.Test.main||8: load ADDR #1||#1: o40|| ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+11:<example_5.Test.main||9: store ADDR to #2||#1: o40||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+12:<example_5.Test.main||10: load ADDR #1||#1: o40, #2: o40|| ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+13:<example_5.Test.main||11: push 10||#2: o40||o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+14:<example_5.Test.main||13: load ADDR #2||#2: o40||o40, 10>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+15:<example_5.Test.main||14: example_5.Loops3.m(ILexample_5/Loops3;)V|| - ||o40, 10, o40>
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+16:<example_5.Loops3.m||0: load ADDR #0||#0: o40, #1: 10, #2: o40|| ->
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+17:<example_5.Loops3.m||1: Read from i||#0: o40, #1: 10, #2: o40||o40>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+18:<example_5.Loops3.m||4: load INT #1||#0: o40, #1: 10, #2: o40||0>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+19:<example_5.Loops3.m||5: GE||#0: o40, #1: 10, #2: o40||0, 10>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+20:<example_5.Loops3.m||8: load ADDR #0||#0: o40, #1: 10, #2: o40|| ->
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+21:<example_5.Loops3.m||9: DUP||#0: o40, #1: 10, #2: o40||o40>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+22:<example_5.Loops3.m||10: Read from i||#0: o40, #1: 10, #2: o40||o40, o40>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+23:<example_5.Loops3.m||13: push 1||#0: o40, #1: 10, #2: o40||o40, 0>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+24:<example_5.Loops3.m||14: ADD||#0: o40, #1: 10, #2: o40||o40, 0, 1>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+25:<example_5.Loops3.m||15: Write to i||#0: o40, #1: 10, #2: o40||o40, 1>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+26:<example_5.Loops3.m||18: load ADDR #2||#0: o40, #1: 10, #2: o40|| ->
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=1) -->{java.lang.Object|}
+YES:  (JL1)
+27:<example_5.Loops3.m||19: DUP||#0: o40, #1: 10, #2: o40||o40>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=1) -->{java.lang.Object|}
+YES:  (JL1)
+28:<example_5.Loops3.m||20: Read from i||#0: o40, #1: 10, #2: o40||o40, o40>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=1) -->{java.lang.Object|}
+YES:  (JL1)
+29:<example_5.Loops3.m||23: push 1||#0: o40, #1: 10, #2: o40||o40, 1>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=1) -->{java.lang.Object|}
+YES:  (JL1)
+30:<example_5.Loops3.m||24: SUB||#0: o40, #1: 10, #2: o40||o40, 1, 1>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=1) -->{java.lang.Object|}
+YES:  (JL1)
+31:<example_5.Loops3.m||25: Write to i||#0: o40, #1: 10, #2: o40||o40, 0>
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=1) -->{java.lang.Object|}
+YES:  (JL1)
+32:<example_5.Loops3.m||28: jmp||#0: o40, #1: 10, #2: o40|| ->
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+33:<example_5.Loops3.m||0: load ADDR #0||#0: o40, #1: 10, #2: o40|| ->
+<example_5.Test.main||14: example_5.Loops3.m|| - || ->
+	o40!: Loops2(Loops3(), i=0) -->{java.lang.Object|}
+YES:  (JL1)
+
+----------------------------------------
+
+(4)
+NO

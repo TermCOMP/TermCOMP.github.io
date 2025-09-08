@@ -1,0 +1,167 @@
+YES
+We consider the system UDEOE.
+
+  Alphabet:
+
+    ack : [N * N] --> N 
+    s : [N] --> N 
+    z : [] --> N 
+
+  Rules:
+
+    ack(z, X) => s(X) 
+    ack(s(X), z) => ack(X, s(z)) 
+    ack(s(X), s(Y)) => ack(X, ack(s(X), Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  ack(z, X) >? s(X) 
+  ack(s(X), z) >? ack(X, s(z)) 
+  ack(s(X), s(Y)) >? ack(X, ack(s(X), Y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[z]] = _|_ 
+
+We choose Lex = {ack} and Mul = {s}, and the following precedence: ack > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  ack(_|_, X) > s(X) 
+  ack(s(X), _|_) >= ack(X, s(_|_)) 
+  ack(s(X), s(Y)) >= ack(X, ack(s(X), Y)) 
+
+With these choices, we have:
+
+  1] ack(_|_, X) > s(X)  because [2], by definition 
+  2] ack*(_|_, X) >= s(X)  because ack > s and [3], by (Copy) 
+  3] ack*(_|_, X) >= X  because [4], by (Select) 
+  4] X >= X  by (Meta) 
+
+  5] ack(s(X), _|_) >= ack(X, s(_|_))  because [6], by (Star) 
+  6] ack*(s(X), _|_) >= ack(X, s(_|_))  because ack in Lex, [7], [10] and [12], by (Stat) 
+  7] s(X) > X  because [8], by definition 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] ack*(s(X), _|_) >= X  because [11], by (Select) 
+  11] s(X) >= X  because [8], by (Star) 
+  12] ack*(s(X), _|_) >= s(_|_)  because ack > s and [13], by (Copy) 
+  13] ack*(s(X), _|_) >= _|_  by (Bot) 
+
+  14] ack(s(X), s(Y)) >= ack(X, ack(s(X), Y))  because [15], by (Star) 
+  15] ack*(s(X), s(Y)) >= ack(X, ack(s(X), Y))  because ack in Lex, [16], [19] and [21], by (Stat) 
+  16] s(X) > X  because [17], by definition 
+  17] s*(X) >= X  because [18], by (Select) 
+  18] X >= X  by (Meta) 
+  19] ack*(s(X), s(Y)) >= X  because [20], by (Select) 
+  20] s(X) >= X  because [17], by (Star) 
+  21] ack*(s(X), s(Y)) >= ack(s(X), Y)  because ack in Lex, [22], [24], [27] and [28], by (Stat) 
+  22] s(X) >= s(X)  because s in Mul and [23], by (Fun) 
+  23] X >= X  by (Meta) 
+  24] s(Y) > Y  because [25], by definition 
+  25] s*(Y) >= Y  because [26], by (Select) 
+  26] Y >= Y  by (Meta) 
+  27] ack*(s(X), s(Y)) >= s(X)  because ack > s and [19], by (Copy) 
+  28] ack*(s(X), s(Y)) >= Y  because [29], by (Select) 
+  29] s(Y) >= Y  because [25], by (Star) 
+
+We can thus remove the following rules:
+
+  ack(z, X) => s(X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  ack(s(X), z) >? ack(X, s(z)) 
+  ack(s(X), s(Y)) >? ack(X, ack(s(X), Y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[z]] = _|_ 
+
+We choose Lex = {ack} and Mul = {s}, and the following precedence: ack > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  ack(s(X), _|_) > ack(X, s(_|_)) 
+  ack(s(X), s(Y)) >= ack(X, ack(s(X), Y)) 
+
+With these choices, we have:
+
+  1] ack(s(X), _|_) > ack(X, s(_|_))  because [2], by definition 
+  2] ack*(s(X), _|_) >= ack(X, s(_|_))  because ack in Lex, [3], [6] and [8], by (Stat) 
+  3] s(X) > X  because [4], by definition 
+  4] s*(X) >= X  because [5], by (Select) 
+  5] X >= X  by (Meta) 
+  6] ack*(s(X), _|_) >= X  because [7], by (Select) 
+  7] s(X) >= X  because [4], by (Star) 
+  8] ack*(s(X), _|_) >= s(_|_)  because ack > s and [9], by (Copy) 
+  9] ack*(s(X), _|_) >= _|_  by (Bot) 
+
+  10] ack(s(X), s(Y)) >= ack(X, ack(s(X), Y))  because [11], by (Star) 
+  11] ack*(s(X), s(Y)) >= ack(X, ack(s(X), Y))  because ack in Lex, [12], [15] and [17], by (Stat) 
+  12] s(X) > X  because [13], by definition 
+  13] s*(X) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+  15] ack*(s(X), s(Y)) >= X  because [16], by (Select) 
+  16] s(X) >= X  because [13], by (Star) 
+  17] ack*(s(X), s(Y)) >= ack(s(X), Y)  because ack in Lex, [18], [20], [23] and [24], by (Stat) 
+  18] s(X) >= s(X)  because s in Mul and [19], by (Fun) 
+  19] X >= X  by (Meta) 
+  20] s(Y) > Y  because [21], by definition 
+  21] s*(Y) >= Y  because [22], by (Select) 
+  22] Y >= Y  by (Meta) 
+  23] ack*(s(X), s(Y)) >= s(X)  because ack > s and [15], by (Copy) 
+  24] ack*(s(X), s(Y)) >= Y  because [25], by (Select) 
+  25] s(Y) >= Y  because [21], by (Star) 
+
+We can thus remove the following rules:
+
+  ack(s(X), z) => ack(X, s(z)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  ack(s(X), s(Y)) >? ack(X, ack(s(X), Y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {ack} and Mul = {s}, and the following precedence: ack > s
+
+With these choices, we have:
+
+  1] ack(s(X), s(Y)) > ack(X, ack(s(X), Y))  because [2], by definition 
+  2] ack*(s(X), s(Y)) >= ack(X, ack(s(X), Y))  because ack in Lex, [3], [6] and [8], by (Stat) 
+  3] s(X) > X  because [4], by definition 
+  4] s*(X) >= X  because [5], by (Select) 
+  5] X >= X  by (Meta) 
+  6] ack*(s(X), s(Y)) >= X  because [7], by (Select) 
+  7] s(X) >= X  because [4], by (Star) 
+  8] ack*(s(X), s(Y)) >= ack(s(X), Y)  because ack in Lex, [9], [11], [14] and [15], by (Stat) 
+  9] s(X) >= s(X)  because s in Mul and [10], by (Fun) 
+  10] X >= X  by (Meta) 
+  11] s(Y) > Y  because [12], by definition 
+  12] s*(Y) >= Y  because [13], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] ack*(s(X), s(Y)) >= s(X)  because ack > s and [6], by (Copy) 
+  15] ack*(s(X), s(Y)) >= Y  because [16], by (Select) 
+  16] s(Y) >= Y  because [12], by (Star) 
+
+We can thus remove the following rules:
+
+  ack(s(X), s(Y)) => ack(X, ack(s(X), Y)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

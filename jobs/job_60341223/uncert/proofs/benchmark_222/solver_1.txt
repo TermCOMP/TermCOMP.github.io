@@ -1,0 +1,128 @@
+YES
+We consider the system 7TfLR.
+
+  Alphabet:
+
+    cons : [c * d] --> d 
+    f : [a] --> a 
+    false : [] --> b 
+    filter : [c -> b * d] --> d 
+    filter2 : [b * c -> b * c * d] --> d 
+    g : [a] --> a 
+    map : [c -> c * d] --> d 
+    nil : [] --> d 
+    true : [] --> b 
+
+  Rules:
+
+    f(g(X)) => g(g(f(X))) 
+    f(g(X)) => g(g(g(X))) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  f(g(X)) >? g(g(f(X))) 
+  f(g(X)) >? g(g(g(X))) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >? filter(F, Y) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  cons = Lam[y0;y1].1 + y0 + y1 
+  f = Lam[y0].1 + y0 
+  false = 3 
+  filter = Lam[G0;y1].2*y1 + G0(0) + y1*G0(y1) 
+  filter2 = Lam[y0;G1;y2;y3].y0 + y2 + 2*y3 + G1(0) + y3*G1(y3) 
+  g = Lam[y0].y0 
+  map = Lam[G0;y1].3*y1 + 2*G0(y1) + y1*G0(y1) 
+  nil = 0 
+  true = 3 
+
+Using this interpretation, the requirements translate to:
+
+  [[f(g(_x0))]] = 1 + x0 >= 1 + x0 = [[g(g(f(_x0)))]] 
+  [[f(g(_x0))]] = 1 + x0 > x0 = [[g(g(g(_x0)))]] 
+  [[map(_F0, nil)]] = 2*F0(0) >= 0 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 3 + 3*x1 + 3*x2 + 3*F0(1 + x1 + x2) + x1*F0(1 + x1 + x2) + x2*F0(1 + x1 + x2) > 1 + x1 + 3*x2 + F0(x1) + 2*F0(x2) + x2*F0(x2) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+  [[filter(_F0, nil)]] = F0(0) >= 0 = [[nil]] 
+  [[filter(_F0, cons(_x1, _x2))]] = 2 + 2*x1 + 2*x2 + F0(0) + F0(1 + x1 + x2) + x1*F0(1 + x1 + x2) + x2*F0(1 + x1 + x2) > 2*x1 + 2*x2 + F0(0) + F0(x1) + x2*F0(x2) = [[filter2(_F0 _x1, _F0, _x1, _x2)]] 
+  [[filter2(true, _F0, _x1, _x2)]] = 3 + x1 + 2*x2 + F0(0) + x2*F0(x2) > 1 + x1 + 2*x2 + F0(0) + x2*F0(x2) = [[cons(_x1, filter(_F0, _x2))]] 
+  [[filter2(false, _F0, _x1, _x2)]] = 3 + x1 + 2*x2 + F0(0) + x2*F0(x2) > 2*x2 + F0(0) + x2*F0(x2) = [[filter(_F0, _x2)]] 
+
+We can thus remove the following rules:
+
+  f(g(X)) => g(g(g(X))) 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  f(g(X)) >? g(g(f(X))) 
+  map(F, nil) >? nil 
+  filter(F, nil) >? nil 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  f = Lam[y0].y0 
+  filter = Lam[G0;y1].3 + 3*y1 + 2*G0(y1) 
+  g = Lam[y0].y0 
+  map = Lam[G0;y1].3 + 3*y1 + G0(0) 
+  nil = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[f(g(_x0))]] = x0 >= x0 = [[g(g(f(_x0)))]] 
+  [[map(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+  [[filter(_F0, nil)]] = 3 + 2*F0(0) > 0 = [[nil]] 
+
+We can thus remove the following rules:
+
+  map(F, nil) => nil 
+  filter(F, nil) => nil 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  f(g(X)) >? g(g(f(X))) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  f = Lam[y0].3*y0 
+  g = Lam[y0].1 + y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[f(g(_x0))]] = 3 + 3*x0 > 2 + 3*x0 = [[g(g(f(_x0)))]] 
+
+We can thus remove the following rules:
+
+  f(g(X)) => g(g(f(X))) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

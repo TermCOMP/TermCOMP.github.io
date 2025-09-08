@@ -1,0 +1,662 @@
+Graph construction failed
+Graph construction failed
+Graph construction failed
+MAYBE
+proof of /hpcwork/ff862203/termcomp25/benchmarks/7lNuD.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+parse(g,a)
+
+w.r.t. the given Prolog program could not be shown:
+
+(0) Prolog
+(1) CutEliminatorProof [SOUND, 0 ms]
+(2) Prolog
+(3) FailTransformerProof [EQUIVALENT, 0 ms]
+(4) Prolog
+(5) UnifyTransformerProof [EQUIVALENT, 0 ms]
+(6) Prolog
+(7) OrTransformerProof [EQUIVALENT, 0 ms]
+(8) Prolog
+(9) UndefinedPredicateHandlerProof [SOUND, 0 ms]
+(10) Prolog
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+goal :- parse(.(some, .(tokens, .(here, []))), ParseTree).
+parse(Tokens, Answer) :- ','(;(','(read(Tokens, 1200, Term, LeftOver), all_read(LeftOver)), syntax_error(Tokens)), ','(!, =(Answer, Term))).
+all_read([]) :- !.
+all_read(S) :- syntax_error(.(operator, .(expected, .(after, .(expression, [])))), S).
+expect(Token, .(Token, Rest), Rest) :- !.
+expect(Token, S0, _M) :- syntax_error(.(Token, .(or, .(operator, .(expected, [])))), S0).
+prefixop(Op, Prec, Prec) :- ','(current_op(Prec, fy, Op), !).
+prefixop(Op, Prec, Less) :- ','(current_op(Prec, fx, Op), ','(!, is(Less, -(Prec, 1)))).
+postfixop(Op, Prec, Prec) :- ','(current_op(Prec, yf, Op), !).
+postfixop(Op, Less, Prec) :- ','(current_op(Prec, xf, Op), ','(!, is(Less, -(Prec, 1)))).
+infixop(Op, Less, Prec, Less) :- ','(current_op(Prec, xfx, Op), ','(!, is(Less, -(Prec, 1)))).
+infixop(Op, Less, Prec, Prec) :- ','(current_op(Prec, xfy, Op), ','(!, is(Less, -(Prec, 1)))).
+infixop(Op, Prec, Prec, Less) :- ','(current_op(Prec, yfx, Op), ','(!, is(Less, -(Prec, 1)))).
+ambigop(F, L1, O1, R1, L2, O2) :- ','(postfixop(F, L2, O2), ','(infixop(F, L1, O1, R1), !)).
+read(.(Token, RestTokens), Precedence, Term, LeftOver) :- read(Token, RestTokens, Precedence, Term, LeftOver).
+read([], _X, _Y, _Z) :- syntax_error(.(expression, .(expected, [])), []).
+read(var(Variable, _M), .('(', S1), Precedence, Answer, S) :- ','(!, ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), ','(!, exprtl0(S3, apply(Variable, .(Arg1, RestArgs)), Precedence, Answer, S))))).
+read(var(Variable, _M), S0, Precedence, Answer, S) :- ','(!, exprtl0(S0, Variable, Precedence, Answer, S)).
+read(atom(-), .(integer(Integer), S1), Precedence, Answer, S) :- ','(is(Negative, -(Integer)), ','(!, exprtl0(S1, Negative, Precedence, Answer, S))).
+read(atom(Functor), .('(', S1), Precedence, Answer, S) :- ','(!, ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), ','(=..(Term, .(Functor, .(Arg1, RestArgs))), ','(!, exprtl0(S3, Term, Precedence, Answer, S)))))).
+read(atom(Functor), S0, Precedence, Answer, S) :- ','(prefixop(Functor, Prec, Right), ','(!, after_prefix_op(Functor, Prec, Right, S0, Precedence, Answer, S))).
+read(atom(Atom), S0, Precedence, Answer, S) :- ','(!, exprtl0(S0, Atom, Precedence, Answer, S)).
+read(integer(Integer), S0, Precedence, Answer, S) :- ','(!, exprtl0(S0, Integer, Precedence, Answer, S)).
+read('[', .(']', S1), Precedence, Answer, S) :- ','(!, exprtl0(S1, [], Precedence, Answer, S)).
+read('[', S1, Precedence, Answer, S) :- ','(!, ','(read(S1, 999, Arg1, S2), ','(read_list(S2, RestArgs, S3), ','(!, exprtl0(S3, .(Arg1, RestArgs), Precedence, Answer, S))))).
+read('(', S1, Precedence, Answer, S) :- ','(!, ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), ','(!, exprtl0(S3, Term, Precedence, Answer, S))))).
+read(' (', S1, Precedence, Answer, S) :- ','(!, ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), ','(!, exprtl0(S3, Term, Precedence, Answer, S))))).
+read('{', .('}', S1), Precedence, Answer, S) :- ','(!, exprtl0(S1, '{}', Precedence, Answer, S)).
+read('{', S1, Precedence, Answer, S) :- ','(!, ','(read(S1, 1200, Term, S2), ','(expect('}', S2, S3), ','(!, exprtl0(S3, '{}'(Term), Precedence, Answer, S))))).
+read(string(List), S0, Precedence, Answer, S) :- ','(!, exprtl0(S0, List, Precedence, Answer, S)).
+read(Token, S0, _X, _Y, _Z) :- syntax_error(.(Token, .(cannot, .(start, .(an, .(expression, []))))), S0).
+read_args(.(',', S1), .(Term, Rest), S) :- ','(!, ','(read(S1, 999, Term, S2), ','(!, read_args(S2, Rest, S)))).
+read_args(.(')', S), [], S) :- !.
+read_args(S, _X, _Y) :- syntax_error(.(', or )', .(expected, .(in, .(arguments, [])))), S).
+read_list(.(',', S1), .(Term, Rest), S) :- ','(!, ','(read(S1, 999, Term, S2), ','(!, read_list(S2, Rest, S)))).
+read_list(.('|', S1), Rest, S) :- ','(!, ','(read(S1, 999, Rest, S2), ','(!, expect(']', S2, S)))).
+read_list(.(']', S), [], S) :- !.
+read_list(S, _X, _Y) :- syntax_error(.(', | or ]', .(expected, .(in, .(list, [])))), S).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, _X, _Y) :- ','(<(Precedence, Oprec), ','(!, syntax_error(.(prefix, .(operator, .(Op, .(in, .(context, .(with, .(precedence, .(Precedence, [])))))))), S0))).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, Answer, S) :- ','(peepop(S0, S1), ','(prefix_is_atom(S1, Oprec), exprtl(S1, Oprec, Op, Precedence, Answer, S))).
+after_prefix_op(Op, Oprec, Aprec, S1, Precedence, Answer, S) :- ','(read(S1, Aprec, Arg, S2), ','(=..(Term, .(Op, .(Arg, []))), ','(!, exprtl(S2, Oprec, Term, Precedence, Answer, S)))).
+peepop(.(atom(F), .('(', S1)), .(atom(F), .('(', S1))) :- !.
+peepop(.(atom(F), S1), .(infixop(F, L, P, R), S1)) :- infixop(F, L, P, R).
+peepop(.(atom(F), S1), .(postfixop(F, L, P), S1)) :- postfixop(F, L, P).
+peepop(S0, S0).
+prefix_is_atom(.(Token, _M), Precedence) :- prefix_is_atom(Token, Precedence).
+prefix_is_atom(infixop(_X, L, _Y, _Z), P) :- >=(L, P).
+prefix_is_atom(postfixop(_X, L, _Y), P) :- >=(L, P).
+prefix_is_atom(')', X1).
+prefix_is_atom(']', X2).
+prefix_is_atom('}', X3).
+prefix_is_atom('|', P) :- >=(1100, P).
+prefix_is_atom(',', P) :- >=(1000, P).
+prefix_is_atom([], X4).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(ambigop(F, L1, O1, R1, L2, O2), ','(!, ;(exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S)))).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(infixop(F, L1, O1, R1), ','(!, exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S))).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(postfixop(F, L2, O2), ','(!, exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S))).
+exprtl0(.(',', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(!, ','(read(S1, 1000, Next, S2), ','(!, exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S))))).
+exprtl0(.('|', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(!, ','(read(S1, 1100, Next, S2), ','(!, exprtl(S2, 1100, ;(Term, Next), Precedence, Answer, S))))).
+exprtl0(.(atom(end_of_file), []), '<eof>', X5, [], []) :- !.
+exprtl0(.(atom(end_of_file), []), Term, X6, Term, []) :- !.
+exprtl0(.(Thing, S1), _X, _Y, _Z, _W) :- ','(cant_follow_expr(Thing, Culprit), ','(!, syntax_error(.(Culprit, .(follows, .(expression, []))), .(Thing, S1)))).
+exprtl0(S, Term, X7, Term, S).
+cant_follow_expr(atom(X8), atom).
+cant_follow_expr(var(X9, X10), variable).
+cant_follow_expr(integer(X11), integer).
+cant_follow_expr(string(X12), string).
+cant_follow_expr(' (', bracket).
+cant_follow_expr('(', bracket).
+cant_follow_expr('[', bracket).
+cant_follow_expr('{', bracket).
+exprtl(.(infixop(F, L, O, R), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(!, ','(read(S1, R, Other, S2), ','(=..(Expr, .(F, .(Term, .(Other, [])))), exprtl(S2, O, Expr, Precedence, Answer, S)))))).
+exprtl(.(postfixop(F, L, O), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(!, ','(=..(Expr, .(F, .(Term, []))), ','(peepop(S1, S2), exprtl(S2, O, Expr, Precedence, Answer, S)))))).
+exprtl(.(',', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(<(C, 1000), ','(!, ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S))))).
+exprtl(.('|', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(<(C, 1100), ','(!, ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, ;(Term, Next), Precedence, Answer, S))))).
+exprtl(S, X13, Term, X14, Term, S).
+syntax_error(Message, List) :- ','(ttynl, ','(display('**'), ','(display_list(Message), ','(length(List, Length), ','(recorda(syntax_error, length(Length), _M), ','(!, fail)))))).
+display_list(.(Head, Tail)) :- ','(ttyput(32), ','(display_token(Head), ','(!, display_list(Tail)))).
+display_list([]) :- ttynl.
+syntax_error(List) :- ','(recorded(syntax_error, length(AfterError), Ref), ','(erase(Ref), ','(length(List, Length), ','(is(BeforeError, -(Length, AfterError)), ','(display_list(List, BeforeError), !))))).
+display_list(X, 0) :- ','(nl, ','(display('<<here>> '), ','(!, ','(nl, display_list(X, 99999))))).
+display_list(.(Head, Tail), BeforeError) :- ','(display_token(Head), ','(ttyput(32), ','(is(Left, -(BeforeError, 1)), ','(!, display_list(Tail, Left))))).
+display_list([], _N) :- ttynl.
+display_token(atom(X)) :- ','(!, display(X)).
+display_token(var(_V, X)) :- ','(!, display(X)).
+display_token(integer(X)) :- ','(!, display(X)).
+display_token(string(X)) :- ','(!, display(X)).
+display_token(X) :- display(X).
+
+
+Query: parse(g,a)
+----------------------------------------
+
+(1) CutEliminatorProof (SOUND)
+Eliminated all cuts by simply ignoring them[PROLOG].
+----------------------------------------
+
+(2)
+Obligation:
+Clauses:
+
+goal :- parse(.(some, .(tokens, .(here, []))), ParseTree).
+parse(Tokens, Answer) :- ','(;(','(read(Tokens, 1200, Term, LeftOver), all_read(LeftOver)), syntax_error(Tokens)), =(Answer, Term)).
+all_read([]).
+all_read(S) :- syntax_error(.(operator, .(expected, .(after, .(expression, [])))), S).
+expect(Token, .(Token, Rest), Rest).
+expect(Token, S0, _M) :- syntax_error(.(Token, .(or, .(operator, .(expected, [])))), S0).
+prefixop(Op, Prec, Prec) :- current_op(Prec, fy, Op).
+prefixop(Op, Prec, Less) :- ','(current_op(Prec, fx, Op), is(Less, -(Prec, 1))).
+postfixop(Op, Prec, Prec) :- current_op(Prec, yf, Op).
+postfixop(Op, Less, Prec) :- ','(current_op(Prec, xf, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Less) :- ','(current_op(Prec, xfx, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Prec) :- ','(current_op(Prec, xfy, Op), is(Less, -(Prec, 1))).
+infixop(Op, Prec, Prec, Less) :- ','(current_op(Prec, yfx, Op), is(Less, -(Prec, 1))).
+ambigop(F, L1, O1, R1, L2, O2) :- ','(postfixop(F, L2, O2), infixop(F, L1, O1, R1)).
+read(.(Token, RestTokens), Precedence, Term, LeftOver) :- read(Token, RestTokens, Precedence, Term, LeftOver).
+read([], _X, _Y, _Z) :- syntax_error(.(expression, .(expected, [])), []).
+read(var(Variable, _M), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), exprtl0(S3, apply(Variable, .(Arg1, RestArgs)), Precedence, Answer, S))).
+read(var(Variable, _M), S0, Precedence, Answer, S) :- exprtl0(S0, Variable, Precedence, Answer, S).
+read(atom(-), .(integer(Integer), S1), Precedence, Answer, S) :- ','(is(Negative, -(Integer)), exprtl0(S1, Negative, Precedence, Answer, S)).
+read(atom(Functor), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), ','(=..(Term, .(Functor, .(Arg1, RestArgs))), exprtl0(S3, Term, Precedence, Answer, S)))).
+read(atom(Functor), S0, Precedence, Answer, S) :- ','(prefixop(Functor, Prec, Right), after_prefix_op(Functor, Prec, Right, S0, Precedence, Answer, S)).
+read(atom(Atom), S0, Precedence, Answer, S) :- exprtl0(S0, Atom, Precedence, Answer, S).
+read(integer(Integer), S0, Precedence, Answer, S) :- exprtl0(S0, Integer, Precedence, Answer, S).
+read('[', .(']', S1), Precedence, Answer, S) :- exprtl0(S1, [], Precedence, Answer, S).
+read('[', S1, Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_list(S2, RestArgs, S3), exprtl0(S3, .(Arg1, RestArgs), Precedence, Answer, S))).
+read('(', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read(' (', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read('{', .('}', S1), Precedence, Answer, S) :- exprtl0(S1, '{}', Precedence, Answer, S).
+read('{', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect('}', S2, S3), exprtl0(S3, '{}'(Term), Precedence, Answer, S))).
+read(string(List), S0, Precedence, Answer, S) :- exprtl0(S0, List, Precedence, Answer, S).
+read(Token, S0, _X, _Y, _Z) :- syntax_error(.(Token, .(cannot, .(start, .(an, .(expression, []))))), S0).
+read_args(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_args(S2, Rest, S)).
+read_args(.(')', S), [], S).
+read_args(S, _X, _Y) :- syntax_error(.(', or )', .(expected, .(in, .(arguments, [])))), S).
+read_list(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_list(S2, Rest, S)).
+read_list(.('|', S1), Rest, S) :- ','(read(S1, 999, Rest, S2), expect(']', S2, S)).
+read_list(.(']', S), [], S).
+read_list(S, _X, _Y) :- syntax_error(.(', | or ]', .(expected, .(in, .(list, [])))), S).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, _X, _Y) :- ','(<(Precedence, Oprec), syntax_error(.(prefix, .(operator, .(Op, .(in, .(context, .(with, .(precedence, .(Precedence, [])))))))), S0)).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, Answer, S) :- ','(peepop(S0, S1), ','(prefix_is_atom(S1, Oprec), exprtl(S1, Oprec, Op, Precedence, Answer, S))).
+after_prefix_op(Op, Oprec, Aprec, S1, Precedence, Answer, S) :- ','(read(S1, Aprec, Arg, S2), ','(=..(Term, .(Op, .(Arg, []))), exprtl(S2, Oprec, Term, Precedence, Answer, S))).
+peepop(.(atom(F), .('(', S1)), .(atom(F), .('(', S1))).
+peepop(.(atom(F), S1), .(infixop(F, L, P, R), S1)) :- infixop(F, L, P, R).
+peepop(.(atom(F), S1), .(postfixop(F, L, P), S1)) :- postfixop(F, L, P).
+peepop(S0, S0).
+prefix_is_atom(.(Token, _M), Precedence) :- prefix_is_atom(Token, Precedence).
+prefix_is_atom(infixop(_X, L, _Y, _Z), P) :- >=(L, P).
+prefix_is_atom(postfixop(_X, L, _Y), P) :- >=(L, P).
+prefix_is_atom(')', X1).
+prefix_is_atom(']', X2).
+prefix_is_atom('}', X3).
+prefix_is_atom('|', P) :- >=(1100, P).
+prefix_is_atom(',', P) :- >=(1000, P).
+prefix_is_atom([], X4).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(ambigop(F, L1, O1, R1, L2, O2), ;(exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S))).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(infixop(F, L1, O1, R1), exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(postfixop(F, L2, O2), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(',', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S))).
+exprtl0(.('|', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, ;(Term, Next), Precedence, Answer, S))).
+exprtl0(.(atom(end_of_file), []), '<eof>', X5, [], []).
+exprtl0(.(atom(end_of_file), []), Term, X6, Term, []).
+exprtl0(.(Thing, S1), _X, _Y, _Z, _W) :- ','(cant_follow_expr(Thing, Culprit), syntax_error(.(Culprit, .(follows, .(expression, []))), .(Thing, S1))).
+exprtl0(S, Term, X7, Term, S).
+cant_follow_expr(atom(X8), atom).
+cant_follow_expr(var(X9, X10), variable).
+cant_follow_expr(integer(X11), integer).
+cant_follow_expr(string(X12), string).
+cant_follow_expr(' (', bracket).
+cant_follow_expr('(', bracket).
+cant_follow_expr('[', bracket).
+cant_follow_expr('{', bracket).
+exprtl(.(infixop(F, L, O, R), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(read(S1, R, Other, S2), ','(=..(Expr, .(F, .(Term, .(Other, [])))), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(postfixop(F, L, O), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(=..(Expr, .(F, .(Term, []))), ','(peepop(S1, S2), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(',', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(<(C, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S)))).
+exprtl(.('|', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(<(C, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, ;(Term, Next), Precedence, Answer, S)))).
+exprtl(S, X13, Term, X14, Term, S).
+syntax_error(Message, List) :- ','(ttynl, ','(display('**'), ','(display_list(Message), ','(length(List, Length), ','(recorda(syntax_error, length(Length), _M), fail))))).
+display_list(.(Head, Tail)) :- ','(ttyput(32), ','(display_token(Head), display_list(Tail))).
+display_list([]) :- ttynl.
+syntax_error(List) :- ','(recorded(syntax_error, length(AfterError), Ref), ','(erase(Ref), ','(length(List, Length), ','(is(BeforeError, -(Length, AfterError)), display_list(List, BeforeError))))).
+display_list(X, 0) :- ','(nl, ','(display('<<here>> '), ','(nl, display_list(X, 99999)))).
+display_list(.(Head, Tail), BeforeError) :- ','(display_token(Head), ','(ttyput(32), ','(is(Left, -(BeforeError, 1)), display_list(Tail, Left)))).
+display_list([], _N) :- ttynl.
+display_token(atom(X)) :- display(X).
+display_token(var(_V, X)) :- display(X).
+display_token(integer(X)) :- display(X).
+display_token(string(X)) :- display(X).
+display_token(X) :- display(X).
+
+
+Query: parse(g,a)
+----------------------------------------
+
+(3) FailTransformerProof (EQUIVALENT)
+Added clauses for the built-in fail predicate [PROLOG].
+----------------------------------------
+
+(4)
+Obligation:
+Clauses:
+
+goal :- parse(.(some, .(tokens, .(here, []))), ParseTree).
+parse(Tokens, Answer) :- ','(;(','(read(Tokens, 1200, Term, LeftOver), all_read(LeftOver)), syntax_error(Tokens)), =(Answer, Term)).
+all_read([]).
+all_read(S) :- syntax_error(.(operator, .(expected, .(after, .(expression, [])))), S).
+expect(Token, .(Token, Rest), Rest).
+expect(Token, S0, _M) :- syntax_error(.(Token, .(or, .(operator, .(expected, [])))), S0).
+prefixop(Op, Prec, Prec) :- current_op(Prec, fy, Op).
+prefixop(Op, Prec, Less) :- ','(current_op(Prec, fx, Op), is(Less, -(Prec, 1))).
+postfixop(Op, Prec, Prec) :- current_op(Prec, yf, Op).
+postfixop(Op, Less, Prec) :- ','(current_op(Prec, xf, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Less) :- ','(current_op(Prec, xfx, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Prec) :- ','(current_op(Prec, xfy, Op), is(Less, -(Prec, 1))).
+infixop(Op, Prec, Prec, Less) :- ','(current_op(Prec, yfx, Op), is(Less, -(Prec, 1))).
+ambigop(F, L1, O1, R1, L2, O2) :- ','(postfixop(F, L2, O2), infixop(F, L1, O1, R1)).
+read(.(Token, RestTokens), Precedence, Term, LeftOver) :- read(Token, RestTokens, Precedence, Term, LeftOver).
+read([], _X, _Y, _Z) :- syntax_error(.(expression, .(expected, [])), []).
+read(var(Variable, _M), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), exprtl0(S3, apply(Variable, .(Arg1, RestArgs)), Precedence, Answer, S))).
+read(var(Variable, _M), S0, Precedence, Answer, S) :- exprtl0(S0, Variable, Precedence, Answer, S).
+read(atom(-), .(integer(Integer), S1), Precedence, Answer, S) :- ','(is(Negative, -(Integer)), exprtl0(S1, Negative, Precedence, Answer, S)).
+read(atom(Functor), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), ','(=..(Term, .(Functor, .(Arg1, RestArgs))), exprtl0(S3, Term, Precedence, Answer, S)))).
+read(atom(Functor), S0, Precedence, Answer, S) :- ','(prefixop(Functor, Prec, Right), after_prefix_op(Functor, Prec, Right, S0, Precedence, Answer, S)).
+read(atom(Atom), S0, Precedence, Answer, S) :- exprtl0(S0, Atom, Precedence, Answer, S).
+read(integer(Integer), S0, Precedence, Answer, S) :- exprtl0(S0, Integer, Precedence, Answer, S).
+read('[', .(']', S1), Precedence, Answer, S) :- exprtl0(S1, [], Precedence, Answer, S).
+read('[', S1, Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_list(S2, RestArgs, S3), exprtl0(S3, .(Arg1, RestArgs), Precedence, Answer, S))).
+read('(', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read(' (', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read('{', .('}', S1), Precedence, Answer, S) :- exprtl0(S1, '{}', Precedence, Answer, S).
+read('{', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect('}', S2, S3), exprtl0(S3, '{}'(Term), Precedence, Answer, S))).
+read(string(List), S0, Precedence, Answer, S) :- exprtl0(S0, List, Precedence, Answer, S).
+read(Token, S0, _X, _Y, _Z) :- syntax_error(.(Token, .(cannot, .(start, .(an, .(expression, []))))), S0).
+read_args(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_args(S2, Rest, S)).
+read_args(.(')', S), [], S).
+read_args(S, _X, _Y) :- syntax_error(.(', or )', .(expected, .(in, .(arguments, [])))), S).
+read_list(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_list(S2, Rest, S)).
+read_list(.('|', S1), Rest, S) :- ','(read(S1, 999, Rest, S2), expect(']', S2, S)).
+read_list(.(']', S), [], S).
+read_list(S, _X, _Y) :- syntax_error(.(', | or ]', .(expected, .(in, .(list, [])))), S).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, _X, _Y) :- ','(<(Precedence, Oprec), syntax_error(.(prefix, .(operator, .(Op, .(in, .(context, .(with, .(precedence, .(Precedence, [])))))))), S0)).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, Answer, S) :- ','(peepop(S0, S1), ','(prefix_is_atom(S1, Oprec), exprtl(S1, Oprec, Op, Precedence, Answer, S))).
+after_prefix_op(Op, Oprec, Aprec, S1, Precedence, Answer, S) :- ','(read(S1, Aprec, Arg, S2), ','(=..(Term, .(Op, .(Arg, []))), exprtl(S2, Oprec, Term, Precedence, Answer, S))).
+peepop(.(atom(F), .('(', S1)), .(atom(F), .('(', S1))).
+peepop(.(atom(F), S1), .(infixop(F, L, P, R), S1)) :- infixop(F, L, P, R).
+peepop(.(atom(F), S1), .(postfixop(F, L, P), S1)) :- postfixop(F, L, P).
+peepop(S0, S0).
+prefix_is_atom(.(Token, _M), Precedence) :- prefix_is_atom(Token, Precedence).
+prefix_is_atom(infixop(_X, L, _Y, _Z), P) :- >=(L, P).
+prefix_is_atom(postfixop(_X, L, _Y), P) :- >=(L, P).
+prefix_is_atom(')', X1).
+prefix_is_atom(']', X2).
+prefix_is_atom('}', X3).
+prefix_is_atom('|', P) :- >=(1100, P).
+prefix_is_atom(',', P) :- >=(1000, P).
+prefix_is_atom([], X4).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(ambigop(F, L1, O1, R1, L2, O2), ;(exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S))).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(infixop(F, L1, O1, R1), exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(postfixop(F, L2, O2), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(',', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S))).
+exprtl0(.('|', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, ;(Term, Next), Precedence, Answer, S))).
+exprtl0(.(atom(end_of_file), []), '<eof>', X5, [], []).
+exprtl0(.(atom(end_of_file), []), Term, X6, Term, []).
+exprtl0(.(Thing, S1), _X, _Y, _Z, _W) :- ','(cant_follow_expr(Thing, Culprit), syntax_error(.(Culprit, .(follows, .(expression, []))), .(Thing, S1))).
+exprtl0(S, Term, X7, Term, S).
+cant_follow_expr(atom(X8), atom).
+cant_follow_expr(var(X9, X10), variable).
+cant_follow_expr(integer(X11), integer).
+cant_follow_expr(string(X12), string).
+cant_follow_expr(' (', bracket).
+cant_follow_expr('(', bracket).
+cant_follow_expr('[', bracket).
+cant_follow_expr('{', bracket).
+exprtl(.(infixop(F, L, O, R), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(read(S1, R, Other, S2), ','(=..(Expr, .(F, .(Term, .(Other, [])))), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(postfixop(F, L, O), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(=..(Expr, .(F, .(Term, []))), ','(peepop(S1, S2), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(',', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(<(C, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S)))).
+exprtl(.('|', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(<(C, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, ;(Term, Next), Precedence, Answer, S)))).
+exprtl(S, X13, Term, X14, Term, S).
+syntax_error(Message, List) :- ','(ttynl, ','(display('**'), ','(display_list(Message), ','(length(List, Length), ','(recorda(syntax_error, length(Length), _M), fail))))).
+display_list(.(Head, Tail)) :- ','(ttyput(32), ','(display_token(Head), display_list(Tail))).
+display_list([]) :- ttynl.
+syntax_error(List) :- ','(recorded(syntax_error, length(AfterError), Ref), ','(erase(Ref), ','(length(List, Length), ','(is(BeforeError, -(Length, AfterError)), display_list(List, BeforeError))))).
+display_list(X, 0) :- ','(nl, ','(display('<<here>> '), ','(nl, display_list(X, 99999)))).
+display_list(.(Head, Tail), BeforeError) :- ','(display_token(Head), ','(ttyput(32), ','(is(Left, -(BeforeError, 1)), display_list(Tail, Left)))).
+display_list([], _N) :- ttynl.
+display_token(atom(X)) :- display(X).
+display_token(var(_V, X)) :- display(X).
+display_token(integer(X)) :- display(X).
+display_token(string(X)) :- display(X).
+display_token(X) :- display(X).
+fail :- failure(a).
+failure(b).
+
+
+Query: parse(g,a)
+----------------------------------------
+
+(5) UnifyTransformerProof (EQUIVALENT)
+Added a fact for the built-in = predicate [PROLOG].
+----------------------------------------
+
+(6)
+Obligation:
+Clauses:
+
+goal :- parse(.(some, .(tokens, .(here, []))), ParseTree).
+parse(Tokens, Answer) :- ','(;(','(read(Tokens, 1200, Term, LeftOver), all_read(LeftOver)), syntax_error(Tokens)), =(Answer, Term)).
+all_read([]).
+all_read(S) :- syntax_error(.(operator, .(expected, .(after, .(expression, [])))), S).
+expect(Token, .(Token, Rest), Rest).
+expect(Token, S0, _M) :- syntax_error(.(Token, .(or, .(operator, .(expected, [])))), S0).
+prefixop(Op, Prec, Prec) :- current_op(Prec, fy, Op).
+prefixop(Op, Prec, Less) :- ','(current_op(Prec, fx, Op), is(Less, -(Prec, 1))).
+postfixop(Op, Prec, Prec) :- current_op(Prec, yf, Op).
+postfixop(Op, Less, Prec) :- ','(current_op(Prec, xf, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Less) :- ','(current_op(Prec, xfx, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Prec) :- ','(current_op(Prec, xfy, Op), is(Less, -(Prec, 1))).
+infixop(Op, Prec, Prec, Less) :- ','(current_op(Prec, yfx, Op), is(Less, -(Prec, 1))).
+ambigop(F, L1, O1, R1, L2, O2) :- ','(postfixop(F, L2, O2), infixop(F, L1, O1, R1)).
+read(.(Token, RestTokens), Precedence, Term, LeftOver) :- read(Token, RestTokens, Precedence, Term, LeftOver).
+read([], _X, _Y, _Z) :- syntax_error(.(expression, .(expected, [])), []).
+read(var(Variable, _M), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), exprtl0(S3, apply(Variable, .(Arg1, RestArgs)), Precedence, Answer, S))).
+read(var(Variable, _M), S0, Precedence, Answer, S) :- exprtl0(S0, Variable, Precedence, Answer, S).
+read(atom(-), .(integer(Integer), S1), Precedence, Answer, S) :- ','(is(Negative, -(Integer)), exprtl0(S1, Negative, Precedence, Answer, S)).
+read(atom(Functor), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), ','(=..(Term, .(Functor, .(Arg1, RestArgs))), exprtl0(S3, Term, Precedence, Answer, S)))).
+read(atom(Functor), S0, Precedence, Answer, S) :- ','(prefixop(Functor, Prec, Right), after_prefix_op(Functor, Prec, Right, S0, Precedence, Answer, S)).
+read(atom(Atom), S0, Precedence, Answer, S) :- exprtl0(S0, Atom, Precedence, Answer, S).
+read(integer(Integer), S0, Precedence, Answer, S) :- exprtl0(S0, Integer, Precedence, Answer, S).
+read('[', .(']', S1), Precedence, Answer, S) :- exprtl0(S1, [], Precedence, Answer, S).
+read('[', S1, Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_list(S2, RestArgs, S3), exprtl0(S3, .(Arg1, RestArgs), Precedence, Answer, S))).
+read('(', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read(' (', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read('{', .('}', S1), Precedence, Answer, S) :- exprtl0(S1, '{}', Precedence, Answer, S).
+read('{', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect('}', S2, S3), exprtl0(S3, '{}'(Term), Precedence, Answer, S))).
+read(string(List), S0, Precedence, Answer, S) :- exprtl0(S0, List, Precedence, Answer, S).
+read(Token, S0, _X, _Y, _Z) :- syntax_error(.(Token, .(cannot, .(start, .(an, .(expression, []))))), S0).
+read_args(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_args(S2, Rest, S)).
+read_args(.(')', S), [], S).
+read_args(S, _X, _Y) :- syntax_error(.(', or )', .(expected, .(in, .(arguments, [])))), S).
+read_list(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_list(S2, Rest, S)).
+read_list(.('|', S1), Rest, S) :- ','(read(S1, 999, Rest, S2), expect(']', S2, S)).
+read_list(.(']', S), [], S).
+read_list(S, _X, _Y) :- syntax_error(.(', | or ]', .(expected, .(in, .(list, [])))), S).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, _X, _Y) :- ','(<(Precedence, Oprec), syntax_error(.(prefix, .(operator, .(Op, .(in, .(context, .(with, .(precedence, .(Precedence, [])))))))), S0)).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, Answer, S) :- ','(peepop(S0, S1), ','(prefix_is_atom(S1, Oprec), exprtl(S1, Oprec, Op, Precedence, Answer, S))).
+after_prefix_op(Op, Oprec, Aprec, S1, Precedence, Answer, S) :- ','(read(S1, Aprec, Arg, S2), ','(=..(Term, .(Op, .(Arg, []))), exprtl(S2, Oprec, Term, Precedence, Answer, S))).
+peepop(.(atom(F), .('(', S1)), .(atom(F), .('(', S1))).
+peepop(.(atom(F), S1), .(infixop(F, L, P, R), S1)) :- infixop(F, L, P, R).
+peepop(.(atom(F), S1), .(postfixop(F, L, P), S1)) :- postfixop(F, L, P).
+peepop(S0, S0).
+prefix_is_atom(.(Token, _M), Precedence) :- prefix_is_atom(Token, Precedence).
+prefix_is_atom(infixop(_X, L, _Y, _Z), P) :- >=(L, P).
+prefix_is_atom(postfixop(_X, L, _Y), P) :- >=(L, P).
+prefix_is_atom(')', X1).
+prefix_is_atom(']', X2).
+prefix_is_atom('}', X3).
+prefix_is_atom('|', P) :- >=(1100, P).
+prefix_is_atom(',', P) :- >=(1000, P).
+prefix_is_atom([], X4).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(ambigop(F, L1, O1, R1, L2, O2), ;(exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S))).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(infixop(F, L1, O1, R1), exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(postfixop(F, L2, O2), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(',', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S))).
+exprtl0(.('|', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, ;(Term, Next), Precedence, Answer, S))).
+exprtl0(.(atom(end_of_file), []), '<eof>', X5, [], []).
+exprtl0(.(atom(end_of_file), []), Term, X6, Term, []).
+exprtl0(.(Thing, S1), _X, _Y, _Z, _W) :- ','(cant_follow_expr(Thing, Culprit), syntax_error(.(Culprit, .(follows, .(expression, []))), .(Thing, S1))).
+exprtl0(S, Term, X7, Term, S).
+cant_follow_expr(atom(X8), atom).
+cant_follow_expr(var(X9, X10), variable).
+cant_follow_expr(integer(X11), integer).
+cant_follow_expr(string(X12), string).
+cant_follow_expr(' (', bracket).
+cant_follow_expr('(', bracket).
+cant_follow_expr('[', bracket).
+cant_follow_expr('{', bracket).
+exprtl(.(infixop(F, L, O, R), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(read(S1, R, Other, S2), ','(=..(Expr, .(F, .(Term, .(Other, [])))), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(postfixop(F, L, O), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(=..(Expr, .(F, .(Term, []))), ','(peepop(S1, S2), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(',', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(<(C, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S)))).
+exprtl(.('|', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(<(C, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, ;(Term, Next), Precedence, Answer, S)))).
+exprtl(S, X13, Term, X14, Term, S).
+syntax_error(Message, List) :- ','(ttynl, ','(display('**'), ','(display_list(Message), ','(length(List, Length), ','(recorda(syntax_error, length(Length), _M), fail))))).
+display_list(.(Head, Tail)) :- ','(ttyput(32), ','(display_token(Head), display_list(Tail))).
+display_list([]) :- ttynl.
+syntax_error(List) :- ','(recorded(syntax_error, length(AfterError), Ref), ','(erase(Ref), ','(length(List, Length), ','(is(BeforeError, -(Length, AfterError)), display_list(List, BeforeError))))).
+display_list(X, 0) :- ','(nl, ','(display('<<here>> '), ','(nl, display_list(X, 99999)))).
+display_list(.(Head, Tail), BeforeError) :- ','(display_token(Head), ','(ttyput(32), ','(is(Left, -(BeforeError, 1)), display_list(Tail, Left)))).
+display_list([], _N) :- ttynl.
+display_token(atom(X)) :- display(X).
+display_token(var(_V, X)) :- display(X).
+display_token(integer(X)) :- display(X).
+display_token(string(X)) :- display(X).
+display_token(X) :- display(X).
+fail :- failure(a).
+failure(b).
+=(X, X).
+
+
+Query: parse(g,a)
+----------------------------------------
+
+(7) OrTransformerProof (EQUIVALENT)
+Transformed all or-constructs[PROLOG].
+----------------------------------------
+
+(8)
+Obligation:
+Clauses:
+
+goal :- parse(.(some, .(tokens, .(here, []))), ParseTree).
+parse(Tokens, Answer) :- ','(','(read(Tokens, 1200, Term, LeftOver), all_read(LeftOver)), =(Answer, Term)).
+parse(Tokens, Answer) :- ','(syntax_error(Tokens), =(Answer, Term)).
+all_read([]).
+all_read(S) :- syntax_error(.(operator, .(expected, .(after, .(expression, [])))), S).
+expect(Token, .(Token, Rest), Rest).
+expect(Token, S0, _M) :- syntax_error(.(Token, .(or, .(operator, .(expected, [])))), S0).
+prefixop(Op, Prec, Prec) :- current_op(Prec, fy, Op).
+prefixop(Op, Prec, Less) :- ','(current_op(Prec, fx, Op), is(Less, -(Prec, 1))).
+postfixop(Op, Prec, Prec) :- current_op(Prec, yf, Op).
+postfixop(Op, Less, Prec) :- ','(current_op(Prec, xf, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Less) :- ','(current_op(Prec, xfx, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Prec) :- ','(current_op(Prec, xfy, Op), is(Less, -(Prec, 1))).
+infixop(Op, Prec, Prec, Less) :- ','(current_op(Prec, yfx, Op), is(Less, -(Prec, 1))).
+ambigop(F, L1, O1, R1, L2, O2) :- ','(postfixop(F, L2, O2), infixop(F, L1, O1, R1)).
+read(.(Token, RestTokens), Precedence, Term, LeftOver) :- read(Token, RestTokens, Precedence, Term, LeftOver).
+read([], _X, _Y, _Z) :- syntax_error(.(expression, .(expected, [])), []).
+read(var(Variable, _M), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), exprtl0(S3, apply(Variable, .(Arg1, RestArgs)), Precedence, Answer, S))).
+read(var(Variable, _M), S0, Precedence, Answer, S) :- exprtl0(S0, Variable, Precedence, Answer, S).
+read(atom(-), .(integer(Integer), S1), Precedence, Answer, S) :- ','(is(Negative, -(Integer)), exprtl0(S1, Negative, Precedence, Answer, S)).
+read(atom(Functor), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), ','(=..(Term, .(Functor, .(Arg1, RestArgs))), exprtl0(S3, Term, Precedence, Answer, S)))).
+read(atom(Functor), S0, Precedence, Answer, S) :- ','(prefixop(Functor, Prec, Right), after_prefix_op(Functor, Prec, Right, S0, Precedence, Answer, S)).
+read(atom(Atom), S0, Precedence, Answer, S) :- exprtl0(S0, Atom, Precedence, Answer, S).
+read(integer(Integer), S0, Precedence, Answer, S) :- exprtl0(S0, Integer, Precedence, Answer, S).
+read('[', .(']', S1), Precedence, Answer, S) :- exprtl0(S1, [], Precedence, Answer, S).
+read('[', S1, Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_list(S2, RestArgs, S3), exprtl0(S3, .(Arg1, RestArgs), Precedence, Answer, S))).
+read('(', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read(' (', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read('{', .('}', S1), Precedence, Answer, S) :- exprtl0(S1, '{}', Precedence, Answer, S).
+read('{', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect('}', S2, S3), exprtl0(S3, '{}'(Term), Precedence, Answer, S))).
+read(string(List), S0, Precedence, Answer, S) :- exprtl0(S0, List, Precedence, Answer, S).
+read(Token, S0, _X, _Y, _Z) :- syntax_error(.(Token, .(cannot, .(start, .(an, .(expression, []))))), S0).
+read_args(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_args(S2, Rest, S)).
+read_args(.(')', S), [], S).
+read_args(S, _X, _Y) :- syntax_error(.(', or )', .(expected, .(in, .(arguments, [])))), S).
+read_list(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_list(S2, Rest, S)).
+read_list(.('|', S1), Rest, S) :- ','(read(S1, 999, Rest, S2), expect(']', S2, S)).
+read_list(.(']', S), [], S).
+read_list(S, _X, _Y) :- syntax_error(.(', | or ]', .(expected, .(in, .(list, [])))), S).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, _X, _Y) :- ','(<(Precedence, Oprec), syntax_error(.(prefix, .(operator, .(Op, .(in, .(context, .(with, .(precedence, .(Precedence, [])))))))), S0)).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, Answer, S) :- ','(peepop(S0, S1), ','(prefix_is_atom(S1, Oprec), exprtl(S1, Oprec, Op, Precedence, Answer, S))).
+after_prefix_op(Op, Oprec, Aprec, S1, Precedence, Answer, S) :- ','(read(S1, Aprec, Arg, S2), ','(=..(Term, .(Op, .(Arg, []))), exprtl(S2, Oprec, Term, Precedence, Answer, S))).
+peepop(.(atom(F), .('(', S1)), .(atom(F), .('(', S1))).
+peepop(.(atom(F), S1), .(infixop(F, L, P, R), S1)) :- infixop(F, L, P, R).
+peepop(.(atom(F), S1), .(postfixop(F, L, P), S1)) :- postfixop(F, L, P).
+peepop(S0, S0).
+prefix_is_atom(.(Token, _M), Precedence) :- prefix_is_atom(Token, Precedence).
+prefix_is_atom(infixop(_X, L, _Y, _Z), P) :- >=(L, P).
+prefix_is_atom(postfixop(_X, L, _Y), P) :- >=(L, P).
+prefix_is_atom(')', X1).
+prefix_is_atom(']', X2).
+prefix_is_atom('}', X3).
+prefix_is_atom('|', P) :- >=(1100, P).
+prefix_is_atom(',', P) :- >=(1000, P).
+prefix_is_atom([], X4).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(ambigop(F, L1, O1, R1, L2, O2), exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(ambigop(F, L1, O1, R1, L2, O2), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(infixop(F, L1, O1, R1), exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(postfixop(F, L2, O2), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(',', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S))).
+exprtl0(.('|', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, Term, Precedence, Answer, S))).
+exprtl0(.('|', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, Next, Precedence, Answer, S))).
+exprtl0(.(atom(end_of_file), []), '<eof>', X5, [], []).
+exprtl0(.(atom(end_of_file), []), Term, X6, Term, []).
+exprtl0(.(Thing, S1), _X, _Y, _Z, _W) :- ','(cant_follow_expr(Thing, Culprit), syntax_error(.(Culprit, .(follows, .(expression, []))), .(Thing, S1))).
+exprtl0(S, Term, X7, Term, S).
+cant_follow_expr(atom(X8), atom).
+cant_follow_expr(var(X9, X10), variable).
+cant_follow_expr(integer(X11), integer).
+cant_follow_expr(string(X12), string).
+cant_follow_expr(' (', bracket).
+cant_follow_expr('(', bracket).
+cant_follow_expr('[', bracket).
+cant_follow_expr('{', bracket).
+exprtl(.(infixop(F, L, O, R), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(read(S1, R, Other, S2), ','(=..(Expr, .(F, .(Term, .(Other, [])))), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(postfixop(F, L, O), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(=..(Expr, .(F, .(Term, []))), ','(peepop(S1, S2), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(',', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(<(C, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S)))).
+exprtl(.('|', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(<(C, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, Term, Precedence, Answer, S)))).
+exprtl(.('|', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(<(C, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, Next, Precedence, Answer, S)))).
+exprtl(S, X13, Term, X14, Term, S).
+syntax_error(Message, List) :- ','(ttynl, ','(display('**'), ','(display_list(Message), ','(length(List, Length), ','(recorda(syntax_error, length(Length), _M), fail))))).
+display_list(.(Head, Tail)) :- ','(ttyput(32), ','(display_token(Head), display_list(Tail))).
+display_list([]) :- ttynl.
+syntax_error(List) :- ','(recorded(syntax_error, length(AfterError), Ref), ','(erase(Ref), ','(length(List, Length), ','(is(BeforeError, -(Length, AfterError)), display_list(List, BeforeError))))).
+display_list(X, 0) :- ','(nl, ','(display('<<here>> '), ','(nl, display_list(X, 99999)))).
+display_list(.(Head, Tail), BeforeError) :- ','(display_token(Head), ','(ttyput(32), ','(is(Left, -(BeforeError, 1)), display_list(Tail, Left)))).
+display_list([], _N) :- ttynl.
+display_token(atom(X)) :- display(X).
+display_token(var(_V, X)) :- display(X).
+display_token(integer(X)) :- display(X).
+display_token(string(X)) :- display(X).
+display_token(X) :- display(X).
+fail :- failure(a).
+failure(b).
+=(X, X).
+
+
+Query: parse(g,a)
+----------------------------------------
+
+(9) UndefinedPredicateHandlerProof (SOUND)
+Added facts for all undefined predicates [PROLOG].
+----------------------------------------
+
+(10)
+Obligation:
+Clauses:
+
+goal :- parse(.(some, .(tokens, .(here, []))), ParseTree).
+parse(Tokens, Answer) :- ','(','(read(Tokens, 1200, Term, LeftOver), all_read(LeftOver)), =(Answer, Term)).
+parse(Tokens, Answer) :- ','(syntax_error(Tokens), =(Answer, Term)).
+all_read([]).
+all_read(S) :- syntax_error(.(operator, .(expected, .(after, .(expression, [])))), S).
+expect(Token, .(Token, Rest), Rest).
+expect(Token, S0, _M) :- syntax_error(.(Token, .(or, .(operator, .(expected, [])))), S0).
+prefixop(Op, Prec, Prec) :- current_op(Prec, fy, Op).
+prefixop(Op, Prec, Less) :- ','(current_op(Prec, fx, Op), is(Less, -(Prec, 1))).
+postfixop(Op, Prec, Prec) :- current_op(Prec, yf, Op).
+postfixop(Op, Less, Prec) :- ','(current_op(Prec, xf, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Less) :- ','(current_op(Prec, xfx, Op), is(Less, -(Prec, 1))).
+infixop(Op, Less, Prec, Prec) :- ','(current_op(Prec, xfy, Op), is(Less, -(Prec, 1))).
+infixop(Op, Prec, Prec, Less) :- ','(current_op(Prec, yfx, Op), is(Less, -(Prec, 1))).
+ambigop(F, L1, O1, R1, L2, O2) :- ','(postfixop(F, L2, O2), infixop(F, L1, O1, R1)).
+read(.(Token, RestTokens), Precedence, Term, LeftOver) :- read(Token, RestTokens, Precedence, Term, LeftOver).
+read([], _X, _Y, _Z) :- syntax_error(.(expression, .(expected, [])), []).
+read(var(Variable, _M), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), exprtl0(S3, apply(Variable, .(Arg1, RestArgs)), Precedence, Answer, S))).
+read(var(Variable, _M), S0, Precedence, Answer, S) :- exprtl0(S0, Variable, Precedence, Answer, S).
+read(atom(-), .(integer(Integer), S1), Precedence, Answer, S) :- ','(is(Negative, -(Integer)), exprtl0(S1, Negative, Precedence, Answer, S)).
+read(atom(Functor), .('(', S1), Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_args(S2, RestArgs, S3), ','(=..(Term, .(Functor, .(Arg1, RestArgs))), exprtl0(S3, Term, Precedence, Answer, S)))).
+read(atom(Functor), S0, Precedence, Answer, S) :- ','(prefixop(Functor, Prec, Right), after_prefix_op(Functor, Prec, Right, S0, Precedence, Answer, S)).
+read(atom(Atom), S0, Precedence, Answer, S) :- exprtl0(S0, Atom, Precedence, Answer, S).
+read(integer(Integer), S0, Precedence, Answer, S) :- exprtl0(S0, Integer, Precedence, Answer, S).
+read('[', .(']', S1), Precedence, Answer, S) :- exprtl0(S1, [], Precedence, Answer, S).
+read('[', S1, Precedence, Answer, S) :- ','(read(S1, 999, Arg1, S2), ','(read_list(S2, RestArgs, S3), exprtl0(S3, .(Arg1, RestArgs), Precedence, Answer, S))).
+read('(', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read(' (', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect(')', S2, S3), exprtl0(S3, Term, Precedence, Answer, S))).
+read('{', .('}', S1), Precedence, Answer, S) :- exprtl0(S1, '{}', Precedence, Answer, S).
+read('{', S1, Precedence, Answer, S) :- ','(read(S1, 1200, Term, S2), ','(expect('}', S2, S3), exprtl0(S3, '{}'(Term), Precedence, Answer, S))).
+read(string(List), S0, Precedence, Answer, S) :- exprtl0(S0, List, Precedence, Answer, S).
+read(Token, S0, _X, _Y, _Z) :- syntax_error(.(Token, .(cannot, .(start, .(an, .(expression, []))))), S0).
+read_args(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_args(S2, Rest, S)).
+read_args(.(')', S), [], S).
+read_args(S, _X, _Y) :- syntax_error(.(', or )', .(expected, .(in, .(arguments, [])))), S).
+read_list(.(',', S1), .(Term, Rest), S) :- ','(read(S1, 999, Term, S2), read_list(S2, Rest, S)).
+read_list(.('|', S1), Rest, S) :- ','(read(S1, 999, Rest, S2), expect(']', S2, S)).
+read_list(.(']', S), [], S).
+read_list(S, _X, _Y) :- syntax_error(.(', | or ]', .(expected, .(in, .(list, [])))), S).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, _X, _Y) :- ','(<(Precedence, Oprec), syntax_error(.(prefix, .(operator, .(Op, .(in, .(context, .(with, .(precedence, .(Precedence, [])))))))), S0)).
+after_prefix_op(Op, Oprec, _Aprec, S0, Precedence, Answer, S) :- ','(peepop(S0, S1), ','(prefix_is_atom(S1, Oprec), exprtl(S1, Oprec, Op, Precedence, Answer, S))).
+after_prefix_op(Op, Oprec, Aprec, S1, Precedence, Answer, S) :- ','(read(S1, Aprec, Arg, S2), ','(=..(Term, .(Op, .(Arg, []))), exprtl(S2, Oprec, Term, Precedence, Answer, S))).
+peepop(.(atom(F), .('(', S1)), .(atom(F), .('(', S1))).
+peepop(.(atom(F), S1), .(infixop(F, L, P, R), S1)) :- infixop(F, L, P, R).
+peepop(.(atom(F), S1), .(postfixop(F, L, P), S1)) :- postfixop(F, L, P).
+peepop(S0, S0).
+prefix_is_atom(.(Token, _M), Precedence) :- prefix_is_atom(Token, Precedence).
+prefix_is_atom(infixop(_X, L, _Y, _Z), P) :- >=(L, P).
+prefix_is_atom(postfixop(_X, L, _Y), P) :- >=(L, P).
+prefix_is_atom(')', X1).
+prefix_is_atom(']', X2).
+prefix_is_atom('}', X3).
+prefix_is_atom('|', P) :- >=(1100, P).
+prefix_is_atom(',', P) :- >=(1000, P).
+prefix_is_atom([], X4).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(ambigop(F, L1, O1, R1, L2, O2), exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(ambigop(F, L1, O1, R1, L2, O2), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(infixop(F, L1, O1, R1), exprtl(.(infixop(F, L1, O1, R1), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(atom(F), S1), Term, Precedence, Answer, S) :- ','(postfixop(F, L2, O2), exprtl(.(postfixop(F, L2, O2), S1), 0, Term, Precedence, Answer, S)).
+exprtl0(.(',', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S))).
+exprtl0(.('|', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, Term, Precedence, Answer, S))).
+exprtl0(.('|', S1), Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, Next, Precedence, Answer, S))).
+exprtl0(.(atom(end_of_file), []), '<eof>', X5, [], []).
+exprtl0(.(atom(end_of_file), []), Term, X6, Term, []).
+exprtl0(.(Thing, S1), _X, _Y, _Z, _W) :- ','(cant_follow_expr(Thing, Culprit), syntax_error(.(Culprit, .(follows, .(expression, []))), .(Thing, S1))).
+exprtl0(S, Term, X7, Term, S).
+cant_follow_expr(atom(X8), atom).
+cant_follow_expr(var(X9, X10), variable).
+cant_follow_expr(integer(X11), integer).
+cant_follow_expr(string(X12), string).
+cant_follow_expr(' (', bracket).
+cant_follow_expr('(', bracket).
+cant_follow_expr('[', bracket).
+cant_follow_expr('{', bracket).
+exprtl(.(infixop(F, L, O, R), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(read(S1, R, Other, S2), ','(=..(Expr, .(F, .(Term, .(Other, [])))), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(postfixop(F, L, O), S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, O), ','(=<(C, L), ','(=..(Expr, .(F, .(Term, []))), ','(peepop(S1, S2), exprtl(S2, O, Expr, Precedence, Answer, S))))).
+exprtl(.(',', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1000), ','(<(C, 1000), ','(read(S1, 1000, Next, S2), exprtl(S2, 1000, ','(Term, Next), Precedence, Answer, S)))).
+exprtl(.('|', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(<(C, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, Term, Precedence, Answer, S)))).
+exprtl(.('|', S1), C, Term, Precedence, Answer, S) :- ','(>=(Precedence, 1100), ','(<(C, 1100), ','(read(S1, 1100, Next, S2), exprtl(S2, 1100, Next, Precedence, Answer, S)))).
+exprtl(S, X13, Term, X14, Term, S).
+syntax_error(Message, List) :- ','(ttynl, ','(display('**'), ','(display_list(Message), ','(length(List, Length), ','(recorda(syntax_error, length(Length), _M), fail))))).
+display_list(.(Head, Tail)) :- ','(ttyput(32), ','(display_token(Head), display_list(Tail))).
+display_list([]) :- ttynl.
+syntax_error(List) :- ','(recorded(syntax_error, length(AfterError), Ref), ','(erase(Ref), ','(length(List, Length), ','(is(BeforeError, -(Length, AfterError)), display_list(List, BeforeError))))).
+display_list(X, 0) :- ','(nl, ','(display('<<here>> '), ','(nl, display_list(X, 99999)))).
+display_list(.(Head, Tail), BeforeError) :- ','(display_token(Head), ','(ttyput(32), ','(is(Left, -(BeforeError, 1)), display_list(Tail, Left)))).
+display_list([], _N) :- ttynl.
+display_token(atom(X)) :- display(X).
+display_token(var(_V, X)) :- display(X).
+display_token(integer(X)) :- display(X).
+display_token(string(X)) :- display(X).
+display_token(X) :- display(X).
+fail :- failure(a).
+failure(b).
+=(X, X).
+current_op(X0, X1, X2).
+is(X0, X1).
+=..(X0, X1).
+<(X0, X1).
+>=(X0, X1).
+=<(X0, X1).
+ttynl.
+display(X0).
+length(X0, X1).
+recorda(X0, X1, X2).
+ttyput(X0).
+recorded(X0, X1, X2).
+erase(X0).
+nl.
+
+
+Query: parse(g,a)

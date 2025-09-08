@@ -1,0 +1,161 @@
+WORST_CASE(?, O(n^1))
+
+
+Initial Problem
+  Start:  l0
+  Program_Vars:  X₀, X₁, X₂, X₃, X₄, X₅, X₆
+  Temp_Vars:  
+  Locations:  l0, l1, l2, l3, l4, l5
+  Return Locations:  
+  Transitions:
+  t₀: l0(X₀, X₁, X₂, X₃, X₄, X₅, X₆) → l2(X₀, X₁, X₂, X₃, X₄, X₅, X₆)
+  t₂: l1(X₀, X₁, X₂, X₃, X₄, X₅, X₆) → l3(X₀, X₁, X₂, X₃, X₄, X₅, X₆) :|: 1 ≤ X₁+X₂
+  t₃: l1(X₀, X₁, X₂, X₃, X₄, X₅, X₆) → l4(X₀, X₁, X₂, X₃, X₄, X₅, X₆) :|: X₁+X₂ ≤ 0
+  t₁: l2(X₀, X₁, X₂, X₃, X₄, X₅, X₆) → l1(X₄, X₅, X₆, X₃, X₄, X₅, X₆)
+  t₄: l3(X₀, X₁, X₂, X₃, X₄, X₅, X₆) → l1(1+X₀, -2-2⋅X₁, 1+X₀, X₃, X₄, X₅, X₆)
+  t₅: l4(X₀, X₁, X₂, X₃, X₄, X₅, X₆) → l5(X₀, X₁, X₂, X₃, X₄, X₅, X₆)
+
+
+Preprocessing
+  Eliminate variables [X₃] that do not contribute to the problem
+
+
+  Found invariant X₃ ≤ X₀ ∧ X₁+X₂ ≤ 0 for location l5
+
+
+  Found invariant X₃ ≤ X₀ for location l1
+
+
+  Found invariant X₃ ≤ X₀ ∧ X₁+X₂ ≤ 0 for location l4
+
+
+  Found invariant X₃ ≤ X₀ ∧ 1 ≤ X₁+X₂ for location l3
+
+
+Problem after Preprocessing
+  Start:  l0
+  Program_Vars:  X₀, X₁, X₂, X₃, X₄, X₅
+  Temp_Vars:  
+  Locations:  l0, l1, l2, l3, l4, l5
+  Return Locations:  
+  Transitions:
+  t₆: l0(X₀, X₁, X₂, X₃, X₄, X₅) → l2(X₀, X₁, X₂, X₃, X₄, X₅)
+  t₇: l1(X₀, X₁, X₂, X₃, X₄, X₅) → l3(X₀, X₁, X₂, X₃, X₄, X₅) :|: 1 ≤ X₁+X₂ ∧ X₃ ≤ X₀
+  t₈: l1(X₀, X₁, X₂, X₃, X₄, X₅) → l4(X₀, X₁, X₂, X₃, X₄, X₅) :|: X₁+X₂ ≤ 0 ∧ X₃ ≤ X₀
+  t₉: l2(X₀, X₁, X₂, X₃, X₄, X₅) → l1(X₃, X₄, X₅, X₃, X₄, X₅)
+  t₁₀: l3(X₀, X₁, X₂, X₃, X₄, X₅) → l1(1+X₀, -2-2⋅X₁, 1+X₀, X₃, X₄, X₅) :|: 1 ≤ X₁+X₂ ∧ X₃ ≤ X₀
+  t₁₁: l4(X₀, X₁, X₂, X₃, X₄, X₅) → l5(X₀, X₁, X₂, X₃, X₄, X₅) :|: X₃ ≤ X₀ ∧ X₁+X₂ ≤ 0
+
+
+TWN: t₇: l1→l3
+
+
+  cycle: [t₇: l1→l3; t₁₀: l3→l1]
+  original loop: (1 ≤ X₁+X₂ ∧ X₃ ≤ X₀ ∧ 1 ≤ X₁+X₂ ∧ X₃ ≤ X₀,(X₀,X₁,X₂,X₃) -> (1+X₀,-2-2⋅X₁,1+X₀,X₃))
+  transformed loop: (1 ≤ X₁+X₂ ∧ X₃ ≤ X₀ ∧ 1 ≤ X₁+X₂ ∧ X₃ ≤ X₀,(X₀,X₁,X₂,X₃) -> (1+X₀,-2-2⋅X₁,1+X₀,X₃))
+  loop: (1 ≤ X₁+X₂ ∧ X₃ ≤ X₀ ∧ 1 ≤ X₁+X₂ ∧ X₃ ≤ X₀,(X₀,X₁,X₂,X₃) -> (1+X₀,-2-2⋅X₁,1+X₀,X₃))
+  order: [X₀; X₃; X₂; X₁]
+closed-form:  X₀: X₀ + [[n != 0]]⋅2⋅n^1
+  X₃: X₃
+  X₂: [[n == 0]]⋅X₂ + [[n != 0]]⋅(2+X₀) + [[n != 0, n != 1]]⋅2⋅n^1 + [[n != 0, n != 1]]⋅-2
+  X₁: X₁⋅(4)^n + [[n != 0]]⋅2/3⋅(4)^n + [[n != 0]]⋅-2/3
+
+  Termination: true
+  Formula: 
+    3⋅X₀ ≤ 5 ∧ 3⋅X₀ ≤ 2 ∧ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 2 ≤ 3⋅X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ 5 ≤ 3⋅X₀ ∧ X₃ ≤ X₀
+     ∨ 3⋅X₀ ≤ 5 ∧ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ 5 ≤ 3⋅X₀ ∧ X₃ ≤ X₀
+     ∨ 3⋅X₀ ≤ 5 ∧ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 2+3⋅X₁ ≤ 0 ∧ 5 ≤ 3⋅X₀ ∧ 5+6⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 3⋅X₀ ≤ 5 ∧ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 2+3⋅X₁ ≤ 0 ∧ 5 ≤ 3⋅X₀ ∧ X₃ ≤ X₀
+     ∨ 3⋅X₀ ≤ 2 ∧ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 0 ≤ 1+3⋅X₁ ∧ 1 ≤ 0 ∧ 2 ≤ 3⋅X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 3⋅X₀ ≤ 2 ∧ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 2 ≤ 3⋅X₀ ∧ 2 ≤ X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 3⋅X₀ ≤ 2 ∧ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 2 ≤ 3⋅X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 0 ≤ 1+3⋅X₁ ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 0 ≤ 1+3⋅X₁ ∧ 2+3⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 2 ≤ X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 1 ≤ X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ 5+6⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 1 ≤ 0 ∧ 2 ≤ X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ 5+6⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ 0 ≤ 2+3⋅X₁ ∧ 0 ≤ 1 ∧ X₃ ≤ 1+X₀ ∧ 2+3⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+     ∨ X₃ ≤ 1+X₀ ∧ 0 ≤ 1+3⋅X₁ ∧ 5+6⋅X₁ ≤ 0 ∧ X₃ ≤ X₀
+
+
+
+Stabilization-Threshold for: 2+2⋅X₁ ≤ X₀
+  alphas_abs: 6+3⋅X₀
+  M: 0
+  N: 2
+  Bound: 6⋅X₀+15 {O(n)}
+
+Stabilization-Threshold for: 1 ≤ X₁+X₂
+  alphas_abs: 6+3⋅X₀
+  M: 0
+  N: 2
+  Bound: 6⋅X₀+15 {O(n)}
+
+TWN - Lifting for [7: l1->l3; 10: l3->l1] of 24⋅X₀+65 {O(n)}
+relevant size-bounds w.r.t. t₉: l2→l1:
+X₀: X₃ {O(n)}
+Runtime-bound of t₉: 1 {O(1)}
+Results in: 24⋅X₃+65 {O(n)}
+All Bounds
+Timebounds
+  Overall timebound:48⋅X₃+134 {O(n)}
+    t₆: 1 {O(1)}
+    t₇: 24⋅X₃+65 {O(n)}
+    t₈: 1 {O(1)}
+    t₉: 1 {O(1)}
+    t₁₀: 24⋅X₃+65 {O(n)}
+    t₁₁: 1 {O(1)}
+
+
+Costbounds
+  Overall costbound: 48⋅X₃+134 {O(n)}
+    t₆: 1 {O(1)}
+    t₇: 24⋅X₃+65 {O(n)}
+    t₈: 1 {O(1)}
+    t₉: 1 {O(1)}
+    t₁₀: 24⋅X₃+65 {O(n)}
+    t₁₁: 1 {O(1)}
+
+
+Sizebounds
+    t₆, X₀: X₀ {O(n)}
+    t₆, X₁: X₁ {O(n)}
+    t₆, X₂: X₂ {O(n)}
+    t₆, X₃: X₃ {O(n)}
+    t₆, X₄: X₄ {O(n)}
+    t₆, X₅: X₅ {O(n)}
+    t₇, X₀: 25⋅X₃+65 {O(n)}
+    t₇, X₁: 24⋅2^(24⋅X₃+65)⋅X₃+2^(24⋅X₃+65)⋅65+2^(24⋅X₃+65)⋅X₄ {O(EXP)}
+    t₇, X₂: 25⋅X₃+X₅+66 {O(n)}
+    t₇, X₃: X₃ {O(n)}
+    t₇, X₄: X₄ {O(n)}
+    t₇, X₅: X₅ {O(n)}
+    t₈, X₀: 26⋅X₃+65 {O(n)}
+    t₈, X₁: 24⋅2^(24⋅X₃+65)⋅X₃+2^(24⋅X₃+65)⋅65+2^(24⋅X₃+65)⋅X₄+X₄ {O(EXP)}
+    t₈, X₂: 25⋅X₃+X₅+66 {O(n)}
+    t₈, X₃: 2⋅X₃ {O(n)}
+    t₈, X₄: 2⋅X₄ {O(n)}
+    t₈, X₅: 2⋅X₅ {O(n)}
+    t₉, X₀: X₃ {O(n)}
+    t₉, X₁: X₄ {O(n)}
+    t₉, X₂: X₅ {O(n)}
+    t₉, X₃: X₃ {O(n)}
+    t₉, X₄: X₄ {O(n)}
+    t₉, X₅: X₅ {O(n)}
+    t₁₀, X₀: 25⋅X₃+65 {O(n)}
+    t₁₀, X₁: 24⋅2^(24⋅X₃+65)⋅X₃+2^(24⋅X₃+65)⋅65+2^(24⋅X₃+65)⋅X₄ {O(EXP)}
+    t₁₀, X₂: 25⋅X₃+66 {O(n)}
+    t₁₀, X₃: X₃ {O(n)}
+    t₁₀, X₄: X₄ {O(n)}
+    t₁₀, X₅: X₅ {O(n)}
+    t₁₁, X₀: 26⋅X₃+65 {O(n)}
+    t₁₁, X₁: 24⋅2^(24⋅X₃+65)⋅X₃+2^(24⋅X₃+65)⋅65+2^(24⋅X₃+65)⋅X₄+X₄ {O(EXP)}
+    t₁₁, X₂: 25⋅X₃+X₅+66 {O(n)}
+    t₁₁, X₃: 2⋅X₃ {O(n)}
+    t₁₁, X₄: 2⋅X₄ {O(n)}
+    t₁₁, X₅: 2⋅X₅ {O(n)}
+
+
+

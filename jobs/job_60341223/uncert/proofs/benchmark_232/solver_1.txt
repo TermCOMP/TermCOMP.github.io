@@ -1,0 +1,489 @@
+YES
+We consider the system Nyi3z.
+
+  Alphabet:
+
+    O : [] --> b 
+    add : [b * c] --> c 
+    app : [c * c] --> c 
+    eq : [b * b] --> a 
+    false : [] --> a 
+    filter : [b -> a * c] --> c 
+    filter2 : [a * b -> a * b * c] --> c 
+    if!6220min : [a * c] --> b 
+    if!6220minsort : [a * c * c] --> c 
+    if!6220rm : [a * b * c] --> c 
+    le : [b * b] --> a 
+    map : [b -> b * c] --> c 
+    min : [c] --> b 
+    minsort : [c * c] --> c 
+    nil : [] --> c 
+    rm : [b * c] --> c 
+    s : [b] --> b 
+    true : [] --> a 
+
+  Rules:
+
+    eq(O, O) => true 
+    eq(O, s(X)) => false 
+    eq(s(X), O) => false 
+    eq(s(X), s(Y)) => eq(X, Y) 
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    app(nil, X) => X 
+    app(add(X, Y), Z) => add(X, app(Y, Z)) 
+    min(add(X, nil)) => X 
+    min(add(X, add(Y, Z))) => if!6220min(le(X, Y), add(X, add(Y, Z))) 
+    if!6220min(true, add(X, add(Y, Z))) => min(add(X, Z)) 
+    if!6220min(false, add(X, add(Y, Z))) => min(add(Y, Z)) 
+    rm(X, nil) => nil 
+    rm(X, add(Y, Z)) => if!6220rm(eq(X, Y), X, add(Y, Z)) 
+    if!6220rm(true, X, add(Y, Z)) => rm(X, Z) 
+    if!6220rm(false, X, add(Y, Z)) => add(Y, rm(X, Z)) 
+    minsort(nil, nil) => nil 
+    minsort(add(X, Y), Z) => if!6220minsort(eq(X, min(add(X, Y))), add(X, Y), Z) 
+    if!6220minsort(true, add(X, Y), Z) => add(X, minsort(app(rm(X, Y), Z), nil)) 
+    if!6220minsort(false, add(X, Y), Z) => minsort(Y, add(X, Z)) 
+    map(F, nil) => nil 
+    map(F, add(X, Y)) => add(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, add(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => add(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We observe that the rules contain a first-order subset:
+
+  eq(O, O) => true 
+  eq(O, s(X)) => false 
+  eq(s(X), O) => false 
+  eq(s(X), s(Y)) => eq(X, Y) 
+  le(O, X) => true 
+  le(s(X), O) => false 
+  le(s(X), s(Y)) => le(X, Y) 
+  app(nil, X) => X 
+  app(add(X, Y), Z) => add(X, app(Y, Z)) 
+  min(add(X, nil)) => X 
+  min(add(X, add(Y, Z))) => if!6220min(le(X, Y), add(X, add(Y, Z))) 
+  if!6220min(true, add(X, add(Y, Z))) => min(add(X, Z)) 
+  if!6220min(false, add(X, add(Y, Z))) => min(add(Y, Z)) 
+  rm(X, nil) => nil 
+  rm(X, add(Y, Z)) => if!6220rm(eq(X, Y), X, add(Y, Z)) 
+  if!6220rm(true, X, add(Y, Z)) => rm(X, Z) 
+  if!6220rm(false, X, add(Y, Z)) => add(Y, rm(X, Z)) 
+  minsort(nil, nil) => nil 
+  minsort(add(X, Y), Z) => if!6220minsort(eq(X, min(add(X, Y))), add(X, Y), Z) 
+  if!6220minsort(true, add(X, Y), Z) => add(X, minsort(app(rm(X, Y), Z), nil)) 
+  if!6220minsort(false, add(X, Y), Z) => minsort(Y, add(X, Z)) 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: eq(O(),O()) -> true()
+ ||     2: eq(O(),s(PeRCenTX)) -> false()
+ ||     3: eq(s(PeRCenTX),O()) -> false()
+ ||     4: eq(s(PeRCenTX),s(PeRCenTY)) -> eq(PeRCenTX,PeRCenTY)
+ ||     5: le(O(),PeRCenTX) -> true()
+ ||     6: le(s(PeRCenTX),O()) -> false()
+ ||     7: le(s(PeRCenTX),s(PeRCenTY)) -> le(PeRCenTX,PeRCenTY)
+ ||     8: app(nil(),PeRCenTX) -> PeRCenTX
+ ||     9: app(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> add(PeRCenTX,app(PeRCenTY,PeRCenTZ))
+ ||     10: min(add(PeRCenTX,nil())) -> PeRCenTX
+ ||     11: min(add(PeRCenTX,add(PeRCenTY,PeRCenTZ))) -> if!6220min(le(PeRCenTX,PeRCenTY),add(PeRCenTX,add(PeRCenTY,PeRCenTZ)))
+ ||     12: if!6220min(true(),add(PeRCenTX,add(PeRCenTY,PeRCenTZ))) -> min(add(PeRCenTX,PeRCenTZ))
+ ||     13: if!6220min(false(),add(PeRCenTX,add(PeRCenTY,PeRCenTZ))) -> min(add(PeRCenTY,PeRCenTZ))
+ ||     14: rm(PeRCenTX,nil()) -> nil()
+ ||     15: rm(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> if!6220rm(eq(PeRCenTX,PeRCenTY),PeRCenTX,add(PeRCenTY,PeRCenTZ))
+ ||     16: if!6220rm(true(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> rm(PeRCenTX,PeRCenTZ)
+ ||     17: if!6220rm(false(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> add(PeRCenTY,rm(PeRCenTX,PeRCenTZ))
+ ||     18: minsort(nil(),nil()) -> nil()
+ ||     19: minsort(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> if!6220minsort(eq(PeRCenTX,min(add(PeRCenTX,PeRCenTY))),add(PeRCenTX,PeRCenTY),PeRCenTZ)
+ ||     20: if!6220minsort(true(),add(PeRCenTX,PeRCenTY),PeRCenTZ) -> add(PeRCenTX,minsort(app(rm(PeRCenTX,PeRCenTY),PeRCenTZ),nil()))
+ ||     21: if!6220minsort(false(),add(PeRCenTX,PeRCenTY),PeRCenTZ) -> minsort(PeRCenTY,add(PeRCenTX,PeRCenTZ))
+ || Number of strict rules: 21
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying min
+ || 1: eq(O(),O()) -> true()
+ || 2: eq(O(),s(PeRCenTX)) -> false()
+ || 3: eq(s(PeRCenTX),O()) -> false()
+ || 4: eq(s(PeRCenTX),s(PeRCenTY)) -> eq(PeRCenTX,PeRCenTY)
+ || 5: le(O(),PeRCenTX) -> true()
+ || 6: le(s(PeRCenTX),O()) -> false()
+ || 7: le(s(PeRCenTX),s(PeRCenTY)) -> le(PeRCenTX,PeRCenTY)
+ || 8: app(nil(),PeRCenTX) -> PeRCenTX
+ || 9: app(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> add(PeRCenTX,app(PeRCenTY,PeRCenTZ))
+ || 10: min^1_add(PeRCenTX,nil()) -> PeRCenTX
+ || 11: min^1_add(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> if!6220min(le(PeRCenTX,PeRCenTY),add(PeRCenTX,add(PeRCenTY,PeRCenTZ)))
+ || 12: if!6220min(true(),add(PeRCenTX,add(PeRCenTY,PeRCenTZ))) -> min^1_add(PeRCenTX,PeRCenTZ)
+ || 13: if!6220min(false(),add(PeRCenTX,add(PeRCenTY,PeRCenTZ))) -> min^1_add(PeRCenTY,PeRCenTZ)
+ || 14: rm(PeRCenTX,nil()) -> nil()
+ || 15: rm(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> if!6220rm(eq(PeRCenTX,PeRCenTY),PeRCenTX,add(PeRCenTY,PeRCenTZ))
+ || 16: if!6220rm(true(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> rm(PeRCenTX,PeRCenTZ)
+ || 17: if!6220rm(false(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> add(PeRCenTY,rm(PeRCenTX,PeRCenTZ))
+ || 18: minsort(nil(),nil()) -> nil()
+ || 19: minsort(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> if!6220minsort(eq(PeRCenTX,min^1_add(PeRCenTX,PeRCenTY)),add(PeRCenTX,PeRCenTY),PeRCenTZ)
+ || 20: if!6220minsort(true(),add(PeRCenTX,PeRCenTY),PeRCenTZ) -> add(PeRCenTX,minsort(app(rm(PeRCenTX,PeRCenTY),PeRCenTZ),nil()))
+ || 21: if!6220minsort(false(),add(PeRCenTX,PeRCenTY),PeRCenTZ) -> minsort(PeRCenTY,add(PeRCenTX,PeRCenTZ))
+ || 22: min(add(_1,_2)) ->= min^1_add(_1,_2)
+ || Number of strict rules: 21
+ || Direct POLO(bPol) ... failed.
+ || Dependency Pairs:
+ ||    #1: #if!6220min(false(),add(PeRCenTX,add(PeRCenTY,PeRCenTZ))) -> #min^1_add(PeRCenTY,PeRCenTZ)
+ ||    #2: #app(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> #app(PeRCenTY,PeRCenTZ)
+ ||    #3: #min^1_add(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #if!6220min(le(PeRCenTX,PeRCenTY),add(PeRCenTX,add(PeRCenTY,PeRCenTZ)))
+ ||    #4: #min^1_add(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #le(PeRCenTX,PeRCenTY)
+ ||    #5: #if!6220min(true(),add(PeRCenTX,add(PeRCenTY,PeRCenTZ))) -> #min^1_add(PeRCenTX,PeRCenTZ)
+ ||    #6: #if!6220minsort(true(),add(PeRCenTX,PeRCenTY),PeRCenTZ) -> #minsort(app(rm(PeRCenTX,PeRCenTY),PeRCenTZ),nil())
+ ||    #7: #if!6220minsort(true(),add(PeRCenTX,PeRCenTY),PeRCenTZ) -> #app(rm(PeRCenTX,PeRCenTY),PeRCenTZ)
+ ||    #8: #if!6220minsort(true(),add(PeRCenTX,PeRCenTY),PeRCenTZ) -> #rm(PeRCenTX,PeRCenTY)
+ ||    #9: #le(s(PeRCenTX),s(PeRCenTY)) -> #le(PeRCenTX,PeRCenTY)
+ ||    #10: #min(add(_1,_2)) ->? #min^1_add(_1,_2)
+ ||    #11: #if!6220rm(false(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #rm(PeRCenTX,PeRCenTZ)
+ ||    #12: #minsort(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> #if!6220minsort(eq(PeRCenTX,min^1_add(PeRCenTX,PeRCenTY)),add(PeRCenTX,PeRCenTY),PeRCenTZ)
+ ||    #13: #minsort(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> #eq(PeRCenTX,min^1_add(PeRCenTX,PeRCenTY))
+ ||    #14: #minsort(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> #min^1_add(PeRCenTX,PeRCenTY)
+ ||    #15: #if!6220minsort(false(),add(PeRCenTX,PeRCenTY),PeRCenTZ) -> #minsort(PeRCenTY,add(PeRCenTX,PeRCenTZ))
+ ||    #16: #if!6220rm(true(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #rm(PeRCenTX,PeRCenTZ)
+ ||    #17: #rm(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #if!6220rm(eq(PeRCenTX,PeRCenTY),PeRCenTX,add(PeRCenTY,PeRCenTZ))
+ ||    #18: #rm(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #eq(PeRCenTX,PeRCenTY)
+ ||    #19: #eq(s(PeRCenTX),s(PeRCenTY)) -> #eq(PeRCenTX,PeRCenTY)
+ || Number of SCCs: 6, DPs: 12
+ ||   SCC { #19 }
+ || POLO(Sum)... succeeded.
+ ||       #if!6220min	w: 0
+ ||       le	w: 0
+ ||       s 	w: x1 + 1
+ ||       #le	w: 0
+ ||       #if!6220minsort	w: 0
+ ||       eq	w: 0
+ ||       false	w: 0
+ ||       #min	w: 0
+ ||       if!6220min	w: 0
+ ||       min^1_add	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       #eq	w: x1 + x2
+ ||       nil	w: 0
+ ||       #app	w: 0
+ ||       min	w: 0
+ ||       if!6220minsort	w: 0
+ ||       #min^1_add	w: 0
+ ||       #minsort	w: 0
+ ||       add	w: 0
+ ||       #if!6220rm	w: 0
+ ||       if!6220rm	w: 0
+ ||       minsort	w: 0
+ ||       rm	w: 0
+ ||       #rm	w: 0
+ ||       app	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #19
+ || Number of SCCs: 5, DPs: 11
+ ||   SCC { #9 }
+ || POLO(Sum)... succeeded.
+ ||       #if!6220min	w: 0
+ ||       le	w: 0
+ ||       s 	w: x1 + 1
+ ||       #le	w: x1
+ ||       #if!6220minsort	w: 0
+ ||       eq	w: 0
+ ||       false	w: 0
+ ||       #min	w: 0
+ ||       if!6220min	w: 0
+ ||       min^1_add	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       #eq	w: 0
+ ||       nil	w: 0
+ ||       #app	w: 0
+ ||       min	w: 0
+ ||       if!6220minsort	w: 0
+ ||       #min^1_add	w: 0
+ ||       #minsort	w: 0
+ ||       add	w: 0
+ ||       #if!6220rm	w: 0
+ ||       if!6220rm	w: 0
+ ||       minsort	w: 0
+ ||       rm	w: 0
+ ||       #rm	w: 0
+ ||       app	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #9
+ || Number of SCCs: 4, DPs: 10
+ ||   SCC { #2 }
+ || POLO(Sum)... succeeded.
+ ||       #if!6220min	w: 0
+ ||       le	w: 0
+ ||       s 	w: 1
+ ||       #le	w: 0
+ ||       #if!6220minsort	w: 0
+ ||       eq	w: 0
+ ||       false	w: 0
+ ||       #min	w: 0
+ ||       if!6220min	w: 0
+ ||       min^1_add	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       #eq	w: 0
+ ||       nil	w: 0
+ ||       #app	w: x1
+ ||       min	w: 0
+ ||       if!6220minsort	w: 0
+ ||       #min^1_add	w: 0
+ ||       #minsort	w: 0
+ ||       add	w: x2 + 1
+ ||       #if!6220rm	w: 0
+ ||       if!6220rm	w: 0
+ ||       minsort	w: 0
+ ||       rm	w: 0
+ ||       #rm	w: 0
+ ||       app	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #2
+ || Number of SCCs: 3, DPs: 9
+ ||   SCC { #11 #16 #17 }
+ || POLO(Sum)... succeeded.
+ ||       #if!6220min	w: 0
+ ||       le	w: 0
+ ||       s 	w: x1 + 1
+ ||       #le	w: 0
+ ||       #if!6220minsort	w: 0
+ ||       eq	w: x1 + x2 + 1
+ ||       false	w: 4
+ ||       #min	w: 0
+ ||       if!6220min	w: 0
+ ||       min^1_add	w: 0
+ ||       O 	w: 1
+ ||       true	w: 4
+ ||       #eq	w: 0
+ ||       nil	w: 0
+ ||       #app	w: 0
+ ||       min	w: 0
+ ||       if!6220minsort	w: 0
+ ||       #min^1_add	w: 0
+ ||       #minsort	w: 0
+ ||       add	w: x2 + 2
+ ||       #if!6220rm	w: x2 + x3
+ ||       if!6220rm	w: 0
+ ||       minsort	w: 0
+ ||       rm	w: 0
+ ||       #rm	w: x1 + x2 + 1
+ ||       app	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #11 #16 #17
+ || Number of SCCs: 2, DPs: 6
+ ||   SCC { #1 #3 #5 }
+ || POLO(Sum)... succeeded.
+ ||       #if!6220min	w: x1 + x2
+ ||       le	w: 3
+ ||       s 	w: x1 + 1
+ ||       #le	w: 0
+ ||       #if!6220minsort	w: 0
+ ||       eq	w: x1 + x2
+ ||       false	w: 3
+ ||       #min	w: 0
+ ||       if!6220min	w: 0
+ ||       min^1_add	w: 0
+ ||       O 	w: 1
+ ||       true	w: 3
+ ||       #eq	w: 0
+ ||       nil	w: 0
+ ||       #app	w: 0
+ ||       min	w: 0
+ ||       if!6220minsort	w: 0
+ ||       #min^1_add	w: x2 + 6
+ ||       #minsort	w: 0
+ ||       add	w: x2 + 2
+ ||       #if!6220rm	w: 0
+ ||       if!6220rm	w: 0
+ ||       minsort	w: 0
+ ||       rm	w: 0
+ ||       #rm	w: 1
+ ||       app	w: 0
+ ||     USABLE RULES: { 5..7 }
+ ||     Removed DPs: #1 #3 #5
+ || Number of SCCs: 1, DPs: 3
+ ||   SCC { #6 #12 #15 }
+ || POLO(Sum)... succeeded.
+ ||       #if!6220min	w: 0
+ ||       le	w: x1 + 1
+ ||       s 	w: 3
+ ||       #le	w: 0
+ ||       #if!6220minsort	w: x1 + x2 + x3
+ ||       eq	w: 1
+ ||       false	w: 1
+ ||       #min	w: 0
+ ||       if!6220min	w: x1 + 1
+ ||       min^1_add	w: 1
+ ||       O 	w: 3
+ ||       true	w: 1
+ ||       #eq	w: 0
+ ||       nil	w: 1
+ ||       #app	w: 0
+ ||       min	w: 0
+ ||       if!6220minsort	w: 0
+ ||       #min^1_add	w: 6
+ ||       #minsort	w: x1 + x2 + 1
+ ||       add	w: x1 + x2 + 4
+ ||       #if!6220rm	w: 0
+ ||       if!6220rm	w: x2 + x3 + 1
+ ||       minsort	w: 0
+ ||       rm	w: x1 + x2 + 1
+ ||       #rm	w: 1
+ ||       app	w: x1 + x2 + 1
+ ||     USABLE RULES: { 1..6 8 9 14..17 }
+ ||     Removed DPs: #6
+ || Number of SCCs: 1, DPs: 2
+ ||   SCC { #12 #15 }
+ || POLO(Sum)... succeeded.
+ ||       #if!6220min	w: 0
+ ||       le	w: x1 + 1
+ ||       s 	w: 3
+ ||       #le	w: 0
+ ||       #if!6220minsort	w: x1 + x2
+ ||       eq	w: 1
+ ||       false	w: 1
+ ||       #min	w: 0
+ ||       if!6220min	w: x1 + x2
+ ||       min^1_add	w: x2 + 1
+ ||       O 	w: 3
+ ||       true	w: 1
+ ||       #eq	w: 0
+ ||       nil	w: 1
+ ||       #app	w: 0
+ ||       min	w: 0
+ ||       if!6220minsort	w: 0
+ ||       #min^1_add	w: 6
+ ||       #minsort	w: x1 + 2
+ ||       add	w: x1 + x2 + 4
+ ||       #if!6220rm	w: 0
+ ||       if!6220rm	w: x2 + x3 + 1
+ ||       minsort	w: 0
+ ||       rm	w: x1 + x2 + 1
+ ||       #rm	w: 1
+ ||       app	w: x1 + x2 + 1
+ ||     USABLE RULES: { 1..6 8 9 14..17 }
+ ||     Removed DPs: #12 #15
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] map#(F, add(X, Y)) =#> map#(F, Y)   
+    1] filter#(F, add(X, Y)) =#> filter2#(F X, F, X, Y)   
+    2] filter2#(true, F, X, Y) =#> filter#(F, Y)   
+    3] filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+  Rules R_0:
+
+    eq(O, O) => true 
+    eq(O, s(X)) => false 
+    eq(s(X), O) => false 
+    eq(s(X), s(Y)) => eq(X, Y) 
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    app(nil, X) => X 
+    app(add(X, Y), Z) => add(X, app(Y, Z)) 
+    min(add(X, nil)) => X 
+    min(add(X, add(Y, Z))) => if!6220min(le(X, Y), add(X, add(Y, Z))) 
+    if!6220min(true, add(X, add(Y, Z))) => min(add(X, Z)) 
+    if!6220min(false, add(X, add(Y, Z))) => min(add(Y, Z)) 
+    rm(X, nil) => nil 
+    rm(X, add(Y, Z)) => if!6220rm(eq(X, Y), X, add(Y, Z)) 
+    if!6220rm(true, X, add(Y, Z)) => rm(X, Z) 
+    if!6220rm(false, X, add(Y, Z)) => add(Y, rm(X, Z)) 
+    minsort(nil, nil) => nil 
+    minsort(add(X, Y), Z) => if!6220minsort(eq(X, min(add(X, Y))), add(X, Y), Z) 
+    if!6220minsort(true, add(X, Y), Z) => add(X, minsort(app(rm(X, Y), Z), nil)) 
+    if!6220minsort(false, add(X, Y), Z) => minsort(Y, add(X, Z)) 
+    map(F, nil) => nil 
+    map(F, add(X, Y)) => add(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, add(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => add(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0 
+    * 1 : 2, 3 
+    * 2 : 1 
+    * 3 : 1 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    map#(F, add(X, Y)) =#> map#(F, Y)   
+
+  P_2:
+
+    filter#(F, add(X, Y)) =#> filter2#(F X, F, X, Y)   
+    filter2#(true, F, X, Y) =#> filter#(F, Y)   
+    filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f) and (P_2, R_0, m, f).
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_2, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(filter2#) = 4 
+  nu(filter#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(filter#(F, add(X, Y))) = add(X, Y) |> Y = nu(filter2#(F X, F, X, Y)) 
+  nu(filter2#(true, F, X, Y)) = Y = Y = nu(filter#(F, Y)) 
+  nu(filter2#(false, F, X, Y)) = Y = Y = nu(filter#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_2, R_0, computable, f) by (P_3, R_0, computable, f), where P_3 contains:
+
+  filter2#(true, F, X, Y) =#> filter#(F, Y)   
+  filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_3, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_3, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+    * 1 :  
+
+This graph has no strongly connected components.  By [Kop12, Thm. 7.31], this implies finiteness of the dependency pair problem.
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(map#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(map#(F, add(X, Y))) = add(X, Y) |> Y = nu(map#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

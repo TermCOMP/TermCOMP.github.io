@@ -1,0 +1,100 @@
+YES
+We consider the system DH9u6.
+
+  Alphabet:
+
+    O : [] --> o 
+    either : [o * o] --> o 
+    f : [o -> o * o * o] --> o 
+    g : [o * o] --> o 
+    s : [o] --> o 
+
+  Rules:
+
+    f(F, X, O) => O 
+    f(F, X, s(Y)) => g(Y, either(Y, F X)) 
+    g(X, Y) => f(/\x.s(O), Y, X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  f(F, X, O) >? O 
+  f(F, X, s(Y)) >? g(Y, either(Y, F X)) 
+  g(X, Y) >? f(/\x.s(O), Y, X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  either = Lam[y0;y1].y0 + y1 
+  f = Lam[G0;y1;y2].1 + y1 + 2*y2 + G0(y1) 
+  g = Lam[y0;y1].1 + y1 + 2*y0 
+  s = Lam[y0].2*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[f(_F0, _x1, O)]] = 1 + x1 + F0(x1) > 0 = [[O]] 
+  [[f(_F0, _x1, s(_x2))]] = 1 + x1 + 4*x2 + F0(x1) >= 1 + x1 + 3*x2 + F0(x1) = [[g(_x2, either(_x2, _F0 _x1))]] 
+  [[g(_x0, _x1)]] = 1 + x1 + 2*x0 >= 1 + x1 + 2*x0 = [[f(/\x.s(O), _x1, _x0)]] 
+
+We can thus remove the following rules:
+
+  f(F, X, O) => O 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  f(F, X, s(Y)) >? g(Y, either(Y, F X)) 
+  g(X, Y) >? f(/\x.s(O), Y, X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  either = Lam[y0;y1].y0 + y1 
+  f = Lam[G0;y1;y2].2*y1 + 3*y2 + 2*G0(y1) 
+  g = Lam[y0;y1].2 + 2*y1 + 3*y0 
+  s = Lam[y0].1 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[f(_F0, _x1, s(_x2))]] = 3 + 2*x1 + 9*x2 + 2*F0(x1) > 2 + 2*x1 + 5*x2 + 2*F0(x1) = [[g(_x2, either(_x2, _F0 _x1))]] 
+  [[g(_x0, _x1)]] = 2 + 2*x1 + 3*x0 >= 2 + 2*x1 + 3*x0 = [[f(/\x.s(O), _x1, _x0)]] 
+
+We can thus remove the following rules:
+
+  f(F, X, s(Y)) => g(Y, either(Y, F X)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  g(X, Y) >? f(/\x.s(O), Y, X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  f = Lam[G0;y1;y2].y1 + y2 + G0(0) 
+  g = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  s = Lam[y0].y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[g(_x0, _x1)]] = 3 + 3*x0 + 3*x1 > x0 + x1 = [[f(/\x.s(O), _x1, _x0)]] 
+
+We can thus remove the following rules:
+
+  g(X, Y) => f(/\x.s(O), Y, X) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

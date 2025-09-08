@@ -1,0 +1,326 @@
+Graph construction failed
+Graph construction failed
+Graph construction failed
+MAYBE
+proof of /hpcwork/ff862203/termcomp25/benchmarks/yGk40.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+numvars(a,g,a)
+
+w.r.t. the given Prolog program could not be shown:
+
+(0) Prolog
+(1) IntegerArithmeticTransformerProof [SOUND, 0 ms]
+(2) Prolog
+    (3) CutEliminatorProof [SOUND, 0 ms]
+    (4) Prolog
+    (5) UnifyTransformerProof [EQUIVALENT, 0 ms]
+    (6) Prolog
+    (7) UndefinedPredicateHandlerProof [SOUND, 0 ms]
+    (8) Prolog
+(9) CutEliminatorProof [SOUND, 0 ms]
+(10) Prolog
+    (11) UnifyTransformerProof [EQUIVALENT, 0 ms]
+    (12) Prolog
+    (13) UndefinedPredicateHandlerProof [SOUND, 0 ms]
+    (14) Prolog
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+numvars(Term, N, N1) :- ','(var(Term), ','(!, ','(=(Term, /(var, N)), is(N1, +(N, 1))))).
+numvars(Term, N, M) :- ','(=..(Term, .(_Functor, Args)), numberargs(Args, N, M)).
+numberargs([], N, N) :- !.
+numberargs(.(Arg, Args), N, M) :- ','(numvars(Arg, N, N1), numberargs(Args, N1, M)).
+numvars2(var(N), N, N1) :- is(N1, +(N, 1)).
+numvars2(Term, N, M) :- ','(nonvar(Term), ','(=..(Term, .(_Functor, Args)), numberargs2(Args, N, M))).
+numberargs2([], N, N).
+numberargs2(.(Arg, Args), N, M) :- ','(numvars2(Arg, N, N1), numberargs2(Args, N1, M)).
+
+
+Query: numvars(a,g,a)
+----------------------------------------
+
+(1) IntegerArithmeticTransformerProof (SOUND)
+Added definitions of predefined predicates [PROLOG].
+----------------------------------------
+
+(2)
+Obligation:
+Clauses:
+
+numvars(Term, N, N1) :- ','(var(Term), ','(!, ','(=(Term, /(var, N)), ','(isPlus(N, succ(zero), U), =(N1, U))))).
+numvars(Term, N, M) :- ','(=..(Term, .(_Functor, Args)), numberargs(Args, N, M)).
+numberargs([], N, N) :- !.
+numberargs(.(Arg, Args), N, M) :- ','(numvars(Arg, N, N1), numberargs(Args, N1, M)).
+numvars2(var(N), N, N1) :- ','(isPlus(N, succ(zero), U), =(N1, U)).
+numvars2(Term, N, M) :- ','(nonvar(Term), ','(=..(Term, .(_Functor, Args)), numberargs2(Args, N, M))).
+numberargs2([], N, N).
+numberargs2(.(Arg, Args), N, M) :- ','(numvars2(Arg, N, N1), numberargs2(Args, N1, M)).
+isPlus(zero, X, X).
+isPlus(succ(X), zero, succ(X)).
+isPlus(succ(X), succ(Y), succ(succ(Z))) :- isPlus(X, Y, Z).
+isPlus(succ(X), pred(Y), Z) :- isPlus(X, Y, Z).
+isPlus(pred(X), zero, pred(X)).
+isPlus(pred(X), succ(Y), Z) :- isPlus(X, Y, Z).
+isPlus(pred(X), pred(Y), pred(pred(Z))) :- isPlus(X, Y, Z).
+isMinus(X, zero, X).
+isMinus(zero, succ(Y), pred(Z)) :- isMinus(zero, Y, Z).
+isMinus(zero, pred(Y), succ(Z)) :- isMinus(zero, Y, Z).
+isMinus(succ(X), succ(Y), Z) :- isMinus(X, Y, Z).
+isMinus(succ(X), pred(Y), succ(succ(Z))) :- isMinus(X, Y, Z).
+isMinus(pred(X), succ(Y), pred(pred(Z))) :- isMinus(X, Y, Z).
+isMinus(pred(X), pred(Y), Z) :- isMinus(X, Y, Z).
+isTimes(X, zero, zero).
+isTimes(zero, succ(Y), zero).
+isTimes(zero, pred(Y), zero).
+isTimes(succ(X), succ(Y), Z) :- ','(isTimes(succ(X), Y, A), isPlus(A, succ(X), Z)).
+isTimes(succ(X), pred(Y), Z) :- ','(isTimes(succ(X), Y, A), isMinus(A, succ(X), Z)).
+isTimes(pred(X), succ(Y), Z) :- ','(isTimes(pred(X), Y, A), isPlus(A, pred(X), Z)).
+isTimes(pred(X), pred(Y), Z) :- ','(isTimes(pred(X), Y, A), isMinus(A, pred(X), Z)).
+isDiv(zero, succ(Y), zero).
+isDiv(zero, pred(Y), zero).
+isDiv(succ(X), succ(Y), zero) :- isMinus(succ(X), succ(Y), pred(Z)).
+isDiv(succ(X), succ(Y), succ(Z)) :- ','(isMinus(succ(X), succ(Y), A), isDiv(A, succ(Y), Z)).
+isDiv(succ(X), pred(Y), Z) :- ','(isMinus(zero, pred(Y), A), ','(isDiv(succ(X), A, B), isMinus(zero, B, Z))).
+isDiv(pred(X), pred(Y), zero) :- isMinus(pred(X), pred(Y), succ(Z)).
+isDiv(pred(X), pred(Y), succ(Z)) :- ','(isMinus(pred(X), pred(Y), A), isDiv(A, pred(Y), Z)).
+isDiv(pred(X), succ(Y), Z) :- ','(isMinus(zero, pred(X), A), ','(isDiv(A, succ(Y), B), isMinus(zero, B, Z))).
+isModulo(X, Y, Z) :- ','(isDiv(X, Y, A), ','(isTimes(A, Y, B), isMinus(X, B, Z))).
+
+
+Query: numvars(a,g,a)
+----------------------------------------
+
+(3) CutEliminatorProof (SOUND)
+Eliminated all cuts by simply ignoring them[PROLOG].
+----------------------------------------
+
+(4)
+Obligation:
+Clauses:
+
+numvars(Term, N, N1) :- ','(var(Term), ','(=(Term, /(var, N)), ','(isPlus(N, succ(zero), U), =(N1, U)))).
+numvars(Term, N, M) :- ','(=..(Term, .(_Functor, Args)), numberargs(Args, N, M)).
+numberargs([], N, N).
+numberargs(.(Arg, Args), N, M) :- ','(numvars(Arg, N, N1), numberargs(Args, N1, M)).
+numvars2(var(N), N, N1) :- ','(isPlus(N, succ(zero), U), =(N1, U)).
+numvars2(Term, N, M) :- ','(nonvar(Term), ','(=..(Term, .(_Functor, Args)), numberargs2(Args, N, M))).
+numberargs2([], N, N).
+numberargs2(.(Arg, Args), N, M) :- ','(numvars2(Arg, N, N1), numberargs2(Args, N1, M)).
+isPlus(zero, X, X).
+isPlus(succ(X), zero, succ(X)).
+isPlus(succ(X), succ(Y), succ(succ(Z))) :- isPlus(X, Y, Z).
+isPlus(succ(X), pred(Y), Z) :- isPlus(X, Y, Z).
+isPlus(pred(X), zero, pred(X)).
+isPlus(pred(X), succ(Y), Z) :- isPlus(X, Y, Z).
+isPlus(pred(X), pred(Y), pred(pred(Z))) :- isPlus(X, Y, Z).
+isMinus(X, zero, X).
+isMinus(zero, succ(Y), pred(Z)) :- isMinus(zero, Y, Z).
+isMinus(zero, pred(Y), succ(Z)) :- isMinus(zero, Y, Z).
+isMinus(succ(X), succ(Y), Z) :- isMinus(X, Y, Z).
+isMinus(succ(X), pred(Y), succ(succ(Z))) :- isMinus(X, Y, Z).
+isMinus(pred(X), succ(Y), pred(pred(Z))) :- isMinus(X, Y, Z).
+isMinus(pred(X), pred(Y), Z) :- isMinus(X, Y, Z).
+isTimes(X, zero, zero).
+isTimes(zero, succ(Y), zero).
+isTimes(zero, pred(Y), zero).
+isTimes(succ(X), succ(Y), Z) :- ','(isTimes(succ(X), Y, A), isPlus(A, succ(X), Z)).
+isTimes(succ(X), pred(Y), Z) :- ','(isTimes(succ(X), Y, A), isMinus(A, succ(X), Z)).
+isTimes(pred(X), succ(Y), Z) :- ','(isTimes(pred(X), Y, A), isPlus(A, pred(X), Z)).
+isTimes(pred(X), pred(Y), Z) :- ','(isTimes(pred(X), Y, A), isMinus(A, pred(X), Z)).
+isDiv(zero, succ(Y), zero).
+isDiv(zero, pred(Y), zero).
+isDiv(succ(X), succ(Y), zero) :- isMinus(succ(X), succ(Y), pred(Z)).
+isDiv(succ(X), succ(Y), succ(Z)) :- ','(isMinus(succ(X), succ(Y), A), isDiv(A, succ(Y), Z)).
+isDiv(succ(X), pred(Y), Z) :- ','(isMinus(zero, pred(Y), A), ','(isDiv(succ(X), A, B), isMinus(zero, B, Z))).
+isDiv(pred(X), pred(Y), zero) :- isMinus(pred(X), pred(Y), succ(Z)).
+isDiv(pred(X), pred(Y), succ(Z)) :- ','(isMinus(pred(X), pred(Y), A), isDiv(A, pred(Y), Z)).
+isDiv(pred(X), succ(Y), Z) :- ','(isMinus(zero, pred(X), A), ','(isDiv(A, succ(Y), B), isMinus(zero, B, Z))).
+isModulo(X, Y, Z) :- ','(isDiv(X, Y, A), ','(isTimes(A, Y, B), isMinus(X, B, Z))).
+
+
+Query: numvars(a,g,a)
+----------------------------------------
+
+(5) UnifyTransformerProof (EQUIVALENT)
+Added a fact for the built-in = predicate [PROLOG].
+----------------------------------------
+
+(6)
+Obligation:
+Clauses:
+
+numvars(Term, N, N1) :- ','(var(Term), ','(=(Term, /(var, N)), ','(isPlus(N, succ(zero), U), =(N1, U)))).
+numvars(Term, N, M) :- ','(=..(Term, .(_Functor, Args)), numberargs(Args, N, M)).
+numberargs([], N, N).
+numberargs(.(Arg, Args), N, M) :- ','(numvars(Arg, N, N1), numberargs(Args, N1, M)).
+numvars2(var(N), N, N1) :- ','(isPlus(N, succ(zero), U), =(N1, U)).
+numvars2(Term, N, M) :- ','(nonvar(Term), ','(=..(Term, .(_Functor, Args)), numberargs2(Args, N, M))).
+numberargs2([], N, N).
+numberargs2(.(Arg, Args), N, M) :- ','(numvars2(Arg, N, N1), numberargs2(Args, N1, M)).
+isPlus(zero, X, X).
+isPlus(succ(X), zero, succ(X)).
+isPlus(succ(X), succ(Y), succ(succ(Z))) :- isPlus(X, Y, Z).
+isPlus(succ(X), pred(Y), Z) :- isPlus(X, Y, Z).
+isPlus(pred(X), zero, pred(X)).
+isPlus(pred(X), succ(Y), Z) :- isPlus(X, Y, Z).
+isPlus(pred(X), pred(Y), pred(pred(Z))) :- isPlus(X, Y, Z).
+isMinus(X, zero, X).
+isMinus(zero, succ(Y), pred(Z)) :- isMinus(zero, Y, Z).
+isMinus(zero, pred(Y), succ(Z)) :- isMinus(zero, Y, Z).
+isMinus(succ(X), succ(Y), Z) :- isMinus(X, Y, Z).
+isMinus(succ(X), pred(Y), succ(succ(Z))) :- isMinus(X, Y, Z).
+isMinus(pred(X), succ(Y), pred(pred(Z))) :- isMinus(X, Y, Z).
+isMinus(pred(X), pred(Y), Z) :- isMinus(X, Y, Z).
+isTimes(X, zero, zero).
+isTimes(zero, succ(Y), zero).
+isTimes(zero, pred(Y), zero).
+isTimes(succ(X), succ(Y), Z) :- ','(isTimes(succ(X), Y, A), isPlus(A, succ(X), Z)).
+isTimes(succ(X), pred(Y), Z) :- ','(isTimes(succ(X), Y, A), isMinus(A, succ(X), Z)).
+isTimes(pred(X), succ(Y), Z) :- ','(isTimes(pred(X), Y, A), isPlus(A, pred(X), Z)).
+isTimes(pred(X), pred(Y), Z) :- ','(isTimes(pred(X), Y, A), isMinus(A, pred(X), Z)).
+isDiv(zero, succ(Y), zero).
+isDiv(zero, pred(Y), zero).
+isDiv(succ(X), succ(Y), zero) :- isMinus(succ(X), succ(Y), pred(Z)).
+isDiv(succ(X), succ(Y), succ(Z)) :- ','(isMinus(succ(X), succ(Y), A), isDiv(A, succ(Y), Z)).
+isDiv(succ(X), pred(Y), Z) :- ','(isMinus(zero, pred(Y), A), ','(isDiv(succ(X), A, B), isMinus(zero, B, Z))).
+isDiv(pred(X), pred(Y), zero) :- isMinus(pred(X), pred(Y), succ(Z)).
+isDiv(pred(X), pred(Y), succ(Z)) :- ','(isMinus(pred(X), pred(Y), A), isDiv(A, pred(Y), Z)).
+isDiv(pred(X), succ(Y), Z) :- ','(isMinus(zero, pred(X), A), ','(isDiv(A, succ(Y), B), isMinus(zero, B, Z))).
+isModulo(X, Y, Z) :- ','(isDiv(X, Y, A), ','(isTimes(A, Y, B), isMinus(X, B, Z))).
+=(X, X).
+
+
+Query: numvars(a,g,a)
+----------------------------------------
+
+(7) UndefinedPredicateHandlerProof (SOUND)
+Added facts for all undefined predicates [PROLOG].
+----------------------------------------
+
+(8)
+Obligation:
+Clauses:
+
+numvars(Term, N, N1) :- ','(var(Term), ','(=(Term, /(var, N)), ','(isPlus(N, succ(zero), U), =(N1, U)))).
+numvars(Term, N, M) :- ','(=..(Term, .(_Functor, Args)), numberargs(Args, N, M)).
+numberargs([], N, N).
+numberargs(.(Arg, Args), N, M) :- ','(numvars(Arg, N, N1), numberargs(Args, N1, M)).
+numvars2(var(N), N, N1) :- ','(isPlus(N, succ(zero), U), =(N1, U)).
+numvars2(Term, N, M) :- ','(nonvar(Term), ','(=..(Term, .(_Functor, Args)), numberargs2(Args, N, M))).
+numberargs2([], N, N).
+numberargs2(.(Arg, Args), N, M) :- ','(numvars2(Arg, N, N1), numberargs2(Args, N1, M)).
+isPlus(zero, X, X).
+isPlus(succ(X), zero, succ(X)).
+isPlus(succ(X), succ(Y), succ(succ(Z))) :- isPlus(X, Y, Z).
+isPlus(succ(X), pred(Y), Z) :- isPlus(X, Y, Z).
+isPlus(pred(X), zero, pred(X)).
+isPlus(pred(X), succ(Y), Z) :- isPlus(X, Y, Z).
+isPlus(pred(X), pred(Y), pred(pred(Z))) :- isPlus(X, Y, Z).
+isMinus(X, zero, X).
+isMinus(zero, succ(Y), pred(Z)) :- isMinus(zero, Y, Z).
+isMinus(zero, pred(Y), succ(Z)) :- isMinus(zero, Y, Z).
+isMinus(succ(X), succ(Y), Z) :- isMinus(X, Y, Z).
+isMinus(succ(X), pred(Y), succ(succ(Z))) :- isMinus(X, Y, Z).
+isMinus(pred(X), succ(Y), pred(pred(Z))) :- isMinus(X, Y, Z).
+isMinus(pred(X), pred(Y), Z) :- isMinus(X, Y, Z).
+isTimes(X, zero, zero).
+isTimes(zero, succ(Y), zero).
+isTimes(zero, pred(Y), zero).
+isTimes(succ(X), succ(Y), Z) :- ','(isTimes(succ(X), Y, A), isPlus(A, succ(X), Z)).
+isTimes(succ(X), pred(Y), Z) :- ','(isTimes(succ(X), Y, A), isMinus(A, succ(X), Z)).
+isTimes(pred(X), succ(Y), Z) :- ','(isTimes(pred(X), Y, A), isPlus(A, pred(X), Z)).
+isTimes(pred(X), pred(Y), Z) :- ','(isTimes(pred(X), Y, A), isMinus(A, pred(X), Z)).
+isDiv(zero, succ(Y), zero).
+isDiv(zero, pred(Y), zero).
+isDiv(succ(X), succ(Y), zero) :- isMinus(succ(X), succ(Y), pred(Z)).
+isDiv(succ(X), succ(Y), succ(Z)) :- ','(isMinus(succ(X), succ(Y), A), isDiv(A, succ(Y), Z)).
+isDiv(succ(X), pred(Y), Z) :- ','(isMinus(zero, pred(Y), A), ','(isDiv(succ(X), A, B), isMinus(zero, B, Z))).
+isDiv(pred(X), pred(Y), zero) :- isMinus(pred(X), pred(Y), succ(Z)).
+isDiv(pred(X), pred(Y), succ(Z)) :- ','(isMinus(pred(X), pred(Y), A), isDiv(A, pred(Y), Z)).
+isDiv(pred(X), succ(Y), Z) :- ','(isMinus(zero, pred(X), A), ','(isDiv(A, succ(Y), B), isMinus(zero, B, Z))).
+isModulo(X, Y, Z) :- ','(isDiv(X, Y, A), ','(isTimes(A, Y, B), isMinus(X, B, Z))).
+=(X, X).
+var(X0).
+=..(X0, X1).
+nonvar(X0).
+
+
+Query: numvars(a,g,a)
+----------------------------------------
+
+(9) CutEliminatorProof (SOUND)
+Eliminated all cuts by simply ignoring them[PROLOG].
+----------------------------------------
+
+(10)
+Obligation:
+Clauses:
+
+numvars(Term, N, N1) :- ','(var(Term), ','(=(Term, /(var, N)), is(N1, +(N, 1)))).
+numvars(Term, N, M) :- ','(=..(Term, .(_Functor, Args)), numberargs(Args, N, M)).
+numberargs([], N, N).
+numberargs(.(Arg, Args), N, M) :- ','(numvars(Arg, N, N1), numberargs(Args, N1, M)).
+numvars2(var(N), N, N1) :- is(N1, +(N, 1)).
+numvars2(Term, N, M) :- ','(nonvar(Term), ','(=..(Term, .(_Functor, Args)), numberargs2(Args, N, M))).
+numberargs2([], N, N).
+numberargs2(.(Arg, Args), N, M) :- ','(numvars2(Arg, N, N1), numberargs2(Args, N1, M)).
+
+
+Query: numvars(a,g,a)
+----------------------------------------
+
+(11) UnifyTransformerProof (EQUIVALENT)
+Added a fact for the built-in = predicate [PROLOG].
+----------------------------------------
+
+(12)
+Obligation:
+Clauses:
+
+numvars(Term, N, N1) :- ','(var(Term), ','(=(Term, /(var, N)), is(N1, +(N, 1)))).
+numvars(Term, N, M) :- ','(=..(Term, .(_Functor, Args)), numberargs(Args, N, M)).
+numberargs([], N, N).
+numberargs(.(Arg, Args), N, M) :- ','(numvars(Arg, N, N1), numberargs(Args, N1, M)).
+numvars2(var(N), N, N1) :- is(N1, +(N, 1)).
+numvars2(Term, N, M) :- ','(nonvar(Term), ','(=..(Term, .(_Functor, Args)), numberargs2(Args, N, M))).
+numberargs2([], N, N).
+numberargs2(.(Arg, Args), N, M) :- ','(numvars2(Arg, N, N1), numberargs2(Args, N1, M)).
+=(X, X).
+
+
+Query: numvars(a,g,a)
+----------------------------------------
+
+(13) UndefinedPredicateHandlerProof (SOUND)
+Added facts for all undefined predicates [PROLOG].
+----------------------------------------
+
+(14)
+Obligation:
+Clauses:
+
+numvars(Term, N, N1) :- ','(var(Term), ','(=(Term, /(var, N)), is(N1, +(N, 1)))).
+numvars(Term, N, M) :- ','(=..(Term, .(_Functor, Args)), numberargs(Args, N, M)).
+numberargs([], N, N).
+numberargs(.(Arg, Args), N, M) :- ','(numvars(Arg, N, N1), numberargs(Args, N1, M)).
+numvars2(var(N), N, N1) :- is(N1, +(N, 1)).
+numvars2(Term, N, M) :- ','(nonvar(Term), ','(=..(Term, .(_Functor, Args)), numberargs2(Args, N, M))).
+numberargs2([], N, N).
+numberargs2(.(Arg, Args), N, M) :- ','(numvars2(Arg, N, N1), numberargs2(Args, N1, M)).
+=(X, X).
+var(X0).
+is(X0, X1).
+=..(X0, X1).
+nonvar(X0).
+
+
+Query: numvars(a,g,a)

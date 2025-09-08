@@ -1,0 +1,1449 @@
+MAYBE
+proof of /hpcwork/ff862203/termcomp25/benchmarks/ONK6y.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could not be shown:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 1017 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 25 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 50 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 10 ms]
+        (13) IRSwT
+        (14) IntTRSCompressionProof [EQUIVALENT, 2 ms]
+        (15) IRSwT
+        (16) TempFilterProof [SOUND, 83 ms]
+        (17) IRSwT
+        (18) IRSwTTerminationDigraphProof [EQUIVALENT, 5 ms]
+        (19) IRSwT
+    (20) JBCTerminationSCC
+        (21) SCCToIRSProof [SOUND, 78 ms]
+        (22) IRSwT
+        (23) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (24) IRSwT
+        (25) IRSwTTerminationDigraphProof [EQUIVALENT, 31 ms]
+        (26) IRSwT
+        (27) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (28) IRSwT
+        (29) TempFilterProof [SOUND, 226 ms]
+        (30) IRSwT
+        (31) IRSwTTerminationDigraphProof [EQUIVALENT, 0 ms]
+        (32) IRSwT
+        (33) IntTRSUnneededArgumentFilterProof [EQUIVALENT, 0 ms]
+        (34) IRSwT
+    (35) JBCTerminationSCC
+        (36) SCCToIRSProof [SOUND, 166 ms]
+        (37) IRSwT
+        (38) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (39) IRSwT
+        (40) IRSwTTerminationDigraphProof [EQUIVALENT, 151 ms]
+        (41) IRSwT
+        (42) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (43) IRSwT
+        (44) TempFilterProof [SOUND, 37 ms]
+        (45) IntTRS
+        (46) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (47) IntTRS
+        (48) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (49) IntTRS
+        (50) RankingReductionPairProof [EQUIVALENT, 0 ms]
+        (51) YES
+    (52) JBCTerminationSCC
+        (53) SCCToIRSProof [SOUND, 101 ms]
+        (54) IRSwT
+        (55) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (56) IRSwT
+        (57) IRSwTTerminationDigraphProof [EQUIVALENT, 11 ms]
+        (58) IRSwT
+        (59) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (60) IRSwT
+        (61) TempFilterProof [SOUND, 22 ms]
+        (62) IntTRS
+        (63) RankingReductionPairProof [EQUIVALENT, 0 ms]
+        (64) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+public class MarkingGraphVisitor {
+	private int mark;
+	private Object val;
+	private List children;
+
+	private static void visit(MarkingGraphVisitor node, int expectedMark) {
+		if (node.mark == expectedMark) {
+			node.mark = expectedMark + 1;
+			List curChild = node.children;
+			while (curChild != null) {
+				MarkingGraphVisitor child = curChild.val;
+				curChild = curChild.next;
+				if (child != null) {
+					visit(child, expectedMark);
+				}
+			}
+		}
+	}
+
+	public MarkingGraphVisitor(Object v, List c) {
+		this.mark = 0;
+		this.val = v;
+		this.children = c;
+	}
+
+	public static MarkingGraphVisitor createTree(int maxDepth) {
+		if (maxDepth <= 0) {
+			return null;
+		}
+
+		int numChildren = Random.random();
+		List children = null;
+		for (int i = numChildren; i > 0; i--) {
+			children = new List(createTree(maxDepth - 1), children);
+		}
+
+		return new MarkingGraphVisitor(null, children);
+	}
+
+	public MarkingGraphVisitor getRandom() {
+		int depth = Random.random();
+		MarkingGraphVisitor curEle = this;
+		while (depth-- >= 0 && curEle.children != null) {
+			int childNum = Random.random();
+			List curChild = curEle.children;
+			while (childNum-- >= 0 && curChild.next != null) { 
+				curChild = curChild.next;
+			}
+			curEle = curChild.val;
+		}
+		return curEle;
+	}
+
+	public static void main(String[] args) {
+		Random.args = args;
+
+
+		//Create graph as tree:
+		MarkingGraphVisitor graph = createTree(Random.random());
+
+		int interconnections = Random.random();
+		while (interconnections-- > 0) {
+			MarkingGraphVisitor rand1 = graph.getRandom();
+			MarkingGraphVisitor rand2 = graph.getRandom();
+			rand1.children = new List(rand2, rand1.children);
+		}
+
+		//Visit all elements:
+		visit(graph, graph.mark);
+	}
+}
+
+class List {
+	public MarkingGraphVisitor val;
+	public List next;
+
+	public List(MarkingGraphVisitor v, List n) {
+		this.val = v;
+		this.next = n;
+	}
+}
+
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+public class MarkingGraphVisitor {
+	private int mark;
+	private Object val;
+	private List children;
+
+	private static void visit(MarkingGraphVisitor node, int expectedMark) {
+		if (node.mark == expectedMark) {
+			node.mark = expectedMark + 1;
+			List curChild = node.children;
+			while (curChild != null) {
+				MarkingGraphVisitor child = curChild.val;
+				curChild = curChild.next;
+				if (child != null) {
+					visit(child, expectedMark);
+				}
+			}
+		}
+	}
+
+	public MarkingGraphVisitor(Object v, List c) {
+		this.mark = 0;
+		this.val = v;
+		this.children = c;
+	}
+
+	public static MarkingGraphVisitor createTree(int maxDepth) {
+		if (maxDepth <= 0) {
+			return null;
+		}
+
+		int numChildren = Random.random();
+		List children = null;
+		for (int i = numChildren; i > 0; i--) {
+			children = new List(createTree(maxDepth - 1), children);
+		}
+
+		return new MarkingGraphVisitor(null, children);
+	}
+
+	public MarkingGraphVisitor getRandom() {
+		int depth = Random.random();
+		MarkingGraphVisitor curEle = this;
+		while (depth-- >= 0 && curEle.children != null) {
+			int childNum = Random.random();
+			List curChild = curEle.children;
+			while (childNum-- >= 0 && curChild.next != null) { 
+				curChild = curChild.next;
+			}
+			curEle = curChild.val;
+		}
+		return curEle;
+	}
+
+	public static void main(String[] args) {
+		Random.args = args;
+
+
+		//Create graph as tree:
+		MarkingGraphVisitor graph = createTree(Random.random());
+
+		int interconnections = Random.random();
+		while (interconnections-- > 0) {
+			MarkingGraphVisitor rand1 = graph.getRandom();
+			MarkingGraphVisitor rand2 = graph.getRandom();
+			rand1.children = new List(rand2, rand1.children);
+		}
+
+		//Visit all elements:
+		visit(graph, graph.mark);
+	}
+}
+
+class List {
+	public MarkingGraphVisitor val;
+	public List next;
+
+	public List(MarkingGraphVisitor v, List n) {
+		this.val = v;
+		this.next = n;
+	}
+}
+
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+MarkingGraphVisitor.main([Ljava/lang/String;)V: Graph of 418 nodes with 1 SCC.
+
+
+
+MarkingGraphVisitor.createTree(I)LMarkingGraphVisitor;: Graph of 314 nodes with 1 SCC.
+
+
+
+MarkingGraphVisitor.getRandom()LMarkingGraphVisitor;: Graph of 262 nodes with 1 SCC.
+
+
+
+MarkingGraphVisitor.visit(LMarkingGraphVisitor;I)V: Graph of 44 nodes with 1 SCC.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 4 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: MarkingGraphVisitor.visit(LMarkingGraphVisitor;I)V
+SCC calls the following helper methods: MarkingGraphVisitor.visit(LMarkingGraphVisitor;I)V
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*MarkingGraphVisitor: [mark, children]
+*List: [val, next]
+*Marker field analysis yielded the following relations that could be markers:
+*MarkingGraphVisitor.mark = i7984 (Introduced counter i9504)
+*MarkingGraphVisitor.mark = i7999 (Introduced counter i9505)
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 43 IRulesP rules:
+f19222_0_visit_FieldAccess(EOS(STATIC_19222), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7999, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7999, o6730-217976518)), i9504, i9505) -> f19229_0_visit_FieldAccess(EOS(STATIC_19229), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7999, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7999, o6730-217976518)), i9504, i9505) :|: TRUE
+f19229_0_visit_FieldAccess(EOS(STATIC_19229), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7999, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7999, o6730-217976518)), i9504, i9505) -> f19237_0_visit_Load(EOS(STATIC_19237), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7999, o6730-217976518)), i7984, i7999, i9504, i9505) :|: TRUE
+f19237_0_visit_Load(EOS(STATIC_19237), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7999, o6730-217976518)), i7984, i7999, i9504, i9505) -> f19246_0_visit_NE(EOS(STATIC_19246), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7999, o6730-217976518)), i7984, i7999, i7984, i9504, i9505) :|: TRUE
+f19246_0_visit_NE(EOS(STATIC_19246), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, i7984, i7984, i9504, i9505) -> f19252_0_visit_NE(EOS(STATIC_19252), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, i7984, i7984, i9504, i9505) :|: i7999 = i7984
+f19252_0_visit_NE(EOS(STATIC_19252), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, i7984, i7984, i9504, i9505) -> f19258_0_visit_Load(EOS(STATIC_19258), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, i9504, i9505) :|: TRUE
+f19258_0_visit_Load(EOS(STATIC_19258), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, i9504, i9505) -> f19263_0_visit_Load(EOS(STATIC_19263), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i9504, i9505) :|: TRUE
+f19263_0_visit_Load(EOS(STATIC_19263), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i9504, i9505) -> f19273_0_visit_ConstantStackPush(EOS(STATIC_19273), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, i9504, i9505) :|: TRUE
+f19273_0_visit_ConstantStackPush(EOS(STATIC_19273), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, i9504, i9505) -> f19280_0_visit_IntArithmetic(EOS(STATIC_19280), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, 1, i9504, i9505) :|: TRUE
+f19280_0_visit_IntArithmetic(EOS(STATIC_19280), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, matching1, i9504, i9505) -> f19287_0_visit_FieldAccess(EOS(STATIC_19287), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984 + 1, i9504, i9505) :|: TRUE && matching1 = 1
+f19287_0_visit_FieldAccess(EOS(STATIC_19287), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i7984, o6730-217976518)), i8206, i9504, i9505) -> f19294_0_visit_Load(EOS(STATIC_19294), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i8206, o6730put-217976518)), i7984, i9504 + -1, i9505 + -1) :|: i9504 >= 0 && i9505 >= 0
+f19294_0_visit_Load(EOS(STATIC_19294), i7984, java.lang.Object(MarkingGraphVisitor(EOC, i8206, o6730-217976518)), i7984, i9504, i9505) -> f19299_0_visit_FieldAccess(EOS(STATIC_19299), i7984, i7984, java.lang.Object(MarkingGraphVisitor(EOC, i8206, o6730-217976518)), i9504, i9505) :|: TRUE
+f19299_0_visit_FieldAccess(EOS(STATIC_19299), i7984, i7984, java.lang.Object(MarkingGraphVisitor(EOC, i8206, o6730-217976518)), i9504, i9505) -> f19305_0_visit_Store(EOS(STATIC_19305), i7984, i7984, o67300, i9504, i9505) :|: TRUE
+f19305_0_visit_Store(EOS(STATIC_19305), i7984, i7984, o67300, i9504, i9505) -> f19312_0_visit_Load(EOS(STATIC_19312), i7984, i7984, o67300, i9504, i9505) :|: TRUE
+f19312_0_visit_Load(EOS(STATIC_19312), i7984, i7984, o67300, i9504, i9505) -> f19319_0_visit_NULL(EOS(STATIC_19319), i7984, i7984, o67300, o67300, i9504, i9505) :|: TRUE
+f19319_0_visit_NULL(EOS(STATIC_19319), i7984, i7984, java.lang.Object(o6839sub0), java.lang.Object(o6839sub0), i9504, i9505) -> f19325_0_visit_NULL(EOS(STATIC_19325), i7984, i7984, java.lang.Object(o6839sub0), java.lang.Object(o6839sub0), i9504, i9505) :|: TRUE
+f19325_0_visit_NULL(EOS(STATIC_19325), i7984, i7984, java.lang.Object(o6839sub0), java.lang.Object(o6839sub0), i9504, i9505) -> f19332_0_visit_Load(EOS(STATIC_19332), i7984, i7984, java.lang.Object(o6839sub0), i9504, i9505) :|: TRUE
+f19332_0_visit_Load(EOS(STATIC_19332), i7984, i7984, java.lang.Object(o6839sub0), i9504, i9505) -> f19338_0_visit_FieldAccess(EOS(STATIC_19338), i7984, i7984, java.lang.Object(o6839sub0), java.lang.Object(o6839sub0), i9504, i9505) :|: TRUE
+f19338_0_visit_FieldAccess(EOS(STATIC_19338), i7984, i7984, java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), i9504, i9505) -> f19343_0_visit_FieldAccess(EOS(STATIC_19343), i7984, i7984, java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), i9504, i9505) :|: TRUE
+f19343_0_visit_FieldAccess(EOS(STATIC_19343), i7984, i7984, java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), i9504, i9505) -> f19348_0_visit_Store(EOS(STATIC_19348), i7984, i7984, java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), o68580, i9504, i9505) :|: TRUE
+f19348_0_visit_Store(EOS(STATIC_19348), i7984, i7984, java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), o68580, i9504, i9505) -> f19354_0_visit_Load(EOS(STATIC_19354), i7984, i7984, java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), o68580, i9504, i9505) :|: TRUE
+f19354_0_visit_Load(EOS(STATIC_19354), i7984, i7984, java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), o68580, i9504, i9505) -> f19365_0_visit_FieldAccess(EOS(STATIC_19365), i7984, i7984, o68580, java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), i9504, i9505) :|: TRUE
+f19365_0_visit_FieldAccess(EOS(STATIC_19365), i7984, i7984, o68580, java.lang.Object(List(EOC, o6858-217943875, o6859-217943875)), i9504, i9505) -> f19371_0_visit_Store(EOS(STATIC_19371), i7984, i7984, o68580, o68590, i9504, i9505) :|: TRUE
+f19371_0_visit_Store(EOS(STATIC_19371), i7984, i7984, o68580, o68590, i9504, i9505) -> f19378_0_visit_Load(EOS(STATIC_19378), i7984, i7984, o68590, o68580, i9504, i9505) :|: TRUE
+f19378_0_visit_Load(EOS(STATIC_19378), i7984, i7984, o68590, o68580, i9504, i9505) -> f19383_0_visit_NULL(EOS(STATIC_19383), i7984, i7984, o68590, o68580, o68580, i9504, i9505) :|: TRUE
+f19383_0_visit_NULL(EOS(STATIC_19383), i7984, i7984, o68590, java.lang.Object(o6929sub0), java.lang.Object(o6929sub0), i9504, i9505) -> f19388_0_visit_NULL(EOS(STATIC_19388), i7984, i7984, o68590, java.lang.Object(o6929sub0), java.lang.Object(o6929sub0), i9504, i9505) :|: TRUE
+f19383_0_visit_NULL(EOS(STATIC_19383), i7984, i7984, o68590, NULL, NULL, i9504, i9505) -> f19389_0_visit_NULL(EOS(STATIC_19389), i7984, i7984, o68590, NULL, NULL, i9504, i9505) :|: TRUE
+f19388_0_visit_NULL(EOS(STATIC_19388), i7984, i7984, o68590, java.lang.Object(o6929sub0), java.lang.Object(o6929sub0), i9504, i9505) -> f19395_0_visit_Load(EOS(STATIC_19395), i7984, i7984, o68590, java.lang.Object(o6929sub0), i9504, i9505) :|: TRUE
+f19395_0_visit_Load(EOS(STATIC_19395), i7984, i7984, o68590, java.lang.Object(o6929sub0), i9504, i9505) -> f19401_0_visit_Load(EOS(STATIC_19401), i7984, i7984, o68590, java.lang.Object(o6929sub0), i9504, i9505) :|: TRUE
+f19401_0_visit_Load(EOS(STATIC_19401), i7984, i7984, o68590, java.lang.Object(o6929sub0), i9504, i9505) -> f19408_0_visit_InvokeMethod(EOS(STATIC_19408), i7984, i7984, o68590, java.lang.Object(o6929sub0), i7984, i9504, i9505) :|: TRUE
+f19408_0_visit_InvokeMethod(EOS(STATIC_19408), i7984, i7984, o68590, java.lang.Object(o6929sub0), i7984, i9504, i9505) -> f19416_0_visit_Load(EOS(STATIC_19416), i7984, o68590, java.lang.Object(o6929sub0), i7984, i9504, i9505) :|: TRUE
+f19408_0_visit_InvokeMethod(EOS(STATIC_19408), i7984, i7984, o68590, java.lang.Object(o6929sub0), i7984, i9504, i9505) -> f19416_1_visit_Load(EOS(STATIC_19416), i7984, i7984, o68590, java.lang.Object(o6929sub0), i7984, i9504, i9505) :|: TRUE
+f19416_0_visit_Load(EOS(STATIC_19416), i7984, o68590, java.lang.Object(o6929sub0), i7984, i9504, i9505) -> f19422_0_visit_Load(EOS(STATIC_19422), i7984, o68590, java.lang.Object(o6929sub0), i7984, i9504, i9505) :|: TRUE
+f19422_0_visit_Load(EOS(STATIC_19422), i7984, o68590, java.lang.Object(o6929sub0), i7984, i9504, i9505) -> f19443_0_visit_Load(EOS(STATIC_19443), i7984, java.lang.Object(o6929sub0), i7984, i9504, i9505) :|: TRUE
+f19443_0_visit_Load(EOS(STATIC_19443), i7984, java.lang.Object(o6929sub0), i7984, i9504, i9505) -> f19212_0_visit_Load(EOS(STATIC_19212), i7984, java.lang.Object(o6929sub0), i7984, i9504, i9505) :|: TRUE
+f19212_0_visit_Load(EOS(STATIC_19212), i7984, java.lang.Object(o6707sub0), i7984, i9504, i9505) -> f19222_0_visit_FieldAccess(EOS(STATIC_19222), i7984, java.lang.Object(o6707sub0), i7984, java.lang.Object(o6707sub0), i9504, i9505) :|: TRUE
+f19444_0_visit_Return(EOS(STATIC_19444), i8516, i8516, o68590, i9504, i9505) -> f19452_0_visit_JMP(EOS(STATIC_19452), i8516, i8516, o68590, i9504, i9505) :|: TRUE
+f19452_0_visit_JMP(EOS(STATIC_19452), i8516, i8516, o68590, i9504, i9505) -> f19396_0_visit_JMP(EOS(STATIC_19396), i8516, i8516, o68590, i9504, i9505) :|: TRUE
+f19396_0_visit_JMP(EOS(STATIC_19396), i7984, i7984, o68590, i9504, i9505) -> f19402_0_visit_Load(EOS(STATIC_19402), i7984, i7984, o68590, i9504, i9505) :|: TRUE
+f19402_0_visit_Load(EOS(STATIC_19402), i7984, i7984, o68590, i9504, i9505) -> f19312_0_visit_Load(EOS(STATIC_19312), i7984, i7984, o68590, i9504, i9505) :|: TRUE
+f19445_0_visit_Return(EOS(STATIC_19445), i8522, i8522, o68590, i9504, i9505) -> f19444_0_visit_Return(EOS(STATIC_19444), i8522, i8522, o68590, i9504, i9505) :|: TRUE
+f19389_0_visit_NULL(EOS(STATIC_19389), i7984, i7984, o68590, NULL, NULL, i9504, i9505) -> f19396_0_visit_JMP(EOS(STATIC_19396), i7984, i7984, o68590, i9504, i9505) :|: TRUE
+f19416_1_visit_Load(EOS(STATIC_19416), i8516, i8516, o68590, java.lang.Object(o6929sub0), i8516, i9504, i9505) -> f19444_0_visit_Return(EOS(STATIC_19444), i8516, i8516, o68590, i9504, i9505) :|: TRUE && (i9504_lC >= i9504 && i9505_lC >= i9505)
+f19416_1_visit_Load(EOS(STATIC_19416), i8522, i8522, o68590, java.lang.Object(o6929sub0), i8522, i9504, i9505) -> f19445_0_visit_Return(EOS(STATIC_19445), i8522, i8522, o68590, i9504, i9505) :|: TRUE && (i9504_lC >= i9504 && i9505_lC >= i9505)
+Combined rules. Obtained 3 IRulesP rules:
+f19383_0_visit_NULL(EOS(STATIC_19383), i7984:0, i7984:0, java.lang.Object(List(EOC, o6858-217943875:0, o6859-217943875:0)), NULL, NULL, i9504:0, i9505:0) -> f19383_0_visit_NULL(EOS(STATIC_19383), i7984:0, i7984:0, o68590:0, o68580:0, o68580:0, i9504:0, i9505:0) :|: TRUE
+f19383_0_visit_NULL(EOS(STATIC_19383), i7984:0, i7984:0, java.lang.Object(List(EOC, o6858-217943875:0, o6859-217943875:0)), java.lang.Object(o6929sub0:0), java.lang.Object(o6929sub0:0), i9504:0, i9505:0) -> f19383_0_visit_NULL(EOS(STATIC_19383), i7984:0, i7984:0, o68590:0, o68580:0, o68580:0, i9504:0, i9505:0) :|: i9504_lC:0 >= i9504:0 && i9505_lC:0 >= i9505:0
+f19383_0_visit_NULL(EOS(STATIC_19383), i7984:0, i7984:0, o68590:0, java.lang.Object(MarkingGraphVisitor(EOC, i7984:0, o6730-217976518:0)), java.lang.Object(MarkingGraphVisitor(EOC, i7984:0, o6730-217976518:0)), i9504:0, i9505:0) -> f19383_0_visit_NULL(EOS(STATIC_19383), i7984:0, i7984:0, o68590:1, o68580:0, o68580:0, i9504:0 - 1, i9505:0 - 1) :|: i9504:0 > -1 && i9505:0 > -1
+Filtered constant ground arguments:
+   f19383_0_visit_NULL(x1, x2, x3, x4, x5, x6, x7, x8) -> f19383_0_visit_NULL(x2, x3, x4, x5, x6, x7, x8)
+   EOS(x1) -> EOS
+   List(x1, x2, x3) -> List(x2, x3)
+   MarkingGraphVisitor(x1, x2, x3) -> MarkingGraphVisitor(x2, x3)
+Filtered duplicate arguments:
+   f19383_0_visit_NULL(x1, x2, x3, x4, x5, x6, x7) -> f19383_0_visit_NULL(x2, x3, x5, x6, x7)
+Filtered unneeded arguments:
+   f19383_0_visit_NULL(x1, x2, x3, x4, x5) -> f19383_0_visit_NULL(x2, x3, x4, x5)
+Finished conversion. Obtained 3 rules.P rules:
+f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0, o6859-217943875:0)), NULL, i9504:0, i9505:0) -> f19383_0_visit_NULL(o68590:0, o68580:0, i9504:0, i9505:0) :|: TRUE
+f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0, o6859-217943875:0)), java.lang.Object(o6929sub0:0), i9504:0, i9505:0) -> f19383_0_visit_NULL(o68590:0, o68580:0, i9504:0, i9505:0) :|: i9504_lC:0 >= i9504:0 && i9505_lC:0 >= i9505:0
+f19383_0_visit_NULL(o68590:0, java.lang.Object(MarkingGraphVisitor(i7984:0, o6730-217976518:0)), i9504:0, i9505:0) -> f19383_0_visit_NULL(o68590:1, o68580:0, i9504:0 - 1, i9505:0 - 1) :|: i9504:0 > -1 && i9505:0 > -1
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0, o6859-217943875:0)), NULL, i9504:0, i9505:0) -> f19383_0_visit_NULL(o68590:0, o68580:0, i9504:0, i9505:0) :|: TRUE
+f19383_0_visit_NULL(java.lang.Object(List(x, x1)), java.lang.Object(x2), x3, x4) -> f19383_0_visit_NULL(x5, x6, x3, x4) :|: x7 >= x3 && x8 >= x4
+f19383_0_visit_NULL(x9, java.lang.Object(MarkingGraphVisitor(x10, x11)), x12, x13) -> f19383_0_visit_NULL(x14, x15, x12 - 1, x13 - 1) :|: x12 > -1 && x13 > -1
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0, o6859-217943875:0)), NULL, i9504:0, i9505:0) -> f19383_0_visit_NULL(o68590:0, o68580:0, i9504:0, i9505:0) :|: TRUE
+f19383_0_visit_NULL(java.lang.Object(List(x, x1)), java.lang.Object(x2), x3, x4) -> f19383_0_visit_NULL(x5, x6, x3, x4) :|: x7 >= x3 && x8 >= x4
+f19383_0_visit_NULL(x9, java.lang.Object(MarkingGraphVisitor(x10, x11)), x12, x13) -> f19383_0_visit_NULL(x14, x15, arith, arith1) :|: x12 > -1 && x13 > -1 && arith = x12 - 1 && arith1 = x13 - 1
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0, o6859-217943875:0)), NULL, i9504:0, i9505:0) -> f19383_0_visit_NULL(o68590:0, o68580:0, i9504:0, i9505:0) :|: TRUE
+(2) f19383_0_visit_NULL(java.lang.Object(List(x, x1)), java.lang.Object(x2), x3, x4) -> f19383_0_visit_NULL(x5, x6, x3, x4) :|: x7 >= x3 && x8 >= x4
+(3) f19383_0_visit_NULL(x9, java.lang.Object(MarkingGraphVisitor(x10, x11)), x12, x13) -> f19383_0_visit_NULL(x14, x15, arith, arith1) :|: x12 > -1 && x13 > -1 && arith = x12 - 1 && arith1 = x13 - 1
+
+Arcs:
+(1) -> (1), (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (1), (2), (3)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0, o6859-217943875:0)), NULL, i9504:0, i9505:0) -> f19383_0_visit_NULL(o68590:0, o68580:0, i9504:0, i9505:0) :|: TRUE
+(2) f19383_0_visit_NULL(java.lang.Object(List(x, x1)), java.lang.Object(x2), x3, x4) -> f19383_0_visit_NULL(x5, x6, x3, x4) :|: x7 >= x3 && x8 >= x4
+(3) f19383_0_visit_NULL(x9, java.lang.Object(MarkingGraphVisitor(x10, x11)), x12, x13) -> f19383_0_visit_NULL(x14, x15, arith, arith1) :|: x12 > -1 && x13 > -1 && arith = x12 - 1 && arith1 = x13 - 1
+
+Arcs:
+(1) -> (1), (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (1), (2), (3)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(14) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(15)
+Obligation:
+Rules:
+f19383_0_visit_NULL(x9:0, java.lang.Object(MarkingGraphVisitor(x10:0, x11:0)), x12:0, x13:0) -> f19383_0_visit_NULL(x14:0, x15:0, x12:0 - 1, x13:0 - 1) :|: x12:0 > -1 && x13:0 > -1
+f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0:0, o6859-217943875:0:0)), NULL, i9504:0:0, i9505:0:0) -> f19383_0_visit_NULL(o68590:0:0, o68580:0:0, i9504:0:0, i9505:0:0) :|: TRUE
+f19383_0_visit_NULL(java.lang.Object(List(x:0, x1:0)), java.lang.Object(x2:0), x3:0, x4:0) -> f19383_0_visit_NULL(x5:0, x6:0, x3:0, x4:0) :|: x7:0 >= x3:0 && x8:0 >= x4:0
+
+----------------------------------------
+
+(16) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f19383_0_visit_NULL(VARIABLE, VARIABLE, VARIABLE, VARIABLE)
+java.lang.Object(VARIABLE)
+MarkingGraphVisitor(VARIABLE, VARIABLE)
+List(VARIABLE, VARIABLE)
+NULL()
+Replaced non-predefined constructor symbols by 0.The following proof was generated: 
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Termination of the given IntTRS could not be shown:
+
+
+
+- IntTRS
+  - PolynomialOrderProcessor
+
+Rules:
+f19383_0_visit_NULL(x9:0, c, x12:0, x13:0) -> f19383_0_visit_NULL(x14:0, x15:0, c1, c2) :|: c2 = x13:0 - 1 && (c1 = x12:0 - 1 && c = 0) && (x12:0 > -1 && x13:0 > -1)
+f19383_0_visit_NULL(c3, c4, i9504:0:0, i9505:0:0) -> f19383_0_visit_NULL(o68590:0:0, o68580:0:0, i9504:0:0, i9505:0:0) :|: c4 = 0 && c3 = 0 && TRUE
+f19383_0_visit_NULL(c5, c6, x3:0, x4:0) -> f19383_0_visit_NULL(x5:0, x6:0, x3:0, x4:0) :|: c6 = 0 && c5 = 0 && (x7:0 >= x3:0 && x8:0 >= x4:0)
+
+Found the following polynomial interpretation:
+[f19383_0_visit_NULL(x, x1, x2, x3)] = x2 + x3
+
+The following rules are decreasing:
+f19383_0_visit_NULL(x9:0, c, x12:0, x13:0) -> f19383_0_visit_NULL(x14:0, x15:0, c1, c2) :|: c2 = x13:0 - 1 && (c1 = x12:0 - 1 && c = 0) && (x12:0 > -1 && x13:0 > -1)
+The following rules are bounded:
+f19383_0_visit_NULL(x9:0, c, x12:0, x13:0) -> f19383_0_visit_NULL(x14:0, x15:0, c1, c2) :|: c2 = x13:0 - 1 && (c1 = x12:0 - 1 && c = 0) && (x12:0 > -1 && x13:0 > -1)
+
+
+- IntTRS
+  - PolynomialOrderProcessor
+    - IntTRS
+
+Rules:
+f19383_0_visit_NULL(c3, c4, i9504:0:0, i9505:0:0) -> f19383_0_visit_NULL(o68590:0:0, o68580:0:0, i9504:0:0, i9505:0:0) :|: c4 = 0 && c3 = 0 && TRUE
+f19383_0_visit_NULL(c5, c6, x3:0, x4:0) -> f19383_0_visit_NULL(x5:0, x6:0, x3:0, x4:0) :|: c6 = 0 && c5 = 0 && (x7:0 >= x3:0 && x8:0 >= x4:0)
+
+
+
+----------------------------------------
+
+(17)
+Obligation:
+Rules:
+f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0:0, o6859-217943875:0:0)), NULL, i9504:0:0, i9505:0:0) -> f19383_0_visit_NULL(o68590:0:0, o68580:0:0, i9504:0:0, i9505:0:0) :|: TRUE
+f19383_0_visit_NULL(java.lang.Object(List(x:0, x1:0)), java.lang.Object(x2:0), x3:0, x4:0) -> f19383_0_visit_NULL(x5:0, x6:0, x3:0, x4:0) :|: x7:0 >= x3:0 && x8:0 >= x4:0
+
+----------------------------------------
+
+(18) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0:0, o6859-217943875:0:0)), NULL, i9504:0:0, i9505:0:0) -> f19383_0_visit_NULL(o68590:0:0, o68580:0:0, i9504:0:0, i9505:0:0) :|: TRUE
+(2) f19383_0_visit_NULL(java.lang.Object(List(x:0, x1:0)), java.lang.Object(x2:0), x3:0, x4:0) -> f19383_0_visit_NULL(x5:0, x6:0, x3:0, x4:0) :|: x7:0 >= x3:0 && x8:0 >= x4:0
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(19)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f19383_0_visit_NULL(java.lang.Object(List(o6858-217943875:0:0, o6859-217943875:0:0)), NULL, i9504:0:0, i9505:0:0) -> f19383_0_visit_NULL(o68590:0:0, o68580:0:0, i9504:0:0, i9505:0:0) :|: TRUE
+(2) f19383_0_visit_NULL(java.lang.Object(List(x:0, x1:0)), java.lang.Object(x2:0), x3:0, x4:0) -> f19383_0_visit_NULL(x5:0, x6:0, x3:0, x4:0) :|: x7:0 >= x3:0 && x8:0 >= x4:0
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(20)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: MarkingGraphVisitor.getRandom()LMarkingGraphVisitor;
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*MarkingGraphVisitor: [children]
+*java.lang.String: [count]
+*List: [val, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(21) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 64 IRulesP rules:
+f19773_0_getRandom_Inc(EOS(STATIC_19773(java.lang.Object(ARRAY(i7655)))), i9237, o74990, i9237) -> f19774_0_getRandom_LT(EOS(STATIC_19774(java.lang.Object(ARRAY(i7655)))), i9237 + -1, o74990, i9237) :|: TRUE
+f19774_0_getRandom_LT(EOS(STATIC_19774(java.lang.Object(ARRAY(i7655)))), i9241, o74990, i9244) -> f19776_0_getRandom_LT(EOS(STATIC_19776(java.lang.Object(ARRAY(i7655)))), i9241, o74990, i9244) :|: TRUE
+f19776_0_getRandom_LT(EOS(STATIC_19776(java.lang.Object(ARRAY(i7655)))), i9241, o74990, i9244) -> f19778_0_getRandom_Load(EOS(STATIC_19778(java.lang.Object(ARRAY(i7655)))), i9241, o74990) :|: i9244 >= 0
+f19778_0_getRandom_Load(EOS(STATIC_19778(java.lang.Object(ARRAY(i7655)))), i9241, o74990) -> f19780_0_getRandom_FieldAccess(EOS(STATIC_19780(java.lang.Object(ARRAY(i7655)))), i9241, o74990, o74990) :|: TRUE
+f19780_0_getRandom_FieldAccess(EOS(STATIC_19780(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(o7509sub0), java.lang.Object(o7509sub0)) -> f19782_0_getRandom_FieldAccess(EOS(STATIC_19782(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(o7509sub0), java.lang.Object(o7509sub0)) :|: TRUE
+f19782_0_getRandom_FieldAccess(EOS(STATIC_19782(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, o7523-217112796)), java.lang.Object(MarkingGraphVisitor(EOC, o7523-217112796))) -> f19784_0_getRandom_FieldAccess(EOS(STATIC_19784(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, o7523-217112796)), java.lang.Object(MarkingGraphVisitor(EOC, o7523-217112796))) :|: TRUE
+f19784_0_getRandom_FieldAccess(EOS(STATIC_19784(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, o7523-217112796)), java.lang.Object(MarkingGraphVisitor(EOC, o7523-217112796))) -> f19788_0_getRandom_NULL(EOS(STATIC_19788(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, o7523-217112796)), o75230) :|: TRUE
+f19788_0_getRandom_NULL(EOS(STATIC_19788(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7530sub0)) -> f19789_0_getRandom_NULL(EOS(STATIC_19789(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7530sub0)) :|: TRUE
+f19789_0_getRandom_NULL(EOS(STATIC_19789(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7530sub0)) -> f19792_0_getRandom_InvokeMethod(EOS(STATIC_19792(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796)))) :|: TRUE
+f19792_0_getRandom_InvokeMethod(EOS(STATIC_19792(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796)))) -> f19795_0_random_FieldAccess(EOS(STATIC_19795(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796)))) :|: TRUE
+f19795_0_random_FieldAccess(EOS(STATIC_19795(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796)))) -> f19799_0_random_FieldAccess(EOS(STATIC_19799(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(ARRAY(i7655))) :|: TRUE
+f19799_0_random_FieldAccess(EOS(STATIC_19799(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(ARRAY(i7655))) -> f19801_0_random_ArrayAccess(EOS(STATIC_19801(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(ARRAY(i7655))) :|: TRUE
+f19801_0_random_ArrayAccess(EOS(STATIC_19801(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(ARRAY(i7655))) -> f19805_0_random_ArrayAccess(EOS(STATIC_19805(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(ARRAY(i7655))) :|: TRUE
+f19805_0_random_ArrayAccess(EOS(STATIC_19805(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(ARRAY(i7655))) -> f19808_0_random_ArrayAccess(EOS(STATIC_19808(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(ARRAY(i7655))) :|: TRUE
+f19808_0_random_ArrayAccess(EOS(STATIC_19808(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(ARRAY(i7655))) -> f19811_0_random_Store(EOS(STATIC_19811(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) :|: TRUE
+f19811_0_random_Store(EOS(STATIC_19811(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) -> f19814_0_random_FieldAccess(EOS(STATIC_19814(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) :|: TRUE
+f19814_0_random_FieldAccess(EOS(STATIC_19814(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) -> f19817_0_random_ConstantStackPush(EOS(STATIC_19817(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) :|: TRUE
+f19817_0_random_ConstantStackPush(EOS(STATIC_19817(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) -> f19820_0_random_IntArithmetic(EOS(STATIC_19820(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) :|: TRUE
+f19820_0_random_IntArithmetic(EOS(STATIC_19820(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) -> f19824_0_random_FieldAccess(EOS(STATIC_19824(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) :|: TRUE
+f19824_0_random_FieldAccess(EOS(STATIC_19824(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) -> f19827_0_random_Load(EOS(STATIC_19827(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) :|: TRUE
+f19827_0_random_Load(EOS(STATIC_19827(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) -> f19830_0_random_InvokeMethod(EOS(STATIC_19830(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), o7562) :|: TRUE
+f19830_0_random_InvokeMethod(EOS(STATIC_19830(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7576sub)) -> f19834_0_random_InvokeMethod(EOS(STATIC_19834(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7576sub)) :|: TRUE
+f19834_0_random_InvokeMethod(EOS(STATIC_19834(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7577sub)) -> f19838_0_random_InvokeMethod(EOS(STATIC_19838(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7577sub)) :|: TRUE
+f19838_0_random_InvokeMethod(EOS(STATIC_19838(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7577sub)) -> f19842_0_length_Load(EOS(STATIC_19842(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7577sub)) :|: TRUE
+f19842_0_length_Load(EOS(STATIC_19842(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7577sub)) -> f19849_0_length_FieldAccess(EOS(STATIC_19849(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(o7577sub)) :|: TRUE
+f19849_0_length_FieldAccess(EOS(STATIC_19849(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(java.lang.String(EOC, i9349))) -> f19853_0_length_FieldAccess(EOS(STATIC_19853(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(java.lang.String(EOC, i9349))) :|: i9349 >= 0
+f19853_0_length_FieldAccess(EOS(STATIC_19853(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), java.lang.Object(java.lang.String(EOC, i9349))) -> f19857_0_length_Return(EOS(STATIC_19857(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), i9349) :|: TRUE
+f19857_0_length_Return(EOS(STATIC_19857(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), i9349) -> f19861_0_random_Return(EOS(STATIC_19861(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), i9349) :|: TRUE
+f19861_0_random_Return(EOS(STATIC_19861(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), i9349) -> f19865_0_getRandom_Store(EOS(STATIC_19865(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), i9349) :|: TRUE
+f19865_0_getRandom_Store(EOS(STATIC_19865(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), i9349) -> f19870_0_getRandom_Load(EOS(STATIC_19870(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), i9349) :|: TRUE
+f19870_0_getRandom_Load(EOS(STATIC_19870(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796))), i9349) -> f19874_0_getRandom_FieldAccess(EOS(STATIC_19874(java.lang.Object(ARRAY(i7655)))), i9241, i9349, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796)))) :|: TRUE
+f19874_0_getRandom_FieldAccess(EOS(STATIC_19874(java.lang.Object(ARRAY(i7655)))), i9241, i9349, java.lang.Object(MarkingGraphVisitor(EOC, java.lang.Object(o7530sub-217112796)))) -> f19878_0_getRandom_Store(EOS(STATIC_19878(java.lang.Object(ARRAY(i7655)))), i9241, i9349, java.lang.Object(o7530sub0)) :|: TRUE
+f19878_0_getRandom_Store(EOS(STATIC_19878(java.lang.Object(ARRAY(i7655)))), i9241, i9349, java.lang.Object(o7530sub0)) -> f19881_0_getRandom_Load(EOS(STATIC_19881(java.lang.Object(ARRAY(i7655)))), i9241, i9349, java.lang.Object(o7530sub0)) :|: TRUE
+f19881_0_getRandom_Load(EOS(STATIC_19881(java.lang.Object(ARRAY(i7655)))), i9241, i9349, java.lang.Object(o7530sub0)) -> f19933_0_getRandom_Load(EOS(STATIC_19933(java.lang.Object(ARRAY(i7655)))), i9241, i9349, java.lang.Object(o7530sub0)) :|: TRUE
+f19933_0_getRandom_Load(EOS(STATIC_19933(java.lang.Object(ARRAY(i7655)))), i9241, i9461, java.lang.Object(o7705sub0)) -> f19962_0_getRandom_Load(EOS(STATIC_19962(java.lang.Object(ARRAY(i7655)))), i9241, i9461, java.lang.Object(o7705sub0)) :|: TRUE
+f19962_0_getRandom_Load(EOS(STATIC_19962(java.lang.Object(ARRAY(i7655)))), i9241, i9487, java.lang.Object(o7772sub0)) -> f19987_0_getRandom_Load(EOS(STATIC_19987(java.lang.Object(ARRAY(i7655)))), i9241, i9487, java.lang.Object(o7772sub0)) :|: TRUE
+f19987_0_getRandom_Load(EOS(STATIC_19987(java.lang.Object(ARRAY(i7655)))), i9241, i9495, java.lang.Object(o7815sub0)) -> f19988_0_getRandom_Inc(EOS(STATIC_19988(java.lang.Object(ARRAY(i7655)))), i9241, i9495, java.lang.Object(o7815sub0), i9495) :|: TRUE
+f19988_0_getRandom_Inc(EOS(STATIC_19988(java.lang.Object(ARRAY(i7655)))), i9241, i9495, java.lang.Object(o7815sub0), i9495) -> f19989_0_getRandom_LT(EOS(STATIC_19989(java.lang.Object(ARRAY(i7655)))), i9241, i9495 + -1, java.lang.Object(o7815sub0), i9495) :|: TRUE
+f19989_0_getRandom_LT(EOS(STATIC_19989(java.lang.Object(ARRAY(i7655)))), i9241, i9499, java.lang.Object(o7815sub0), i9498) -> f19990_0_getRandom_LT(EOS(STATIC_19990(java.lang.Object(ARRAY(i7655)))), i9241, i9499, java.lang.Object(o7815sub0), i9498) :|: TRUE
+f19989_0_getRandom_LT(EOS(STATIC_19989(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7815sub0), i9500) -> f19991_0_getRandom_LT(EOS(STATIC_19991(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7815sub0), i9500) :|: TRUE
+f19990_0_getRandom_LT(EOS(STATIC_19990(java.lang.Object(ARRAY(i7655)))), i9241, i9499, java.lang.Object(o7815sub0), i9498) -> f19992_0_getRandom_Load(EOS(STATIC_19992(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(o7815sub0)) :|: i9498 < 0
+f19992_0_getRandom_Load(EOS(STATIC_19992(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(o7815sub0)) -> f19994_0_getRandom_FieldAccess(EOS(STATIC_19994(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(o7815sub0)) :|: TRUE
+f19994_0_getRandom_FieldAccess(EOS(STATIC_19994(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(List(EOC, o7826-217023299, o7827-217023299))) -> f19996_0_getRandom_FieldAccess(EOS(STATIC_19996(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(List(EOC, o7826-217023299, o7827-217023299))) :|: TRUE
+f19996_0_getRandom_FieldAccess(EOS(STATIC_19996(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(List(EOC, o7826-217023299, o7827-217023299))) -> f19998_0_getRandom_Store(EOS(STATIC_19998(java.lang.Object(ARRAY(i7655)))), i9241, o78260) :|: TRUE
+f19998_0_getRandom_Store(EOS(STATIC_19998(java.lang.Object(ARRAY(i7655)))), i9241, o78260) -> f20000_0_getRandom_JMP(EOS(STATIC_20000(java.lang.Object(ARRAY(i7655)))), i9241, o78260) :|: TRUE
+f20000_0_getRandom_JMP(EOS(STATIC_20000(java.lang.Object(ARRAY(i7655)))), i9241, o78260) -> f20003_0_getRandom_Load(EOS(STATIC_20003(java.lang.Object(ARRAY(i7655)))), i9241, o78260) :|: TRUE
+f20003_0_getRandom_Load(EOS(STATIC_20003(java.lang.Object(ARRAY(i7655)))), i9241, o78260) -> f19772_0_getRandom_Load(EOS(STATIC_19772(java.lang.Object(ARRAY(i7655)))), i9241, o78260) :|: TRUE
+f19772_0_getRandom_Load(EOS(STATIC_19772(java.lang.Object(ARRAY(i7655)))), i9237, o74990) -> f19773_0_getRandom_Inc(EOS(STATIC_19773(java.lang.Object(ARRAY(i7655)))), i9237, o74990, i9237) :|: TRUE
+f19991_0_getRandom_LT(EOS(STATIC_19991(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7815sub0), i9500) -> f19993_0_getRandom_Load(EOS(STATIC_19993(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7815sub0)) :|: i9500 >= 0
+f19993_0_getRandom_Load(EOS(STATIC_19993(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7815sub0)) -> f19995_0_getRandom_FieldAccess(EOS(STATIC_19995(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7815sub0), java.lang.Object(o7815sub0)) :|: TRUE
+f19995_0_getRandom_FieldAccess(EOS(STATIC_19995(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, o7830-217023206)), java.lang.Object(List(EOC, o7829-217023206, o7830-217023206))) -> f19997_0_getRandom_FieldAccess(EOS(STATIC_19997(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, o7830-217023206)), java.lang.Object(List(EOC, o7829-217023206, o7830-217023206))) :|: TRUE
+f19997_0_getRandom_FieldAccess(EOS(STATIC_19997(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, o7830-217023206)), java.lang.Object(List(EOC, o7829-217023206, o7830-217023206))) -> f19999_0_getRandom_NULL(EOS(STATIC_19999(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, o7830-217023206)), o78300) :|: TRUE
+f19999_0_getRandom_NULL(EOS(STATIC_19999(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, java.lang.Object(o7831sub-217023206))), java.lang.Object(o7831sub0)) -> f20001_0_getRandom_NULL(EOS(STATIC_20001(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, java.lang.Object(o7831sub-217023206))), java.lang.Object(o7831sub0)) :|: TRUE
+f19999_0_getRandom_NULL(EOS(STATIC_19999(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, NULL)), NULL) -> f20002_0_getRandom_NULL(EOS(STATIC_20002(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, NULL)), NULL) :|: TRUE
+f20001_0_getRandom_NULL(EOS(STATIC_20001(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, java.lang.Object(o7831sub-217023206))), java.lang.Object(o7831sub0)) -> f20004_0_getRandom_Load(EOS(STATIC_20004(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, java.lang.Object(o7831sub-217023206)))) :|: TRUE
+f20004_0_getRandom_Load(EOS(STATIC_20004(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, java.lang.Object(o7831sub-217023206)))) -> f20006_0_getRandom_FieldAccess(EOS(STATIC_20006(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, java.lang.Object(o7831sub-217023206)))) :|: TRUE
+f20006_0_getRandom_FieldAccess(EOS(STATIC_20006(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, java.lang.Object(o7831sub-217023206)))) -> f20008_0_getRandom_Store(EOS(STATIC_20008(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7831sub0)) :|: TRUE
+f20008_0_getRandom_Store(EOS(STATIC_20008(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7831sub0)) -> f20010_0_getRandom_JMP(EOS(STATIC_20010(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7831sub0)) :|: TRUE
+f20010_0_getRandom_JMP(EOS(STATIC_20010(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7831sub0)) -> f20011_0_getRandom_Load(EOS(STATIC_20011(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7831sub0)) :|: TRUE
+f20011_0_getRandom_Load(EOS(STATIC_20011(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7831sub0)) -> f19987_0_getRandom_Load(EOS(STATIC_19987(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(o7831sub0)) :|: TRUE
+f20002_0_getRandom_NULL(EOS(STATIC_20002(java.lang.Object(ARRAY(i7655)))), i9241, i9497, java.lang.Object(List(EOC, o7829-217023206, NULL)), NULL) -> f20005_0_getRandom_Load(EOS(STATIC_20005(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(List(EOC, o7829-217023206, NULL))) :|: TRUE
+f20005_0_getRandom_Load(EOS(STATIC_20005(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(List(EOC, o7829-217023206, NULL))) -> f20007_0_getRandom_FieldAccess(EOS(STATIC_20007(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(List(EOC, o7829-217023206, NULL))) :|: TRUE
+f20007_0_getRandom_FieldAccess(EOS(STATIC_20007(java.lang.Object(ARRAY(i7655)))), i9241, java.lang.Object(List(EOC, o7829-217023206, NULL))) -> f20009_0_getRandom_Store(EOS(STATIC_20009(java.lang.Object(ARRAY(i7655)))), i9241, o78290) :|: TRUE
+f20009_0_getRandom_Store(EOS(STATIC_20009(java.lang.Object(ARRAY(i7655)))), i9241, o78290) -> f19998_0_getRandom_Store(EOS(STATIC_19998(java.lang.Object(ARRAY(i7655)))), i9241, o78290) :|: TRUE
+Combined rules. Obtained 3 IRulesP rules:
+f19989_0_getRandom_LT(EOS(STATIC_19989(java.lang.Object(ARRAY(i7655:0)))), i9241:0, i9499:0, java.lang.Object(List(EOC, o7826-217023299:0, o7827-217023299:0)), i9498:0) -> f19989_0_getRandom_LT(EOS(STATIC_19989(java.lang.Object(ARRAY(i7655:0)))), i9241:0 - 1, i9349:0 - 1, java.lang.Object(o7530sub0:0), i9349:0) :|: i9241:0 > -1 && i9498:0 < 0 && i9349:0 > -1
+f19989_0_getRandom_LT(EOS(STATIC_19989(java.lang.Object(ARRAY(i7655:0)))), i9241:0, i9497:0, java.lang.Object(List(EOC, o7829-217023206:0, java.lang.Object(o7831sub-217023206:0))), i9500:0) -> f19989_0_getRandom_LT(EOS(STATIC_19989(java.lang.Object(ARRAY(i7655:0)))), i9241:0, i9497:0 - 1, java.lang.Object(o7831sub0:0), i9497:0) :|: i9500:0 > -1
+f19989_0_getRandom_LT(EOS(STATIC_19989(java.lang.Object(ARRAY(i7655:0)))), i9241:0, i9497:0, java.lang.Object(List(EOC, o7829-217023206:0, NULL)), i9500:0) -> f19989_0_getRandom_LT(EOS(STATIC_19989(java.lang.Object(ARRAY(i7655:0)))), i9241:0 - 1, i9349:0 - 1, java.lang.Object(o7530sub0:0), i9349:0) :|: i9241:0 > -1 && i9500:0 > -1 && i9349:0 > -1
+Filtered constant ground arguments:
+   List(x1, x2, x3) -> List(x2, x3)
+Filtered unneeded arguments:
+   f19989_0_getRandom_LT(x1, x2, x3, x4, x5) -> f19989_0_getRandom_LT(x2, x3, x4, x5)
+   List(x1, x2) -> List(x2)
+Finished conversion. Obtained 3 rules.P rules:
+f19989_0_getRandom_LT(i9241:0, i9499:0, java.lang.Object(List(o7827-217023299:0)), i9498:0) -> f19989_0_getRandom_LT(i9241:0 - 1, i9349:0 - 1, java.lang.Object(o7530sub0:0), i9349:0) :|: i9498:0 < 0 && i9349:0 > -1 && i9241:0 > -1
+f19989_0_getRandom_LT(i9241:0, i9497:0, java.lang.Object(List(java.lang.Object(o7831sub-217023206:0))), i9500:0) -> f19989_0_getRandom_LT(i9241:0, i9497:0 - 1, java.lang.Object(o7831sub0:0), i9497:0) :|: i9500:0 > -1
+f19989_0_getRandom_LT(i9241:0, i9497:0, java.lang.Object(List(NULL)), i9500:0) -> f19989_0_getRandom_LT(i9241:0 - 1, i9349:0 - 1, java.lang.Object(o7530sub0:0), i9349:0) :|: i9500:0 > -1 && i9349:0 > -1 && i9241:0 > -1
+
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f19989_0_getRandom_LT(i9241:0, i9499:0, java.lang.Object(List(o7827-217023299:0)), i9498:0) -> f19989_0_getRandom_LT(i9241:0 - 1, i9349:0 - 1, java.lang.Object(o7530sub0:0), i9349:0) :|: i9498:0 < 0 && i9349:0 > -1 && i9241:0 > -1
+f19989_0_getRandom_LT(x, x1, java.lang.Object(List(java.lang.Object(x2))), x3) -> f19989_0_getRandom_LT(x, x1 - 1, java.lang.Object(x4), x1) :|: x3 > -1
+f19989_0_getRandom_LT(x5, x6, java.lang.Object(List(NULL)), x7) -> f19989_0_getRandom_LT(x5 - 1, x8 - 1, java.lang.Object(x9), x8) :|: x7 > -1 && x8 > -1 && x5 > -1
+
+----------------------------------------
+
+(23) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(24)
+Obligation:
+Rules:
+f19989_0_getRandom_LT(i9241:0, i9499:0, java.lang.Object(List(o7827-217023299:0)), i9498:0) -> f19989_0_getRandom_LT(arith, arith1, java.lang.Object(o7530sub0:0), i9349:0) :|: i9498:0 < 0 && i9349:0 > -1 && i9241:0 > -1 && arith = i9241:0 - 1 && arith1 = i9349:0 - 1
+f19989_0_getRandom_LT(x10, x11, java.lang.Object(List(java.lang.Object(x12))), x13) -> f19989_0_getRandom_LT(x10, x14, java.lang.Object(x15), x11) :|: x13 > -1 && x14 = x11 - 1
+f19989_0_getRandom_LT(x16, x17, java.lang.Object(List(NULL)), x18) -> f19989_0_getRandom_LT(x19, x20, java.lang.Object(x21), x22) :|: x18 > -1 && x22 > -1 && x16 > -1 && x19 = x16 - 1 && x20 = x22 - 1
+
+----------------------------------------
+
+(25) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f19989_0_getRandom_LT(i9241:0, i9499:0, java.lang.Object(List(o7827-217023299:0)), i9498:0) -> f19989_0_getRandom_LT(arith, arith1, java.lang.Object(o7530sub0:0), i9349:0) :|: i9498:0 < 0 && i9349:0 > -1 && i9241:0 > -1 && arith = i9241:0 - 1 && arith1 = i9349:0 - 1
+(2) f19989_0_getRandom_LT(x10, x11, java.lang.Object(List(java.lang.Object(x12))), x13) -> f19989_0_getRandom_LT(x10, x14, java.lang.Object(x15), x11) :|: x13 > -1 && x14 = x11 - 1
+(3) f19989_0_getRandom_LT(x16, x17, java.lang.Object(List(NULL)), x18) -> f19989_0_getRandom_LT(x19, x20, java.lang.Object(x21), x22) :|: x18 > -1 && x22 > -1 && x16 > -1 && x19 = x16 - 1 && x20 = x22 - 1
+
+Arcs:
+(1) -> (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (2), (3)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(26)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f19989_0_getRandom_LT(i9241:0, i9499:0, java.lang.Object(List(o7827-217023299:0)), i9498:0) -> f19989_0_getRandom_LT(arith, arith1, java.lang.Object(o7530sub0:0), i9349:0) :|: i9498:0 < 0 && i9349:0 > -1 && i9241:0 > -1 && arith = i9241:0 - 1 && arith1 = i9349:0 - 1
+(2) f19989_0_getRandom_LT(x10, x11, java.lang.Object(List(java.lang.Object(x12))), x13) -> f19989_0_getRandom_LT(x10, x14, java.lang.Object(x15), x11) :|: x13 > -1 && x14 = x11 - 1
+(3) f19989_0_getRandom_LT(x16, x17, java.lang.Object(List(NULL)), x18) -> f19989_0_getRandom_LT(x19, x20, java.lang.Object(x21), x22) :|: x18 > -1 && x22 > -1 && x16 > -1 && x19 = x16 - 1 && x20 = x22 - 1
+
+Arcs:
+(1) -> (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (2), (3)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(27) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(28)
+Obligation:
+Rules:
+f19989_0_getRandom_LT(i9241:0:0, i9499:0:0, java.lang.Object(List(o7827-217023299:0:0)), i9498:0:0) -> f19989_0_getRandom_LT(i9241:0:0 - 1, i9349:0:0 - 1, java.lang.Object(o7530sub0:0:0), i9349:0:0) :|: i9498:0:0 < 0 && i9349:0:0 > -1 && i9241:0:0 > -1
+f19989_0_getRandom_LT(x10:0, x11:0, java.lang.Object(List(java.lang.Object(x12:0))), x13:0) -> f19989_0_getRandom_LT(x10:0, x11:0 - 1, java.lang.Object(x15:0), x11:0) :|: x13:0 > -1
+f19989_0_getRandom_LT(x16:0, x17:0, java.lang.Object(List(NULL)), x18:0) -> f19989_0_getRandom_LT(x16:0 - 1, x22:0 - 1, java.lang.Object(x21:0), x22:0) :|: x18:0 > -1 && x22:0 > -1 && x16:0 > -1
+
+----------------------------------------
+
+(29) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f19989_0_getRandom_LT(VARIABLE, VARIABLE, VARIABLE, VARIABLE)
+java.lang.Object(VARIABLE)
+List(VARIABLE)
+NULL()
+Replaced non-predefined constructor symbols by 0.The following proof was generated: 
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Termination of the given IntTRS could not be shown:
+
+
+
+- IntTRS
+  - RankingReductionPairProof
+
+Rules:
+f19989_0_getRandom_LT(i9241:0:0, i9499:0:0, c, i9498:0:0) -> f19989_0_getRandom_LT(c1, c2, c3, i9349:0:0) :|: c3 = 0 && (c2 = i9349:0:0 - 1 && (c1 = i9241:0:0 - 1 && c = 0)) && (i9498:0:0 < 0 && i9349:0:0 > -1 && i9241:0:0 > -1)
+f19989_0_getRandom_LT(x10:0, x11:0, c4, x13:0) -> f19989_0_getRandom_LT(x10:0, c5, c6, x11:0) :|: c6 = 0 && (c5 = x11:0 - 1 && c4 = 0) && x13:0 > -1
+f19989_0_getRandom_LT(x16:0, x17:0, c7, x18:0) -> f19989_0_getRandom_LT(c8, c9, c10, x22:0) :|: c10 = 0 && (c9 = x22:0 - 1 && (c8 = x16:0 - 1 && c7 = 0)) && (x18:0 > -1 && x22:0 > -1 && x16:0 > -1)
+
+Interpretation:
+[ f19989_0_getRandom_LT ] = 2*f19989_0_getRandom_LT_1 + 1
+
+The following rules are decreasing:
+f19989_0_getRandom_LT(i9241:0:0, i9499:0:0, c, i9498:0:0) -> f19989_0_getRandom_LT(c1, c2, c3, i9349:0:0) :|: c3 = 0 && (c2 = i9349:0:0 - 1 && (c1 = i9241:0:0 - 1 && c = 0)) && (i9498:0:0 < 0 && i9349:0:0 > -1 && i9241:0:0 > -1)
+f19989_0_getRandom_LT(x16:0, x17:0, c7, x18:0) -> f19989_0_getRandom_LT(c8, c9, c10, x22:0) :|: c10 = 0 && (c9 = x22:0 - 1 && (c8 = x16:0 - 1 && c7 = 0)) && (x18:0 > -1 && x22:0 > -1 && x16:0 > -1)
+
+The following rules are bounded:
+f19989_0_getRandom_LT(i9241:0:0, i9499:0:0, c, i9498:0:0) -> f19989_0_getRandom_LT(c1, c2, c3, i9349:0:0) :|: c3 = 0 && (c2 = i9349:0:0 - 1 && (c1 = i9241:0:0 - 1 && c = 0)) && (i9498:0:0 < 0 && i9349:0:0 > -1 && i9241:0:0 > -1)
+
+
+
+- IntTRS
+  - RankingReductionPairProof
+    - IntTRS
+      - PolynomialOrderProcessor
+
+Rules:
+f19989_0_getRandom_LT(x10:0, x11:0, c4, x13:0) -> f19989_0_getRandom_LT(x10:0, c5, c6, x11:0) :|: c6 = 0 && (c5 = x11:0 - 1 && c4 = 0) && x13:0 > -1
+f19989_0_getRandom_LT(x16:0, x17:0, c7, x18:0) -> f19989_0_getRandom_LT(c8, c9, c10, x22:0) :|: c10 = 0 && (c9 = x22:0 - 1 && (c8 = x16:0 - 1 && c7 = 0)) && (x18:0 > -1 && x22:0 > -1 && x16:0 > -1)
+
+Found the following polynomial interpretation:
+[f19989_0_getRandom_LT(x, x1, x2, x3)] = x + c2*x2
+
+The following rules are decreasing:
+f19989_0_getRandom_LT(x16:0, x17:0, c7, x18:0) -> f19989_0_getRandom_LT(c8, c9, c10, x22:0) :|: c10 = 0 && (c9 = x22:0 - 1 && (c8 = x16:0 - 1 && c7 = 0)) && (x18:0 > -1 && x22:0 > -1 && x16:0 > -1)
+The following rules are bounded:
+f19989_0_getRandom_LT(x16:0, x17:0, c7, x18:0) -> f19989_0_getRandom_LT(c8, c9, c10, x22:0) :|: c10 = 0 && (c9 = x22:0 - 1 && (c8 = x16:0 - 1 && c7 = 0)) && (x18:0 > -1 && x22:0 > -1 && x16:0 > -1)
+
+
+- IntTRS
+  - RankingReductionPairProof
+    - IntTRS
+      - PolynomialOrderProcessor
+        - IntTRS
+
+Rules:
+f19989_0_getRandom_LT(x10:0, x11:0, c4, x13:0) -> f19989_0_getRandom_LT(x10:0, c5, c6, x11:0) :|: c6 = 0 && (c5 = x11:0 - 1 && c4 = 0) && x13:0 > -1
+
+
+
+----------------------------------------
+
+(30)
+Obligation:
+Rules:
+f19989_0_getRandom_LT(x10:0, x11:0, java.lang.Object(List(java.lang.Object(x12:0))), x13:0) -> f19989_0_getRandom_LT(x10:0, x11:0 - 1, java.lang.Object(x15:0), x11:0) :|: x13:0 > -1
+
+----------------------------------------
+
+(31) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f19989_0_getRandom_LT(x10:0, x11:0, java.lang.Object(List(java.lang.Object(x12:0))), x13:0) -> f19989_0_getRandom_LT(x10:0, x11:0 - 1, java.lang.Object(x15:0), x11:0) :|: x13:0 > -1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(32)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f19989_0_getRandom_LT(x10:0, x11:0, java.lang.Object(List(java.lang.Object(x12:0))), x13:0) -> f19989_0_getRandom_LT(x10:0, x11:0 - 1, java.lang.Object(x15:0), x11:0) :|: x13:0 > -1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(33) IntTRSUnneededArgumentFilterProof (EQUIVALENT)
+Some arguments are removed because they cannot influence termination. We removed arguments according to the following replacements:
+
+   f19989_0_getRandom_LT(x1, x2, x3, x4) -> f19989_0_getRandom_LT(x2, x3, x4)
+
+----------------------------------------
+
+(34)
+Obligation:
+Rules:
+f19989_0_getRandom_LT(x11:0, java.lang.Object(List(java.lang.Object(x12:0))), x13:0) -> f19989_0_getRandom_LT(x11:0 - 1, java.lang.Object(x15:0), x11:0) :|: x13:0 > -1
+
+----------------------------------------
+
+(35)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: MarkingGraphVisitor.createTree(I)LMarkingGraphVisitor;
+SCC calls the following helper methods: MarkingGraphVisitor.createTree(I)LMarkingGraphVisitor;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(36) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 186 IRulesP rules:
+f188_0_createTree_GT(EOS(STATIC_188(java.lang.Object(o22sub), i10)), i22, i22, i22) -> f203_0_createTree_GT(EOS(STATIC_203(java.lang.Object(o22sub), i10)), i22, i22, i22) :|: TRUE
+f203_0_createTree_GT(EOS(STATIC_203(java.lang.Object(o22sub), i10)), i22, i22, i22) -> f238_0_createTree_InvokeMethod(EOS(STATIC_238(java.lang.Object(o22sub), i10)), i22, i22) :|: i22 > 0
+f238_0_createTree_InvokeMethod(EOS(STATIC_238(java.lang.Object(o22sub), i10)), i22, i22) -> f252_0_random_FieldAccess(EOS(STATIC_252(java.lang.Object(o22sub), i10)), i22, i22) :|: TRUE
+f252_0_random_FieldAccess(EOS(STATIC_252(java.lang.Object(o22sub), i10)), i22, i22) -> f315_0_random_FieldAccess(EOS(STATIC_315(java.lang.Object(o22sub), i10)), i22, i22, java.lang.Object(o22sub)) :|: TRUE
+f315_0_random_FieldAccess(EOS(STATIC_315(java.lang.Object(o22sub), i10)), i22, i22, java.lang.Object(o22sub)) -> f324_0_random_ArrayAccess(EOS(STATIC_324(java.lang.Object(o22sub), i10)), i22, i22, java.lang.Object(o22sub), i10) :|: TRUE
+f324_0_random_ArrayAccess(EOS(STATIC_324(java.lang.Object(ARRAY(i41)), i10)), i22, i22, java.lang.Object(ARRAY(i41)), i10) -> f330_0_random_ArrayAccess(EOS(STATIC_330(java.lang.Object(ARRAY(i41)), i10)), i22, i22, java.lang.Object(ARRAY(i41)), i10) :|: i41 >= 0
+f330_0_random_ArrayAccess(EOS(STATIC_330(java.lang.Object(ARRAY(i41)), i10)), i22, i22, java.lang.Object(ARRAY(i41)), i10) -> f334_0_random_ArrayAccess(EOS(STATIC_334(java.lang.Object(ARRAY(i41)), i10)), i22, i22, java.lang.Object(ARRAY(i41)), i10) :|: TRUE
+f334_0_random_ArrayAccess(EOS(STATIC_334(java.lang.Object(ARRAY(i41)), i10)), i22, i22, java.lang.Object(ARRAY(i41)), i10) -> f338_0_random_Store(EOS(STATIC_338(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40) :|: TRUE
+f338_0_random_Store(EOS(STATIC_338(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40) -> f341_0_random_FieldAccess(EOS(STATIC_341(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40) :|: TRUE
+f341_0_random_FieldAccess(EOS(STATIC_341(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40) -> f351_0_random_ConstantStackPush(EOS(STATIC_351(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40, i10) :|: TRUE
+f351_0_random_ConstantStackPush(EOS(STATIC_351(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40, i10) -> f364_0_random_IntArithmetic(EOS(STATIC_364(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40, i10, 1) :|: TRUE
+f364_0_random_IntArithmetic(EOS(STATIC_364(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40, i10, matching1) -> f369_0_random_FieldAccess(EOS(STATIC_369(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40, i10 + 1) :|: i10 > 0 && matching1 = 1
+f369_0_random_FieldAccess(EOS(STATIC_369(java.lang.Object(ARRAY(i41)), i10)), i22, i22, o40, i44) -> f376_0_random_Load(EOS(STATIC_376(java.lang.Object(ARRAY(i41)), i44)), i22, i22, o40) :|: TRUE
+f376_0_random_Load(EOS(STATIC_376(java.lang.Object(ARRAY(i41)), i44)), i22, i22, o40) -> f385_0_random_InvokeMethod(EOS(STATIC_385(java.lang.Object(ARRAY(i41)), i44)), i22, i22, o40) :|: TRUE
+f385_0_random_InvokeMethod(EOS(STATIC_385(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(o50sub)) -> f395_0_random_InvokeMethod(EOS(STATIC_395(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(o50sub)) :|: TRUE
+f395_0_random_InvokeMethod(EOS(STATIC_395(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(o51sub)) -> f402_0_random_InvokeMethod(EOS(STATIC_402(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(o51sub)) :|: TRUE
+f402_0_random_InvokeMethod(EOS(STATIC_402(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(o51sub)) -> f412_0_length_Load(EOS(STATIC_412(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(o51sub)) :|: TRUE
+f412_0_length_Load(EOS(STATIC_412(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(o51sub)) -> f438_0_length_FieldAccess(EOS(STATIC_438(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(o51sub)) :|: TRUE
+f438_0_length_FieldAccess(EOS(STATIC_438(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(java.lang.String(EOC, i54))) -> f451_0_length_FieldAccess(EOS(STATIC_451(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(java.lang.String(EOC, i54))) :|: i54 >= 0
+f451_0_length_FieldAccess(EOS(STATIC_451(java.lang.Object(ARRAY(i41)), i44)), i22, i22, java.lang.Object(java.lang.String(EOC, i54))) -> f465_0_length_Return(EOS(STATIC_465(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54) :|: TRUE
+f465_0_length_Return(EOS(STATIC_465(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54) -> f475_0_random_Return(EOS(STATIC_475(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54) :|: TRUE
+f475_0_random_Return(EOS(STATIC_475(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54) -> f484_0_createTree_Store(EOS(STATIC_484(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54) :|: TRUE
+f484_0_createTree_Store(EOS(STATIC_484(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54) -> f499_0_createTree_ConstantStackPush(EOS(STATIC_499(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54) :|: TRUE
+f499_0_createTree_ConstantStackPush(EOS(STATIC_499(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54) -> f508_0_createTree_Store(EOS(STATIC_508(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54, NULL) :|: TRUE
+f508_0_createTree_Store(EOS(STATIC_508(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54, NULL) -> f513_0_createTree_Load(EOS(STATIC_513(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54, NULL) :|: TRUE
+f513_0_createTree_Load(EOS(STATIC_513(java.lang.Object(ARRAY(i41)), i44)), i22, i22, i54, NULL) -> f518_0_createTree_Store(EOS(STATIC_518(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i54) :|: TRUE
+f518_0_createTree_Store(EOS(STATIC_518(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i54) -> f523_0_createTree_Load(EOS(STATIC_523(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i54) :|: TRUE
+f523_0_createTree_Load(EOS(STATIC_523(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i54) -> f530_0_createTree_LE(EOS(STATIC_530(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i54, i54) :|: TRUE
+f530_0_createTree_LE(EOS(STATIC_530(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, i74) -> f550_0_createTree_LE(EOS(STATIC_550(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, i74) :|: TRUE
+f550_0_createTree_LE(EOS(STATIC_550(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, i74) -> f573_0_createTree_New(EOS(STATIC_573(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74) :|: i74 > 0
+f573_0_createTree_New(EOS(STATIC_573(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74) -> f601_0_createTree_Duplicate(EOS(STATIC_601(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC))) :|: TRUE
+f601_0_createTree_Duplicate(EOS(STATIC_601(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC))) -> f622_0_createTree_Load(EOS(STATIC_622(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f622_0_createTree_Load(EOS(STATIC_622(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f643_0_createTree_ConstantStackPush(EOS(STATIC_643(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22) :|: TRUE
+f643_0_createTree_ConstantStackPush(EOS(STATIC_643(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22) -> f667_0_createTree_IntArithmetic(EOS(STATIC_667(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22, 1) :|: TRUE
+f667_0_createTree_IntArithmetic(EOS(STATIC_667(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22, matching1) -> f684_0_createTree_InvokeMethod(EOS(STATIC_684(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22 - 1) :|: i22 > 0 && matching1 = 1
+f684_0_createTree_InvokeMethod(EOS(STATIC_684(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i92) -> f700_0_createTree_Load(EOS(STATIC_700(java.lang.Object(ARRAY(i41)), i44)), i92, i92) :|: i22 >= 1 && i74 >= 1 && i44 > 1 && i92 < i22
+f684_0_createTree_InvokeMethod(EOS(STATIC_684(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i92) -> f700_1_createTree_Load(EOS(STATIC_700(java.lang.Object(ARRAY(i41)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i92) :|: i22 >= 1 && i74 >= 1 && i44 > 1 && i92 < i22
+f700_0_createTree_Load(EOS(STATIC_700(java.lang.Object(ARRAY(i41)), i44)), i92, i92) -> f735_0_createTree_Load(EOS(STATIC_735(java.lang.Object(ARRAY(i41)), i44)), i92, i92) :|: TRUE
+f735_0_createTree_Load(EOS(STATIC_735(java.lang.Object(ARRAY(i41)), i44)), i92, i92) -> f176_0_createTree_Load(EOS(STATIC_176(java.lang.Object(ARRAY(i41)), i44)), i92, i92) :|: TRUE
+f176_0_createTree_Load(EOS(STATIC_176(java.lang.Object(o22sub), i10)), i19, i19) -> f188_0_createTree_GT(EOS(STATIC_188(java.lang.Object(o22sub), i10)), i19, i19, i19) :|: TRUE
+f2604_0_createTree_Return(EOS(STATIC_2604(java.lang.Object(ARRAY(i41)), i119)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f2837_0_createTree_Load(EOS(STATIC_2837(java.lang.Object(ARRAY(i41)), i119)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f2837_0_createTree_Load(EOS(STATIC_2837(java.lang.Object(ARRAY(i41)), i119)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f2860_0_createTree_InvokeMethod(EOS(STATIC_2860(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL) :|: TRUE
+f2860_0_createTree_InvokeMethod(EOS(STATIC_2860(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL) -> f2872_0__init__Load(EOS(STATIC_2872(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL) :|: TRUE
+f2872_0__init__Load(EOS(STATIC_2872(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL) -> f2966_0__init__InvokeMethod(EOS(STATIC_2966(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL, java.lang.Object(List(EOC))) :|: TRUE
+f2966_0__init__InvokeMethod(EOS(STATIC_2966(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL, java.lang.Object(List(EOC))) -> f3000_0__init__Load(EOS(STATIC_3000(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL) :|: TRUE
+f3000_0__init__Load(EOS(STATIC_3000(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL) -> f3019_0__init__Load(EOS(STATIC_3019(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL, java.lang.Object(List(EOC))) :|: TRUE
+f3019_0__init__Load(EOS(STATIC_3019(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, NULL, java.lang.Object(List(EOC))) -> f3044_0__init__FieldAccess(EOS(STATIC_3044(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), NULL) :|: TRUE
+f3044_0__init__FieldAccess(EOS(STATIC_3044(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), NULL) -> f3099_0__init__Load(EOS(STATIC_3099(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f3099_0__init__Load(EOS(STATIC_3099(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f3119_0__init__Load(EOS(STATIC_3119(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f3119_0__init__Load(EOS(STATIC_3119(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) -> f3141_0__init__FieldAccess(EOS(STATIC_3141(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f3141_0__init__FieldAccess(EOS(STATIC_3141(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f3281_0__init__Return(EOS(STATIC_3281(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC))) :|: TRUE
+f3281_0__init__Return(EOS(STATIC_3281(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC))) -> f3350_0_createTree_Store(EOS(STATIC_3350(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC))) :|: TRUE
+f3350_0_createTree_Store(EOS(STATIC_3350(java.lang.Object(ARRAY(i41)), i119)), i22, i22, i74, java.lang.Object(List(EOC))) -> f3364_0_createTree_Inc(EOS(STATIC_3364(java.lang.Object(ARRAY(i41)), i119)), i22, i22, java.lang.Object(List(EOC)), i74) :|: TRUE
+f3364_0_createTree_Inc(EOS(STATIC_3364(java.lang.Object(ARRAY(i41)), i119)), i22, i22, java.lang.Object(List(EOC)), i74) -> f3371_0_createTree_JMP(EOS(STATIC_3371(java.lang.Object(ARRAY(i41)), i119)), i22, i22, java.lang.Object(List(EOC)), i74 + -1) :|: TRUE
+f3371_0_createTree_JMP(EOS(STATIC_3371(java.lang.Object(ARRAY(i41)), i119)), i22, i22, java.lang.Object(List(EOC)), i421) -> f3411_0_createTree_Load(EOS(STATIC_3411(java.lang.Object(ARRAY(i41)), i119)), i22, i22, java.lang.Object(List(EOC)), i421) :|: TRUE
+f3411_0_createTree_Load(EOS(STATIC_3411(java.lang.Object(ARRAY(i41)), i119)), i22, i22, java.lang.Object(List(EOC)), i421) -> f9702_0_createTree_Load(EOS(STATIC_9702(java.lang.Object(ARRAY(i41)), i119)), i22, i22, java.lang.Object(List(EOC)), i421) :|: TRUE
+f9702_0_createTree_Load(EOS(STATIC_9702(java.lang.Object(ARRAY(i41)), i1755)), i22, i22, java.lang.Object(List(EOC)), i1756) -> f15563_0_createTree_Load(EOS(STATIC_15563(java.lang.Object(ARRAY(i41)), i1755)), i22, i22, java.lang.Object(List(EOC)), i1756) :|: TRUE
+f15563_0_createTree_Load(EOS(STATIC_15563(java.lang.Object(ARRAY(i41)), i3007)), i22, i22, java.lang.Object(List(EOC)), i3008) -> f17746_0_createTree_Load(EOS(STATIC_17746(java.lang.Object(ARRAY(i41)), i3007)), i22, i22, java.lang.Object(List(EOC)), i3008) :|: TRUE
+f17746_0_createTree_Load(EOS(STATIC_17746(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5558) -> f17751_0_createTree_LE(EOS(STATIC_17751(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5558, i5558) :|: TRUE
+f17751_0_createTree_LE(EOS(STATIC_17751(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, i5594) -> f17757_0_createTree_LE(EOS(STATIC_17757(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, i5594) :|: TRUE
+f17757_0_createTree_LE(EOS(STATIC_17757(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, i5594) -> f17764_0_createTree_New(EOS(STATIC_17764(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594) :|: i5594 > 0
+f17764_0_createTree_New(EOS(STATIC_17764(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594) -> f17771_0_createTree_Duplicate(EOS(STATIC_17771(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC))) :|: TRUE
+f17771_0_createTree_Duplicate(EOS(STATIC_17771(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC))) -> f17777_0_createTree_Load(EOS(STATIC_17777(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17777_0_createTree_Load(EOS(STATIC_17777(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f17785_0_createTree_ConstantStackPush(EOS(STATIC_17785(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22) :|: TRUE
+f17785_0_createTree_ConstantStackPush(EOS(STATIC_17785(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22) -> f17791_0_createTree_IntArithmetic(EOS(STATIC_17791(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22, 1) :|: TRUE
+f17791_0_createTree_IntArithmetic(EOS(STATIC_17791(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22, matching1) -> f17798_0_createTree_InvokeMethod(EOS(STATIC_17798(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22 - 1) :|: i22 > 0 && matching1 = 1
+f17798_0_createTree_InvokeMethod(EOS(STATIC_17798(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683) -> f17805_0_createTree_Load(EOS(STATIC_17805(java.lang.Object(ARRAY(i5556)), i5557)), i5683, i5683) :|: i22 >= 1 && i5594 >= 1 && i5557 > 1 && i5683 < i22
+f17798_0_createTree_InvokeMethod(EOS(STATIC_17798(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683) -> f17805_1_createTree_Load(EOS(STATIC_17805(java.lang.Object(ARRAY(i5556)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683) :|: i22 >= 1 && i5594 >= 1 && i5557 > 1 && i5683 < i22
+f17805_0_createTree_Load(EOS(STATIC_17805(java.lang.Object(ARRAY(i5556)), i5557)), i5683, i5683) -> f17813_0_createTree_Load(EOS(STATIC_17813(java.lang.Object(ARRAY(i5556)), i5557)), i5683, i5683) :|: TRUE
+f17813_0_createTree_Load(EOS(STATIC_17813(java.lang.Object(ARRAY(i5556)), i5557)), i5683, i5683) -> f176_0_createTree_Load(EOS(STATIC_176(java.lang.Object(ARRAY(i5556)), i5557)), i5683, i5683) :|: TRUE
+f17841_0_createTree_Return(EOS(STATIC_17841(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f17855_0_createTree_Load(EOS(STATIC_17855(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f17855_0_createTree_Load(EOS(STATIC_17855(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f17867_0_createTree_InvokeMethod(EOS(STATIC_17867(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f17867_0_createTree_InvokeMethod(EOS(STATIC_17867(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) -> f17877_0__init__Load(EOS(STATIC_17877(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f17877_0__init__Load(EOS(STATIC_17877(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) -> f17897_0__init__InvokeMethod(EOS(STATIC_17897(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17897_0__init__InvokeMethod(EOS(STATIC_17897(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f17907_0__init__Load(EOS(STATIC_17907(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f17907_0__init__Load(EOS(STATIC_17907(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) -> f17915_0__init__Load(EOS(STATIC_17915(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17915_0__init__Load(EOS(STATIC_17915(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f17923_0__init__FieldAccess(EOS(STATIC_17923(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f17923_0__init__FieldAccess(EOS(STATIC_17923(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f17930_0__init__Load(EOS(STATIC_17930(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17930_0__init__Load(EOS(STATIC_17930(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f17951_0__init__Load(EOS(STATIC_17951(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17951_0__init__Load(EOS(STATIC_17951(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f17964_0__init__FieldAccess(EOS(STATIC_17964(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17964_0__init__FieldAccess(EOS(STATIC_17964(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f17976_0__init__Return(EOS(STATIC_17976(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC))) :|: TRUE
+f17976_0__init__Return(EOS(STATIC_17976(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC))) -> f17987_0_createTree_Store(EOS(STATIC_17987(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC))) :|: TRUE
+f17987_0_createTree_Store(EOS(STATIC_17987(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, i5594, java.lang.Object(List(EOC))) -> f17998_0_createTree_Inc(EOS(STATIC_17998(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i5594) :|: TRUE
+f17998_0_createTree_Inc(EOS(STATIC_17998(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i5594) -> f18010_0_createTree_JMP(EOS(STATIC_18010(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i5594 + -1) :|: TRUE
+f18010_0_createTree_JMP(EOS(STATIC_18010(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i6373) -> f18019_0_createTree_Load(EOS(STATIC_18019(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i6373) :|: TRUE
+f18019_0_createTree_Load(EOS(STATIC_18019(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i6373) -> f17746_0_createTree_Load(EOS(STATIC_17746(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i6373) :|: TRUE
+f17846_0_createTree_Return(EOS(STATIC_17846(java.lang.Object(ARRAY(i5785)), i5782)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17950_0_createTree_Return(EOS(STATIC_17950(java.lang.Object(ARRAY(i5785)), i5782)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17950_0_createTree_Return(EOS(STATIC_17950(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17963_0_createTree_Load(EOS(STATIC_17963(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17963_0_createTree_Load(EOS(STATIC_17963(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17975_0_createTree_InvokeMethod(EOS(STATIC_17975(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17975_0_createTree_InvokeMethod(EOS(STATIC_17975(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) -> f17986_0__init__Load(EOS(STATIC_17986(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17986_0__init__Load(EOS(STATIC_17986(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) -> f18009_0__init__InvokeMethod(EOS(STATIC_18009(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18009_0__init__InvokeMethod(EOS(STATIC_18009(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18018_0__init__Load(EOS(STATIC_18018(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18018_0__init__Load(EOS(STATIC_18018(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) -> f18030_0__init__Load(EOS(STATIC_18030(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18030_0__init__Load(EOS(STATIC_18030(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18039_0__init__FieldAccess(EOS(STATIC_18039(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f18039_0__init__FieldAccess(EOS(STATIC_18039(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f18046_0__init__Load(EOS(STATIC_18046(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18046_0__init__Load(EOS(STATIC_18046(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18054_0__init__Load(EOS(STATIC_18054(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18054_0__init__Load(EOS(STATIC_18054(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18059_0__init__FieldAccess(EOS(STATIC_18059(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18059_0__init__FieldAccess(EOS(STATIC_18059(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18064_0__init__Return(EOS(STATIC_18064(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC))) :|: TRUE
+f18064_0__init__Return(EOS(STATIC_18064(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC))) -> f18069_0_createTree_Store(EOS(STATIC_18069(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC))) :|: TRUE
+f18069_0_createTree_Store(EOS(STATIC_18069(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, i5594, java.lang.Object(List(EOC))) -> f18076_0_createTree_Inc(EOS(STATIC_18076(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i5594) :|: TRUE
+f18076_0_createTree_Inc(EOS(STATIC_18076(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i5594) -> f18083_0_createTree_JMP(EOS(STATIC_18083(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i5594 + -1) :|: TRUE
+f18083_0_createTree_JMP(EOS(STATIC_18083(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i6695) -> f18088_0_createTree_Load(EOS(STATIC_18088(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i6695) :|: TRUE
+f18088_0_createTree_Load(EOS(STATIC_18088(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i6695) -> f17811_0_createTree_Load(EOS(STATIC_17811(java.lang.Object(ARRAY(i6155)), i6156)), i22, i22, java.lang.Object(List(EOC)), i6695) :|: TRUE
+f17811_0_createTree_Load(EOS(STATIC_17811(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5707) -> f17818_0_createTree_LE(EOS(STATIC_17818(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5707, i5707) :|: TRUE
+f17818_0_createTree_LE(EOS(STATIC_17818(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, i5737) -> f17825_0_createTree_LE(EOS(STATIC_17825(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, i5737) :|: TRUE
+f17825_0_createTree_LE(EOS(STATIC_17825(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, i5737) -> f17831_0_createTree_New(EOS(STATIC_17831(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737) :|: i5737 > 0
+f17831_0_createTree_New(EOS(STATIC_17831(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737) -> f17839_0_createTree_Duplicate(EOS(STATIC_17839(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC))) :|: TRUE
+f17839_0_createTree_Duplicate(EOS(STATIC_17839(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC))) -> f17853_0_createTree_Load(EOS(STATIC_17853(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17853_0_createTree_Load(EOS(STATIC_17853(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f17865_0_createTree_ConstantStackPush(EOS(STATIC_17865(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22) :|: TRUE
+f17865_0_createTree_ConstantStackPush(EOS(STATIC_17865(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22) -> f17875_0_createTree_IntArithmetic(EOS(STATIC_17875(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22, 1) :|: TRUE
+f17875_0_createTree_IntArithmetic(EOS(STATIC_17875(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22, matching1) -> f17884_0_createTree_InvokeMethod(EOS(STATIC_17884(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22 - 1) :|: i22 > 0 && matching1 = 1
+f17884_0_createTree_InvokeMethod(EOS(STATIC_17884(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5897) -> f17895_0_createTree_Load(EOS(STATIC_17895(java.lang.Object(ARRAY(i5705)), i5706)), i5897, i5897) :|: i22 >= 1 && i5737 >= 1 && i5706 > 1 && i5897 < i22
+f17884_0_createTree_InvokeMethod(EOS(STATIC_17884(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5897) -> f17895_1_createTree_Load(EOS(STATIC_17895(java.lang.Object(ARRAY(i5705)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5897) :|: i22 >= 1 && i5737 >= 1 && i5706 > 1 && i5897 < i22
+f17895_0_createTree_Load(EOS(STATIC_17895(java.lang.Object(ARRAY(i5705)), i5706)), i5897, i5897) -> f17905_0_createTree_Load(EOS(STATIC_17905(java.lang.Object(ARRAY(i5705)), i5706)), i5897, i5897) :|: TRUE
+f17905_0_createTree_Load(EOS(STATIC_17905(java.lang.Object(ARRAY(i5705)), i5706)), i5897, i5897) -> f176_0_createTree_Load(EOS(STATIC_176(java.lang.Object(ARRAY(i5705)), i5706)), i5897, i5897) :|: TRUE
+f17937_0_createTree_Return(EOS(STATIC_17937(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f17959_0_createTree_Load(EOS(STATIC_17959(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f17959_0_createTree_Load(EOS(STATIC_17959(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f17972_0_createTree_InvokeMethod(EOS(STATIC_17972(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f17972_0_createTree_InvokeMethod(EOS(STATIC_17972(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) -> f17984_0__init__Load(EOS(STATIC_17984(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f17984_0__init__Load(EOS(STATIC_17984(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) -> f18007_0__init__InvokeMethod(EOS(STATIC_18007(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18007_0__init__InvokeMethod(EOS(STATIC_18007(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18016_0__init__Load(EOS(STATIC_18016(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f18016_0__init__Load(EOS(STATIC_18016(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) -> f18028_0__init__Load(EOS(STATIC_18028(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18028_0__init__Load(EOS(STATIC_18028(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18037_0__init__FieldAccess(EOS(STATIC_18037(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f18037_0__init__FieldAccess(EOS(STATIC_18037(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f18044_0__init__Load(EOS(STATIC_18044(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18044_0__init__Load(EOS(STATIC_18044(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18052_0__init__Load(EOS(STATIC_18052(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18052_0__init__Load(EOS(STATIC_18052(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18057_0__init__FieldAccess(EOS(STATIC_18057(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18057_0__init__FieldAccess(EOS(STATIC_18057(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18062_0__init__Return(EOS(STATIC_18062(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC))) :|: TRUE
+f18062_0__init__Return(EOS(STATIC_18062(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC))) -> f18067_0_createTree_Store(EOS(STATIC_18067(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC))) :|: TRUE
+f18067_0_createTree_Store(EOS(STATIC_18067(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, i5737, java.lang.Object(List(EOC))) -> f18074_0_createTree_Inc(EOS(STATIC_18074(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i5737) :|: TRUE
+f18074_0_createTree_Inc(EOS(STATIC_18074(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i5737) -> f18081_0_createTree_JMP(EOS(STATIC_18081(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i5737 + -1) :|: TRUE
+f18081_0_createTree_JMP(EOS(STATIC_18081(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i6679) -> f18086_0_createTree_Load(EOS(STATIC_18086(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i6679) :|: TRUE
+f18086_0_createTree_Load(EOS(STATIC_18086(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i6679) -> f17746_0_createTree_Load(EOS(STATIC_17746(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i6679) :|: TRUE
+f17942_0_createTree_Return(EOS(STATIC_17942(java.lang.Object(ARRAY(i6039)), i6036)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17946_0_createTree_Return(EOS(STATIC_17946(java.lang.Object(ARRAY(i6039)), i6036)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17946_0_createTree_Return(EOS(STATIC_17946(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17962_0_createTree_Load(EOS(STATIC_17962(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17962_0_createTree_Load(EOS(STATIC_17962(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17974_0_createTree_InvokeMethod(EOS(STATIC_17974(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17974_0_createTree_InvokeMethod(EOS(STATIC_17974(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) -> f17985_0__init__Load(EOS(STATIC_17985(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f17985_0__init__Load(EOS(STATIC_17985(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) -> f18008_0__init__InvokeMethod(EOS(STATIC_18008(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18008_0__init__InvokeMethod(EOS(STATIC_18008(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18017_0__init__Load(EOS(STATIC_18017(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18017_0__init__Load(EOS(STATIC_18017(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC))) -> f18029_0__init__Load(EOS(STATIC_18029(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18029_0__init__Load(EOS(STATIC_18029(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18038_0__init__FieldAccess(EOS(STATIC_18038(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f18038_0__init__FieldAccess(EOS(STATIC_18038(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f18045_0__init__Load(EOS(STATIC_18045(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18045_0__init__Load(EOS(STATIC_18045(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18053_0__init__Load(EOS(STATIC_18053(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18053_0__init__Load(EOS(STATIC_18053(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18058_0__init__FieldAccess(EOS(STATIC_18058(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) :|: TRUE
+f18058_0__init__FieldAccess(EOS(STATIC_18058(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(List(EOC))) -> f18063_0__init__Return(EOS(STATIC_18063(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC))) :|: TRUE
+f18063_0__init__Return(EOS(STATIC_18063(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC))) -> f18068_0_createTree_Store(EOS(STATIC_18068(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC))) :|: TRUE
+f18068_0_createTree_Store(EOS(STATIC_18068(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, i5737, java.lang.Object(List(EOC))) -> f18075_0_createTree_Inc(EOS(STATIC_18075(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i5737) :|: TRUE
+f18075_0_createTree_Inc(EOS(STATIC_18075(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i5737) -> f18082_0_createTree_JMP(EOS(STATIC_18082(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i5737 + -1) :|: TRUE
+f18082_0_createTree_JMP(EOS(STATIC_18082(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i6686) -> f18087_0_createTree_Load(EOS(STATIC_18087(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i6686) :|: TRUE
+f18087_0_createTree_Load(EOS(STATIC_18087(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i6686) -> f17811_0_createTree_Load(EOS(STATIC_17811(java.lang.Object(ARRAY(i6139)), i6140)), i22, i22, java.lang.Object(List(EOC)), i6686) :|: TRUE
+f17945_0_createTree_Return(EOS(STATIC_17945(java.lang.Object(ARRAY(i6054)), i6051)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17946_0_createTree_Return(EOS(STATIC_17946(java.lang.Object(ARRAY(i6054)), i6051)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f18051_0_createTree_Return(EOS(STATIC_18051(java.lang.Object(ARRAY(i6503)), i6500)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17946_0_createTree_Return(EOS(STATIC_17946(java.lang.Object(ARRAY(i6503)), i6500)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17949_0_createTree_Return(EOS(STATIC_17949(java.lang.Object(ARRAY(i6075)), i6072)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17950_0_createTree_Return(EOS(STATIC_17950(java.lang.Object(ARRAY(i6075)), i6072)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f18050_0_createTree_Return(EOS(STATIC_18050(java.lang.Object(ARRAY(i6496)), i6493)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17950_0_createTree_Return(EOS(STATIC_17950(java.lang.Object(ARRAY(i6496)), i6493)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f3117_0_createTree_Return(EOS(STATIC_3117(java.lang.Object(ARRAY(i385)), i377)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f9432_0_createTree_Return(EOS(STATIC_9432(java.lang.Object(ARRAY(i385)), i377)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f9432_0_createTree_Return(EOS(STATIC_9432(java.lang.Object(ARRAY(i1659)), i1660)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f15505_0_createTree_Return(EOS(STATIC_15505(java.lang.Object(ARRAY(i1659)), i1660)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f15505_0_createTree_Return(EOS(STATIC_15505(java.lang.Object(ARRAY(i2918)), i2919)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17404_0_createTree_Return(EOS(STATIC_17404(java.lang.Object(ARRAY(i2918)), i2919)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17404_0_createTree_Return(EOS(STATIC_17404(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17411_0_createTree_Load(EOS(STATIC_17411(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17411_0_createTree_Load(EOS(STATIC_17411(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17416_0_createTree_InvokeMethod(EOS(STATIC_17416(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL) :|: TRUE
+f17416_0_createTree_InvokeMethod(EOS(STATIC_17416(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL) -> f17422_0__init__Load(EOS(STATIC_17422(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL) :|: TRUE
+f17422_0__init__Load(EOS(STATIC_17422(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL) -> f17430_0__init__InvokeMethod(EOS(STATIC_17430(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f17430_0__init__InvokeMethod(EOS(STATIC_17430(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL, java.lang.Object(List(EOC))) -> f17436_0__init__Load(EOS(STATIC_17436(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL) :|: TRUE
+f17436_0__init__Load(EOS(STATIC_17436(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL) -> f17443_0__init__Load(EOS(STATIC_17443(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f17443_0__init__Load(EOS(STATIC_17443(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC)), NULL, java.lang.Object(List(EOC))) -> f17450_0__init__FieldAccess(EOS(STATIC_17450(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17450_0__init__FieldAccess(EOS(STATIC_17450(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17457_0__init__Load(EOS(STATIC_17457(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f17457_0__init__Load(EOS(STATIC_17457(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f17465_0__init__Load(EOS(STATIC_17465(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) :|: TRUE
+f17465_0__init__Load(EOS(STATIC_17465(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), NULL, java.lang.Object(List(EOC))) -> f17472_0__init__FieldAccess(EOS(STATIC_17472(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f17472_0__init__FieldAccess(EOS(STATIC_17472(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) -> f17480_0__init__Return(EOS(STATIC_17480(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC))) :|: TRUE
+f17480_0__init__Return(EOS(STATIC_17480(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC))) -> f17487_0_createTree_Store(EOS(STATIC_17487(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC))) :|: TRUE
+f17487_0_createTree_Store(EOS(STATIC_17487(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, i74, java.lang.Object(List(EOC))) -> f17494_0_createTree_Inc(EOS(STATIC_17494(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, java.lang.Object(List(EOC)), i74) :|: TRUE
+f17494_0_createTree_Inc(EOS(STATIC_17494(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, java.lang.Object(List(EOC)), i74) -> f17502_0_createTree_JMP(EOS(STATIC_17502(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, java.lang.Object(List(EOC)), i74 + -1) :|: TRUE
+f17502_0_createTree_JMP(EOS(STATIC_17502(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, java.lang.Object(List(EOC)), i4622) -> f17510_0_createTree_Load(EOS(STATIC_17510(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, java.lang.Object(List(EOC)), i4622) :|: TRUE
+f17510_0_createTree_Load(EOS(STATIC_17510(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, java.lang.Object(List(EOC)), i4622) -> f17512_0_createTree_Load(EOS(STATIC_17512(java.lang.Object(ARRAY(i4418)), i4419)), i22, i22, java.lang.Object(List(EOC)), i4622) :|: TRUE
+f17512_0_createTree_Load(EOS(STATIC_17512(java.lang.Object(ARRAY(i4654)), i4655)), i22, i22, java.lang.Object(List(EOC)), i4656) -> f17811_0_createTree_Load(EOS(STATIC_17811(java.lang.Object(ARRAY(i4654)), i4655)), i22, i22, java.lang.Object(List(EOC)), i4656) :|: TRUE
+f17948_0_createTree_Return(EOS(STATIC_17948(java.lang.Object(ARRAY(i6068)), i6065)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17404_0_createTree_Return(EOS(STATIC_17404(java.lang.Object(ARRAY(i6068)), i6065)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f18049_0_createTree_Return(EOS(STATIC_18049(java.lang.Object(ARRAY(i6489)), i6486)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) -> f17404_0_createTree_Return(EOS(STATIC_17404(java.lang.Object(ARRAY(i6489)), i6486)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f700_1_createTree_Load(EOS(STATIC_700(java.lang.Object(ARRAY(i41)), i119)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i92) -> f2604_0_createTree_Return(EOS(STATIC_2604(java.lang.Object(ARRAY(i41)), i119)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f700_1_createTree_Load(EOS(STATIC_700(java.lang.Object(ARRAY(i385)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i92) -> f3117_0_createTree_Return(EOS(STATIC_3117(java.lang.Object(ARRAY(i385)), i377)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f700_1_createTree_Load(EOS(STATIC_700(java.lang.Object(ARRAY(i6068)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i92) -> f17948_0_createTree_Return(EOS(STATIC_17948(java.lang.Object(ARRAY(i6068)), i6065)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f700_1_createTree_Load(EOS(STATIC_700(java.lang.Object(ARRAY(i6489)), i44)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i92) -> f18049_0_createTree_Return(EOS(STATIC_18049(java.lang.Object(ARRAY(i6489)), i6486)), i22, i22, NULL, i74, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17805_1_createTree_Load(EOS(STATIC_17805(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683) -> f17841_0_createTree_Return(EOS(STATIC_17841(java.lang.Object(ARRAY(i5556)), i5756)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE
+f17805_1_createTree_Load(EOS(STATIC_17805(java.lang.Object(ARRAY(i5785)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683) -> f17846_0_createTree_Return(EOS(STATIC_17846(java.lang.Object(ARRAY(i5785)), i5782)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17805_1_createTree_Load(EOS(STATIC_17805(java.lang.Object(ARRAY(i6075)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683) -> f17949_0_createTree_Return(EOS(STATIC_17949(java.lang.Object(ARRAY(i6075)), i6072)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17805_1_createTree_Load(EOS(STATIC_17805(java.lang.Object(ARRAY(i6496)), i5557)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683) -> f18050_0_createTree_Return(EOS(STATIC_18050(java.lang.Object(ARRAY(i6496)), i6493)), i22, i22, java.lang.Object(List(EOC)), i5594, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17895_1_createTree_Load(EOS(STATIC_17895(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), matching1) -> f17937_0_createTree_Return(EOS(STATIC_17937(java.lang.Object(ARRAY(i5705)), i6010)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), NULL) :|: TRUE && matching1 = 0
+f17895_1_createTree_Load(EOS(STATIC_17895(java.lang.Object(ARRAY(i6039)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5897) -> f17942_0_createTree_Return(EOS(STATIC_17942(java.lang.Object(ARRAY(i6039)), i6036)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17895_1_createTree_Load(EOS(STATIC_17895(java.lang.Object(ARRAY(i6054)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5897) -> f17945_0_createTree_Return(EOS(STATIC_17945(java.lang.Object(ARRAY(i6054)), i6051)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+f17895_1_createTree_Load(EOS(STATIC_17895(java.lang.Object(ARRAY(i6503)), i5706)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5897) -> f18051_0_createTree_Return(EOS(STATIC_18051(java.lang.Object(ARRAY(i6503)), i6500)), i22, i22, java.lang.Object(List(EOC)), i5737, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), java.lang.Object(MarkingGraphVisitor(EOC))) :|: TRUE
+Combined rules. Obtained 9 IRulesP rules:
+f188_0_createTree_GT(EOS(STATIC_188(java.lang.Object(ARRAY(i41:0)), i10:0)), i22:0, i22:0, i22:0) -> f17884_0_createTree_InvokeMethod(EOS(STATIC_17884(java.lang.Object(ARRAY(i41:0)), i377:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i54:0 - 1, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22:0 - 1) :|: i54:0 > 1 && i22:0 > 0 && i41:0 > -1 && i10:0 > 0 && i22:0 - 1 < i22:0
+f188_0_createTree_GT(EOS(STATIC_188(java.lang.Object(ARRAY(i41:0)), i10:0)), i22:0, i22:0, i22:0) -> f17798_0_createTree_InvokeMethod(EOS(STATIC_17798(java.lang.Object(ARRAY(i41:0)), i10:0 + 1)), i22:0, i22:0, java.lang.Object(List(EOC)), i54:0 - 1, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22:0 - 1) :|: i54:0 > 1 && i22:0 > 0 && i41:0 > -1 && i10:0 > 0 && i22:0 - 1 < i22:0
+f17884_0_createTree_InvokeMethod(EOS(STATIC_17884(java.lang.Object(ARRAY(i5705:0)), i5706:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5737:0, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5897:0) -> f17884_0_createTree_InvokeMethod(EOS(STATIC_17884(java.lang.Object(ARRAY(i5705:0)), i6036:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5737:0 - 1, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22:0 - 1) :|: i5737:0 > 1 && i22:0 > 0 && i5897:0 < i22:0 && i5706:0 > 1
+f17884_0_createTree_InvokeMethod(EOS(STATIC_17884(java.lang.Object(ARRAY(i5705:0)), i5706:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5737:0, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), 0) -> f17798_0_createTree_InvokeMethod(EOS(STATIC_17798(java.lang.Object(ARRAY(i5705:0)), i5706:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5737:0 - 1, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22:0 - 1) :|: i5737:0 > 1 && i22:0 > 0 && i5706:0 > 1
+f17884_0_createTree_InvokeMethod(EOS(STATIC_17884(java.lang.Object(ARRAY(i5705:0)), i5706:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5737:0, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5897:0) -> f188_0_createTree_GT(EOS(STATIC_188(java.lang.Object(ARRAY(i5705:0)), i5706:0)), i5897:0, i5897:0, i5897:0) :|: i5737:0 > 0 && i22:0 > 0 && i5897:0 < i22:0 && i5706:0 > 1
+f17798_0_createTree_InvokeMethod(EOS(STATIC_17798(java.lang.Object(ARRAY(i5556:0)), i5557:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5594:0, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683:0) -> f188_0_createTree_GT(EOS(STATIC_188(java.lang.Object(ARRAY(i5556:0)), i5557:0)), i5683:0, i5683:0, i5683:0) :|: i5594:0 > 0 && i22:0 > 0 && i5683:0 < i22:0 && i5557:0 > 1
+f17798_0_createTree_InvokeMethod(EOS(STATIC_17798(java.lang.Object(ARRAY(i5556:0)), i5557:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5594:0, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683:0) -> f17884_0_createTree_InvokeMethod(EOS(STATIC_17884(java.lang.Object(ARRAY(i5556:0)), i5782:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5594:0 - 1, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22:0 - 1) :|: i5594:0 > 1 && i22:0 > 0 && i5557:0 > 1 && i5683:0 < i22:0
+f188_0_createTree_GT(EOS(STATIC_188(java.lang.Object(ARRAY(i41:0)), i10:0)), i22:0, i22:0, i22:0) -> f188_0_createTree_GT(EOS(STATIC_188(java.lang.Object(ARRAY(i41:0)), i10:0 + 1)), i22:0 - 1, i22:0 - 1, i22:0 - 1) :|: i54:0 > 0 && i22:0 > 0 && i41:0 > -1 && i10:0 > 0 && i22:0 - 1 < i22:0
+f17798_0_createTree_InvokeMethod(EOS(STATIC_17798(java.lang.Object(ARRAY(i5556:0)), i5557:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5594:0, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i5683:0) -> f17798_0_createTree_InvokeMethod(EOS(STATIC_17798(java.lang.Object(ARRAY(i5556:0)), i5557:0)), i22:0, i22:0, java.lang.Object(List(EOC)), i5594:0 - 1, java.lang.Object(List(EOC)), java.lang.Object(List(EOC)), i22:0 - 1) :|: i5594:0 > 1 && i22:0 > 0 && i5683:0 < i22:0 && i5557:0 > 1
+Filtered constant ground arguments:
+   f17884_0_createTree_InvokeMethod(x1, x2, x3, x4, x5, x6, x7, x8) -> f17884_0_createTree_InvokeMethod(x1, x2, x3, x5, x8)
+   f17798_0_createTree_InvokeMethod(x1, x2, x3, x4, x5, x6, x7, x8) -> f17798_0_createTree_InvokeMethod(x1, x2, x3, x5, x8)
+   List(x1) -> List
+Filtered duplicate arguments:
+   f188_0_createTree_GT(x1, x2, x3, x4) -> f188_0_createTree_GT(x1, x4)
+   f17884_0_createTree_InvokeMethod(x1, x2, x3, x4, x5) -> f17884_0_createTree_InvokeMethod(x1, x3, x4, x5)
+   f17798_0_createTree_InvokeMethod(x1, x2, x3, x4, x5) -> f17798_0_createTree_InvokeMethod(x1, x3, x4, x5)
+Finished conversion. Obtained 9 rules.P rules:
+f188_0_createTree_GT(i22:0, i41:0, i10:0) -> f17884_0_createTree_InvokeMethod(i22:0, i54:0 - 1, i22:0 - 1, i41:0, i377:0) :|: i22:0 > 0 && i54:0 > 1 && i41:0 > -1 && i22:0 - 1 < i22:0 && i10:0 > 0
+f188_0_createTree_GT(i22:0, i41:0, i10:0) -> f17798_0_createTree_InvokeMethod(i22:0, i54:0 - 1, i22:0 - 1, i41:0, i10:0 + 1) :|: i22:0 > 0 && i54:0 > 1 && i41:0 > -1 && i22:0 - 1 < i22:0 && i10:0 > 0
+f17884_0_createTree_InvokeMethod(i22:0, i5737:0, i5897:0, i5705:0, i5706:0) -> f17884_0_createTree_InvokeMethod(i22:0, i5737:0 - 1, i22:0 - 1, i5705:0, i6036:0) :|: i22:0 > 0 && i5737:0 > 1 && i5706:0 > 1 && i5897:0 < i22:0
+f17884_0_createTree_InvokeMethod(i22:0, i5737:0, cons_0, i5705:0, i5706:0) -> f17798_0_createTree_InvokeMethod(i22:0, i5737:0 - 1, i22:0 - 1, i5705:0, i5706:0) :|: i22:0 > 0 && i5706:0 > 1 && i5737:0 > 1 && cons_0 = 0
+f17884_0_createTree_InvokeMethod(i22:0, i5737:0, i5897:0, i5705:0, i5706:0) -> f188_0_createTree_GT(i5897:0, i5705:0, i5706:0) :|: i22:0 > 0 && i5737:0 > 0 && i5706:0 > 1 && i5897:0 < i22:0
+f17798_0_createTree_InvokeMethod(i22:0, i5594:0, i5683:0, i5556:0, i5557:0) -> f188_0_createTree_GT(i5683:0, i5556:0, i5557:0) :|: i22:0 > 0 && i5594:0 > 0 && i5557:0 > 1 && i5683:0 < i22:0
+f17798_0_createTree_InvokeMethod(i22:0, i5594:0, i5683:0, i5556:0, i5557:0) -> f17884_0_createTree_InvokeMethod(i22:0, i5594:0 - 1, i22:0 - 1, i5556:0, i5782:0) :|: i22:0 > 0 && i5594:0 > 1 && i5683:0 < i22:0 && i5557:0 > 1
+f188_0_createTree_GT(i22:0, i41:0, i10:0) -> f188_0_createTree_GT(i22:0 - 1, i41:0, i10:0 + 1) :|: i22:0 > 0 && i54:0 > 0 && i41:0 > -1 && i22:0 - 1 < i22:0 && i10:0 > 0
+f17798_0_createTree_InvokeMethod(i22:0, i5594:0, i5683:0, i5556:0, i5557:0) -> f17798_0_createTree_InvokeMethod(i22:0, i5594:0 - 1, i22:0 - 1, i5556:0, i5557:0) :|: i22:0 > 0 && i5594:0 > 1 && i5557:0 > 1 && i5683:0 < i22:0
+
+----------------------------------------
+
+(37)
+Obligation:
+Rules:
+f188_0_createTree_GT(i22:0, i41:0, i10:0) -> f17884_0_createTree_InvokeMethod(i22:0, i54:0 - 1, i22:0 - 1, i41:0, i377:0) :|: i22:0 > 0 && i54:0 > 1 && i41:0 > -1 && i22:0 - 1 < i22:0 && i10:0 > 0
+f188_0_createTree_GT(x, x1, x2) -> f17798_0_createTree_InvokeMethod(x, x3 - 1, x - 1, x1, x2 + 1) :|: x > 0 && x3 > 1 && x1 > -1 && x - 1 < x && x2 > 0
+f17884_0_createTree_InvokeMethod(x4, x5, x6, x7, x8) -> f17884_0_createTree_InvokeMethod(x4, x5 - 1, x4 - 1, x7, x9) :|: x4 > 0 && x5 > 1 && x8 > 1 && x6 < x4
+f17884_0_createTree_InvokeMethod(x10, x11, x12, x13, x14) -> f17798_0_createTree_InvokeMethod(x10, x11 - 1, x10 - 1, x13, x14) :|: x10 > 0 && x14 > 1 && x11 > 1 && x12 = 0
+f17884_0_createTree_InvokeMethod(x15, x16, x17, x18, x19) -> f188_0_createTree_GT(x17, x18, x19) :|: x15 > 0 && x16 > 0 && x19 > 1 && x17 < x15
+f17798_0_createTree_InvokeMethod(x20, x21, x22, x23, x24) -> f188_0_createTree_GT(x22, x23, x24) :|: x20 > 0 && x21 > 0 && x24 > 1 && x22 < x20
+f17798_0_createTree_InvokeMethod(x25, x26, x27, x28, x29) -> f17884_0_createTree_InvokeMethod(x25, x26 - 1, x25 - 1, x28, x30) :|: x25 > 0 && x26 > 1 && x27 < x25 && x29 > 1
+f188_0_createTree_GT(x31, x32, x33) -> f188_0_createTree_GT(x31 - 1, x32, x33 + 1) :|: x31 > 0 && x34 > 0 && x32 > -1 && x31 - 1 < x31 && x33 > 0
+f17798_0_createTree_InvokeMethod(x35, x36, x37, x38, x39) -> f17798_0_createTree_InvokeMethod(x35, x36 - 1, x35 - 1, x38, x39) :|: x35 > 0 && x36 > 1 && x39 > 1 && x37 < x35
+
+----------------------------------------
+
+(38) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(39)
+Obligation:
+Rules:
+f188_0_createTree_GT(i22:0, i41:0, i10:0) -> f17884_0_createTree_InvokeMethod(i22:0, arith, arith1, i41:0, i377:0) :|: i22:0 > 0 && i54:0 > 1 && i41:0 > -1 && i22:0 - 1 < i22:0 && i10:0 > 0 && arith = i54:0 - 1 && arith1 = i22:0 - 1
+f188_0_createTree_GT(x40, x41, x42) -> f17798_0_createTree_InvokeMethod(x40, x43, x44, x41, x45) :|: x40 > 0 && x46 > 1 && x41 > -1 && x40 - 1 < x40 && x42 > 0 && x43 = x46 - 1 && x44 = x40 - 1 && x45 = x42 + 1
+f17884_0_createTree_InvokeMethod(x47, x48, x49, x50, x51) -> f17884_0_createTree_InvokeMethod(x47, x52, x53, x50, x54) :|: x47 > 0 && x48 > 1 && x51 > 1 && x49 < x47 && x52 = x48 - 1 && x53 = x47 - 1
+f17884_0_createTree_InvokeMethod(x55, x56, x57, x58, x59) -> f17798_0_createTree_InvokeMethod(x55, x60, x61, x58, x59) :|: x55 > 0 && x59 > 1 && x56 > 1 && x57 = 0 && x60 = x56 - 1 && x61 = x55 - 1
+f17884_0_createTree_InvokeMethod(x15, x16, x17, x18, x19) -> f188_0_createTree_GT(x17, x18, x19) :|: x15 > 0 && x16 > 0 && x19 > 1 && x17 < x15
+f17798_0_createTree_InvokeMethod(x20, x21, x22, x23, x24) -> f188_0_createTree_GT(x22, x23, x24) :|: x20 > 0 && x21 > 0 && x24 > 1 && x22 < x20
+f17798_0_createTree_InvokeMethod(x62, x63, x64, x65, x66) -> f17884_0_createTree_InvokeMethod(x62, x67, x68, x65, x69) :|: x62 > 0 && x63 > 1 && x64 < x62 && x66 > 1 && x67 = x63 - 1 && x68 = x62 - 1
+f188_0_createTree_GT(x70, x71, x72) -> f188_0_createTree_GT(x73, x71, x74) :|: x70 > 0 && x75 > 0 && x71 > -1 && x70 - 1 < x70 && x72 > 0 && x73 = x70 - 1 && x74 = x72 + 1
+f17798_0_createTree_InvokeMethod(x76, x77, x78, x79, x80) -> f17798_0_createTree_InvokeMethod(x76, x81, x82, x79, x80) :|: x76 > 0 && x77 > 1 && x80 > 1 && x78 < x76 && x81 = x77 - 1 && x82 = x76 - 1
+
+----------------------------------------
+
+(40) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f188_0_createTree_GT(i22:0, i41:0, i10:0) -> f17884_0_createTree_InvokeMethod(i22:0, arith, arith1, i41:0, i377:0) :|: i22:0 > 0 && i54:0 > 1 && i41:0 > -1 && i22:0 - 1 < i22:0 && i10:0 > 0 && arith = i54:0 - 1 && arith1 = i22:0 - 1
+(2) f188_0_createTree_GT(x40, x41, x42) -> f17798_0_createTree_InvokeMethod(x40, x43, x44, x41, x45) :|: x40 > 0 && x46 > 1 && x41 > -1 && x40 - 1 < x40 && x42 > 0 && x43 = x46 - 1 && x44 = x40 - 1 && x45 = x42 + 1
+(3) f17884_0_createTree_InvokeMethod(x47, x48, x49, x50, x51) -> f17884_0_createTree_InvokeMethod(x47, x52, x53, x50, x54) :|: x47 > 0 && x48 > 1 && x51 > 1 && x49 < x47 && x52 = x48 - 1 && x53 = x47 - 1
+(4) f17884_0_createTree_InvokeMethod(x55, x56, x57, x58, x59) -> f17798_0_createTree_InvokeMethod(x55, x60, x61, x58, x59) :|: x55 > 0 && x59 > 1 && x56 > 1 && x57 = 0 && x60 = x56 - 1 && x61 = x55 - 1
+(5) f17884_0_createTree_InvokeMethod(x15, x16, x17, x18, x19) -> f188_0_createTree_GT(x17, x18, x19) :|: x15 > 0 && x16 > 0 && x19 > 1 && x17 < x15
+(6) f17798_0_createTree_InvokeMethod(x20, x21, x22, x23, x24) -> f188_0_createTree_GT(x22, x23, x24) :|: x20 > 0 && x21 > 0 && x24 > 1 && x22 < x20
+(7) f17798_0_createTree_InvokeMethod(x62, x63, x64, x65, x66) -> f17884_0_createTree_InvokeMethod(x62, x67, x68, x65, x69) :|: x62 > 0 && x63 > 1 && x64 < x62 && x66 > 1 && x67 = x63 - 1 && x68 = x62 - 1
+(8) f188_0_createTree_GT(x70, x71, x72) -> f188_0_createTree_GT(x73, x71, x74) :|: x70 > 0 && x75 > 0 && x71 > -1 && x70 - 1 < x70 && x72 > 0 && x73 = x70 - 1 && x74 = x72 + 1
+(9) f17798_0_createTree_InvokeMethod(x76, x77, x78, x79, x80) -> f17798_0_createTree_InvokeMethod(x76, x81, x82, x79, x80) :|: x76 > 0 && x77 > 1 && x80 > 1 && x78 < x76 && x81 = x77 - 1 && x82 = x76 - 1
+
+Arcs:
+(1) -> (3), (4), (5)
+(2) -> (6), (7), (9)
+(3) -> (3), (4), (5)
+(4) -> (6), (7), (9)
+(5) -> (1), (2), (8)
+(6) -> (1), (2), (8)
+(7) -> (3), (4), (5)
+(8) -> (1), (2), (8)
+(9) -> (6), (7), (9)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(41)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f188_0_createTree_GT(i22:0, i41:0, i10:0) -> f17884_0_createTree_InvokeMethod(i22:0, arith, arith1, i41:0, i377:0) :|: i22:0 > 0 && i54:0 > 1 && i41:0 > -1 && i22:0 - 1 < i22:0 && i10:0 > 0 && arith = i54:0 - 1 && arith1 = i22:0 - 1
+(2) f17884_0_createTree_InvokeMethod(x15, x16, x17, x18, x19) -> f188_0_createTree_GT(x17, x18, x19) :|: x15 > 0 && x16 > 0 && x19 > 1 && x17 < x15
+(3) f17884_0_createTree_InvokeMethod(x47, x48, x49, x50, x51) -> f17884_0_createTree_InvokeMethod(x47, x52, x53, x50, x54) :|: x47 > 0 && x48 > 1 && x51 > 1 && x49 < x47 && x52 = x48 - 1 && x53 = x47 - 1
+(4) f17798_0_createTree_InvokeMethod(x62, x63, x64, x65, x66) -> f17884_0_createTree_InvokeMethod(x62, x67, x68, x65, x69) :|: x62 > 0 && x63 > 1 && x64 < x62 && x66 > 1 && x67 = x63 - 1 && x68 = x62 - 1
+(5) f188_0_createTree_GT(x40, x41, x42) -> f17798_0_createTree_InvokeMethod(x40, x43, x44, x41, x45) :|: x40 > 0 && x46 > 1 && x41 > -1 && x40 - 1 < x40 && x42 > 0 && x43 = x46 - 1 && x44 = x40 - 1 && x45 = x42 + 1
+(6) f188_0_createTree_GT(x70, x71, x72) -> f188_0_createTree_GT(x73, x71, x74) :|: x70 > 0 && x75 > 0 && x71 > -1 && x70 - 1 < x70 && x72 > 0 && x73 = x70 - 1 && x74 = x72 + 1
+(7) f17798_0_createTree_InvokeMethod(x20, x21, x22, x23, x24) -> f188_0_createTree_GT(x22, x23, x24) :|: x20 > 0 && x21 > 0 && x24 > 1 && x22 < x20
+(8) f17798_0_createTree_InvokeMethod(x76, x77, x78, x79, x80) -> f17798_0_createTree_InvokeMethod(x76, x81, x82, x79, x80) :|: x76 > 0 && x77 > 1 && x80 > 1 && x78 < x76 && x81 = x77 - 1 && x82 = x76 - 1
+(9) f17884_0_createTree_InvokeMethod(x55, x56, x57, x58, x59) -> f17798_0_createTree_InvokeMethod(x55, x60, x61, x58, x59) :|: x55 > 0 && x59 > 1 && x56 > 1 && x57 = 0 && x60 = x56 - 1 && x61 = x55 - 1
+
+Arcs:
+(1) -> (2), (3), (9)
+(2) -> (1), (5), (6)
+(3) -> (2), (3), (9)
+(4) -> (2), (3), (9)
+(5) -> (4), (7), (8)
+(6) -> (1), (5), (6)
+(7) -> (1), (5), (6)
+(8) -> (4), (7), (8)
+(9) -> (4), (7), (8)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(42) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(43)
+Obligation:
+Rules:
+f17798_0_createTree_InvokeMethod(x62:0, x63:0, x64:0, x65:0, x66:0) -> f17884_0_createTree_InvokeMethod(x62:0, x63:0 - 1, x62:0 - 1, x65:0, x69:0) :|: x64:0 < x62:0 && x66:0 > 1 && x63:0 > 1 && x62:0 > 0
+f17884_0_createTree_InvokeMethod(x15:0, x16:0, x17:0, x18:0, x19:0) -> f188_0_createTree_GT(x17:0, x18:0, x19:0) :|: x19:0 > 1 && x17:0 < x15:0 && x16:0 > 0 && x15:0 > 0
+f188_0_createTree_GT(x40:0, x41:0, x42:0) -> f17798_0_createTree_InvokeMethod(x40:0, x46:0 - 1, x40:0 - 1, x41:0, x42:0 + 1) :|: x40:0 - 1 < x40:0 && x42:0 > 0 && x41:0 > -1 && x46:0 > 1 && x40:0 > 0
+f188_0_createTree_GT(x70:0, x71:0, x72:0) -> f188_0_createTree_GT(x70:0 - 1, x71:0, x72:0 + 1) :|: x70:0 - 1 < x70:0 && x72:0 > 0 && x71:0 > -1 && x75:0 > 0 && x70:0 > 0
+f17884_0_createTree_InvokeMethod(x55:0, x56:0, cons_0, x58:0, x59:0) -> f17798_0_createTree_InvokeMethod(x55:0, x56:0 - 1, x55:0 - 1, x58:0, x59:0) :|: x55:0 > 0 && x59:0 > 1 && x56:0 > 1 && cons_0 = 0
+f17798_0_createTree_InvokeMethod(x20:0, x21:0, x22:0, x23:0, x24:0) -> f188_0_createTree_GT(x22:0, x23:0, x24:0) :|: x24:0 > 1 && x22:0 < x20:0 && x21:0 > 0 && x20:0 > 0
+f17884_0_createTree_InvokeMethod(x47:0, x48:0, x49:0, x50:0, x51:0) -> f17884_0_createTree_InvokeMethod(x47:0, x48:0 - 1, x47:0 - 1, x50:0, x54:0) :|: x51:0 > 1 && x49:0 < x47:0 && x48:0 > 1 && x47:0 > 0
+f17798_0_createTree_InvokeMethod(x76:0, x77:0, x78:0, x79:0, x80:0) -> f17798_0_createTree_InvokeMethod(x76:0, x77:0 - 1, x76:0 - 1, x79:0, x80:0) :|: x80:0 > 1 && x78:0 < x76:0 && x77:0 > 1 && x76:0 > 0
+f188_0_createTree_GT(i22:0:0, i41:0:0, i10:0:0) -> f17884_0_createTree_InvokeMethod(i22:0:0, i54:0:0 - 1, i22:0:0 - 1, i41:0:0, i377:0:0) :|: i22:0:0 - 1 < i22:0:0 && i10:0:0 > 0 && i41:0:0 > -1 && i54:0:0 > 1 && i22:0:0 > 0
+
+----------------------------------------
+
+(44) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f17798_0_createTree_InvokeMethod(INTEGER, INTEGER, INTEGER, VARIABLE, INTEGER)
+f17884_0_createTree_InvokeMethod(INTEGER, INTEGER, INTEGER, VARIABLE, VARIABLE)
+f188_0_createTree_GT(INTEGER, VARIABLE, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(45)
+Obligation:
+Rules:
+f17798_0_createTree_InvokeMethod(x62:0, x63:0, x64:0, x65:0, x66:0) -> f17884_0_createTree_InvokeMethod(x62:0, c, c1, x65:0, x69:0) :|: c1 = x62:0 - 1 && c = x63:0 - 1 && (x64:0 < x62:0 && x66:0 > 1 && x63:0 > 1 && x62:0 > 0)
+f17884_0_createTree_InvokeMethod(x15:0, x16:0, x17:0, x18:0, x19:0) -> f188_0_createTree_GT(x17:0, x18:0, x19:0) :|: x19:0 > 1 && x17:0 < x15:0 && x16:0 > 0 && x15:0 > 0
+f188_0_createTree_GT(x40:0, x41:0, x42:0) -> f17798_0_createTree_InvokeMethod(x40:0, c2, c3, x41:0, c4) :|: c4 = x42:0 + 1 && (c3 = x40:0 - 1 && c2 = x46:0 - 1) && (x40:0 - 1 < x40:0 && x42:0 > 0 && x41:0 > -1 && x46:0 > 1 && x40:0 > 0)
+f188_0_createTree_GT(x70:0, x71:0, x72:0) -> f188_0_createTree_GT(c5, x71:0, c6) :|: c6 = x72:0 + 1 && c5 = x70:0 - 1 && (x70:0 - 1 < x70:0 && x72:0 > 0 && x71:0 > -1 && x75:0 > 0 && x70:0 > 0)
+f17884_0_createTree_InvokeMethod(x55:0, x56:0, c7, x58:0, x59:0) -> f17798_0_createTree_InvokeMethod(x55:0, c8, c9, x58:0, x59:0) :|: c9 = x55:0 - 1 && (c8 = x56:0 - 1 && c7 = 0) && (x55:0 > 0 && x59:0 > 1 && x56:0 > 1 && cons_0 = 0)
+f17798_0_createTree_InvokeMethod(x20:0, x21:0, x22:0, x23:0, x24:0) -> f188_0_createTree_GT(x22:0, x23:0, x24:0) :|: x24:0 > 1 && x22:0 < x20:0 && x21:0 > 0 && x20:0 > 0
+f17884_0_createTree_InvokeMethod(x47:0, x48:0, x49:0, x50:0, x51:0) -> f17884_0_createTree_InvokeMethod(x47:0, c10, c11, x50:0, x54:0) :|: c11 = x47:0 - 1 && c10 = x48:0 - 1 && (x51:0 > 1 && x49:0 < x47:0 && x48:0 > 1 && x47:0 > 0)
+f17798_0_createTree_InvokeMethod(x76:0, x77:0, x78:0, x79:0, x80:0) -> f17798_0_createTree_InvokeMethod(x76:0, c12, c13, x79:0, x80:0) :|: c13 = x76:0 - 1 && c12 = x77:0 - 1 && (x80:0 > 1 && x78:0 < x76:0 && x77:0 > 1 && x76:0 > 0)
+f188_0_createTree_GT(i22:0:0, i41:0:0, i10:0:0) -> f17884_0_createTree_InvokeMethod(i22:0:0, c14, c15, i41:0:0, i377:0:0) :|: c15 = i22:0:0 - 1 && c14 = i54:0:0 - 1 && (i22:0:0 - 1 < i22:0:0 && i10:0:0 > 0 && i41:0:0 > -1 && i54:0:0 > 1 && i22:0:0 > 0)
+
+----------------------------------------
+
+(46) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f17798_0_createTree_InvokeMethod(x, x1, x2, x3, x4)] = x
+[f17884_0_createTree_InvokeMethod(x5, x6, x7, x8, x9)] = x5
+[f188_0_createTree_GT(x10, x11, x12)] = x10
+
+The following rules are decreasing:
+f17884_0_createTree_InvokeMethod(x15:0, x16:0, x17:0, x18:0, x19:0) -> f188_0_createTree_GT(x17:0, x18:0, x19:0) :|: x19:0 > 1 && x17:0 < x15:0 && x16:0 > 0 && x15:0 > 0
+f188_0_createTree_GT(x70:0, x71:0, x72:0) -> f188_0_createTree_GT(c5, x71:0, c6) :|: c6 = x72:0 + 1 && c5 = x70:0 - 1 && (x70:0 - 1 < x70:0 && x72:0 > 0 && x71:0 > -1 && x75:0 > 0 && x70:0 > 0)
+f17798_0_createTree_InvokeMethod(x20:0, x21:0, x22:0, x23:0, x24:0) -> f188_0_createTree_GT(x22:0, x23:0, x24:0) :|: x24:0 > 1 && x22:0 < x20:0 && x21:0 > 0 && x20:0 > 0
+The following rules are bounded:
+f17798_0_createTree_InvokeMethod(x62:0, x63:0, x64:0, x65:0, x66:0) -> f17884_0_createTree_InvokeMethod(x62:0, c, c1, x65:0, x69:0) :|: c1 = x62:0 - 1 && c = x63:0 - 1 && (x64:0 < x62:0 && x66:0 > 1 && x63:0 > 1 && x62:0 > 0)
+f17884_0_createTree_InvokeMethod(x15:0, x16:0, x17:0, x18:0, x19:0) -> f188_0_createTree_GT(x17:0, x18:0, x19:0) :|: x19:0 > 1 && x17:0 < x15:0 && x16:0 > 0 && x15:0 > 0
+f188_0_createTree_GT(x40:0, x41:0, x42:0) -> f17798_0_createTree_InvokeMethod(x40:0, c2, c3, x41:0, c4) :|: c4 = x42:0 + 1 && (c3 = x40:0 - 1 && c2 = x46:0 - 1) && (x40:0 - 1 < x40:0 && x42:0 > 0 && x41:0 > -1 && x46:0 > 1 && x40:0 > 0)
+f188_0_createTree_GT(x70:0, x71:0, x72:0) -> f188_0_createTree_GT(c5, x71:0, c6) :|: c6 = x72:0 + 1 && c5 = x70:0 - 1 && (x70:0 - 1 < x70:0 && x72:0 > 0 && x71:0 > -1 && x75:0 > 0 && x70:0 > 0)
+f17884_0_createTree_InvokeMethod(x55:0, x56:0, c7, x58:0, x59:0) -> f17798_0_createTree_InvokeMethod(x55:0, c8, c9, x58:0, x59:0) :|: c9 = x55:0 - 1 && (c8 = x56:0 - 1 && c7 = 0) && (x55:0 > 0 && x59:0 > 1 && x56:0 > 1 && cons_0 = 0)
+f17798_0_createTree_InvokeMethod(x20:0, x21:0, x22:0, x23:0, x24:0) -> f188_0_createTree_GT(x22:0, x23:0, x24:0) :|: x24:0 > 1 && x22:0 < x20:0 && x21:0 > 0 && x20:0 > 0
+f17884_0_createTree_InvokeMethod(x47:0, x48:0, x49:0, x50:0, x51:0) -> f17884_0_createTree_InvokeMethod(x47:0, c10, c11, x50:0, x54:0) :|: c11 = x47:0 - 1 && c10 = x48:0 - 1 && (x51:0 > 1 && x49:0 < x47:0 && x48:0 > 1 && x47:0 > 0)
+f17798_0_createTree_InvokeMethod(x76:0, x77:0, x78:0, x79:0, x80:0) -> f17798_0_createTree_InvokeMethod(x76:0, c12, c13, x79:0, x80:0) :|: c13 = x76:0 - 1 && c12 = x77:0 - 1 && (x80:0 > 1 && x78:0 < x76:0 && x77:0 > 1 && x76:0 > 0)
+f188_0_createTree_GT(i22:0:0, i41:0:0, i10:0:0) -> f17884_0_createTree_InvokeMethod(i22:0:0, c14, c15, i41:0:0, i377:0:0) :|: c15 = i22:0:0 - 1 && c14 = i54:0:0 - 1 && (i22:0:0 - 1 < i22:0:0 && i10:0:0 > 0 && i41:0:0 > -1 && i54:0:0 > 1 && i22:0:0 > 0)
+
+----------------------------------------
+
+(47)
+Obligation:
+Rules:
+f17798_0_createTree_InvokeMethod(x62:0, x63:0, x64:0, x65:0, x66:0) -> f17884_0_createTree_InvokeMethod(x62:0, c, c1, x65:0, x69:0) :|: c1 = x62:0 - 1 && c = x63:0 - 1 && (x64:0 < x62:0 && x66:0 > 1 && x63:0 > 1 && x62:0 > 0)
+f188_0_createTree_GT(x40:0, x41:0, x42:0) -> f17798_0_createTree_InvokeMethod(x40:0, c2, c3, x41:0, c4) :|: c4 = x42:0 + 1 && (c3 = x40:0 - 1 && c2 = x46:0 - 1) && (x40:0 - 1 < x40:0 && x42:0 > 0 && x41:0 > -1 && x46:0 > 1 && x40:0 > 0)
+f17884_0_createTree_InvokeMethod(x55:0, x56:0, c7, x58:0, x59:0) -> f17798_0_createTree_InvokeMethod(x55:0, c8, c9, x58:0, x59:0) :|: c9 = x55:0 - 1 && (c8 = x56:0 - 1 && c7 = 0) && (x55:0 > 0 && x59:0 > 1 && x56:0 > 1 && cons_0 = 0)
+f17884_0_createTree_InvokeMethod(x47:0, x48:0, x49:0, x50:0, x51:0) -> f17884_0_createTree_InvokeMethod(x47:0, c10, c11, x50:0, x54:0) :|: c11 = x47:0 - 1 && c10 = x48:0 - 1 && (x51:0 > 1 && x49:0 < x47:0 && x48:0 > 1 && x47:0 > 0)
+f17798_0_createTree_InvokeMethod(x76:0, x77:0, x78:0, x79:0, x80:0) -> f17798_0_createTree_InvokeMethod(x76:0, c12, c13, x79:0, x80:0) :|: c13 = x76:0 - 1 && c12 = x77:0 - 1 && (x80:0 > 1 && x78:0 < x76:0 && x77:0 > 1 && x76:0 > 0)
+f188_0_createTree_GT(i22:0:0, i41:0:0, i10:0:0) -> f17884_0_createTree_InvokeMethod(i22:0:0, c14, c15, i41:0:0, i377:0:0) :|: c15 = i22:0:0 - 1 && c14 = i54:0:0 - 1 && (i22:0:0 - 1 < i22:0:0 && i10:0:0 > 0 && i41:0:0 > -1 && i54:0:0 > 1 && i22:0:0 > 0)
+
+----------------------------------------
+
+(48) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f17798_0_createTree_InvokeMethod(x, x1, x2, x3, x4)] = -x - x3
+[f17884_0_createTree_InvokeMethod(x5, x6, x7, x8, x9)] = -x5 - x8
+[f188_0_createTree_GT(x10, x11, x12)] = 0
+
+The following rules are decreasing:
+f188_0_createTree_GT(x40:0, x41:0, x42:0) -> f17798_0_createTree_InvokeMethod(x40:0, c2, c3, x41:0, c4) :|: c4 = x42:0 + 1 && (c3 = x40:0 - 1 && c2 = x46:0 - 1) && (x40:0 - 1 < x40:0 && x42:0 > 0 && x41:0 > -1 && x46:0 > 1 && x40:0 > 0)
+f188_0_createTree_GT(i22:0:0, i41:0:0, i10:0:0) -> f17884_0_createTree_InvokeMethod(i22:0:0, c14, c15, i41:0:0, i377:0:0) :|: c15 = i22:0:0 - 1 && c14 = i54:0:0 - 1 && (i22:0:0 - 1 < i22:0:0 && i10:0:0 > 0 && i41:0:0 > -1 && i54:0:0 > 1 && i22:0:0 > 0)
+The following rules are bounded:
+f188_0_createTree_GT(x40:0, x41:0, x42:0) -> f17798_0_createTree_InvokeMethod(x40:0, c2, c3, x41:0, c4) :|: c4 = x42:0 + 1 && (c3 = x40:0 - 1 && c2 = x46:0 - 1) && (x40:0 - 1 < x40:0 && x42:0 > 0 && x41:0 > -1 && x46:0 > 1 && x40:0 > 0)
+f188_0_createTree_GT(i22:0:0, i41:0:0, i10:0:0) -> f17884_0_createTree_InvokeMethod(i22:0:0, c14, c15, i41:0:0, i377:0:0) :|: c15 = i22:0:0 - 1 && c14 = i54:0:0 - 1 && (i22:0:0 - 1 < i22:0:0 && i10:0:0 > 0 && i41:0:0 > -1 && i54:0:0 > 1 && i22:0:0 > 0)
+
+----------------------------------------
+
+(49)
+Obligation:
+Rules:
+f17798_0_createTree_InvokeMethod(x62:0, x63:0, x64:0, x65:0, x66:0) -> f17884_0_createTree_InvokeMethod(x62:0, c, c1, x65:0, x69:0) :|: c1 = x62:0 - 1 && c = x63:0 - 1 && (x64:0 < x62:0 && x66:0 > 1 && x63:0 > 1 && x62:0 > 0)
+f17884_0_createTree_InvokeMethod(x55:0, x56:0, c7, x58:0, x59:0) -> f17798_0_createTree_InvokeMethod(x55:0, c8, c9, x58:0, x59:0) :|: c9 = x55:0 - 1 && (c8 = x56:0 - 1 && c7 = 0) && (x55:0 > 0 && x59:0 > 1 && x56:0 > 1 && cons_0 = 0)
+f17884_0_createTree_InvokeMethod(x47:0, x48:0, x49:0, x50:0, x51:0) -> f17884_0_createTree_InvokeMethod(x47:0, c10, c11, x50:0, x54:0) :|: c11 = x47:0 - 1 && c10 = x48:0 - 1 && (x51:0 > 1 && x49:0 < x47:0 && x48:0 > 1 && x47:0 > 0)
+f17798_0_createTree_InvokeMethod(x76:0, x77:0, x78:0, x79:0, x80:0) -> f17798_0_createTree_InvokeMethod(x76:0, c12, c13, x79:0, x80:0) :|: c13 = x76:0 - 1 && c12 = x77:0 - 1 && (x80:0 > 1 && x78:0 < x76:0 && x77:0 > 1 && x76:0 > 0)
+
+----------------------------------------
+
+(50) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f17798_0_createTree_InvokeMethod ] = f17798_0_createTree_InvokeMethod_2
+[ f17884_0_createTree_InvokeMethod ] = f17884_0_createTree_InvokeMethod_2
+
+The following rules are decreasing:
+f17798_0_createTree_InvokeMethod(x62:0, x63:0, x64:0, x65:0, x66:0) -> f17884_0_createTree_InvokeMethod(x62:0, c, c1, x65:0, x69:0) :|: c1 = x62:0 - 1 && c = x63:0 - 1 && (x64:0 < x62:0 && x66:0 > 1 && x63:0 > 1 && x62:0 > 0)
+f17884_0_createTree_InvokeMethod(x55:0, x56:0, c7, x58:0, x59:0) -> f17798_0_createTree_InvokeMethod(x55:0, c8, c9, x58:0, x59:0) :|: c9 = x55:0 - 1 && (c8 = x56:0 - 1 && c7 = 0) && (x55:0 > 0 && x59:0 > 1 && x56:0 > 1 && cons_0 = 0)
+f17884_0_createTree_InvokeMethod(x47:0, x48:0, x49:0, x50:0, x51:0) -> f17884_0_createTree_InvokeMethod(x47:0, c10, c11, x50:0, x54:0) :|: c11 = x47:0 - 1 && c10 = x48:0 - 1 && (x51:0 > 1 && x49:0 < x47:0 && x48:0 > 1 && x47:0 > 0)
+f17798_0_createTree_InvokeMethod(x76:0, x77:0, x78:0, x79:0, x80:0) -> f17798_0_createTree_InvokeMethod(x76:0, c12, c13, x79:0, x80:0) :|: c13 = x76:0 - 1 && c12 = x77:0 - 1 && (x80:0 > 1 && x78:0 < x76:0 && x77:0 > 1 && x76:0 > 0)
+
+The following rules are bounded:
+f17798_0_createTree_InvokeMethod(x62:0, x63:0, x64:0, x65:0, x66:0) -> f17884_0_createTree_InvokeMethod(x62:0, c, c1, x65:0, x69:0) :|: c1 = x62:0 - 1 && c = x63:0 - 1 && (x64:0 < x62:0 && x66:0 > 1 && x63:0 > 1 && x62:0 > 0)
+f17884_0_createTree_InvokeMethod(x55:0, x56:0, c7, x58:0, x59:0) -> f17798_0_createTree_InvokeMethod(x55:0, c8, c9, x58:0, x59:0) :|: c9 = x55:0 - 1 && (c8 = x56:0 - 1 && c7 = 0) && (x55:0 > 0 && x59:0 > 1 && x56:0 > 1 && cons_0 = 0)
+f17884_0_createTree_InvokeMethod(x47:0, x48:0, x49:0, x50:0, x51:0) -> f17884_0_createTree_InvokeMethod(x47:0, c10, c11, x50:0, x54:0) :|: c11 = x47:0 - 1 && c10 = x48:0 - 1 && (x51:0 > 1 && x49:0 < x47:0 && x48:0 > 1 && x47:0 > 0)
+f17798_0_createTree_InvokeMethod(x76:0, x77:0, x78:0, x79:0, x80:0) -> f17798_0_createTree_InvokeMethod(x76:0, c12, c13, x79:0, x80:0) :|: c13 = x76:0 - 1 && c12 = x77:0 - 1 && (x80:0 > 1 && x78:0 < x76:0 && x77:0 > 1 && x76:0 > 0)
+
+
+----------------------------------------
+
+(51)
+YES
+
+----------------------------------------
+
+(52)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: MarkingGraphVisitor.main([Ljava/lang/String;)V
+SCC calls the following helper methods: MarkingGraphVisitor.getRandom()LMarkingGraphVisitor;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*MarkingGraphVisitor: [children]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(53) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 46 IRulesP rules:
+f19131_0_main_Inc(EOS(STATIC_19131), java.lang.Object(ARRAY(i7869)), o6607, i7871, i7871) -> f19135_0_main_LE(EOS(STATIC_19135), java.lang.Object(ARRAY(i7869)), o6607, i7871 + -1, i7871) :|: TRUE
+f19135_0_main_LE(EOS(STATIC_19135), java.lang.Object(ARRAY(i7869)), o6607, i7876, i7879) -> f19140_0_main_LE(EOS(STATIC_19140), java.lang.Object(ARRAY(i7869)), o6607, i7876, i7879) :|: TRUE
+f19140_0_main_LE(EOS(STATIC_19140), java.lang.Object(ARRAY(i7869)), o6607, i7876, i7879) -> f19146_0_main_Load(EOS(STATIC_19146), java.lang.Object(ARRAY(i7869)), o6607, i7876) :|: i7879 > 0
+f19146_0_main_Load(EOS(STATIC_19146), java.lang.Object(ARRAY(i7869)), o6607, i7876) -> f19152_0_main_InvokeMethod(EOS(STATIC_19152), java.lang.Object(ARRAY(i7869)), o6607, i7876, o6607) :|: TRUE
+f19152_0_main_InvokeMethod(EOS(STATIC_19152), java.lang.Object(ARRAY(i7869)), java.lang.Object(o6613sub), i7876, java.lang.Object(o6613sub)) -> f19158_0_main_InvokeMethod(EOS(STATIC_19158), java.lang.Object(ARRAY(i7869)), java.lang.Object(o6613sub), i7876, java.lang.Object(o6613sub)) :|: TRUE
+f19158_0_main_InvokeMethod(EOS(STATIC_19158), java.lang.Object(ARRAY(i7869)), java.lang.Object(o6613sub), i7876, java.lang.Object(o6613sub)) -> f19165_0_getRandom_InvokeMethod(EOS(STATIC_19165), java.lang.Object(o6613sub), java.lang.Object(ARRAY(i7869)), java.lang.Object(o6613sub)) :|: TRUE
+f19158_0_main_InvokeMethod(EOS(STATIC_19158), java.lang.Object(ARRAY(i7869)), java.lang.Object(o6613sub), i7876, java.lang.Object(o6613sub)) -> f19165_1_getRandom_InvokeMethod(EOS(STATIC_19165), java.lang.Object(ARRAY(i7869)), java.lang.Object(o6613sub), i7876, java.lang.Object(o6613sub)) :|: TRUE
+f19165_0_getRandom_InvokeMethod(EOS(STATIC_19165), java.lang.Object(o6613sub), java.lang.Object(ARRAY(i7869)), java.lang.Object(o6613sub)) -> f20991_0_getRandom_InvokeMethod(EOS(STATIC_20991), java.lang.Object(o6613sub), java.lang.Object(ARRAY(i7869)), java.lang.Object(o6613sub)) :|: TRUE
+f19786_0_getRandom_Return(EOS(STATIC_19786), java.lang.Object(ARRAY(i9248)), java.lang.Object(o7514sub), i7876, o7512) -> f19303_0_getRandom_Return(EOS(STATIC_19303), java.lang.Object(ARRAY(i9248)), java.lang.Object(o7514sub), i7876, o7512) :|: TRUE
+f19303_0_getRandom_Return(EOS(STATIC_19303), java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub), i7876, o6824) -> f19308_0_main_Store(EOS(STATIC_19308), java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub), i7876, o6824) :|: TRUE
+f19308_0_main_Store(EOS(STATIC_19308), java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub), i7876, o6824) -> f19315_0_main_Load(EOS(STATIC_19315), java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub), i7876, o6824) :|: TRUE
+f19315_0_main_Load(EOS(STATIC_19315), java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub), i7876, o6824) -> f19322_0_main_InvokeMethod(EOS(STATIC_19322), java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub), i7876, o6824, java.lang.Object(o6825sub)) :|: TRUE
+f19322_0_main_InvokeMethod(EOS(STATIC_19322), java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub), i7876, o6824, java.lang.Object(o6825sub)) -> f19329_0_getRandom_InvokeMethod(EOS(STATIC_19329), java.lang.Object(o6825sub), o6824, java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub)) :|: TRUE
+f19322_0_main_InvokeMethod(EOS(STATIC_19322), java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub), i7876, o6824, java.lang.Object(o6825sub)) -> f19329_1_getRandom_InvokeMethod(EOS(STATIC_19329), java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub), i7876, o6824, java.lang.Object(o6825sub)) :|: TRUE
+f19329_0_getRandom_InvokeMethod(EOS(STATIC_19329), java.lang.Object(o6825sub), o6824, java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub)) -> f21021_0_getRandom_InvokeMethod(EOS(STATIC_21021), java.lang.Object(o6825sub), o6824, java.lang.Object(ARRAY(i8301)), java.lang.Object(o6825sub)) :|: TRUE
+f19787_0_getRandom_Return(EOS(STATIC_19787), java.lang.Object(ARRAY(i9252)), java.lang.Object(o7520sub), i7876, o6824, o7518) -> f19361_0_getRandom_Return(EOS(STATIC_19361), java.lang.Object(ARRAY(i9252)), java.lang.Object(o7520sub), i7876, o6824, o7518) :|: TRUE
+f19361_0_getRandom_Return(EOS(STATIC_19361), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893) -> f19367_0_main_Store(EOS(STATIC_19367), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893) :|: TRUE
+f19367_0_main_Store(EOS(STATIC_19367), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893) -> f19373_0_main_Load(EOS(STATIC_19373), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893) :|: TRUE
+f19373_0_main_Load(EOS(STATIC_19373), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893) -> f19379_0_main_New(EOS(STATIC_19379), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893, o6824) :|: TRUE
+f19379_0_main_New(EOS(STATIC_19379), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893, o6824) -> f19384_0_main_Duplicate(EOS(STATIC_19384), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893, o6824) :|: TRUE
+f19384_0_main_Duplicate(EOS(STATIC_19384), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893, o6824) -> f19390_0_main_Load(EOS(STATIC_19390), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893, o6824) :|: TRUE
+f19390_0_main_Load(EOS(STATIC_19390), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893, o6824) -> f19397_0_main_Load(EOS(STATIC_19397), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6824, o6893) :|: TRUE
+f19397_0_main_Load(EOS(STATIC_19397), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6824, o6893) -> f19403_0_main_FieldAccess(EOS(STATIC_19403), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, o6824, o6893, o6824) :|: TRUE
+f19403_0_main_FieldAccess(EOS(STATIC_19403), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(o6939sub), o6893, java.lang.Object(o6939sub)) -> f19409_0_main_FieldAccess(EOS(STATIC_19409), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(o6939sub), o6893, java.lang.Object(o6939sub)) :|: TRUE
+f19409_0_main_FieldAccess(EOS(STATIC_19409), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) -> f19417_0_main_FieldAccess(EOS(STATIC_19417), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) :|: TRUE
+f19417_0_main_FieldAccess(EOS(STATIC_19417), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) -> f19423_0_main_InvokeMethod(EOS(STATIC_19423), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) :|: TRUE
+f19423_0_main_InvokeMethod(EOS(STATIC_19423), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) -> f19427_0__init__Load(EOS(STATIC_19427), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) :|: TRUE
+f19427_0__init__Load(EOS(STATIC_19427), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) -> f19438_0__init__InvokeMethod(EOS(STATIC_19438), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) :|: TRUE
+f19438_0__init__InvokeMethod(EOS(STATIC_19438), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) -> f19446_0__init__Load(EOS(STATIC_19446), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) :|: TRUE
+f19446_0__init__Load(EOS(STATIC_19446), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) -> f19453_0__init__Load(EOS(STATIC_19453), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) :|: TRUE
+f19453_0__init__Load(EOS(STATIC_19453), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) -> f19460_0__init__FieldAccess(EOS(STATIC_19460), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) :|: TRUE
+f19460_0__init__FieldAccess(EOS(STATIC_19460), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945)), o6893) -> f19467_0__init__Load(EOS(STATIC_19467), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) :|: TRUE
+f19467_0__init__Load(EOS(STATIC_19467), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) -> f19475_0__init__Load(EOS(STATIC_19475), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) :|: TRUE
+f19475_0__init__Load(EOS(STATIC_19475), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) -> f19480_0__init__FieldAccess(EOS(STATIC_19480), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) :|: TRUE
+f19480_0__init__FieldAccess(EOS(STATIC_19480), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) -> f19485_0__init__Return(EOS(STATIC_19485), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) :|: TRUE
+f19485_0__init__Return(EOS(STATIC_19485), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) -> f19491_0_main_FieldAccess(EOS(STATIC_19491), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) :|: TRUE
+f19491_0_main_FieldAccess(EOS(STATIC_19491), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, o6945))) -> f19497_0_main_JMP(EOS(STATIC_19497), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895put), i7876) :|: TRUE
+f19497_0_main_JMP(EOS(STATIC_19497), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876) -> f19503_0_main_Load(EOS(STATIC_19503), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876) :|: TRUE
+f19503_0_main_Load(EOS(STATIC_19503), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876) -> f19127_0_main_Load(EOS(STATIC_19127), java.lang.Object(ARRAY(i8410)), java.lang.Object(o6895sub), i7876) :|: TRUE
+f19127_0_main_Load(EOS(STATIC_19127), java.lang.Object(ARRAY(i7869)), o6607, i7871) -> f19131_0_main_Inc(EOS(STATIC_19131), java.lang.Object(ARRAY(i7869)), o6607, i7871, i7871) :|: TRUE
+f19803_0_getRandom_Return(EOS(STATIC_19803), java.lang.Object(ARRAY(i9271)), java.lang.Object(o7553sub), i7876, o6824, java.lang.Object(MarkingGraphVisitor(EOC, NULL))) -> f19361_0_getRandom_Return(EOS(STATIC_19361), java.lang.Object(ARRAY(i9271)), java.lang.Object(o7553sub), i7876, o6824, java.lang.Object(MarkingGraphVisitor(EOC, NULL))) :|: TRUE
+f19802_0_getRandom_Return(EOS(STATIC_19802), java.lang.Object(ARRAY(i9266)), java.lang.Object(o7546sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, NULL))) -> f19303_0_getRandom_Return(EOS(STATIC_19303), java.lang.Object(ARRAY(i9266)), java.lang.Object(o7546sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, NULL))) :|: TRUE
+f19165_1_getRandom_InvokeMethod(EOS(STATIC_19165), java.lang.Object(ARRAY(i9248)), java.lang.Object(o7514sub), i7876, java.lang.Object(o7514sub)) -> f19786_0_getRandom_Return(EOS(STATIC_19786), java.lang.Object(ARRAY(i9248)), java.lang.Object(o7514sub), i7876, o7512) :|: TRUE
+f19165_1_getRandom_InvokeMethod(EOS(STATIC_19165), java.lang.Object(ARRAY(i9266)), java.lang.Object(o7546sub), i7876, java.lang.Object(o7546sub)) -> f19802_0_getRandom_Return(EOS(STATIC_19802), java.lang.Object(ARRAY(i9266)), java.lang.Object(o7546sub), i7876, java.lang.Object(MarkingGraphVisitor(EOC, NULL))) :|: TRUE
+f19329_1_getRandom_InvokeMethod(EOS(STATIC_19329), java.lang.Object(ARRAY(i9252)), java.lang.Object(o7520sub), i7876, o6824, java.lang.Object(o7520sub)) -> f19787_0_getRandom_Return(EOS(STATIC_19787), java.lang.Object(ARRAY(i9252)), java.lang.Object(o7520sub), i7876, o6824, o7518) :|: TRUE
+f19329_1_getRandom_InvokeMethod(EOS(STATIC_19329), java.lang.Object(ARRAY(i9271)), java.lang.Object(o7553sub), i7876, o6824, java.lang.Object(o7553sub)) -> f19803_0_getRandom_Return(EOS(STATIC_19803), java.lang.Object(ARRAY(i9271)), java.lang.Object(o7553sub), i7876, o6824, java.lang.Object(MarkingGraphVisitor(EOC, NULL))) :|: TRUE
+Combined rules. Obtained 4 IRulesP rules:
+f19322_0_main_InvokeMethod(EOS(STATIC_19322), java.lang.Object(ARRAY(i8301:0)), java.lang.Object(o6825sub:0), i7876:0, java.lang.Object(MarkingGraphVisitor(EOC, o6945:0)), java.lang.Object(o6825sub:0)) -> f19322_0_main_InvokeMethod(EOS(STATIC_19322), java.lang.Object(ARRAY(i8301:0)), java.lang.Object(o6895put:0), i7876:0 - 1, java.lang.Object(MarkingGraphVisitor(EOC, NULL)), java.lang.Object(o6895put:0)) :|: i7876:0 > 0
+f19322_0_main_InvokeMethod(EOS(STATIC_19322), java.lang.Object(ARRAY(i8301:0)), java.lang.Object(o6825sub:0), i7876:0, java.lang.Object(MarkingGraphVisitor(EOC, o6945:0)), java.lang.Object(o6825sub:0)) -> f19322_0_main_InvokeMethod(EOS(STATIC_19322), java.lang.Object(ARRAY(i8301:0)), java.lang.Object(o6895put:0), i7876:0 - 1, o7512:0, java.lang.Object(o6895put:0)) :|: i7876:0 > 0
+Removed following non-SCC rules:
+f19322_0_main_InvokeMethod(EOS(STATIC_19322), java.lang.Object(ARRAY(i8301:0)), java.lang.Object(o6825sub:0), i7876:0, java.lang.Object(MarkingGraphVisitor(EOC, o6945:0)), java.lang.Object(o6825sub:0)) -> f20991_0_getRandom_InvokeMethod(EOS(STATIC_20991), java.lang.Object(o6895put:0), java.lang.Object(ARRAY(i8301:0)), java.lang.Object(o6895put:0)) :|: i7876:0 > 0
+f19322_0_main_InvokeMethod(EOS(STATIC_19322), java.lang.Object(ARRAY(i8301:0)), java.lang.Object(o6825sub:0), i7876:0, o6824:0, java.lang.Object(o6825sub:0)) -> f21021_0_getRandom_InvokeMethod(EOS(STATIC_21021), java.lang.Object(o6825sub:0), o6824:0, java.lang.Object(ARRAY(i8301:0)), java.lang.Object(o6825sub:0)) :|: TRUE
+Filtered constant ground arguments:
+   f19322_0_main_InvokeMethod(x1, x2, x3, x4, x5, x6) -> f19322_0_main_InvokeMethod(x2, x3, x4, x5, x6)
+   EOS(x1) -> EOS
+   MarkingGraphVisitor(x1, x2) -> MarkingGraphVisitor(x2)
+Filtered duplicate arguments:
+   f19322_0_main_InvokeMethod(x1, x2, x3, x4, x5) -> f19322_0_main_InvokeMethod(x1, x3, x4, x5)
+Filtered unneeded arguments:
+   f19322_0_main_InvokeMethod(x1, x2, x3, x4) -> f19322_0_main_InvokeMethod(x2, x3)
+Finished conversion. Obtained 2 rules.P rules:
+f19322_0_main_InvokeMethod(i7876:0, java.lang.Object(MarkingGraphVisitor(o6945:0))) -> f19322_0_main_InvokeMethod(i7876:0 - 1, java.lang.Object(MarkingGraphVisitor(NULL))) :|: i7876:0 > 0
+f19322_0_main_InvokeMethod(i7876:0, java.lang.Object(MarkingGraphVisitor(o6945:0))) -> f19322_0_main_InvokeMethod(i7876:0 - 1, o7512:0) :|: i7876:0 > 0
+
+----------------------------------------
+
+(54)
+Obligation:
+Rules:
+f19322_0_main_InvokeMethod(i7876:0, java.lang.Object(MarkingGraphVisitor(o6945:0))) -> f19322_0_main_InvokeMethod(i7876:0 - 1, java.lang.Object(MarkingGraphVisitor(NULL))) :|: i7876:0 > 0
+f19322_0_main_InvokeMethod(x, java.lang.Object(MarkingGraphVisitor(x1))) -> f19322_0_main_InvokeMethod(x - 1, x2) :|: x > 0
+
+----------------------------------------
+
+(55) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(56)
+Obligation:
+Rules:
+f19322_0_main_InvokeMethod(i7876:0, java.lang.Object(MarkingGraphVisitor(o6945:0))) -> f19322_0_main_InvokeMethod(arith, java.lang.Object(MarkingGraphVisitor(NULL))) :|: i7876:0 > 0 && arith = i7876:0 - 1
+f19322_0_main_InvokeMethod(x3, java.lang.Object(MarkingGraphVisitor(x4))) -> f19322_0_main_InvokeMethod(x5, x6) :|: x3 > 0 && x5 = x3 - 1
+
+----------------------------------------
+
+(57) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f19322_0_main_InvokeMethod(i7876:0, java.lang.Object(MarkingGraphVisitor(o6945:0))) -> f19322_0_main_InvokeMethod(arith, java.lang.Object(MarkingGraphVisitor(NULL))) :|: i7876:0 > 0 && arith = i7876:0 - 1
+(2) f19322_0_main_InvokeMethod(x3, java.lang.Object(MarkingGraphVisitor(x4))) -> f19322_0_main_InvokeMethod(x5, x6) :|: x3 > 0 && x5 = x3 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(58)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f19322_0_main_InvokeMethod(i7876:0, java.lang.Object(MarkingGraphVisitor(o6945:0))) -> f19322_0_main_InvokeMethod(arith, java.lang.Object(MarkingGraphVisitor(NULL))) :|: i7876:0 > 0 && arith = i7876:0 - 1
+(2) f19322_0_main_InvokeMethod(x3, java.lang.Object(MarkingGraphVisitor(x4))) -> f19322_0_main_InvokeMethod(x5, x6) :|: x3 > 0 && x5 = x3 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(59) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(60)
+Obligation:
+Rules:
+f19322_0_main_InvokeMethod(i7876:0:0, java.lang.Object(MarkingGraphVisitor(o6945:0:0))) -> f19322_0_main_InvokeMethod(i7876:0:0 - 1, java.lang.Object(MarkingGraphVisitor(NULL))) :|: i7876:0:0 > 0
+f19322_0_main_InvokeMethod(x3:0, java.lang.Object(MarkingGraphVisitor(x4:0))) -> f19322_0_main_InvokeMethod(x3:0 - 1, x6:0) :|: x3:0 > 0
+
+----------------------------------------
+
+(61) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f19322_0_main_InvokeMethod(INTEGER, VARIABLE)
+java.lang.Object(VARIABLE)
+MarkingGraphVisitor(VARIABLE)
+NULL()
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(62)
+Obligation:
+Rules:
+f19322_0_main_InvokeMethod(i7876:0:0, c) -> f19322_0_main_InvokeMethod(c1, c2) :|: c2 = 0 && (c1 = i7876:0:0 - 1 && c = 0) && i7876:0:0 > 0
+f19322_0_main_InvokeMethod(x3:0, c3) -> f19322_0_main_InvokeMethod(c4, x6:0) :|: c4 = x3:0 - 1 && c3 = 0 && x3:0 > 0
+
+----------------------------------------
+
+(63) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f19322_0_main_InvokeMethod ] = f19322_0_main_InvokeMethod_1
+
+The following rules are decreasing:
+f19322_0_main_InvokeMethod(i7876:0:0, c) -> f19322_0_main_InvokeMethod(c1, c2) :|: c2 = 0 && (c1 = i7876:0:0 - 1 && c = 0) && i7876:0:0 > 0
+f19322_0_main_InvokeMethod(x3:0, c3) -> f19322_0_main_InvokeMethod(c4, x6:0) :|: c4 = x3:0 - 1 && c3 = 0 && x3:0 > 0
+
+The following rules are bounded:
+f19322_0_main_InvokeMethod(i7876:0:0, c) -> f19322_0_main_InvokeMethod(c1, c2) :|: c2 = 0 && (c1 = i7876:0:0 - 1 && c = 0) && i7876:0:0 > 0
+f19322_0_main_InvokeMethod(x3:0, c3) -> f19322_0_main_InvokeMethod(c4, x6:0) :|: c4 = x3:0 - 1 && c3 = 0 && x3:0 > 0
+
+
+----------------------------------------
+
+(64)
+YES

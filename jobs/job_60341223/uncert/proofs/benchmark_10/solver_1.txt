@@ -1,0 +1,158 @@
+YES
+We consider the system EbCuG.
+
+  Alphabet:
+
+    id : [N] --> N 
+    succ : [(N -> N) -> N -> N * N -> N * N] --> N 
+    two : [((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    zero : [((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+
+  Rules:
+
+    succ(F, G, X) => F G (G X) 
+    id(X) => X 
+    two(F, G, H, X) => F (F G) H X 
+    zero(F, G, H, X) => G H X 
+
+Symbol id is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    succ : [(N -> N) -> N -> N * N -> N * N] --> N 
+    two : [((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    zero : [((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+
+  Rules:
+
+    succ(F, G, X) => F G (G X) 
+    two(F, G, H, X) => F (F G) H X 
+    zero(F, G, H, X) => G H X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ(F, G, X) >? F G (G X) 
+  two(F, G, H, X) >? F (F G) H X 
+  zero(F, G, H, X) >? G H X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{(o -> o) -> o -> o}, @_{o -> o}, succ, two, zero}, and the following precedence: succ > two > zero > @_{(o -> o) -> o -> o} > @_{o -> o} > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}
+
+With these choices, we have:
+
+  1] succ(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), @_{o -> o}(G, X))  because [2], by (Star) 
+  2] succ*(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), @_{o -> o}(G, X))  because succ > @_{o -> o}, [3] and [8], by (Copy) 
+  3] succ*(F, G, X) >= @_{(o -> o) -> o -> o}(F, G)  because succ > @_{(o -> o) -> o -> o}, [4] and [6], by (Copy) 
+  4] succ*(F, G, X) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] succ*(F, G, X) >= G  because [7], by (Select) 
+  7] G >= G  by (Meta) 
+  8] succ*(F, G, X) >= @_{o -> o}(G, X)  because succ > @_{o -> o}, [6] and [9], by (Copy) 
+  9] succ*(F, G, X) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+
+  11] two(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)), H), X)  because [12], by (Star) 
+  12] two*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)), H), X)  because two > @_{o -> o}, [13] and [22], by (Copy) 
+  13] two*(F, G, H, X) >= @_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)), H)  because two > @_{(o -> o) -> o -> o}, [14] and [20], by (Copy) 
+  14] two*(F, G, H, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G))  because two > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [15] and [17], by (Copy) 
+  15] two*(F, G, H, X) >= F  because [16], by (Select) 
+  16] F >= F  by (Meta) 
+  17] two*(F, G, H, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)  because two > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [15] and [18], by (Copy) 
+  18] two*(F, G, H, X) >= G  because [19], by (Select) 
+  19] G >= G  by (Meta) 
+  20] two*(F, G, H, X) >= H  because [21], by (Select) 
+  21] H >= H  by (Meta) 
+  22] two*(F, G, H, X) >= X  because [23], by (Select) 
+  23] X >= X  by (Meta) 
+
+  24] zero(F, G, H, X) > @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X)  because [25], by definition 
+  25] zero*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X)  because zero > @_{o -> o}, [26] and [31], by (Copy) 
+  26] zero*(F, G, H, X) >= @_{(o -> o) -> o -> o}(G, H)  because zero > @_{(o -> o) -> o -> o}, [27] and [29], by (Copy) 
+  27] zero*(F, G, H, X) >= G  because [28], by (Select) 
+  28] G >= G  by (Meta) 
+  29] zero*(F, G, H, X) >= H  because [30], by (Select) 
+  30] H >= H  by (Meta) 
+  31] zero*(F, G, H, X) >= X  because [32], by (Select) 
+  32] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  zero(F, G, H, X) => G H X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ(F, G, X) >? F G (G X) 
+  two(F, G, H, X) >? F (F G) H X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{(o -> o) -> o -> o}, @_{o -> o}, succ, two}, and the following precedence: succ > two > @_{(o -> o) -> o -> o} > @_{o -> o} > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}
+
+With these choices, we have:
+
+  1] succ(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), @_{o -> o}(G, X))  because [2], by (Star) 
+  2] succ*(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), @_{o -> o}(G, X))  because succ > @_{o -> o}, [3] and [8], by (Copy) 
+  3] succ*(F, G, X) >= @_{(o -> o) -> o -> o}(F, G)  because succ > @_{(o -> o) -> o -> o}, [4] and [6], by (Copy) 
+  4] succ*(F, G, X) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] succ*(F, G, X) >= G  because [7], by (Select) 
+  7] G >= G  by (Meta) 
+  8] succ*(F, G, X) >= @_{o -> o}(G, X)  because succ > @_{o -> o}, [6] and [9], by (Copy) 
+  9] succ*(F, G, X) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+
+  11] two(F, G, H, X) > @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)), H), X)  because [12], by definition 
+  12] two*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)), H), X)  because two > @_{o -> o}, [13] and [22], by (Copy) 
+  13] two*(F, G, H, X) >= @_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)), H)  because two > @_{(o -> o) -> o -> o}, [14] and [20], by (Copy) 
+  14] two*(F, G, H, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G))  because two > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [15] and [17], by (Copy) 
+  15] two*(F, G, H, X) >= F  because [16], by (Select) 
+  16] F >= F  by (Meta) 
+  17] two*(F, G, H, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)  because two > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [15] and [18], by (Copy) 
+  18] two*(F, G, H, X) >= G  because [19], by (Select) 
+  19] G >= G  by (Meta) 
+  20] two*(F, G, H, X) >= H  because [21], by (Select) 
+  21] H >= H  by (Meta) 
+  22] two*(F, G, H, X) >= X  because [23], by (Select) 
+  23] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  two(F, G, H, X) => F (F G) H X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ(F, G, X) >? F G (G X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{(o -> o) -> o -> o}, @_{o -> o}, succ}, and the following precedence: @_{(o -> o) -> o -> o} = succ > @_{o -> o}
+
+With these choices, we have:
+
+  1] succ(F, G, X) > @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), @_{o -> o}(G, X))  because [2], by definition 
+  2] succ*(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), @_{o -> o}(G, X))  because succ > @_{o -> o}, [3] and [6], by (Copy) 
+  3] succ*(F, G, X) >= @_{(o -> o) -> o -> o}(F, G)  because succ = @_{(o -> o) -> o -> o}, succ in Mul, [4] and [5], by (Stat) 
+  4] F >= F  by (Meta) 
+  5] G >= G  by (Meta) 
+  6] succ*(F, G, X) >= @_{o -> o}(G, X)  because succ > @_{o -> o}, [7] and [8], by (Copy) 
+  7] succ*(F, G, X) >= G  because [5], by (Select) 
+  8] succ*(F, G, X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  succ(F, G, X) => F G (G X) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

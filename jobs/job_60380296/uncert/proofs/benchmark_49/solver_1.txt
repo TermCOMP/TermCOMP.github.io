@@ -1,0 +1,837 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/zSsaw.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 551 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 111 ms]
+        (9) QDP
+        (10) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (11) YES
+    (12) JBCTerminationSCC
+        (13) SCCToQDPProof [SOUND, 206 ms]
+        (14) QDP
+        (15) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (16) TRUE
+    (17) JBCTerminationSCC
+        (18) SCCToIRSProof [SOUND, 55 ms]
+        (19) IRSwT
+        (20) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (21) IRSwT
+        (22) IRSwTTerminationDigraphProof [EQUIVALENT, 15 ms]
+        (23) IRSwT
+        (24) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (25) IRSwT
+        (26) TempFilterProof [SOUND, 7 ms]
+        (27) IntTRS
+        (28) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (29) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package Shuffle;
+
+public class List {
+
+  int value;
+  List next;
+
+  public List() {}
+
+  public List(int value, List next) {
+    this.value = value;
+    this.next = next;
+  }
+
+  public static List copy(List x) {
+    if (x == null) return null;
+    else return new List(x.value,copy(x.next));
+  }
+}
+
+
+package Shuffle;
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package Shuffle; 
+public class Shuffle {
+
+	// from Walther (1994)
+	public static List reverse(final List l) {
+		if (l == null || l.next==null) return l;
+		final List nextItem = l.next;
+		final List reverseRest = reverse(nextItem);
+		l.next = null;
+		nextItem.next = l;
+		return reverseRest;
+	}
+
+	public static List shuffle(List xs) {
+		if (xs == null) {
+			return null;
+		} else {
+			List next = xs.next;
+//			xs.next = null;
+			return new List(xs.value, shuffle(reverse(next)));
+		}
+	} 
+
+  public static void main(String[] args) {
+	Random.args = args;
+
+	List xs = createList(Random.random());
+	List ys = shuffle(xs);
+  }
+
+  public static List createList(int l) {
+		if (l <= 0) {
+				return null;
+		} else {
+				return new List(Random.random(), createList(l-1));
+		}
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package Shuffle;
+
+public class List {
+
+  int value;
+  List next;
+
+  public List() {}
+
+  public List(int value, List next) {
+    this.value = value;
+    this.next = next;
+  }
+
+  public static List copy(List x) {
+    if (x == null) return null;
+    else return new List(x.value,copy(x.next));
+  }
+}
+
+
+package Shuffle;
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package Shuffle; 
+public class Shuffle {
+
+	// from Walther (1994)
+	public static List reverse(final List l) {
+		if (l == null || l.next==null) return l;
+		final List nextItem = l.next;
+		final List reverseRest = reverse(nextItem);
+		l.next = null;
+		nextItem.next = l;
+		return reverseRest;
+	}
+
+	public static List shuffle(List xs) {
+		if (xs == null) {
+			return null;
+		} else {
+			List next = xs.next;
+//			xs.next = null;
+			return new List(xs.value, shuffle(reverse(next)));
+		}
+	} 
+
+  public static void main(String[] args) {
+	Random.args = args;
+
+	List xs = createList(Random.random());
+	List ys = shuffle(xs);
+  }
+
+  public static List createList(int l) {
+		if (l <= 0) {
+				return null;
+		} else {
+				return new List(Random.random(), createList(l-1));
+		}
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+Shuffle.Shuffle.main([Ljava/lang/String;)V: Graph of 152 nodes with 0 SCCs.
+
+
+
+Shuffle.Shuffle.createList(I)LShuffle/List;: Graph of 119 nodes with 0 SCCs.
+
+
+
+Shuffle.Shuffle.shuffle(LShuffle/List;)LShuffle/List;: Graph of 101 nodes with 0 SCCs.
+
+
+
+Shuffle.Shuffle.reverse(LShuffle/List;)LShuffle/List;: Graph of 57 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 3 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Shuffle.Shuffle.reverse(LShuffle/List;)LShuffle/List;
+SCC calls the following helper methods: Shuffle.Shuffle.reverse(LShuffle/List;)LShuffle/List;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*Shuffle.List: [next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 17 rules for P and 54 rules for R.P rules:
+f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) -> f10045_0_reverse_NULL(EOS(STATIC_10045), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) :|: TRUE
+f10045_0_reverse_NULL(EOS(STATIC_10045), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) -> f10049_0_reverse_Load(EOS(STATIC_10049), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) :|: TRUE
+f10049_0_reverse_Load(EOS(STATIC_10049), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) -> f10052_0_reverse_FieldAccess(EOS(STATIC_10052), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) :|: TRUE
+f10052_0_reverse_FieldAccess(EOS(STATIC_10052), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940))) -> f10055_0_reverse_FieldAccess(EOS(STATIC_10055), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940))) :|: TRUE
+f10055_0_reverse_FieldAccess(EOS(STATIC_10055), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940))) -> f10057_0_reverse_NONNULL(EOS(STATIC_10057), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940)), o1940) :|: TRUE
+f10057_0_reverse_NONNULL(EOS(STATIC_10057), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10062_0_reverse_NONNULL(EOS(STATIC_10062), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10062_0_reverse_NONNULL(EOS(STATIC_10062), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10075_0_reverse_Load(EOS(STATIC_10075), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub)))) :|: TRUE
+f10075_0_reverse_Load(EOS(STATIC_10075), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub)))) -> f10079_0_reverse_FieldAccess(EOS(STATIC_10079), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub)))) :|: TRUE
+f10079_0_reverse_FieldAccess(EOS(STATIC_10079), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub)))) -> f10086_0_reverse_Store(EOS(STATIC_10086), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10086_0_reverse_Store(EOS(STATIC_10086), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10093_0_reverse_Load(EOS(STATIC_10093), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10093_0_reverse_Load(EOS(STATIC_10093), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10123_0_reverse_InvokeMethod(EOS(STATIC_10123), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub), java.lang.Object(o1957sub)) :|: TRUE
+f10123_0_reverse_InvokeMethod(EOS(STATIC_10123), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub), java.lang.Object(o1957sub)) -> f10135_1_reverse_InvokeMethod(f10135_0_reverse_Load(EOS(STATIC_10135), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10135_0_reverse_Load(EOS(STATIC_10135), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10140_0_reverse_Load(EOS(STATIC_10140), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10140_0_reverse_Load(EOS(STATIC_10140), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10172_0_reverse_Load(EOS(STATIC_10172), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub), o1939[List.next]o1957) :|: o1939[List.next]o1957 = 1
+f10172_0_reverse_Load(EOS(STATIC_10172), java.lang.Object(o2001sub), o2008, java.lang.Object(o2001sub), o2008[List.next]o2001) -> f10442_0_reverse_Load(EOS(STATIC_10442), java.lang.Object(o2001sub), java.lang.Object(o2001sub)) :|: TRUE
+f10442_0_reverse_Load(EOS(STATIC_10442), java.lang.Object(o2001sub), java.lang.Object(o2001sub)) -> f10038_0_reverse_Load(EOS(STATIC_10038), java.lang.Object(o2001sub), java.lang.Object(o2001sub)) :|: TRUE
+f10038_0_reverse_Load(EOS(STATIC_10038), o1909, o1909) -> f10044_0_reverse_NULL(EOS(STATIC_10044), o1909, o1909, o1909) :|: TRUE
+R rules:
+f10038_0_reverse_Load(EOS(STATIC_10038), o1909, o1909) -> f10044_0_reverse_NULL(EOS(STATIC_10044), o1909, o1909, o1909) :|: TRUE
+f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) -> f10045_0_reverse_NULL(EOS(STATIC_10045), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) :|: TRUE
+f10044_0_reverse_NULL(EOS(STATIC_10044), NULL, NULL, NULL) -> f10046_0_reverse_NULL(EOS(STATIC_10046), NULL, NULL, NULL) :|: TRUE
+f10045_0_reverse_NULL(EOS(STATIC_10045), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) -> f10049_0_reverse_Load(EOS(STATIC_10049), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) :|: TRUE
+f10046_0_reverse_NULL(EOS(STATIC_10046), NULL, NULL, NULL) -> f10050_0_reverse_Load(EOS(STATIC_10050), NULL, NULL) :|: TRUE
+f10049_0_reverse_Load(EOS(STATIC_10049), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) -> f10052_0_reverse_FieldAccess(EOS(STATIC_10052), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) :|: TRUE
+f10050_0_reverse_Load(EOS(STATIC_10050), NULL, NULL) -> f10053_0_reverse_Return(EOS(STATIC_10053), NULL, NULL) :|: TRUE
+f10052_0_reverse_FieldAccess(EOS(STATIC_10052), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940))) -> f10055_0_reverse_FieldAccess(EOS(STATIC_10055), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940))) :|: TRUE
+f10055_0_reverse_FieldAccess(EOS(STATIC_10055), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940))) -> f10057_0_reverse_NONNULL(EOS(STATIC_10057), java.lang.Object(Shuffle.List(EOC, o1940)), java.lang.Object(Shuffle.List(EOC, o1940)), o1940) :|: TRUE
+f10057_0_reverse_NONNULL(EOS(STATIC_10057), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10062_0_reverse_NONNULL(EOS(STATIC_10062), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10057_0_reverse_NONNULL(EOS(STATIC_10057), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), NULL) -> f10063_0_reverse_NONNULL(EOS(STATIC_10063), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), NULL) :|: TRUE
+f10062_0_reverse_NONNULL(EOS(STATIC_10062), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10075_0_reverse_Load(EOS(STATIC_10075), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub)))) :|: TRUE
+f10063_0_reverse_NONNULL(EOS(STATIC_10063), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), NULL) -> f10077_0_reverse_Load(EOS(STATIC_10077), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10075_0_reverse_Load(EOS(STATIC_10075), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub)))) -> f10079_0_reverse_FieldAccess(EOS(STATIC_10079), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub)))) :|: TRUE
+f10077_0_reverse_Load(EOS(STATIC_10077), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10079_0_reverse_FieldAccess(EOS(STATIC_10079), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub)))) -> f10086_0_reverse_Store(EOS(STATIC_10086), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10086_0_reverse_Store(EOS(STATIC_10086), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10093_0_reverse_Load(EOS(STATIC_10093), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10093_0_reverse_Load(EOS(STATIC_10093), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10123_0_reverse_InvokeMethod(EOS(STATIC_10123), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub), java.lang.Object(o1957sub)) :|: TRUE
+f10123_0_reverse_InvokeMethod(EOS(STATIC_10123), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub), java.lang.Object(o1957sub)) -> f10135_1_reverse_InvokeMethod(f10135_0_reverse_Load(EOS(STATIC_10135), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10135_0_reverse_Load(EOS(STATIC_10135), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10140_0_reverse_Load(EOS(STATIC_10140), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) :|: TRUE
+f10140_0_reverse_Load(EOS(STATIC_10140), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10172_0_reverse_Load(EOS(STATIC_10172), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub), o1939[List.next]o1957) :|: o1939[List.next]o1957 = 1
+f10172_0_reverse_Load(EOS(STATIC_10172), java.lang.Object(o2001sub), o2008, java.lang.Object(o2001sub), o2008[List.next]o2001) -> f10442_0_reverse_Load(EOS(STATIC_10442), java.lang.Object(o2001sub), java.lang.Object(o2001sub)) :|: TRUE
+f10445_0_reverse_Return(EOS(STATIC_10445), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10448_0_reverse_Store(EOS(STATIC_10448), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10448_0_reverse_Store(EOS(STATIC_10448), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10450_0_reverse_Load(EOS(STATIC_10450), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10450_0_reverse_Load(EOS(STATIC_10450), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10451_0_reverse_ConstantStackPush(EOS(STATIC_10451), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))) :|: TRUE
+f10451_0_reverse_ConstantStackPush(EOS(STATIC_10451), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))) -> f10455_0_reverse_FieldAccess(EOS(STATIC_10455), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), NULL) :|: TRUE
+f10455_0_reverse_FieldAccess(EOS(STATIC_10455), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), NULL) -> f10462_0_reverse_Load(EOS(STATIC_10462), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10462_0_reverse_Load(EOS(STATIC_10462), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10467_0_reverse_Load(EOS(STATIC_10467), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10467_0_reverse_Load(EOS(STATIC_10467), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10469_0_reverse_FieldAccess(EOS(STATIC_10469), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10469_0_reverse_FieldAccess(EOS(STATIC_10469), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10474_0_reverse_Load(EOS(STATIC_10474), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))) :|: TRUE
+f10474_0_reverse_Load(EOS(STATIC_10474), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))) -> f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))) :|: TRUE
+f10548_0_reverse_Return(EOS(STATIC_10548), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))) -> f10969_0_reverse_Return(EOS(STATIC_10969), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))) :|: TRUE
+f10969_0_reverse_Return(EOS(STATIC_10969), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2473sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2473sub))), java.lang.Object(o2473sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2471))))) -> f11595_0_reverse_Return(EOS(STATIC_11595), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2473sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2473sub))), java.lang.Object(o2473sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2471))))) :|: TRUE
+f11595_0_reverse_Return(EOS(STATIC_11595), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997))))) -> f11641_0_reverse_Store(EOS(STATIC_11641), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997))))) :|: TRUE
+f11641_0_reverse_Store(EOS(STATIC_11641), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997))))) -> f11653_0_reverse_Load(EOS(STATIC_11653), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997))))) :|: TRUE
+f11653_0_reverse_Load(EOS(STATIC_11653), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997))))) -> f11667_0_reverse_ConstantStackPush(EOS(STATIC_11667), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub)))) :|: TRUE
+f11667_0_reverse_ConstantStackPush(EOS(STATIC_11667), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub)))) -> f11686_0_reverse_FieldAccess(EOS(STATIC_11686), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), NULL) :|: TRUE
+f11686_0_reverse_FieldAccess(EOS(STATIC_11686), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub))), NULL) -> f11695_0_reverse_Load(EOS(STATIC_11695), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997))))) :|: TRUE
+f11695_0_reverse_Load(EOS(STATIC_11695), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997))))) -> f11882_0_reverse_Load(EOS(STATIC_11882), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(o2999sub)) :|: TRUE
+f11882_0_reverse_Load(EOS(STATIC_11882), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(o2999sub)) -> f11977_0_reverse_FieldAccess(EOS(STATIC_11977), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f11977_0_reverse_FieldAccess(EOS(STATIC_11977), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(Shuffle.List(EOC, o3324)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(Shuffle.List(EOC, o3324)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(Shuffle.List(EOC, o3324)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f12011_0_reverse_FieldAccess(EOS(STATIC_12011), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(Shuffle.List(EOC, o3324)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3330)))), java.lang.Object(Shuffle.List(EOC, o3330)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f12012_0_reverse_FieldAccess(EOS(STATIC_12012), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3330)))), java.lang.Object(Shuffle.List(EOC, o3330)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f12011_0_reverse_FieldAccess(EOS(STATIC_12011), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997)))), java.lang.Object(Shuffle.List(EOC, o3324)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f12027_0_reverse_Load(EOS(STATIC_12027), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997put))))) :|: TRUE
+f12012_0_reverse_FieldAccess(EOS(STATIC_12012), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3330)))), java.lang.Object(Shuffle.List(EOC, o3330)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f12033_0_reverse_Load(EOS(STATIC_12033), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))))) :|: TRUE
+f12027_0_reverse_Load(EOS(STATIC_12027), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997))))) -> f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997))))) :|: TRUE
+f12033_0_reverse_Load(EOS(STATIC_12033), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))))) -> f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))))) :|: TRUE
+f12369_0_reverse_Return(EOS(STATIC_12369), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453))))) -> f11595_0_reverse_Return(EOS(STATIC_11595), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453))))) :|: TRUE
+f12409_0_reverse_Return(EOS(STATIC_12409), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))))) -> f11595_0_reverse_Return(EOS(STATIC_11595), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))))) :|: TRUE
+f10442_0_reverse_Load(EOS(STATIC_10442), java.lang.Object(o2001sub), java.lang.Object(o2001sub)) -> f10038_0_reverse_Load(EOS(STATIC_10038), java.lang.Object(o2001sub), java.lang.Object(o2001sub)) :|: TRUE
+f10135_1_reverse_InvokeMethod(f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10445_0_reverse_Return(EOS(STATIC_10445), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f10548_0_reverse_Return(EOS(STATIC_10548), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453))))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f12369_0_reverse_Return(EOS(STATIC_12369), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453))))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub))), java.lang.Object(o1957sub)) -> f12409_0_reverse_Return(EOS(STATIC_12409), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))))) :|: TRUE
+Combined rules. Obtained 1 conditional rules for P and 9 conditional rules for R.P rules:
+f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0)))) -> f10135_1_reverse_InvokeMethod(f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(o1957sub:0), java.lang.Object(o1957sub:0), java.lang.Object(o1957sub:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(o1957sub:0)) :|: TRUE
+R rules:
+f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL))) -> f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453:0))))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(o1957sub:0)) -> f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453:0)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10044_0_reverse_NULL(EOS(STATIC_10044), NULL, NULL, NULL) -> f10053_0_reverse_Return(EOS(STATIC_10053), NULL, NULL) :|: TRUE
+f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0)))) -> f10135_1_reverse_InvokeMethod(f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(o1957sub:0), java.lang.Object(o1957sub:0), java.lang.Object(o1957sub:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(o1957sub:0)) :|: TRUE
+f10135_1_reverse_InvokeMethod(f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(o1957sub:0)) -> f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0))), java.lang.Object(o1957sub:0)) -> f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL)))))), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, NULL))) :|: TRUE
+f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3330:0)))), java.lang.Object(Shuffle.List(EOC, o3330:0)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL))))))) :|: TRUE
+f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997:0)))), java.lang.Object(Shuffle.List(EOC, o3324:0)), java.lang.Object(Shuffle.List(EOC, NULL))) -> f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997put:0))))) :|: TRUE
+Filtered ground terms:
+   f10044_0_reverse_NULL(x1, x2, x3, x4) -> f10044_0_reverse_NULL(x2, x3, x4)
+   Shuffle.List(x1, x2) -> Shuffle.List(x2)
+   f10082_0_reverse_Return(x1, x2, x3) -> f10082_0_reverse_Return
+   f10480_0_reverse_Return(x1, x2, x3) -> f10480_0_reverse_Return
+   f11984_0_reverse_FieldAccess(x1, x2, x3, x4, x5) -> f11984_0_reverse_FieldAccess(x3, x4)
+   f10053_0_reverse_Return(x1, x2, x3) -> f10053_0_reverse_Return
+   f12047_0_reverse_Return(x1, x2, x3) -> f12047_0_reverse_Return
+   f12043_0_reverse_Return(x1, x2, x3) -> f12043_0_reverse_Return(x3)
+Filtered duplicate args:
+   f10044_0_reverse_NULL(x1, x2, x3) -> f10044_0_reverse_NULL(x3)
+   f10135_1_reverse_InvokeMethod(x1, x2, x3, x4) -> f10135_1_reverse_InvokeMethod(x1, x3)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F10044_0_REVERSE_NULL(java.lang.Object(Shuffle.List(java.lang.Object(o1957sub:0:0)))) -> F10044_0_REVERSE_NULL(java.lang.Object(o1957sub:0:0)) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F10044_0_REVERSE_NULL(java.lang.Object(Shuffle.List(java.lang.Object(o1957sub:0:0)))) -> F10044_0_REVERSE_NULL(java.lang.Object(o1957sub:0:0))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F10044_0_REVERSE_NULL(java.lang.Object(Shuffle.List(java.lang.Object(o1957sub:0:0)))) -> F10044_0_REVERSE_NULL(java.lang.Object(o1957sub:0:0))
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(11)
+YES
+
+----------------------------------------
+
+(12)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Shuffle.Shuffle.shuffle(LShuffle/List;)LShuffle/List;
+SCC calls the following helper methods: Shuffle.Shuffle.reverse(LShuffle/List;)LShuffle/List;, Shuffle.Shuffle.shuffle(LShuffle/List;)LShuffle/List;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*Shuffle.List: [next, value]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(13) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 37 rules for P and 161 rules for R.P rules:
+f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(o1591sub), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) -> f9783_0_shuffle_NONNULL(EOS(STATIC_9783), java.lang.Object(o1591sub), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) :|: TRUE
+f9783_0_shuffle_NONNULL(EOS(STATIC_9783), java.lang.Object(o1591sub), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) -> f9800_0_shuffle_Load(EOS(STATIC_9800), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) :|: TRUE
+f9800_0_shuffle_Load(EOS(STATIC_9800), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) -> f9814_0_shuffle_FieldAccess(EOS(STATIC_9814), java.lang.Object(o1591sub), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) :|: TRUE
+f9814_0_shuffle_FieldAccess(EOS(STATIC_9814), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f9827_0_shuffle_FieldAccess(EOS(STATIC_9827), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883))) :|: TRUE
+f9827_0_shuffle_FieldAccess(EOS(STATIC_9827), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f9833_0_shuffle_Store(EOS(STATIC_9833), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9833_0_shuffle_Store(EOS(STATIC_9833), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9863_0_shuffle_New(EOS(STATIC_9863), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9863_0_shuffle_New(EOS(STATIC_9863), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9904_0_shuffle_Duplicate(EOS(STATIC_9904), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9904_0_shuffle_Duplicate(EOS(STATIC_9904), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9910_0_shuffle_Load(EOS(STATIC_9910), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9910_0_shuffle_Load(EOS(STATIC_9910), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9916_0_shuffle_FieldAccess(EOS(STATIC_9916), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883))) :|: TRUE
+f9916_0_shuffle_FieldAccess(EOS(STATIC_9916), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f9918_0_shuffle_Load(EOS(STATIC_9918), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9918_0_shuffle_Load(EOS(STATIC_9918), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9920_0_shuffle_InvokeMethod(EOS(STATIC_9920), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9920_0_shuffle_InvokeMethod(EOS(STATIC_9920), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9922_1_shuffle_InvokeMethod(f9922_0_reverse_Load(EOS(STATIC_9922), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633), java.lang.Object(Shuffle.List(EOC, o1633, i883))) :|: TRUE
+f9922_0_reverse_Load(EOS(STATIC_9922), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f13177_0_reverse_Load(EOS(STATIC_13177), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f10065_0_reverse_Return(EOS(STATIC_10065), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f9994_0_reverse_Return(EOS(STATIC_9994), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f9994_0_reverse_Return(EOS(STATIC_9994), java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) -> f9996_0_shuffle_InvokeMethod(EOS(STATIC_9996), java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) :|: TRUE
+f9996_0_shuffle_InvokeMethod(EOS(STATIC_9996), java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) -> f9998_1_shuffle_InvokeMethod(f9998_0_shuffle_Load(EOS(STATIC_9998), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879), java.lang.Object(Shuffle.List(EOC, o1879, i883))) :|: TRUE
+f9998_0_shuffle_Load(EOS(STATIC_9998), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) -> f10013_0_shuffle_Load(EOS(STATIC_10013), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) :|: TRUE
+f10013_0_shuffle_Load(EOS(STATIC_10013), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) -> f10018_0_shuffle_Load(EOS(STATIC_10018), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) :|: TRUE
+f10018_0_shuffle_Load(EOS(STATIC_10018), o1900, o1905, o1900) -> f10047_0_shuffle_Load(EOS(STATIC_10047), o1900, o1900) :|: TRUE
+f10047_0_shuffle_Load(EOS(STATIC_10047), o1900, o1900) -> f9763_0_shuffle_Load(EOS(STATIC_9763), o1900, o1900) :|: TRUE
+f9763_0_shuffle_Load(EOS(STATIC_9763), o1566, o1566) -> f9779_0_shuffle_NONNULL(EOS(STATIC_9779), o1566, o1566, o1566) :|: TRUE
+f10131_0_reverse_Return(EOS(STATIC_10131), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965)), i883)), java.lang.Object(Shuffle.List(EOC, NULL, i965))) -> f9994_0_reverse_Return(EOS(STATIC_9994), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965)), i883)), java.lang.Object(Shuffle.List(EOC, NULL, i965))) :|: TRUE
+f10547_0_reverse_Return(EOS(STATIC_10547), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i1003))) -> f10944_0_reverse_Return(EOS(STATIC_10944), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i1003))) :|: TRUE
+f10944_0_reverse_Return(EOS(STATIC_10944), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField12)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2452, i1109)), i1110))) -> f11529_0_reverse_Return(EOS(STATIC_11529), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField13)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2452, i1109)), i1110))) :|: TRUE
+f11529_0_reverse_Return(EOS(STATIC_11529), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField14)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) -> f11634_0_shuffle_InvokeMethod(EOS(STATIC_11634), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField15)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) :|: TRUE
+f11634_0_shuffle_InvokeMethod(EOS(STATIC_11634), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField16)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) -> f11647_1_shuffle_InvokeMethod(f11647_0_shuffle_Load(EOS(STATIC_11647), java.lang.Object(Shuffle.List(EOC, NULL, abstractField17)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField18)), i883))) :|: TRUE
+f11647_0_shuffle_Load(EOS(STATIC_11647), java.lang.Object(Shuffle.List(EOC, NULL, abstractField19)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) -> f11661_0_shuffle_Load(EOS(STATIC_11661), java.lang.Object(Shuffle.List(EOC, NULL, abstractField20)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) :|: TRUE
+f11661_0_shuffle_Load(EOS(STATIC_11661), java.lang.Object(Shuffle.List(EOC, NULL, abstractField21)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) -> f11682_0_shuffle_Load(EOS(STATIC_11682), java.lang.Object(Shuffle.List(EOC, NULL, abstractField22)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) :|: TRUE
+f11682_0_shuffle_Load(EOS(STATIC_11682), o3107, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250))) -> f11923_0_shuffle_Load(EOS(STATIC_11923), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250))) :|: TRUE
+f11923_0_shuffle_Load(EOS(STATIC_11923), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250))) -> f9763_0_shuffle_Load(EOS(STATIC_9763), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250))) :|: TRUE
+f12276_0_reverse_Return(EOS(STATIC_12276), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1373)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437, i1375)), i1374))) -> f11529_0_reverse_Return(EOS(STATIC_11529), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1373)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437, i1375)), i1374))) :|: TRUE
+f12399_0_reverse_Return(EOS(STATIC_12399), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i1387)), i1386))) -> f11529_0_reverse_Return(EOS(STATIC_11529), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i1387)), i1386))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10053_0_reverse_Return(EOS(STATIC_10053), NULL, NULL), java.lang.Object(Shuffle.List(EOC, NULL, i883))) -> f10065_0_reverse_Return(EOS(STATIC_10065), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL, i965)), java.lang.Object(Shuffle.List(EOC, NULL, i965))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965)), i883))) -> f10131_0_reverse_Return(EOS(STATIC_10131), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965)), i883)), java.lang.Object(Shuffle.List(EOC, NULL, i965))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL, i1002)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i1003))), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f10547_0_reverse_Return(EOS(STATIC_10547), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i1003))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL, i1373)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437, i1375)), i1374))), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f12276_0_reverse_Return(EOS(STATIC_12276), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1373)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437, i1375)), i1374))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL, i1385)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i1387)), i1386))), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f12399_0_reverse_Return(EOS(STATIC_12399), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i1387)), i1386))) :|: TRUE
+R rules:
+f9922_0_reverse_Load(EOS(STATIC_9922), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9924_0_reverse_Load(EOS(STATIC_9924), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9924_0_reverse_Load(EOS(STATIC_9924), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9926_0_reverse_Load(EOS(STATIC_9926), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9926_0_reverse_Load(EOS(STATIC_9926), o1805, o1810, o1805) -> f9931_0_reverse_Load(EOS(STATIC_9931), o1805, o1805) :|: TRUE
+f9931_0_reverse_Load(EOS(STATIC_9931), o1805, o1805) -> f10038_0_reverse_Load(EOS(STATIC_10038), o1805, o1805) :|: TRUE
+f10442_0_reverse_Load(EOS(STATIC_10442), java.lang.Object(o2001sub), java.lang.Object(o2001sub)) -> f10038_0_reverse_Load(EOS(STATIC_10038), java.lang.Object(o2001sub), java.lang.Object(o2001sub)) :|: TRUE
+f10038_0_reverse_Load(EOS(STATIC_10038), o1909, o1909) -> f10044_0_reverse_NULL(EOS(STATIC_10044), o1909, o1909, o1909) :|: TRUE
+f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) -> f10045_0_reverse_NULL(EOS(STATIC_10045), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) :|: TRUE
+f10044_0_reverse_NULL(EOS(STATIC_10044), NULL, NULL, NULL) -> f10046_0_reverse_NULL(EOS(STATIC_10046), NULL, NULL, NULL) :|: TRUE
+f10045_0_reverse_NULL(EOS(STATIC_10045), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) -> f10049_0_reverse_Load(EOS(STATIC_10049), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) :|: TRUE
+f10046_0_reverse_NULL(EOS(STATIC_10046), NULL, NULL, NULL) -> f10050_0_reverse_Load(EOS(STATIC_10050), NULL, NULL) :|: TRUE
+f10049_0_reverse_Load(EOS(STATIC_10049), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) -> f10052_0_reverse_FieldAccess(EOS(STATIC_10052), java.lang.Object(o1938sub), java.lang.Object(o1938sub), java.lang.Object(o1938sub)) :|: TRUE
+f10050_0_reverse_Load(EOS(STATIC_10050), NULL, NULL) -> f10053_0_reverse_Return(EOS(STATIC_10053), NULL, NULL) :|: TRUE
+f10052_0_reverse_FieldAccess(EOS(STATIC_10052), java.lang.Object(Shuffle.List(EOC, o1940, i954)), java.lang.Object(Shuffle.List(EOC, o1940, i954)), java.lang.Object(Shuffle.List(EOC, o1940, i954))) -> f10055_0_reverse_FieldAccess(EOS(STATIC_10055), java.lang.Object(Shuffle.List(EOC, o1940, i954)), java.lang.Object(Shuffle.List(EOC, o1940, i954)), java.lang.Object(Shuffle.List(EOC, o1940, i954))) :|: TRUE
+f10055_0_reverse_FieldAccess(EOS(STATIC_10055), java.lang.Object(Shuffle.List(EOC, o1940, i954)), java.lang.Object(Shuffle.List(EOC, o1940, i954)), java.lang.Object(Shuffle.List(EOC, o1940, i954))) -> f10057_0_reverse_NONNULL(EOS(STATIC_10057), java.lang.Object(Shuffle.List(EOC, o1940, i954)), java.lang.Object(Shuffle.List(EOC, o1940, i954)), o1940) :|: TRUE
+f10057_0_reverse_NONNULL(EOS(STATIC_10057), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) -> f10062_0_reverse_NONNULL(EOS(STATIC_10062), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) :|: TRUE
+f10057_0_reverse_NONNULL(EOS(STATIC_10057), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), NULL) -> f10063_0_reverse_NONNULL(EOS(STATIC_10063), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), NULL) :|: TRUE
+f10062_0_reverse_NONNULL(EOS(STATIC_10062), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) -> f10075_0_reverse_Load(EOS(STATIC_10075), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954))) :|: TRUE
+f10063_0_reverse_NONNULL(EOS(STATIC_10063), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), NULL) -> f10077_0_reverse_Load(EOS(STATIC_10077), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) :|: TRUE
+f10075_0_reverse_Load(EOS(STATIC_10075), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954))) -> f10079_0_reverse_FieldAccess(EOS(STATIC_10079), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954))) :|: TRUE
+f10077_0_reverse_Load(EOS(STATIC_10077), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) -> f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) :|: TRUE
+f10079_0_reverse_FieldAccess(EOS(STATIC_10079), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954))) -> f10086_0_reverse_Store(EOS(STATIC_10086), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) :|: TRUE
+f10086_0_reverse_Store(EOS(STATIC_10086), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) -> f10093_0_reverse_Load(EOS(STATIC_10093), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) :|: TRUE
+f10093_0_reverse_Load(EOS(STATIC_10093), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) -> f10123_0_reverse_InvokeMethod(EOS(STATIC_10123), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub), java.lang.Object(o1957sub)) :|: TRUE
+f10123_0_reverse_InvokeMethod(EOS(STATIC_10123), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub), java.lang.Object(o1957sub)) -> f10135_1_reverse_InvokeMethod(f10135_0_reverse_Load(EOS(STATIC_10135), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) :|: TRUE
+f10135_0_reverse_Load(EOS(STATIC_10135), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) -> f10140_0_reverse_Load(EOS(STATIC_10140), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) :|: TRUE
+f10140_0_reverse_Load(EOS(STATIC_10140), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) -> f10172_0_reverse_Load(EOS(STATIC_10172), java.lang.Object(o1957sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub), o1939[List.next]o1957) :|: o1939[List.next]o1957 = 1
+f10172_0_reverse_Load(EOS(STATIC_10172), java.lang.Object(o2001sub), o2008, java.lang.Object(o2001sub), o2008[List.next]o2001) -> f10442_0_reverse_Load(EOS(STATIC_10442), java.lang.Object(o2001sub), java.lang.Object(o2001sub)) :|: TRUE
+f10445_0_reverse_Return(EOS(STATIC_10445), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) -> f10448_0_reverse_Store(EOS(STATIC_10448), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) :|: TRUE
+f10448_0_reverse_Store(EOS(STATIC_10448), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) -> f10450_0_reverse_Load(EOS(STATIC_10450), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) :|: TRUE
+f10450_0_reverse_Load(EOS(STATIC_10450), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) -> f10451_0_reverse_ConstantStackPush(EOS(STATIC_10451), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954))) :|: TRUE
+f10451_0_reverse_ConstantStackPush(EOS(STATIC_10451), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954))) -> f10455_0_reverse_FieldAccess(EOS(STATIC_10455), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), NULL) :|: TRUE
+f10455_0_reverse_FieldAccess(EOS(STATIC_10455), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), NULL) -> f10462_0_reverse_Load(EOS(STATIC_10462), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) :|: TRUE
+f10462_0_reverse_Load(EOS(STATIC_10462), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) -> f10467_0_reverse_Load(EOS(STATIC_10467), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) :|: TRUE
+f10467_0_reverse_Load(EOS(STATIC_10467), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) -> f10469_0_reverse_FieldAccess(EOS(STATIC_10469), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) :|: TRUE
+f10469_0_reverse_FieldAccess(EOS(STATIC_10469), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) -> f10474_0_reverse_Load(EOS(STATIC_10474), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i954)), i986))) :|: TRUE
+f10474_0_reverse_Load(EOS(STATIC_10474), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i954)), i986))) -> f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i954)), i986))) :|: TRUE
+f10548_0_reverse_Return(EOS(STATIC_10548), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i1007)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i1008))) -> f10969_0_reverse_Return(EOS(STATIC_10969), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i1007)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i1008))) :|: TRUE
+f10969_0_reverse_Return(EOS(STATIC_10969), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2473sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2473sub), i954)), java.lang.Object(o2473sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2471, i1114)), i1115))) -> f11595_0_reverse_Return(EOS(STATIC_11595), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2473sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2473sub), i954)), java.lang.Object(o2473sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2471, i1114)), i1115))) :|: TRUE
+f11595_0_reverse_Return(EOS(STATIC_11595), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262))) -> f11641_0_reverse_Store(EOS(STATIC_11641), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262))) :|: TRUE
+f11641_0_reverse_Store(EOS(STATIC_11641), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262))) -> f11653_0_reverse_Load(EOS(STATIC_11653), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262))) :|: TRUE
+f11653_0_reverse_Load(EOS(STATIC_11653), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262))) -> f11667_0_reverse_ConstantStackPush(EOS(STATIC_11667), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954))) :|: TRUE
+f11667_0_reverse_ConstantStackPush(EOS(STATIC_11667), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954))) -> f11686_0_reverse_FieldAccess(EOS(STATIC_11686), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), NULL) :|: TRUE
+f11686_0_reverse_FieldAccess(EOS(STATIC_11686), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o2999sub), i954)), NULL) -> f11695_0_reverse_Load(EOS(STATIC_11695), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262))) :|: TRUE
+f11695_0_reverse_Load(EOS(STATIC_11695), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262))) -> f11882_0_reverse_Load(EOS(STATIC_11882), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(o2999sub)) :|: TRUE
+f11882_0_reverse_Load(EOS(STATIC_11882), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(o2999sub)) -> f11977_0_reverse_FieldAccess(EOS(STATIC_11977), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(o2999sub), java.lang.Object(Shuffle.List(EOC, NULL, i954))) :|: TRUE
+f11977_0_reverse_FieldAccess(EOS(STATIC_11977), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(Shuffle.List(EOC, o3324, i1346)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) -> f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(Shuffle.List(EOC, o3324, i1346)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) :|: TRUE
+f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(Shuffle.List(EOC, o3324, i1346)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) -> f12011_0_reverse_FieldAccess(EOS(STATIC_12011), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(Shuffle.List(EOC, o3324, i1346)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) :|: TRUE
+f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3330, i1349)), i1262)), java.lang.Object(Shuffle.List(EOC, o3330, i1349)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) -> f12012_0_reverse_FieldAccess(EOS(STATIC_12012), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3330, i1349)), i1262)), java.lang.Object(Shuffle.List(EOC, o3330, i1349)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) :|: TRUE
+f12011_0_reverse_FieldAccess(EOS(STATIC_12011), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262)), java.lang.Object(Shuffle.List(EOC, o3324, i1346)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) -> f12027_0_reverse_Load(EOS(STATIC_12027), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997put, i1261)), i1262))) :|: TRUE
+f12012_0_reverse_FieldAccess(EOS(STATIC_12012), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3330, i1349)), i1262)), java.lang.Object(Shuffle.List(EOC, o3330, i1349)), java.lang.Object(Shuffle.List(EOC, NULL, i954))) -> f12033_0_reverse_Load(EOS(STATIC_12033), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i954)), i1349)), i1262))) :|: TRUE
+f12027_0_reverse_Load(EOS(STATIC_12027), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262))) -> f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997, i1261)), i1262))) :|: TRUE
+f12033_0_reverse_Load(EOS(STATIC_12033), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i954)), i1349)), i1262))) -> f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL, i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i954)), i1349)), i1262))) :|: TRUE
+f12369_0_reverse_Return(EOS(STATIC_12369), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1379)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1379)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i1379)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453, i1381)), i1380))) -> f11595_0_reverse_Return(EOS(STATIC_11595), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1379)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1379)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i1379)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453, i1381)), i1380))) :|: TRUE
+f12409_0_reverse_Return(EOS(STATIC_12409), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i1391)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i1393)), i1392))) -> f11595_0_reverse_Return(EOS(STATIC_11595), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i1391)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i1393)), i1392))) :|: TRUE
+f9763_0_shuffle_Load(EOS(STATIC_9763), o1566, o1566) -> f9779_0_shuffle_NONNULL(EOS(STATIC_9779), o1566, o1566, o1566) :|: TRUE
+f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(o1591sub), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) -> f9783_0_shuffle_NONNULL(EOS(STATIC_9783), java.lang.Object(o1591sub), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) :|: TRUE
+f9779_0_shuffle_NONNULL(EOS(STATIC_9779), NULL, NULL, NULL) -> f9784_0_shuffle_NONNULL(EOS(STATIC_9784), NULL, NULL, NULL) :|: TRUE
+f9783_0_shuffle_NONNULL(EOS(STATIC_9783), java.lang.Object(o1591sub), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) -> f9800_0_shuffle_Load(EOS(STATIC_9800), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) :|: TRUE
+f9784_0_shuffle_NONNULL(EOS(STATIC_9784), NULL, NULL, NULL) -> f9801_0_shuffle_ConstantStackPush(EOS(STATIC_9801), NULL) :|: TRUE
+f9800_0_shuffle_Load(EOS(STATIC_9800), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) -> f9814_0_shuffle_FieldAccess(EOS(STATIC_9814), java.lang.Object(o1591sub), java.lang.Object(o1591sub), java.lang.Object(o1591sub)) :|: TRUE
+f9801_0_shuffle_ConstantStackPush(EOS(STATIC_9801), NULL) -> f9815_0_shuffle_Return(EOS(STATIC_9815), NULL, NULL) :|: TRUE
+f9814_0_shuffle_FieldAccess(EOS(STATIC_9814), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f9827_0_shuffle_FieldAccess(EOS(STATIC_9827), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883))) :|: TRUE
+f9827_0_shuffle_FieldAccess(EOS(STATIC_9827), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f9833_0_shuffle_Store(EOS(STATIC_9833), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9833_0_shuffle_Store(EOS(STATIC_9833), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9863_0_shuffle_New(EOS(STATIC_9863), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9863_0_shuffle_New(EOS(STATIC_9863), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9904_0_shuffle_Duplicate(EOS(STATIC_9904), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9904_0_shuffle_Duplicate(EOS(STATIC_9904), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9910_0_shuffle_Load(EOS(STATIC_9910), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9910_0_shuffle_Load(EOS(STATIC_9910), java.lang.Object(Shuffle.List(EOC, o1633, i883)), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9916_0_shuffle_FieldAccess(EOS(STATIC_9916), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883))) :|: TRUE
+f9916_0_shuffle_FieldAccess(EOS(STATIC_9916), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f9918_0_shuffle_Load(EOS(STATIC_9918), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9918_0_shuffle_Load(EOS(STATIC_9918), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9920_0_shuffle_InvokeMethod(EOS(STATIC_9920), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) :|: TRUE
+f9920_0_shuffle_InvokeMethod(EOS(STATIC_9920), java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633) -> f9922_1_shuffle_InvokeMethod(f9922_0_reverse_Load(EOS(STATIC_9922), o1633, java.lang.Object(Shuffle.List(EOC, o1633, i883)), o1633), java.lang.Object(Shuffle.List(EOC, o1633, i883))) :|: TRUE
+f9994_0_reverse_Return(EOS(STATIC_9994), java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) -> f9996_0_shuffle_InvokeMethod(EOS(STATIC_9996), java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) :|: TRUE
+f9996_0_shuffle_InvokeMethod(EOS(STATIC_9996), java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) -> f9998_1_shuffle_InvokeMethod(f9998_0_shuffle_Load(EOS(STATIC_9998), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879), java.lang.Object(Shuffle.List(EOC, o1879, i883))) :|: TRUE
+f9998_0_shuffle_Load(EOS(STATIC_9998), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) -> f10013_0_shuffle_Load(EOS(STATIC_10013), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) :|: TRUE
+f10013_0_shuffle_Load(EOS(STATIC_10013), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) -> f10018_0_shuffle_Load(EOS(STATIC_10018), o1879, java.lang.Object(Shuffle.List(EOC, o1879, i883)), o1879) :|: TRUE
+f10018_0_shuffle_Load(EOS(STATIC_10018), o1900, o1905, o1900) -> f10047_0_shuffle_Load(EOS(STATIC_10047), o1900, o1900) :|: TRUE
+f10048_0_shuffle_Return(EOS(STATIC_10048), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10051_0_shuffle_InvokeMethod(EOS(STATIC_10051), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10051_0_shuffle_InvokeMethod(EOS(STATIC_10051), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10054_0__init__Load(EOS(STATIC_10054), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10054_0__init__Load(EOS(STATIC_10054), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10060_0__init__InvokeMethod(EOS(STATIC_10060), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10060_0__init__InvokeMethod(EOS(STATIC_10060), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10074_0__init__Load(EOS(STATIC_10074), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10065_0_reverse_Return(EOS(STATIC_10065), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f9994_0_reverse_Return(EOS(STATIC_9994), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10074_0__init__Load(EOS(STATIC_10074), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10078_0__init__Load(EOS(STATIC_10078), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10078_0__init__Load(EOS(STATIC_10078), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10084_0__init__FieldAccess(EOS(STATIC_10084), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10084_0__init__FieldAccess(EOS(STATIC_10084), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10091_0__init__Load(EOS(STATIC_10091), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10091_0__init__Load(EOS(STATIC_10091), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10121_0__init__Load(EOS(STATIC_10121), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10121_0__init__Load(EOS(STATIC_10121), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10133_0__init__FieldAccess(EOS(STATIC_10133), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f10131_0_reverse_Return(EOS(STATIC_10131), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965)), i883)), java.lang.Object(Shuffle.List(EOC, NULL, i965))) -> f9994_0_reverse_Return(EOS(STATIC_9994), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965)), i883)), java.lang.Object(Shuffle.List(EOC, NULL, i965))) :|: TRUE
+f10133_0__init__FieldAccess(EOS(STATIC_10133), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) -> f10136_0__init__Return(EOS(STATIC_10136), java.lang.Object(Shuffle.List(EOC, NULL, i883))) :|: TRUE
+f10136_0__init__Return(EOS(STATIC_10136), java.lang.Object(Shuffle.List(EOC, NULL, i883))) -> f10143_0_shuffle_Return(EOS(STATIC_10143), java.lang.Object(Shuffle.List(EOC, NULL, i883))) :|: TRUE
+f10441_0_shuffle_Return(EOS(STATIC_10441), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i978)), i883))) -> f10705_0_shuffle_Return(EOS(STATIC_10705), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i978)), i883))) :|: TRUE
+f10547_0_reverse_Return(EOS(STATIC_10547), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i1003))) -> f10944_0_reverse_Return(EOS(STATIC_10944), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i1003))) :|: TRUE
+f10705_0_shuffle_Return(EOS(STATIC_10705), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2219, i1041)), i883))) -> f11231_0_shuffle_Return(EOS(STATIC_11231), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2219, i1041)), i883))) :|: TRUE
+f10944_0_reverse_Return(EOS(STATIC_10944), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField27)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2452, i1109)), i1110))) -> f11529_0_reverse_Return(EOS(STATIC_11529), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField28)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2452, i1109)), i1110))) :|: TRUE
+f11231_0_shuffle_Return(EOS(STATIC_11231), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2626, i1156)), i883))) -> f12649_0_shuffle_Return(EOS(STATIC_12649), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2626, i1156)), i883))) :|: TRUE
+f11529_0_reverse_Return(EOS(STATIC_11529), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField29)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) -> f11634_0_shuffle_InvokeMethod(EOS(STATIC_11634), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField30)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) :|: TRUE
+f11634_0_shuffle_InvokeMethod(EOS(STATIC_11634), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField31)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) -> f11647_1_shuffle_InvokeMethod(f11647_0_shuffle_Load(EOS(STATIC_11647), java.lang.Object(Shuffle.List(EOC, NULL, abstractField32)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField33)), i883))) :|: TRUE
+f11647_0_shuffle_Load(EOS(STATIC_11647), java.lang.Object(Shuffle.List(EOC, NULL, abstractField34)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) -> f11661_0_shuffle_Load(EOS(STATIC_11661), java.lang.Object(Shuffle.List(EOC, NULL, abstractField35)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) :|: TRUE
+f11661_0_shuffle_Load(EOS(STATIC_11661), java.lang.Object(Shuffle.List(EOC, NULL, abstractField48)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) -> f11682_0_shuffle_Load(EOS(STATIC_11682), java.lang.Object(Shuffle.List(EOC, NULL, abstractField49)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2949, i1249)), i1250))) :|: TRUE
+f11682_0_shuffle_Load(EOS(STATIC_11682), o3107, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250))) -> f11923_0_shuffle_Load(EOS(STATIC_11923), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250))) :|: TRUE
+f11924_0_shuffle_Return(EOS(STATIC_11924), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField50)), i883)), NULL) -> f11979_0_shuffle_InvokeMethod(EOS(STATIC_11979), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField51)), i883)), NULL) :|: TRUE
+f11925_0_shuffle_Return(EOS(STATIC_11925), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField52)), i883))) -> f11940_0_shuffle_Return(EOS(STATIC_11940), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField53)), i883))) :|: TRUE
+f11940_0_shuffle_Return(EOS(STATIC_11940), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField54)), i883))) -> f11981_0_shuffle_InvokeMethod(EOS(STATIC_11981), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField55)), i883))) :|: TRUE
+f11979_0_shuffle_InvokeMethod(EOS(STATIC_11979), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField56)), i883)), NULL) -> f11986_0__init__Load(EOS(STATIC_11986), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField57)), i883)), NULL) :|: TRUE
+f11981_0_shuffle_InvokeMethod(EOS(STATIC_11981), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField58)), i883))) -> f11987_0__init__Load(EOS(STATIC_11987), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField59)), i883))) :|: TRUE
+f11986_0__init__Load(EOS(STATIC_11986), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField60)), i883)), NULL) -> f12035_0__init__InvokeMethod(EOS(STATIC_12035), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField61)), i883)), NULL) :|: TRUE
+f11987_0__init__Load(EOS(STATIC_11987), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField62)), i883))) -> f12039_0__init__InvokeMethod(EOS(STATIC_12039), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField63)), i883))) :|: TRUE
+f12035_0__init__InvokeMethod(EOS(STATIC_12035), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField64)), i883)), NULL) -> f12048_0__init__Load(EOS(STATIC_12048), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField65)), i883)), NULL) :|: TRUE
+f12039_0__init__InvokeMethod(EOS(STATIC_12039), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField66)), i883))) -> f12052_0__init__Load(EOS(STATIC_12052), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField67)), i883))) :|: TRUE
+f12048_0__init__Load(EOS(STATIC_12048), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField68)), i883)), NULL) -> f12056_0__init__Load(EOS(STATIC_12056), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField69)), i883)), NULL) :|: TRUE
+f12052_0__init__Load(EOS(STATIC_12052), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField70)), i883))) -> f12057_0__init__Load(EOS(STATIC_12057), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField71)), i883))) :|: TRUE
+f12056_0__init__Load(EOS(STATIC_12056), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField72)), i883)), NULL) -> f12265_0__init__FieldAccess(EOS(STATIC_12265), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField73)), i883)), NULL) :|: TRUE
+f12057_0__init__Load(EOS(STATIC_12057), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField74)), i883))) -> f12269_0__init__FieldAccess(EOS(STATIC_12269), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField75)), i883))) :|: TRUE
+f12265_0__init__FieldAccess(EOS(STATIC_12265), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField76)), i883)), NULL) -> f12424_0__init__Load(EOS(STATIC_12424), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField77)), i883)), NULL) :|: TRUE
+f12269_0__init__FieldAccess(EOS(STATIC_12269), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField78)), i883))) -> f12431_0__init__Load(EOS(STATIC_12431), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField79)), i883))) :|: TRUE
+f12276_0_reverse_Return(EOS(STATIC_12276), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1373)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437, i1375)), i1374))) -> f11529_0_reverse_Return(EOS(STATIC_11529), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1373)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437, i1375)), i1374))) :|: TRUE
+f12399_0_reverse_Return(EOS(STATIC_12399), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i1387)), i1386))) -> f11529_0_reverse_Return(EOS(STATIC_11529), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i1387)), i1386))) :|: TRUE
+f12424_0__init__Load(EOS(STATIC_12424), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField80)), i883)), NULL) -> f12446_0__init__Load(EOS(STATIC_12446), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField81)), i883)), NULL) :|: TRUE
+f12431_0__init__Load(EOS(STATIC_12431), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField82)), i883))) -> f12451_0__init__Load(EOS(STATIC_12451), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField83)), i883))) :|: TRUE
+f12446_0__init__Load(EOS(STATIC_12446), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField84)), i883)), NULL) -> f12454_0__init__FieldAccess(EOS(STATIC_12454), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField85)), i883)), NULL) :|: TRUE
+f12451_0__init__Load(EOS(STATIC_12451), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField86)), i883))) -> f12456_0__init__FieldAccess(EOS(STATIC_12456), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField87)), i883))) :|: TRUE
+f12454_0__init__FieldAccess(EOS(STATIC_12454), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField88)), i883)), NULL) -> f12457_0__init__Return(EOS(STATIC_12457), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField89)), i883))) :|: TRUE
+f12456_0__init__FieldAccess(EOS(STATIC_12456), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField90)), i883))) -> f12463_0__init__Return(EOS(STATIC_12463), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField91)), i883))) :|: TRUE
+f12457_0__init__Return(EOS(STATIC_12457), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField92)), i883))) -> f12479_0_shuffle_Return(EOS(STATIC_12479), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField93)), i883))) :|: TRUE
+f12463_0__init__Return(EOS(STATIC_12463), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField94)), i883))) -> f12486_0_shuffle_Return(EOS(STATIC_12486), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField95)), i883))) :|: TRUE
+f12648_0_shuffle_Return(EOS(STATIC_12648), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField96)), i1460)), i883))) -> f12649_0_shuffle_Return(EOS(STATIC_12649), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField97)), i1460)), i883))) :|: TRUE
+f12649_0_shuffle_Return(EOS(STATIC_12649), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12740_0_shuffle_InvokeMethod(EOS(STATIC_12740), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12683_0_shuffle_Return(EOS(STATIC_12683), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField98)), i883))) -> f11940_0_shuffle_Return(EOS(STATIC_11940), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField99)), i883))) :|: TRUE
+f12733_0_shuffle_Return(EOS(STATIC_12733), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField100)), i1478)), i883))) -> f12649_0_shuffle_Return(EOS(STATIC_12649), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField101)), i1478)), i883))) :|: TRUE
+f12735_0_shuffle_Return(EOS(STATIC_12735), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField102)), i883))) -> f11940_0_shuffle_Return(EOS(STATIC_11940), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField103)), i883))) :|: TRUE
+f12740_0_shuffle_InvokeMethod(EOS(STATIC_12740), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12746_0__init__Load(EOS(STATIC_12746), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12746_0__init__Load(EOS(STATIC_12746), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12752_0__init__InvokeMethod(EOS(STATIC_12752), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12752_0__init__InvokeMethod(EOS(STATIC_12752), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12755_0__init__Load(EOS(STATIC_12755), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12755_0__init__Load(EOS(STATIC_12755), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12759_0__init__Load(EOS(STATIC_12759), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12759_0__init__Load(EOS(STATIC_12759), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12765_0__init__FieldAccess(EOS(STATIC_12765), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12765_0__init__FieldAccess(EOS(STATIC_12765), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12771_0__init__Load(EOS(STATIC_12771), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12771_0__init__Load(EOS(STATIC_12771), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12775_0__init__Load(EOS(STATIC_12775), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12775_0__init__Load(EOS(STATIC_12775), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12777_0__init__FieldAccess(EOS(STATIC_12777), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12777_0__init__FieldAccess(EOS(STATIC_12777), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12815_0__init__Return(EOS(STATIC_12815), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12815_0__init__Return(EOS(STATIC_12815), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) -> f12817_0_shuffle_Return(EOS(STATIC_12817), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1493)), i883))) :|: TRUE
+f12903_0_shuffle_Return(EOS(STATIC_12903), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3968, i1577)), i1576)), i883))) -> f12649_0_shuffle_Return(EOS(STATIC_12649), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3968, i1577)), i1576)), i883))) :|: TRUE
+f12910_0_shuffle_Return(EOS(STATIC_12910), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField104)), i883))) -> f11940_0_shuffle_Return(EOS(STATIC_11940), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField105)), i883))) :|: TRUE
+f10047_0_shuffle_Load(EOS(STATIC_10047), o1900, o1900) -> f9763_0_shuffle_Load(EOS(STATIC_9763), o1900, o1900) :|: TRUE
+f11923_0_shuffle_Load(EOS(STATIC_11923), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250))) -> f9763_0_shuffle_Load(EOS(STATIC_9763), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3114, i1249)), i1250))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) -> f10445_0_reverse_Return(EOS(STATIC_10445), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i986)), java.lang.Object(Shuffle.List(EOC, NULL, i986))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL, i1007)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i1008))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) -> f10548_0_reverse_Return(EOS(STATIC_10548), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i1007)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007)), i1008))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL, i1379)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453, i1381)), i1380))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) -> f12369_0_reverse_Return(EOS(STATIC_12369), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1379)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1379)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i1379)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453, i1381)), i1380))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL, i1391)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i1393)), i1392))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub), i954)), java.lang.Object(o1957sub)) -> f12409_0_reverse_Return(EOS(STATIC_12409), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i954)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i954)), java.lang.Object(Shuffle.List(EOC, NULL, i1391)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391)), i1393)), i1392))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10053_0_reverse_Return(EOS(STATIC_10053), NULL, NULL), java.lang.Object(Shuffle.List(EOC, NULL, i883))) -> f10065_0_reverse_Return(EOS(STATIC_10065), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL, i965)), java.lang.Object(Shuffle.List(EOC, NULL, i965))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965)), i883))) -> f10131_0_reverse_Return(EOS(STATIC_10131), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965)), i883)), java.lang.Object(Shuffle.List(EOC, NULL, i965))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL, i1002)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i1003))), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f10547_0_reverse_Return(EOS(STATIC_10547), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002)), i1003))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL, i1373)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437, i1375)), i1374))), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f12276_0_reverse_Return(EOS(STATIC_12276), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1373)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437, i1375)), i1374))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL, i1385)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i1387)), i1386))), java.lang.Object(Shuffle.List(EOC, o1633, i883))) -> f12399_0_reverse_Return(EOS(STATIC_12399), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i883)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385)), i1387)), i1386))) :|: TRUE
+f9998_1_shuffle_InvokeMethod(f9815_0_shuffle_Return(EOS(STATIC_9815), NULL, NULL), java.lang.Object(Shuffle.List(EOC, NULL, i883))) -> f10048_0_shuffle_Return(EOS(STATIC_10048), java.lang.Object(Shuffle.List(EOC, NULL, i883)), NULL) :|: TRUE
+f9998_1_shuffle_InvokeMethod(f10143_0_shuffle_Return(EOS(STATIC_10143), java.lang.Object(Shuffle.List(EOC, NULL, i978))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i978)), i883))) -> f10441_0_shuffle_Return(EOS(STATIC_10441), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i978)), i883))) :|: TRUE
+f9998_1_shuffle_InvokeMethod(f12479_0_shuffle_Return(EOS(STATIC_12479), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField24)), i1460))), java.lang.Object(Shuffle.List(EOC, o1879, i883))) -> f12648_0_shuffle_Return(EOS(STATIC_12648), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField23)), i1460)), i883))) :|: TRUE
+f9998_1_shuffle_InvokeMethod(f12486_0_shuffle_Return(EOS(STATIC_12486), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField26)), i1478))), java.lang.Object(Shuffle.List(EOC, o1879, i883))) -> f12733_0_shuffle_Return(EOS(STATIC_12733), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField25)), i1478)), i883))) :|: TRUE
+f9998_1_shuffle_InvokeMethod(f12817_0_shuffle_Return(EOS(STATIC_12817), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3968, i1577)), i1576))), java.lang.Object(Shuffle.List(EOC, o1879, i883))) -> f12903_0_shuffle_Return(EOS(STATIC_12903), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3968, i1577)), i1576)), i883))) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f9815_0_shuffle_Return(EOS(STATIC_9815), NULL, NULL), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField37)), i883))) -> f11924_0_shuffle_Return(EOS(STATIC_11924), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField36)), i883)), NULL) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f10143_0_shuffle_Return(EOS(STATIC_10143), java.lang.Object(Shuffle.List(EOC, NULL, i1315))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField39)), i883))) -> f11925_0_shuffle_Return(EOS(STATIC_11925), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField38)), i883))) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f12479_0_shuffle_Return(EOS(STATIC_12479), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField42)), i1464))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField41)), i883))) -> f12683_0_shuffle_Return(EOS(STATIC_12683), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField40)), i883))) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f12486_0_shuffle_Return(EOS(STATIC_12486), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField45)), i1484))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField44)), i883))) -> f12735_0_shuffle_Return(EOS(STATIC_12735), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField43)), i883))) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f12817_0_shuffle_Return(EOS(STATIC_12817), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757, i1582)), i1581))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField47)), i883))) -> f12910_0_shuffle_Return(EOS(STATIC_12910), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField46)), i883))) :|: TRUE
+Combined rules. Obtained 6 conditional rules for P and 26 conditional rules for R.P rules:
+f9922_1_shuffle_InvokeMethod(f10053_0_reverse_Return(EOS(STATIC_10053), NULL, NULL), java.lang.Object(Shuffle.List(EOC, NULL, i883:0))) -> f9998_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), NULL, NULL, NULL), java.lang.Object(Shuffle.List(EOC, NULL, i883:0))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), i1003:0))), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) -> f11647_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), i1003:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), i1003:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), i1003:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField18:0)), i883:0))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), i1387:0)), i1386:0))), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) -> f11647_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), i1387:0)), i1386:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), i1387:0)), i1386:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), i1387:0)), i1386:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField18:0)), i883:0))) :|: TRUE
+f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0)), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0)), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) -> f9922_1_shuffle_InvokeMethod(f13177_0_reverse_Load(EOS(STATIC_13177), o1633:0, java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0)), o1633:0), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), java.lang.Object(Shuffle.List(EOC, NULL, i965:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), i883:0))) -> f9998_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), java.lang.Object(Shuffle.List(EOC, NULL, i965:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), i883:0))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL, i1373:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437:0, i1375:0)), i1374:0))), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) -> f11647_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437:0, i1375:0)), i1374:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437:0, i1375:0)), i1374:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437:0, i1375:0)), i1374:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField18:0)), i883:0))) :|: TRUE
+R rules:
+f9998_1_shuffle_InvokeMethod(f12486_0_shuffle_Return(EOS(STATIC_12486), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField26:0)), i1478:0))), java.lang.Object(Shuffle.List(EOC, o1879:0, i883:0))) -> f12817_0_shuffle_Return(EOS(STATIC_12817), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField101:0)), i1478:0)), i883:0))) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f9815_0_shuffle_Return(EOS(STATIC_9815), NULL, NULL), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField37:0)), i883:0))) -> f12479_0_shuffle_Return(EOS(STATIC_12479), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField93:0)), i883:0))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), i1003:0))), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) -> f11647_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), i1003:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), i1003:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1002:0)), i1003:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField33:0)), i883:0))) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f12479_0_shuffle_Return(EOS(STATIC_12479), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField42:0)), i1464:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField41:0)), i883:0))) -> f12486_0_shuffle_Return(EOS(STATIC_12486), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField95:0)), i883:0))) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f12817_0_shuffle_Return(EOS(STATIC_12817), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3757:0, i1582:0)), i1581:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField47:0)), i883:0))) -> f12486_0_shuffle_Return(EOS(STATIC_12486), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField95:0)), i883:0))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), i1387:0)), i1386:0))), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) -> f11647_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), i1387:0)), i1386:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), i1387:0)), i1386:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1385:0)), i1387:0)), i1386:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField33:0)), i883:0))) :|: TRUE
+f9998_1_shuffle_InvokeMethod(f9815_0_shuffle_Return(EOS(STATIC_9815), NULL, NULL), java.lang.Object(Shuffle.List(EOC, NULL, i883:0))) -> f10143_0_shuffle_Return(EOS(STATIC_10143), java.lang.Object(Shuffle.List(EOC, NULL, i883:0))) :|: TRUE
+f9998_1_shuffle_InvokeMethod(f12479_0_shuffle_Return(EOS(STATIC_12479), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField24:0)), i1460:0))), java.lang.Object(Shuffle.List(EOC, o1879:0, i883:0))) -> f12817_0_shuffle_Return(EOS(STATIC_12817), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField97:0)), i1460:0)), i883:0))) :|: TRUE
+f9998_1_shuffle_InvokeMethod(f12817_0_shuffle_Return(EOS(STATIC_12817), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3968:0, i1577:0)), i1576:0))), java.lang.Object(Shuffle.List(EOC, o1879:0, i883:0))) -> f12817_0_shuffle_Return(EOS(STATIC_12817), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3968:0, i1577:0)), i1576:0)), i883:0))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), java.lang.Object(Shuffle.List(EOC, NULL, i965:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), i883:0))) -> f9998_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), java.lang.Object(Shuffle.List(EOC, NULL, i965:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i965:0)), i883:0))) :|: TRUE
+f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0)), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0)), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) -> f9922_1_shuffle_InvokeMethod(f10044_0_reverse_NULL(EOS(STATIC_10044), o1633:0, o1633:0, o1633:0), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f10053_0_reverse_Return(EOS(STATIC_10053), NULL, NULL), java.lang.Object(Shuffle.List(EOC, NULL, i883:0))) -> f9998_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), NULL, NULL, NULL), java.lang.Object(Shuffle.List(EOC, NULL, i883:0))) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f10143_0_shuffle_Return(EOS(STATIC_10143), java.lang.Object(Shuffle.List(EOC, NULL, i1315:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField39:0)), i883:0))) -> f12486_0_shuffle_Return(EOS(STATIC_12486), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField95:0)), i883:0))) :|: TRUE
+f9922_1_shuffle_InvokeMethod(f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL, i1373:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437:0, i1375:0)), i1374:0))), java.lang.Object(Shuffle.List(EOC, o1633:0, i883:0))) -> f11647_1_shuffle_InvokeMethod(f9779_0_shuffle_NONNULL(EOS(STATIC_9779), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437:0, i1375:0)), i1374:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437:0, i1375:0)), i1374:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3437:0, i1375:0)), i1374:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField33:0)), i883:0))) :|: TRUE
+f9779_0_shuffle_NONNULL(EOS(STATIC_9779), NULL, NULL, NULL) -> f9815_0_shuffle_Return(EOS(STATIC_9815), NULL, NULL) :|: TRUE
+f9998_1_shuffle_InvokeMethod(f10143_0_shuffle_Return(EOS(STATIC_10143), java.lang.Object(Shuffle.List(EOC, NULL, i978:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i978:0)), i883:0))) -> f12817_0_shuffle_Return(EOS(STATIC_12817), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i978:0)), i883:0))) :|: TRUE
+f11647_1_shuffle_InvokeMethod(f12486_0_shuffle_Return(EOS(STATIC_12486), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField45:0)), i1484:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField44:0)), i883:0))) -> f12486_0_shuffle_Return(EOS(STATIC_12486), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, abstractField95:0)), i883:0))) :|: TRUE
+f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, NULL, i954:0))) -> f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, NULL, i954:0))) :|: TRUE
+f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0))) -> f10135_1_reverse_InvokeMethod(f10044_0_reverse_NULL(EOS(STATIC_10044), java.lang.Object(o1957sub:0), java.lang.Object(o1957sub:0), java.lang.Object(o1957sub:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(o1957sub:0)) :|: TRUE
+f10135_1_reverse_InvokeMethod(f10082_0_reverse_Return(EOS(STATIC_10082), java.lang.Object(Shuffle.List(EOC, NULL, i986:0)), java.lang.Object(Shuffle.List(EOC, NULL, i986:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986:0)), i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i986:0)), i954:0)), java.lang.Object(Shuffle.List(EOC, NULL, i986:0))) -> f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), i986:0))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f10480_0_reverse_Return(EOS(STATIC_10480), java.lang.Object(Shuffle.List(EOC, NULL, i1007:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007:0)), i1008:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(o1957sub:0)) -> f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1007:0)), i1008:0)), java.lang.Object(Shuffle.List(EOC, NULL, i1007:0)), java.lang.Object(Shuffle.List(EOC, NULL, i954:0))) :|: TRUE
+f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997:0, i1261:0)), i1262:0)), java.lang.Object(Shuffle.List(EOC, o3324:0, i1346:0)), java.lang.Object(Shuffle.List(EOC, NULL, i954:0))) -> f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o2997put:0, i1261:0)), i1262:0))) :|: TRUE
+f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3330:0, i1349:0)), i1262:0)), java.lang.Object(Shuffle.List(EOC, o3330:0, i1349:0)), java.lang.Object(Shuffle.List(EOC, NULL, i954:0))) -> f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), i1349:0)), i1262:0))) :|: TRUE
+f10044_0_reverse_NULL(EOS(STATIC_10044), NULL, NULL, NULL) -> f10053_0_reverse_Return(EOS(STATIC_10053), NULL, NULL) :|: TRUE
+f10135_1_reverse_InvokeMethod(f12047_0_reverse_Return(EOS(STATIC_12047), java.lang.Object(Shuffle.List(EOC, NULL, i1391:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391:0)), i1393:0)), i1392:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(o1957sub:0)) -> f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, NULL, i1391:0)), i1393:0)), i1392:0)), java.lang.Object(Shuffle.List(EOC, NULL, i1391:0)), java.lang.Object(Shuffle.List(EOC, NULL, i954:0))) :|: TRUE
+f10135_1_reverse_InvokeMethod(f12043_0_reverse_Return(EOS(STATIC_12043), java.lang.Object(Shuffle.List(EOC, NULL, i1379:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453:0, i1381:0)), i1380:0))), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(o1957sub:0), i954:0)), java.lang.Object(o1957sub:0)) -> f11984_0_reverse_FieldAccess(EOS(STATIC_11984), java.lang.Object(Shuffle.List(EOC, NULL, i954:0)), java.lang.Object(Shuffle.List(EOC, java.lang.Object(Shuffle.List(EOC, o3453:0, i1381:0)), i1380:0)), java.lang.Object(Shuffle.List(EOC, NULL, i1379:0)), java.lang.Object(Shuffle.List(EOC, NULL, i954:0))) :|: TRUE
+Filtered ground terms:
+   f9779_0_shuffle_NONNULL(x1, x2, x3, x4) -> f9779_0_shuffle_NONNULL(x2, x3, x4)
+   f10053_0_reverse_Return(x1, x2, x3) -> f10053_0_reverse_Return
+   f10480_0_reverse_Return(x1, x2, x3) -> f10480_0_reverse_Return(x2, x3)
+   f12047_0_reverse_Return(x1, x2, x3) -> f12047_0_reverse_Return(x2, x3)
+   f13177_0_reverse_Load(x1, x2, x3, x4) -> f13177_0_reverse_Load(x2, x3, x4)
+   f10082_0_reverse_Return(x1, x2, x3) -> f10082_0_reverse_Return(x2, x3)
+   f12043_0_reverse_Return(x1, x2, x3) -> f12043_0_reverse_Return(x2, x3)
+   Shuffle.List(x1, x2, x3) -> Shuffle.List(x2, x3)
+   f12817_0_shuffle_Return(x1, x2) -> f12817_0_shuffle_Return(x2)
+   f12479_0_shuffle_Return(x1, x2) -> f12479_0_shuffle_Return(x2)
+   f12486_0_shuffle_Return(x1, x2) -> f12486_0_shuffle_Return(x2)
+   f10143_0_shuffle_Return(x1, x2) -> f10143_0_shuffle_Return(x2)
+   f9815_0_shuffle_Return(x1, x2, x3) -> f9815_0_shuffle_Return
+   f10044_0_reverse_NULL(x1, x2, x3, x4) -> f10044_0_reverse_NULL(x2, x3, x4)
+   f11984_0_reverse_FieldAccess(x1, x2, x3, x4, x5) -> f11984_0_reverse_FieldAccess(x2, x3, x4, x5)
+Filtered unneeded arguments:
+   Shuffle.List(x1, x2) -> Shuffle.List(x1)
+   f11647_1_shuffle_InvokeMethod(x1, x2) -> f11647_1_shuffle_InvokeMethod(x1)
+   f12043_0_reverse_Return(x1, x2) -> f12043_0_reverse_Return(x2)
+   f11984_0_reverse_FieldAccess(x1, x2, x3, x4) -> f11984_0_reverse_FieldAccess(x2, x3)
+Filtered duplicate args:
+   f9779_0_shuffle_NONNULL(x1, x2, x3) -> f9779_0_shuffle_NONNULL(x3)
+   f10480_0_reverse_Return(x1, x2) -> f10480_0_reverse_Return(x2)
+   f12047_0_reverse_Return(x1, x2) -> f12047_0_reverse_Return(x2)
+   f13177_0_reverse_Load(x1, x2, x3) -> f13177_0_reverse_Load(x2)
+   f10082_0_reverse_Return(x1, x2) -> f10082_0_reverse_Return(x2)
+   f10044_0_reverse_NULL(x1, x2, x3) -> f10044_0_reverse_NULL(x3)
+   f10135_1_reverse_InvokeMethod(x1, x2, x3, x4) -> f10135_1_reverse_InvokeMethod(x1, x3)
+Combined rules. Obtained 6 conditional rules for P and 0 conditional rules for R.P rules:
+F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(o1633:0:0))) -> F9922_1_SHUFFLE_INVOKEMETHOD(f13177_0_reverse_Load(java.lang.Object(Shuffle.List(o1633:0:0))), java.lang.Object(Shuffle.List(o1633:0:0))) :|: TRUE
+F9922_1_SHUFFLE_INVOKEMETHOD(f10082_0_reverse_Return(java.lang.Object(Shuffle.List(NULL))), java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL))))) -> F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(NULL))) :|: TRUE
+F9922_1_SHUFFLE_INVOKEMETHOD(f12047_0_reverse_Return(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL))))))), java.lang.Object(Shuffle.List(o1633:0:0))) -> F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL))))))) :|: TRUE
+F9922_1_SHUFFLE_INVOKEMETHOD(f10480_0_reverse_Return(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL))))), java.lang.Object(Shuffle.List(o1633:0:0))) -> F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL))))) :|: TRUE
+F9922_1_SHUFFLE_INVOKEMETHOD(f10053_0_reverse_Return, java.lang.Object(Shuffle.List(NULL))) -> F9779_0_SHUFFLE_NONNULL(NULL) :|: TRUE
+F9922_1_SHUFFLE_INVOKEMETHOD(f12043_0_reverse_Return(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(o3437:0:0))))), java.lang.Object(Shuffle.List(o1633:0:0))) -> F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(o3437:0:0))))) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(14)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(o1633:0:0))) -> F9922_1_SHUFFLE_INVOKEMETHOD(f13177_0_reverse_Load(java.lang.Object(Shuffle.List(o1633:0:0))), java.lang.Object(Shuffle.List(o1633:0:0)))
+   F9922_1_SHUFFLE_INVOKEMETHOD(f10082_0_reverse_Return(java.lang.Object(Shuffle.List(NULL))), java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL))))) -> F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(NULL)))
+   F9922_1_SHUFFLE_INVOKEMETHOD(f12047_0_reverse_Return(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL))))))), java.lang.Object(Shuffle.List(o1633:0:0))) -> F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL)))))))
+   F9922_1_SHUFFLE_INVOKEMETHOD(f10480_0_reverse_Return(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL))))), java.lang.Object(Shuffle.List(o1633:0:0))) -> F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(NULL)))))
+   F9922_1_SHUFFLE_INVOKEMETHOD(f10053_0_reverse_Return, java.lang.Object(Shuffle.List(NULL))) -> F9779_0_SHUFFLE_NONNULL(NULL)
+   F9922_1_SHUFFLE_INVOKEMETHOD(f12043_0_reverse_Return(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(o3437:0:0))))), java.lang.Object(Shuffle.List(o1633:0:0))) -> F9779_0_SHUFFLE_NONNULL(java.lang.Object(Shuffle.List(java.lang.Object(Shuffle.List(o3437:0:0)))))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(15) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 0 SCCs with 6 less nodes.
+----------------------------------------
+
+(16)
+TRUE
+
+----------------------------------------
+
+(17)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Shuffle.Shuffle.createList(I)LShuffle/List;
+SCC calls the following helper methods: Shuffle.Shuffle.createList(I)LShuffle/List;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(18) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 32 IRulesP rules:
+f195_0_createList_GT(EOS(STATIC_195(java.lang.Object(o23sub), i15)), i22, i22, i22) -> f200_0_createList_GT(EOS(STATIC_200(java.lang.Object(o23sub), i15)), i22, i22, i22) :|: TRUE
+f200_0_createList_GT(EOS(STATIC_200(java.lang.Object(o23sub), i15)), i22, i22, i22) -> f206_0_createList_New(EOS(STATIC_206(java.lang.Object(o23sub), i15)), i22, i22) :|: i22 > 0
+f206_0_createList_New(EOS(STATIC_206(java.lang.Object(o23sub), i15)), i22, i22) -> f217_0_createList_Duplicate(EOS(STATIC_217(java.lang.Object(o23sub), i15)), i22, i22) :|: TRUE
+f217_0_createList_Duplicate(EOS(STATIC_217(java.lang.Object(o23sub), i15)), i22, i22) -> f223_0_createList_InvokeMethod(EOS(STATIC_223(java.lang.Object(o23sub), i15)), i22, i22) :|: TRUE
+f223_0_createList_InvokeMethod(EOS(STATIC_223(java.lang.Object(o23sub), i15)), i22, i22) -> f266_0_random_FieldAccess(EOS(STATIC_266(java.lang.Object(o23sub), i15)), i22, i22) :|: TRUE
+f266_0_random_FieldAccess(EOS(STATIC_266(java.lang.Object(o23sub), i15)), i22, i22) -> f284_0_random_FieldAccess(EOS(STATIC_284(java.lang.Object(o23sub), i15)), i22, i22, java.lang.Object(o23sub)) :|: TRUE
+f284_0_random_FieldAccess(EOS(STATIC_284(java.lang.Object(o23sub), i15)), i22, i22, java.lang.Object(o23sub)) -> f293_0_random_ArrayAccess(EOS(STATIC_293(java.lang.Object(o23sub), i15)), i22, i22, java.lang.Object(o23sub), i15) :|: TRUE
+f293_0_random_ArrayAccess(EOS(STATIC_293(java.lang.Object(ARRAY(i34)), i15)), i22, i22, java.lang.Object(ARRAY(i34)), i15) -> f299_0_random_ArrayAccess(EOS(STATIC_299(java.lang.Object(ARRAY(i34)), i15)), i22, i22, java.lang.Object(ARRAY(i34)), i15) :|: i34 >= 0
+f299_0_random_ArrayAccess(EOS(STATIC_299(java.lang.Object(ARRAY(i34)), i15)), i22, i22, java.lang.Object(ARRAY(i34)), i15) -> f305_0_random_ArrayAccess(EOS(STATIC_305(java.lang.Object(ARRAY(i34)), i15)), i22, i22, java.lang.Object(ARRAY(i34)), i15) :|: TRUE
+f305_0_random_ArrayAccess(EOS(STATIC_305(java.lang.Object(ARRAY(i34)), i15)), i22, i22, java.lang.Object(ARRAY(i34)), i15) -> f316_0_random_Store(EOS(STATIC_316(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36) :|: i15 < i34
+f316_0_random_Store(EOS(STATIC_316(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36) -> f329_0_random_FieldAccess(EOS(STATIC_329(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36) :|: TRUE
+f329_0_random_FieldAccess(EOS(STATIC_329(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36) -> f333_0_random_ConstantStackPush(EOS(STATIC_333(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36, i15) :|: TRUE
+f333_0_random_ConstantStackPush(EOS(STATIC_333(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36, i15) -> f339_0_random_IntArithmetic(EOS(STATIC_339(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36, i15, 1) :|: TRUE
+f339_0_random_IntArithmetic(EOS(STATIC_339(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36, i15, matching1) -> f345_0_random_FieldAccess(EOS(STATIC_345(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36, i15 + 1) :|: i15 > 0 && matching1 = 1
+f345_0_random_FieldAccess(EOS(STATIC_345(java.lang.Object(ARRAY(i34)), i15)), i22, i22, o36, i35) -> f350_0_random_Load(EOS(STATIC_350(java.lang.Object(ARRAY(i34)), i35)), i22, i22, o36) :|: TRUE
+f350_0_random_Load(EOS(STATIC_350(java.lang.Object(ARRAY(i34)), i35)), i22, i22, o36) -> f353_0_random_InvokeMethod(EOS(STATIC_353(java.lang.Object(ARRAY(i34)), i35)), i22, i22, o36) :|: TRUE
+f353_0_random_InvokeMethod(EOS(STATIC_353(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(o43sub)) -> f356_0_random_InvokeMethod(EOS(STATIC_356(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(o43sub)) :|: TRUE
+f356_0_random_InvokeMethod(EOS(STATIC_356(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(o46sub)) -> f358_0_random_InvokeMethod(EOS(STATIC_358(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(o46sub)) :|: TRUE
+f358_0_random_InvokeMethod(EOS(STATIC_358(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(o46sub)) -> f363_0_length_Load(EOS(STATIC_363(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(o46sub)) :|: TRUE
+f363_0_length_Load(EOS(STATIC_363(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(o46sub)) -> f373_0_length_FieldAccess(EOS(STATIC_373(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(o46sub)) :|: TRUE
+f373_0_length_FieldAccess(EOS(STATIC_373(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(java.lang.String(EOC, i43))) -> f383_0_length_FieldAccess(EOS(STATIC_383(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(java.lang.String(EOC, i43))) :|: TRUE
+f383_0_length_FieldAccess(EOS(STATIC_383(java.lang.Object(ARRAY(i34)), i35)), i22, i22, java.lang.Object(java.lang.String(EOC, i43))) -> f388_0_length_Return(EOS(STATIC_388(java.lang.Object(ARRAY(i34)), i35)), i22, i22) :|: TRUE
+f388_0_length_Return(EOS(STATIC_388(java.lang.Object(ARRAY(i34)), i35)), i22, i22) -> f393_0_random_Return(EOS(STATIC_393(java.lang.Object(ARRAY(i34)), i35)), i22, i22) :|: TRUE
+f393_0_random_Return(EOS(STATIC_393(java.lang.Object(ARRAY(i34)), i35)), i22, i22) -> f399_0_createList_Load(EOS(STATIC_399(java.lang.Object(ARRAY(i34)), i35)), i22, i22) :|: TRUE
+f399_0_createList_Load(EOS(STATIC_399(java.lang.Object(ARRAY(i34)), i35)), i22, i22) -> f401_0_createList_ConstantStackPush(EOS(STATIC_401(java.lang.Object(ARRAY(i34)), i35)), i22, i22) :|: TRUE
+f401_0_createList_ConstantStackPush(EOS(STATIC_401(java.lang.Object(ARRAY(i34)), i35)), i22, i22) -> f404_0_createList_IntArithmetic(EOS(STATIC_404(java.lang.Object(ARRAY(i34)), i35)), i22, i22, 1) :|: TRUE
+f404_0_createList_IntArithmetic(EOS(STATIC_404(java.lang.Object(ARRAY(i34)), i35)), i22, i22, matching1) -> f407_0_createList_InvokeMethod(EOS(STATIC_407(java.lang.Object(ARRAY(i34)), i35)), i22, i22 - 1) :|: i22 > 0 && matching1 = 1
+f407_0_createList_InvokeMethod(EOS(STATIC_407(java.lang.Object(ARRAY(i34)), i35)), i22, i45) -> f409_0_createList_Load(EOS(STATIC_409(java.lang.Object(ARRAY(i34)), i35)), i45, i45) :|: i22 >= 1 && i35 > 1 && i45 < i22
+f407_0_createList_InvokeMethod(EOS(STATIC_407(java.lang.Object(ARRAY(i34)), i35)), i22, i45) -> f409_1_createList_Load(EOS(STATIC_409(java.lang.Object(ARRAY(i34)), i35)), i22, i45) :|: i22 >= 1 && i35 > 1 && i45 < i22
+f409_0_createList_Load(EOS(STATIC_409(java.lang.Object(ARRAY(i34)), i35)), i45, i45) -> f419_0_createList_Load(EOS(STATIC_419(java.lang.Object(ARRAY(i34)), i35)), i45, i45) :|: TRUE
+f419_0_createList_Load(EOS(STATIC_419(java.lang.Object(ARRAY(i34)), i35)), i45, i45) -> f191_0_createList_Load(EOS(STATIC_191(java.lang.Object(ARRAY(i34)), i35)), i45, i45) :|: TRUE
+f191_0_createList_Load(EOS(STATIC_191(java.lang.Object(o23sub), i15)), i20, i20) -> f195_0_createList_GT(EOS(STATIC_195(java.lang.Object(o23sub), i15)), i20, i20, i20) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f195_0_createList_GT(EOS(STATIC_195(java.lang.Object(ARRAY(i34:0)), i15:0)), i22:0, i22:0, i22:0) -> f195_0_createList_GT(EOS(STATIC_195(java.lang.Object(ARRAY(i34:0)), i15:0 + 1)), i22:0 - 1, i22:0 - 1, i22:0 - 1) :|: i22:0 > 0 && i34:0 > -1 && i34:0 > i15:0 && i15:0 > 0 && i22:0 - 1 < i22:0
+Removed following non-SCC rules:
+f195_0_createList_GT(EOS(STATIC_195(java.lang.Object(ARRAY(i34:0)), i15:0)), i22:0, i22:0, i22:0) -> f409_1_createList_Load(EOS(STATIC_409(java.lang.Object(ARRAY(i34:0)), i15:0 + 1)), i22:0, i22:0 - 1) :|: i22:0 > 0 && i34:0 > -1 && i34:0 > i15:0 && i15:0 > 0 && i22:0 - 1 < i22:0
+Filtered duplicate arguments:
+   f195_0_createList_GT(x1, x2, x3, x4) -> f195_0_createList_GT(x1, x4)
+Finished conversion. Obtained 1 rules.P rules:
+f195_0_createList_GT(i22:0, i34:0, i15:0) -> f195_0_createList_GT(i22:0 - 1, i34:0, i15:0 + 1) :|: i34:0 > -1 && i22:0 > 0 && i34:0 > i15:0 && i22:0 - 1 < i22:0 && i15:0 > 0
+
+----------------------------------------
+
+(19)
+Obligation:
+Rules:
+f195_0_createList_GT(i22:0, i34:0, i15:0) -> f195_0_createList_GT(i22:0 - 1, i34:0, i15:0 + 1) :|: i34:0 > -1 && i22:0 > 0 && i34:0 > i15:0 && i22:0 - 1 < i22:0 && i15:0 > 0
+
+----------------------------------------
+
+(20) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(21)
+Obligation:
+Rules:
+f195_0_createList_GT(i22:0, i34:0, i15:0) -> f195_0_createList_GT(arith, i34:0, arith1) :|: i34:0 > -1 && i22:0 > 0 && i34:0 > i15:0 && i22:0 - 1 < i22:0 && i15:0 > 0 && arith = i22:0 - 1 && arith1 = i15:0 + 1
+
+----------------------------------------
+
+(22) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f195_0_createList_GT(i22:0, i34:0, i15:0) -> f195_0_createList_GT(arith, i34:0, arith1) :|: i34:0 > -1 && i22:0 > 0 && i34:0 > i15:0 && i22:0 - 1 < i22:0 && i15:0 > 0 && arith = i22:0 - 1 && arith1 = i15:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(23)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f195_0_createList_GT(i22:0, i34:0, i15:0) -> f195_0_createList_GT(arith, i34:0, arith1) :|: i34:0 > -1 && i22:0 > 0 && i34:0 > i15:0 && i22:0 - 1 < i22:0 && i15:0 > 0 && arith = i22:0 - 1 && arith1 = i15:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(24) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(25)
+Obligation:
+Rules:
+f195_0_createList_GT(i22:0:0, i34:0:0, i15:0:0) -> f195_0_createList_GT(i22:0:0 - 1, i34:0:0, i15:0:0 + 1) :|: i22:0:0 - 1 < i22:0:0 && i15:0:0 > 0 && i34:0:0 > i15:0:0 && i22:0:0 > 0 && i34:0:0 > -1
+
+----------------------------------------
+
+(26) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f195_0_createList_GT(INTEGER, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(27)
+Obligation:
+Rules:
+f195_0_createList_GT(i22:0:0, i34:0:0, i15:0:0) -> f195_0_createList_GT(c, i34:0:0, c1) :|: c1 = i15:0:0 + 1 && c = i22:0:0 - 1 && (i22:0:0 - 1 < i22:0:0 && i15:0:0 > 0 && i34:0:0 > i15:0:0 && i22:0:0 > 0 && i34:0:0 > -1)
+
+----------------------------------------
+
+(28) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f195_0_createList_GT(x, x1, x2)] = -1 + x1 - x2
+
+The following rules are decreasing:
+f195_0_createList_GT(i22:0:0, i34:0:0, i15:0:0) -> f195_0_createList_GT(c, i34:0:0, c1) :|: c1 = i15:0:0 + 1 && c = i22:0:0 - 1 && (i22:0:0 - 1 < i22:0:0 && i15:0:0 > 0 && i34:0:0 > i15:0:0 && i22:0:0 > 0 && i34:0:0 > -1)
+The following rules are bounded:
+f195_0_createList_GT(i22:0:0, i34:0:0, i15:0:0) -> f195_0_createList_GT(c, i34:0:0, c1) :|: c1 = i15:0:0 + 1 && c = i22:0:0 - 1 && (i22:0:0 - 1 < i22:0:0 && i15:0:0 > 0 && i34:0:0 > i15:0:0 && i22:0:0 > 0 && i34:0:0 > -1)
+
+----------------------------------------
+
+(29)
+YES

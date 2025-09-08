@@ -1,0 +1,94 @@
+YES
+
+Problem 1: 
+
+(VAR vu95NonEmpty l x y)
+(RULES
+le(num0,s(x)) -> ftrue
+le(s(x),s(y)) -> le(x,y)
+le(x,num0) -> ffalse
+min(cons(x,nil)) -> x
+min(cons(x,l)) -> min(l) | le(x,min(l)) ->* ffalse
+min(cons(x,l)) -> min(l) | min(l) ->* x
+min(cons(x,l)) -> x | le(x,min(l)) ->* ftrue
+)
+
+
+Problem 1: 
+
+Well-founded Relation Processor:
+-> Rules:
+ le(num0,s(x)) -> ftrue
+ le(s(x),s(y)) -> le(x,y)
+ le(x,num0) -> ffalse
+ min(cons(x,nil)) -> x
+ min(cons(x,l)) -> min(l) | le(x,min(l)) ->* ffalse
+ min(cons(x,l)) -> min(l) | min(l) ->* x
+ min(cons(x,l)) -> x | le(x,min(l)) ->* ftrue
+->AGES Output:
+ 
+Model Results
+
+System:
+mod InTheory is
+sort S .
+sort Bool .
+
+
+op _->*_ : S S -> Bool [m = 2] .
+op _->_ : S S -> Bool [m = 2] .
+op le : S S -> S .
+op min : S -> S .
+op num0 :  -> S .
+op cons : S S -> S .
+op fSNonEmpty :  -> S .
+op ffalse :  -> S .
+op nil :  -> S .
+op s : S -> S .
+op ftrue :  -> S .
+op sqsupset : S S -> Bool [wellfounded m = 1] .
+
+endm
+
+
+Property:
+x ->R* x
+x ->R y /\ y ->R* z => x ->R* z
+x1 ->R y1 => le(x1,x2) ->R le(y1,x2)
+x2 ->R y2 => le(x1,x2) ->R le(x1,y2)
+x1 ->R y1 => min(x1) ->R min(y1)
+x1 ->R y1 => cons(x1,x2) ->R cons(y1,x2)
+x2 ->R y2 => cons(x1,x2) ->R cons(x1,y2)
+x1 ->R y1 => s(x1) ->R s(y1)
+le(num0,s(x)) ->R ftrue
+le(s(x),s(y)) ->R le(x,y)
+le(x,num0) ->R ffalse
+min(cons(x,nil)) ->R x
+le(x,min(l)) ->R* ffalse => min(cons(x,l)) ->R min(l)
+min(l) ->R* x => min(cons(x,l)) ->R min(l)
+le(x,min(l)) ->R* ftrue => min(cons(x,l)) ->R x
+x ->R y => sqsupset(x,y)
+
+Results:
+
+
+Domains:
+S: -|N \ {0}
+
+Function Interpretations:
+|[cons(x_1_1:S,x_2_1:S)]| = 6.x_1_1:S + x_2_1:S
+|[fSNonEmpty]| = - 1
+|[ffalse]| = - 1
+|[ftrue]| = - 1
+|[le(x_1_1:S,x_2_1:S)]| = x_1_1:S + x_2_1:S
+|[min(x_1_1:S)]| = x_1_1:S
+|[nil]| = - 1
+|[num0]| = - 1
+|[s(x_1_1:S)]| = 2.x_1_1:S
+
+Predicate Interpretations:
+ x_1_1:S ->* x_2_1:S <=> ((0 >= 1 + x_2_1:S) /\ (0 >= x_2_1:S))
+ x_1_1:S -> x_2_1:S <=> (x_2_1:S >= 1 + x_1_1:S)
+sqsupset(x_1_1:S,x_2_1:S) <=> (x_2_1:S >= 1 + x_1_1:S)
+
+The problem is finite.

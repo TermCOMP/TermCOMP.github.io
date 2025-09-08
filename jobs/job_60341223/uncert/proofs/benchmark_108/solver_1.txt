@@ -1,0 +1,406 @@
+YES
+We consider the system uc1rg.
+
+  Alphabet:
+
+    !div : [real * real] --> real 
+    !minus : [real] --> real 
+    !plus : [real * real] --> real 
+    !times : [real * real] --> real 
+    One : [] --> real 
+    Zero : [] --> real 
+    cos : [real] --> real 
+    der : [real -> real] --> real -> real 
+    ln : [real] --> real 
+    sin : [real] --> real 
+
+  Rules:
+
+    der(/\x.X) => /\y.Zero 
+    der(/\x.x) => /\y.One 
+    der(/\x.sin(x)) => /\y.cos(y) 
+    der(/\x.cos(x)) => /\y.!minus(sin(y)) 
+    der(/\x.!plus(X[x], Y[x])) => /\y.!plus(der(/\z.X[z]) y, der(/\u.Y[u]) y) 
+    der(/\x.!times(X[x], Y[x])) => /\y.!plus(!times(der(/\z.X[z]) y, Y[y]), !times(X[y], der(/\u.Y[u]) y)) 
+    der(/\x.ln(X[x])) => /\y.!div(der(/\z.X[z]) y, X[y]) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  der(/\x.X) >? /\y.Zero 
+  der(/\x.x) >? /\y.One 
+  der(/\x.sin(x)) >? /\y.cos(y) 
+  der(/\x.cos(x)) >? /\y.!minus(sin(y)) 
+  der(/\x.!plus(X[x], Y[x])) >? /\y.!plus(der(/\z.X[z]) y, der(/\u.Y[u]) y) 
+  der(/\x.!times(X[x], Y[x])) >? /\y.!plus(!times(der(/\z.X[z]) y, Y[y]), !times(X[y], der(/\u.Y[u]) y)) 
+  der(/\x.ln(X[x])) >? /\y.!div(der(/\z.X[z]) y, X[y]) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[One]] = _|_ 
+  [[Zero]] = _|_ 
+
+We choose Lex = {} and Mul = {!div, !minus, !plus, !times, @_{o -> o}, cos, der, ln, sin}, and the following precedence: der > @_{o -> o} > cos > sin > ln > !div > !times > !plus > !minus
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  der(/\x.X) >= /\x._|_ 
+  der(/\x.x) > /\x._|_ 
+  der(/\x.sin(x)) > /\x.cos(x) 
+  der(/\x.cos(x)) >= /\x.!minus(sin(x)) 
+  der(/\x.!plus(X[x], Y[x])) > /\x.!plus(@_{o -> o}(der(/\y.X[y]), x), @_{o -> o}(der(/\z.Y[z]), x)) 
+  der(/\x.!times(X[x], Y[x])) >= /\x.!plus(!times(@_{o -> o}(der(/\y.X[y]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\z.Y[z]), x))) 
+  der(/\x.ln(X[x])) >= /\x.!div(@_{o -> o}(der(/\y.X[y]), x), X[x]) 
+
+With these choices, we have:
+
+  1] der(/\x.X) >= /\x._|_  because [2], by (Star) 
+  2] der*(/\x.X) >= /\x._|_  because [3], by (F-Abs) 
+  3] der*(/\x.X, y) >= _|_  by (Bot) 
+
+  4] der(/\x.x) > /\x._|_  because [5], by definition 
+  5] der*(/\x.x) >= /\x._|_  because [6], by (Select) 
+  6] /\y.y >= /\y._|_  because [7], by (Abs) 
+  7] x >= _|_  by (Bot) 
+
+  8] der(/\x.sin(x)) > /\x.cos(x)  because [9], by definition 
+  9] der*(/\x.sin(x)) >= /\x.cos(x)  because [10], by (F-Abs) 
+  10] der*(/\x.sin(x), y) >= cos(y)  because der > cos and [11], by (Copy) 
+  11] der*(/\x.sin(x), y) >= y  because [12], by (Select) 
+  12] y >= y  by (Var) 
+
+  13] der(/\x.cos(x)) >= /\x.!minus(sin(x))  because [14], by (Star) 
+  14] der*(/\x.cos(x)) >= /\x.!minus(sin(x))  because [15], by (F-Abs) 
+  15] der*(/\x.cos(x), y) >= !minus(sin(y))  because [16], by (Select) 
+  16] cos(der*(/\x.cos(x), y)) >= !minus(sin(y))  because [17], by (Star) 
+  17] cos*(der*(/\x.cos(x), y)) >= !minus(sin(y))  because cos > !minus and [18], by (Copy) 
+  18] cos*(der*(/\x.cos(x), y)) >= sin(y)  because cos > sin and [19], by (Copy) 
+  19] cos*(der*(/\x.cos(x), y)) >= y  because [20], by (Select) 
+  20] der*(/\x.cos(x), y) >= y  because [21], by (Select) 
+  21] y >= y  by (Var) 
+
+  22] der(/\x.!plus(X[x], Y[x])) > /\x.!plus(@_{o -> o}(der(/\y.X[y]), x), @_{o -> o}(der(/\z.Y[z]), x))  because [23], by definition 
+  23] der*(/\x.!plus(X[x], Y[x])) >= /\x.!plus(@_{o -> o}(der(/\z.X[z]), x), @_{o -> o}(der(/\u.Y[u]), x))  because [24], by (F-Abs) 
+  24] der*(/\x.!plus(X[x], Y[x]), y) >= !plus(@_{o -> o}(der(/\x.X[x]), y), @_{o -> o}(der(/\z.Y[z]), y))  because der > !plus, [25] and [34], by (Copy) 
+  25] der*(/\x.!plus(X[x], Y[x]), y) >= @_{o -> o}(der(/\x.X[x]), y)  because der > @_{o -> o}, [26] and [32], by (Copy) 
+  26] der*(/\x.!plus(X[x], Y[x]), y) >= der(/\x.X[x])  because der in Mul and [27], by (Stat) 
+  27] /\x.!plus(X[x], Y[x]) > /\x.X[x]  because [28], by definition 
+  28] /\z.!plus*(X[z], Y[z]) >= /\z.X[z]  because [29], by (Abs) 
+  29] !plus*(X[x], Y[x]) >= X[x]  because [30], by (Select) 
+  30] X[x] >= X[x]  because [31], by (Meta) 
+  31] x >= x  by (Var) 
+  32] der*(/\z.!plus(X[z], Y[z]), y) >= y  because [33], by (Select) 
+  33] y >= y  by (Var) 
+  34] der*(/\z.!plus(X[z], Y[z]), y) >= @_{o -> o}(der(/\z.Y[z]), y)  because der > @_{o -> o}, [35] and [32], by (Copy) 
+  35] der*(/\z.!plus(X[z], Y[z]), y) >= der(/\z.Y[z])  because der in Mul and [36], by (Stat) 
+  36] /\z.!plus(X[z], Y[z]) > /\z.Y[z]  because [37], by definition 
+  37] /\u.!plus*(X[u], Y[u]) >= /\u.Y[u]  because [38], by (Abs) 
+  38] !plus*(X[z], Y[z]) >= Y[z]  because [39], by (Select) 
+  39] Y[z] >= Y[z]  because [40], by (Meta) 
+  40] z >= z  by (Var) 
+
+  41] der(/\x.!times(X[x], Y[x])) >= /\x.!plus(!times(@_{o -> o}(der(/\y.X[y]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\z.Y[z]), x)))  because [42], by (Star) 
+  42] der*(/\x.!times(X[x], Y[x])) >= /\x.!plus(!times(@_{o -> o}(der(/\z.X[z]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\u.Y[u]), x)))  because [43], by (F-Abs) 
+  43] der*(/\x.!times(X[x], Y[x]), y) >= !plus(!times(@_{o -> o}(der(/\x.X[x]), y), Y[y]), !times(X[y], @_{o -> o}(der(/\z.Y[z]), y)))  because der > !plus, [44] and [58], by (Copy) 
+  44] der*(/\x.!times(X[x], Y[x]), y) >= !times(@_{o -> o}(der(/\x.X[x]), y), Y[y])  because der > !times, [45] and [54], by (Copy) 
+  45] der*(/\x.!times(X[x], Y[x]), y) >= @_{o -> o}(der(/\x.X[x]), y)  because der > @_{o -> o}, [46] and [52], by (Copy) 
+  46] der*(/\x.!times(X[x], Y[x]), y) >= der(/\x.X[x])  because der in Mul and [47], by (Stat) 
+  47] /\x.!times(X[x], Y[x]) > /\x.X[x]  because [48], by definition 
+  48] /\z.!times*(X[z], Y[z]) >= /\z.X[z]  because [49], by (Abs) 
+  49] !times*(X[x], Y[x]) >= X[x]  because [50], by (Select) 
+  50] X[x] >= X[x]  because [51], by (Meta) 
+  51] x >= x  by (Var) 
+  52] der*(/\z.!times(X[z], Y[z]), y) >= y  because [53], by (Select) 
+  53] y >= y  by (Var) 
+  54] der*(/\z.!times(X[z], Y[z]), y) >= Y[y]  because [55], by (Select) 
+  55] !times(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= Y[y]  because [56], by (Star) 
+  56] !times*(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= Y[y]  because [57], by (Select) 
+  57] Y[der*(/\z.!times(X[z], Y[z]), y)] >= Y[y]  because [52], by (Meta) 
+  58] der*(/\z.!times(X[z], Y[z]), y) >= !times(X[y], @_{o -> o}(der(/\z.Y[z]), y))  because der > !times, [59] and [63], by (Copy) 
+  59] der*(/\z.!times(X[z], Y[z]), y) >= X[y]  because [60], by (Select) 
+  60] !times(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= X[y]  because [61], by (Star) 
+  61] !times*(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= X[y]  because [62], by (Select) 
+  62] X[der*(/\z.!times(X[z], Y[z]), y)] >= X[y]  because [52], by (Meta) 
+  63] der*(/\z.!times(X[z], Y[z]), y) >= @_{o -> o}(der(/\z.Y[z]), y)  because der > @_{o -> o}, [64] and [52], by (Copy) 
+  64] der*(/\z.!times(X[z], Y[z]), y) >= der(/\z.Y[z])  because der in Mul and [65], by (Stat) 
+  65] /\z.!times(X[z], Y[z]) > /\z.Y[z]  because [66], by definition 
+  66] /\u.!times*(X[u], Y[u]) >= /\u.Y[u]  because [67], by (Abs) 
+  67] !times*(X[z], Y[z]) >= Y[z]  because [68], by (Select) 
+  68] Y[z] >= Y[z]  because [69], by (Meta) 
+  69] z >= z  by (Var) 
+
+  70] der(/\x.ln(X[x])) >= /\x.!div(@_{o -> o}(der(/\y.X[y]), x), X[x])  because [71], by (Star) 
+  71] der*(/\x.ln(X[x])) >= /\x.!div(@_{o -> o}(der(/\z.X[z]), x), X[x])  because [72], by (F-Abs) 
+  72] der*(/\x.ln(X[x]), y) >= !div(@_{o -> o}(der(/\x.X[x]), y), X[y])  because der > !div, [73] and [82], by (Copy) 
+  73] der*(/\x.ln(X[x]), y) >= @_{o -> o}(der(/\x.X[x]), y)  because der > @_{o -> o}, [74] and [80], by (Copy) 
+  74] der*(/\x.ln(X[x]), y) >= der(/\x.X[x])  because der in Mul and [75], by (Stat) 
+  75] /\x.ln(X[x]) > /\x.X[x]  because [76], by definition 
+  76] /\z.ln*(X[z]) >= /\z.X[z]  because [77], by (Abs) 
+  77] ln*(X[x]) >= X[x]  because [78], by (Select) 
+  78] X[x] >= X[x]  because [79], by (Meta) 
+  79] x >= x  by (Var) 
+  80] der*(/\z.ln(X[z]), y) >= y  because [81], by (Select) 
+  81] y >= y  by (Var) 
+  82] der*(/\z.ln(X[z]), y) >= X[y]  because [83], by (Select) 
+  83] ln(X[der*(/\z.ln(X[z]), y)]) >= X[y]  because [84], by (Star) 
+  84] ln*(X[der*(/\z.ln(X[z]), y)]) >= X[y]  because [85], by (Select) 
+  85] X[der*(/\z.ln(X[z]), y)] >= X[y]  because [80], by (Meta) 
+
+We can thus remove the following rules:
+
+  der(/\x.x) => /\y.One 
+  der(/\x.sin(x)) => /\y.cos(y) 
+  der(/\x.!plus(X[x], Y[x])) => /\y.!plus(der(/\z.X[z]) y, der(/\u.Y[u]) y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  der(/\x.X) >? /\y.Zero 
+  der(/\x.cos(x)) >? /\y.!minus(sin(y)) 
+  der(/\x.!times(X[x], Y[x])) >? /\y.!plus(!times(der(/\z.X[z]) y, Y[y]), !times(X[y], der(/\u.Y[u]) y)) 
+  der(/\x.ln(X[x])) >? /\y.!div(der(/\z.X[z]) y, X[y]) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[!minus(x_1)]] = x_1 
+  [[Zero]] = _|_ 
+  [[cos(x_1)]] = x_1 
+  [[sin(x_1)]] = x_1 
+
+We choose Lex = {} and Mul = {!div, !plus, !times, @_{o -> o}, der, ln}, and the following precedence: der > !plus > !times > @_{o -> o} > !div > ln
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  der(/\x.X) > /\x._|_ 
+  der(/\x.x) >= /\x.x 
+  der(/\x.!times(X[x], Y[x])) >= /\x.!plus(!times(@_{o -> o}(der(/\y.X[y]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\z.Y[z]), x))) 
+  der(/\x.ln(X[x])) >= /\x.!div(@_{o -> o}(der(/\y.X[y]), x), X[x]) 
+
+With these choices, we have:
+
+  1] der(/\x.X) > /\x._|_  because [2], by definition 
+  2] der*(/\x.X) >= /\x._|_  because [3], by (F-Abs) 
+  3] der*(/\x.X, y) >= _|_  by (Bot) 
+
+  4] der(/\x.x) >= /\x.x  because [5], by (Star) 
+  5] der*(/\x.x) >= /\x.x  because [6], by (Select) 
+  6] /\y.y >= /\y.y  because [7], by (Abs) 
+  7] x >= x  by (Var) 
+
+  8] der(/\x.!times(X[x], Y[x])) >= /\x.!plus(!times(@_{o -> o}(der(/\y.X[y]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\z.Y[z]), x)))  because [9], by (Star) 
+  9] der*(/\x.!times(X[x], Y[x])) >= /\x.!plus(!times(@_{o -> o}(der(/\z.X[z]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\u.Y[u]), x)))  because [10], by (F-Abs) 
+  10] der*(/\x.!times(X[x], Y[x]), y) >= !plus(!times(@_{o -> o}(der(/\x.X[x]), y), Y[y]), !times(X[y], @_{o -> o}(der(/\z.Y[z]), y)))  because der > !plus, [11] and [25], by (Copy) 
+  11] der*(/\x.!times(X[x], Y[x]), y) >= !times(@_{o -> o}(der(/\x.X[x]), y), Y[y])  because der > !times, [12] and [21], by (Copy) 
+  12] der*(/\x.!times(X[x], Y[x]), y) >= @_{o -> o}(der(/\x.X[x]), y)  because der > @_{o -> o}, [13] and [19], by (Copy) 
+  13] der*(/\x.!times(X[x], Y[x]), y) >= der(/\x.X[x])  because der in Mul and [14], by (Stat) 
+  14] /\x.!times(X[x], Y[x]) > /\x.X[x]  because [15], by definition 
+  15] /\z.!times*(X[z], Y[z]) >= /\z.X[z]  because [16], by (Abs) 
+  16] !times*(X[x], Y[x]) >= X[x]  because [17], by (Select) 
+  17] X[x] >= X[x]  because [18], by (Meta) 
+  18] x >= x  by (Var) 
+  19] der*(/\z.!times(X[z], Y[z]), y) >= y  because [20], by (Select) 
+  20] y >= y  by (Var) 
+  21] der*(/\z.!times(X[z], Y[z]), y) >= Y[y]  because [22], by (Select) 
+  22] !times(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= Y[y]  because [23], by (Star) 
+  23] !times*(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= Y[y]  because [24], by (Select) 
+  24] Y[der*(/\z.!times(X[z], Y[z]), y)] >= Y[y]  because [19], by (Meta) 
+  25] der*(/\z.!times(X[z], Y[z]), y) >= !times(X[y], @_{o -> o}(der(/\z.Y[z]), y))  because der > !times, [26] and [30], by (Copy) 
+  26] der*(/\z.!times(X[z], Y[z]), y) >= X[y]  because [27], by (Select) 
+  27] !times(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= X[y]  because [28], by (Star) 
+  28] !times*(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= X[y]  because [29], by (Select) 
+  29] X[der*(/\z.!times(X[z], Y[z]), y)] >= X[y]  because [19], by (Meta) 
+  30] der*(/\z.!times(X[z], Y[z]), y) >= @_{o -> o}(der(/\z.Y[z]), y)  because der > @_{o -> o}, [31] and [19], by (Copy) 
+  31] der*(/\z.!times(X[z], Y[z]), y) >= der(/\z.Y[z])  because der in Mul and [32], by (Stat) 
+  32] /\z.!times(X[z], Y[z]) > /\z.Y[z]  because [33], by definition 
+  33] /\u.!times*(X[u], Y[u]) >= /\u.Y[u]  because [34], by (Abs) 
+  34] !times*(X[z], Y[z]) >= Y[z]  because [35], by (Select) 
+  35] Y[z] >= Y[z]  because [36], by (Meta) 
+  36] z >= z  by (Var) 
+
+  37] der(/\x.ln(X[x])) >= /\x.!div(@_{o -> o}(der(/\y.X[y]), x), X[x])  because [38], by (Star) 
+  38] der*(/\x.ln(X[x])) >= /\x.!div(@_{o -> o}(der(/\z.X[z]), x), X[x])  because [39], by (F-Abs) 
+  39] der*(/\x.ln(X[x]), y) >= !div(@_{o -> o}(der(/\x.X[x]), y), X[y])  because der > !div, [40] and [49], by (Copy) 
+  40] der*(/\x.ln(X[x]), y) >= @_{o -> o}(der(/\x.X[x]), y)  because der > @_{o -> o}, [41] and [47], by (Copy) 
+  41] der*(/\x.ln(X[x]), y) >= der(/\x.X[x])  because der in Mul and [42], by (Stat) 
+  42] /\x.ln(X[x]) > /\x.X[x]  because [43], by definition 
+  43] /\z.ln*(X[z]) >= /\z.X[z]  because [44], by (Abs) 
+  44] ln*(X[x]) >= X[x]  because [45], by (Select) 
+  45] X[x] >= X[x]  because [46], by (Meta) 
+  46] x >= x  by (Var) 
+  47] der*(/\z.ln(X[z]), y) >= y  because [48], by (Select) 
+  48] y >= y  by (Var) 
+  49] der*(/\z.ln(X[z]), y) >= X[y]  because [50], by (Select) 
+  50] ln(X[der*(/\z.ln(X[z]), y)]) >= X[y]  because [51], by (Star) 
+  51] ln*(X[der*(/\z.ln(X[z]), y)]) >= X[y]  because [52], by (Select) 
+  52] X[der*(/\z.ln(X[z]), y)] >= X[y]  because [47], by (Meta) 
+
+We can thus remove the following rules:
+
+  der(/\x.X) => /\y.Zero 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  der(/\x.cos(x)) >? /\y.!minus(sin(y)) 
+  der(/\x.!times(X[x], Y[x])) >? /\y.!plus(!times(der(/\z.X[z]) y, Y[y]), !times(X[y], der(/\u.Y[u]) y)) 
+  der(/\x.ln(X[x])) >? /\y.!div(der(/\z.X[z]) y, X[y]) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {!div, !minus, !plus, !times, @_{o -> o}, cos, der, ln, sin}, and the following precedence: cos > !minus > der > !plus > !times > @_{o -> o} > !div > ln > sin
+
+With these choices, we have:
+
+  1] der(/\x.cos(x)) >= /\x.!minus(sin(x))  because [2], by (Star) 
+  2] der*(/\x.cos(x)) >= /\x.!minus(sin(x))  because [3], by (F-Abs) 
+  3] der*(/\x.cos(x), y) >= !minus(sin(y))  because [4], by (Select) 
+  4] cos(der*(/\x.cos(x), y)) >= !minus(sin(y))  because [5], by (Star) 
+  5] cos*(der*(/\x.cos(x), y)) >= !minus(sin(y))  because cos > !minus and [6], by (Copy) 
+  6] cos*(der*(/\x.cos(x), y)) >= sin(y)  because cos > sin and [7], by (Copy) 
+  7] cos*(der*(/\x.cos(x), y)) >= y  because [8], by (Select) 
+  8] der*(/\x.cos(x), y) >= y  because [9], by (Select) 
+  9] y >= y  by (Var) 
+
+  10] der(/\x.!times(X[x], Y[x])) >= /\x.!plus(!times(@_{o -> o}(der(/\y.X[y]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\z.Y[z]), x)))  because [11], by (Star) 
+  11] der*(/\x.!times(X[x], Y[x])) >= /\x.!plus(!times(@_{o -> o}(der(/\z.X[z]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\u.Y[u]), x)))  because [12], by (F-Abs) 
+  12] der*(/\x.!times(X[x], Y[x]), y) >= !plus(!times(@_{o -> o}(der(/\x.X[x]), y), Y[y]), !times(X[y], @_{o -> o}(der(/\z.Y[z]), y)))  because der > !plus, [13] and [27], by (Copy) 
+  13] der*(/\x.!times(X[x], Y[x]), y) >= !times(@_{o -> o}(der(/\x.X[x]), y), Y[y])  because der > !times, [14] and [23], by (Copy) 
+  14] der*(/\x.!times(X[x], Y[x]), y) >= @_{o -> o}(der(/\x.X[x]), y)  because der > @_{o -> o}, [15] and [21], by (Copy) 
+  15] der*(/\x.!times(X[x], Y[x]), y) >= der(/\x.X[x])  because der in Mul and [16], by (Stat) 
+  16] /\x.!times(X[x], Y[x]) > /\x.X[x]  because [17], by definition 
+  17] /\z.!times*(X[z], Y[z]) >= /\z.X[z]  because [18], by (Abs) 
+  18] !times*(X[x], Y[x]) >= X[x]  because [19], by (Select) 
+  19] X[x] >= X[x]  because [20], by (Meta) 
+  20] x >= x  by (Var) 
+  21] der*(/\z.!times(X[z], Y[z]), y) >= y  because [22], by (Select) 
+  22] y >= y  by (Var) 
+  23] der*(/\z.!times(X[z], Y[z]), y) >= Y[y]  because [24], by (Select) 
+  24] !times(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= Y[y]  because [25], by (Star) 
+  25] !times*(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= Y[y]  because [26], by (Select) 
+  26] Y[der*(/\z.!times(X[z], Y[z]), y)] >= Y[y]  because [21], by (Meta) 
+  27] der*(/\z.!times(X[z], Y[z]), y) >= !times(X[y], @_{o -> o}(der(/\z.Y[z]), y))  because der > !times, [28] and [32], by (Copy) 
+  28] der*(/\z.!times(X[z], Y[z]), y) >= X[y]  because [29], by (Select) 
+  29] !times(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= X[y]  because [30], by (Star) 
+  30] !times*(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= X[y]  because [31], by (Select) 
+  31] X[der*(/\z.!times(X[z], Y[z]), y)] >= X[y]  because [21], by (Meta) 
+  32] der*(/\z.!times(X[z], Y[z]), y) >= @_{o -> o}(der(/\z.Y[z]), y)  because der > @_{o -> o}, [33] and [21], by (Copy) 
+  33] der*(/\z.!times(X[z], Y[z]), y) >= der(/\z.Y[z])  because der in Mul and [34], by (Stat) 
+  34] /\z.!times(X[z], Y[z]) > /\z.Y[z]  because [35], by definition 
+  35] /\u.!times*(X[u], Y[u]) >= /\u.Y[u]  because [36], by (Abs) 
+  36] !times*(X[z], Y[z]) >= Y[z]  because [37], by (Select) 
+  37] Y[z] >= Y[z]  because [38], by (Meta) 
+  38] z >= z  by (Var) 
+
+  39] der(/\x.ln(X[x])) > /\x.!div(@_{o -> o}(der(/\y.X[y]), x), X[x])  because [40], by definition 
+  40] der*(/\x.ln(X[x])) >= /\x.!div(@_{o -> o}(der(/\z.X[z]), x), X[x])  because [41], by (F-Abs) 
+  41] der*(/\x.ln(X[x]), y) >= !div(@_{o -> o}(der(/\x.X[x]), y), X[y])  because der > !div, [42] and [51], by (Copy) 
+  42] der*(/\x.ln(X[x]), y) >= @_{o -> o}(der(/\x.X[x]), y)  because der > @_{o -> o}, [43] and [49], by (Copy) 
+  43] der*(/\x.ln(X[x]), y) >= der(/\x.X[x])  because der in Mul and [44], by (Stat) 
+  44] /\x.ln(X[x]) > /\x.X[x]  because [45], by definition 
+  45] /\z.ln*(X[z]) >= /\z.X[z]  because [46], by (Abs) 
+  46] ln*(X[x]) >= X[x]  because [47], by (Select) 
+  47] X[x] >= X[x]  because [48], by (Meta) 
+  48] x >= x  by (Var) 
+  49] der*(/\z.ln(X[z]), y) >= y  because [50], by (Select) 
+  50] y >= y  by (Var) 
+  51] der*(/\z.ln(X[z]), y) >= X[y]  because [52], by (Select) 
+  52] ln(X[der*(/\z.ln(X[z]), y)]) >= X[y]  because [53], by (Star) 
+  53] ln*(X[der*(/\z.ln(X[z]), y)]) >= X[y]  because [54], by (Select) 
+  54] X[der*(/\z.ln(X[z]), y)] >= X[y]  because [49], by (Meta) 
+
+We can thus remove the following rules:
+
+  der(/\x.ln(X[x])) => /\y.!div(der(/\z.X[z]) y, X[y]) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  der(/\x.cos(x)) >? /\y.!minus(sin(y)) 
+  der(/\x.!times(X[x], Y[x])) >? /\y.!plus(!times(der(/\z.X[z]) y, Y[y]), !times(X[y], der(/\u.Y[u]) y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {!minus, !plus, !times, @_{o -> o}, cos, der, sin}, and the following precedence: der > !plus > !times > @_{o -> o} > cos > !minus > sin
+
+With these choices, we have:
+
+  1] der(/\x.cos(x)) >= /\x.!minus(sin(x))  because [2], by (Star) 
+  2] der*(/\x.cos(x)) >= /\x.!minus(sin(x))  because [3], by (Select) 
+  3] /\y.cos(y) >= /\y.!minus(sin(y))  because [4], by (Abs) 
+  4] cos(x) >= !minus(sin(x))  because [5], by (Star) 
+  5] cos*(x) >= !minus(sin(x))  because cos > !minus and [6], by (Copy) 
+  6] cos*(x) >= sin(x)  because cos > sin and [7], by (Copy) 
+  7] cos*(x) >= x  because [8], by (Select) 
+  8] x >= x  by (Var) 
+
+  9] der(/\x.!times(X[x], Y[x])) > /\x.!plus(!times(@_{o -> o}(der(/\y.X[y]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\z.Y[z]), x)))  because [10], by definition 
+  10] der*(/\x.!times(X[x], Y[x])) >= /\x.!plus(!times(@_{o -> o}(der(/\z.X[z]), x), Y[x]), !times(X[x], @_{o -> o}(der(/\u.Y[u]), x)))  because [11], by (F-Abs) 
+  11] der*(/\x.!times(X[x], Y[x]), y) >= !plus(!times(@_{o -> o}(der(/\x.X[x]), y), Y[y]), !times(X[y], @_{o -> o}(der(/\z.Y[z]), y)))  because der > !plus, [12] and [26], by (Copy) 
+  12] der*(/\x.!times(X[x], Y[x]), y) >= !times(@_{o -> o}(der(/\x.X[x]), y), Y[y])  because der > !times, [13] and [22], by (Copy) 
+  13] der*(/\x.!times(X[x], Y[x]), y) >= @_{o -> o}(der(/\x.X[x]), y)  because der > @_{o -> o}, [14] and [20], by (Copy) 
+  14] der*(/\x.!times(X[x], Y[x]), y) >= der(/\x.X[x])  because der in Mul and [15], by (Stat) 
+  15] /\x.!times(X[x], Y[x]) > /\x.X[x]  because [16], by definition 
+  16] /\z.!times*(X[z], Y[z]) >= /\z.X[z]  because [17], by (Abs) 
+  17] !times*(X[x], Y[x]) >= X[x]  because [18], by (Select) 
+  18] X[x] >= X[x]  because [19], by (Meta) 
+  19] x >= x  by (Var) 
+  20] der*(/\z.!times(X[z], Y[z]), y) >= y  because [21], by (Select) 
+  21] y >= y  by (Var) 
+  22] der*(/\z.!times(X[z], Y[z]), y) >= Y[y]  because [23], by (Select) 
+  23] !times(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= Y[y]  because [24], by (Star) 
+  24] !times*(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= Y[y]  because [25], by (Select) 
+  25] Y[der*(/\z.!times(X[z], Y[z]), y)] >= Y[y]  because [20], by (Meta) 
+  26] der*(/\z.!times(X[z], Y[z]), y) >= !times(X[y], @_{o -> o}(der(/\z.Y[z]), y))  because der > !times, [27] and [31], by (Copy) 
+  27] der*(/\z.!times(X[z], Y[z]), y) >= X[y]  because [28], by (Select) 
+  28] !times(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= X[y]  because [29], by (Star) 
+  29] !times*(X[der*(/\z.!times(X[z], Y[z]), y)], Y[der*(/\u.!times(X[u], Y[u]), y)]) >= X[y]  because [30], by (Select) 
+  30] X[der*(/\z.!times(X[z], Y[z]), y)] >= X[y]  because [20], by (Meta) 
+  31] der*(/\z.!times(X[z], Y[z]), y) >= @_{o -> o}(der(/\z.Y[z]), y)  because der > @_{o -> o}, [32] and [20], by (Copy) 
+  32] der*(/\z.!times(X[z], Y[z]), y) >= der(/\z.Y[z])  because der in Mul and [33], by (Stat) 
+  33] /\z.!times(X[z], Y[z]) > /\z.Y[z]  because [34], by definition 
+  34] /\u.!times*(X[u], Y[u]) >= /\u.Y[u]  because [35], by (Abs) 
+  35] !times*(X[z], Y[z]) >= Y[z]  because [36], by (Select) 
+  36] Y[z] >= Y[z]  because [37], by (Meta) 
+  37] z >= z  by (Var) 
+
+We can thus remove the following rules:
+
+  der(/\x.!times(X[x], Y[x])) => /\y.!plus(!times(der(/\z.X[z]) y, Y[y]), !times(X[y], der(/\u.Y[u]) y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  der(/\x.cos(x)) >? /\y.!minus(sin(y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  !minus = Lam[y0].y0 
+  cos = Lam[y0].3 + 3*y0 
+  der = Lam[G0;y1].3 + 3*y1 + G0(0) 
+  sin = Lam[y0].y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[der(/\x.cos(x))]] = Lam[y0].6 + 3*y0 > Lam[y0].y0 = [[/\x.!minus(sin(x))]] 
+
+We can thus remove the following rules:
+
+  der(/\x.cos(x)) => /\y.!minus(sin(y)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

@@ -1,0 +1,280 @@
+YES
+We consider the system T15ZZ.
+
+  Alphabet:
+
+    compose : [a -> a * a -> a] --> a -> a 
+    cons : [a * a] --> a 
+    hd : [] --> a -> a 
+    init : [] --> a -> a 
+    last : [] --> a -> a 
+    nil : [] --> a 
+    reverse : [] --> a -> a 
+    reverse2 : [a * a] --> a 
+    tl : [] --> a -> a 
+
+  Rules:
+
+    compose(F, G) X => G (F X) 
+    reverse X => reverse2(X, nil) 
+    reverse2(nil, X) => X 
+    reverse2(cons(X, Y), Z) => reverse2(Y, cons(X, Z)) 
+    hd cons(X, Y) => X 
+    tl cons(X, Y) => Y 
+    last => compose(hd, reverse) 
+    init => compose(reverse, compose(tl, reverse)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  compose(F, G) X >? G (F X) 
+  reverse X >? reverse2(X, nil) 
+  reverse2(nil, X) >? X 
+  reverse2(cons(X, Y), Z) >? reverse2(Y, cons(X, Z)) 
+  hd cons(X, Y) >? X 
+  tl cons(X, Y) >? Y 
+  last >? compose(hd, reverse) 
+  init >? compose(reverse, compose(tl, reverse)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[hd]] = _|_ 
+  [[nil]] = _|_ 
+  [[reverse]] = _|_ 
+  [[tl]] = _|_ 
+
+We choose Lex = {reverse2} and Mul = {@_{o -> o}, compose, cons, init, last}, and the following precedence: init > last > compose > @_{o -> o} > reverse2 > cons
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X)) 
+  @_{o -> o}(_|_, X) >= reverse2(X, _|_) 
+  reverse2(_|_, X) > X 
+  reverse2(cons(X, Y), Z) >= reverse2(Y, cons(X, Z)) 
+  @_{o -> o}(_|_, cons(X, Y)) > X 
+  @_{o -> o}(_|_, cons(X, Y)) > Y 
+  last >= compose(_|_, _|_) 
+  init > compose(_|_, compose(_|_, _|_)) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because [2], by (Star) 
+  2] @_{o -> o}*(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because [3], by (Select) 
+  3] compose(F, G) @_{o -> o}*(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because [4] 
+  4] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= @_{o -> o}(G, @_{o -> o}(F, X))  because compose > @_{o -> o}, [5] and [7], by (Copy) 
+  5] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= G  because [6], by (Select) 
+  6] G >= G  by (Meta) 
+  7] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= @_{o -> o}(F, X)  because compose > @_{o -> o}, [8] and [10], by (Copy) 
+  8] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= F  because [9], by (Select) 
+  9] F >= F  by (Meta) 
+  10] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= X  because [11], by (Select) 
+  11] @_{o -> o}*(compose(F, G), X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+
+  13] @_{o -> o}(_|_, X) >= reverse2(X, _|_)  because [14], by (Star) 
+  14] @_{o -> o}*(_|_, X) >= reverse2(X, _|_)  because @_{o -> o} > reverse2, [15] and [17], by (Copy) 
+  15] @_{o -> o}*(_|_, X) >= X  because [16], by (Select) 
+  16] X >= X  by (Meta) 
+  17] @_{o -> o}*(_|_, X) >= _|_  by (Bot) 
+
+  18] reverse2(_|_, X) > X  because [19], by definition 
+  19] reverse2*(_|_, X) >= X  because [20], by (Select) 
+  20] X >= X  by (Meta) 
+
+  21] reverse2(cons(X, Y), Z) >= reverse2(Y, cons(X, Z))  because [22], by (Star) 
+  22] reverse2*(cons(X, Y), Z) >= reverse2(Y, cons(X, Z))  because reverse2 in Lex, [23], [26] and [28], by (Stat) 
+  23] cons(X, Y) > Y  because [24], by definition 
+  24] cons*(X, Y) >= Y  because [25], by (Select) 
+  25] Y >= Y  by (Meta) 
+  26] reverse2*(cons(X, Y), Z) >= Y  because [27], by (Select) 
+  27] cons(X, Y) >= Y  because [24], by (Star) 
+  28] reverse2*(cons(X, Y), Z) >= cons(X, Z)  because reverse2 > cons, [29] and [33], by (Copy) 
+  29] reverse2*(cons(X, Y), Z) >= X  because [30], by (Select) 
+  30] cons(X, Y) >= X  because [31], by (Star) 
+  31] cons*(X, Y) >= X  because [32], by (Select) 
+  32] X >= X  by (Meta) 
+  33] reverse2*(cons(X, Y), Z) >= Z  because [34], by (Select) 
+  34] Z >= Z  by (Meta) 
+
+  35] @_{o -> o}(_|_, cons(X, Y)) > X  because [36], by definition 
+  36] @_{o -> o}*(_|_, cons(X, Y)) >= X  because [37], by (Select) 
+  37] cons(X, Y) >= X  because [38], by (Star) 
+  38] cons*(X, Y) >= X  because [39], by (Select) 
+  39] X >= X  by (Meta) 
+
+  40] @_{o -> o}(_|_, cons(X, Y)) > Y  because [41], by definition 
+  41] @_{o -> o}*(_|_, cons(X, Y)) >= Y  because [42], by (Select) 
+  42] cons(X, Y) >= Y  because [43], by (Star) 
+  43] cons*(X, Y) >= Y  because [44], by (Select) 
+  44] Y >= Y  by (Meta) 
+
+  45] last >= compose(_|_, _|_)  because [46], by (Star) 
+  46] last* >= compose(_|_, _|_)  because last > compose, [47] and [48], by (Copy) 
+  47] last* >= _|_  by (Bot) 
+  48] last* >= _|_  by (Bot) 
+
+  49] init > compose(_|_, compose(_|_, _|_))  because [50], by definition 
+  50] init* >= compose(_|_, compose(_|_, _|_))  because init > compose, [51] and [52], by (Copy) 
+  51] init* >= _|_  by (Bot) 
+  52] init* >= compose(_|_, _|_)  because init > compose, [53] and [51], by (Copy) 
+  53] init* >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  reverse2(nil, X) => X 
+  hd cons(X, Y) => X 
+  tl cons(X, Y) => Y 
+  init => compose(reverse, compose(tl, reverse)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  compose(F, G) X >? G (F X) 
+  reverse X >? reverse2(X, nil) 
+  reverse2(cons(X, Y), Z) >? reverse2(Y, cons(X, Z)) 
+  last >? compose(hd, reverse) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[hd]] = _|_ 
+  [[nil]] = _|_ 
+  [[reverse]] = _|_ 
+
+We choose Lex = {reverse2} and Mul = {@_{o -> o}, compose, cons, last}, and the following precedence: last > compose > @_{o -> o} > reverse2 > cons
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X)) 
+  @_{o -> o}(_|_, X) > reverse2(X, _|_) 
+  reverse2(cons(X, Y), Z) > reverse2(Y, cons(X, Z)) 
+  last >= compose(_|_, _|_) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because [2], by (Star) 
+  2] @_{o -> o}*(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because [3], by (Select) 
+  3] compose(F, G) @_{o -> o}*(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because [4] 
+  4] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= @_{o -> o}(G, @_{o -> o}(F, X))  because compose > @_{o -> o}, [5] and [7], by (Copy) 
+  5] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= G  because [6], by (Select) 
+  6] G >= G  by (Meta) 
+  7] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= @_{o -> o}(F, X)  because compose > @_{o -> o}, [8] and [10], by (Copy) 
+  8] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= F  because [9], by (Select) 
+  9] F >= F  by (Meta) 
+  10] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= X  because [11], by (Select) 
+  11] @_{o -> o}*(compose(F, G), X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+
+  13] @_{o -> o}(_|_, X) > reverse2(X, _|_)  because [14], by definition 
+  14] @_{o -> o}*(_|_, X) >= reverse2(X, _|_)  because @_{o -> o} > reverse2, [15] and [17], by (Copy) 
+  15] @_{o -> o}*(_|_, X) >= X  because [16], by (Select) 
+  16] X >= X  by (Meta) 
+  17] @_{o -> o}*(_|_, X) >= _|_  by (Bot) 
+
+  18] reverse2(cons(X, Y), Z) > reverse2(Y, cons(X, Z))  because [19], by definition 
+  19] reverse2*(cons(X, Y), Z) >= reverse2(Y, cons(X, Z))  because reverse2 in Lex, [20], [23] and [25], by (Stat) 
+  20] cons(X, Y) > Y  because [21], by definition 
+  21] cons*(X, Y) >= Y  because [22], by (Select) 
+  22] Y >= Y  by (Meta) 
+  23] reverse2*(cons(X, Y), Z) >= Y  because [24], by (Select) 
+  24] cons(X, Y) >= Y  because [21], by (Star) 
+  25] reverse2*(cons(X, Y), Z) >= cons(X, Z)  because reverse2 > cons, [26] and [30], by (Copy) 
+  26] reverse2*(cons(X, Y), Z) >= X  because [27], by (Select) 
+  27] cons(X, Y) >= X  because [28], by (Star) 
+  28] cons*(X, Y) >= X  because [29], by (Select) 
+  29] X >= X  by (Meta) 
+  30] reverse2*(cons(X, Y), Z) >= Z  because [31], by (Select) 
+  31] Z >= Z  by (Meta) 
+
+  32] last >= compose(_|_, _|_)  because [33], by (Star) 
+  33] last* >= compose(_|_, _|_)  because last > compose, [34] and [35], by (Copy) 
+  34] last* >= _|_  by (Bot) 
+  35] last* >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  reverse X => reverse2(X, nil) 
+  reverse2(cons(X, Y), Z) => reverse2(Y, cons(X, Z)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  compose(F, G) X >? G (F X) 
+  last >? compose(hd, reverse) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[hd]] = _|_ 
+  [[reverse]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, compose, last}, and the following precedence: last > compose > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X)) 
+  last > compose(_|_, _|_) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because [2], by (Star) 
+  2] @_{o -> o}*(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because [3], by (Select) 
+  3] compose(F, G) @_{o -> o}*(compose(F, G), X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because [4] 
+  4] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= @_{o -> o}(G, @_{o -> o}(F, X))  because compose > @_{o -> o}, [5] and [7], by (Copy) 
+  5] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= G  because [6], by (Select) 
+  6] G >= G  by (Meta) 
+  7] compose*(F, G, @_{o -> o}*(compose(F, G), X)) >= @_{o -> o}(F, X)  because [8], by (Select) 
+  8] @_{o -> o}*(compose(F, G), X) >= @_{o -> o}(F, X)  because @_{o -> o} in Mul, [9] and [12], by (Stat) 
+  9] compose(F, G) > F  because [10], by definition 
+  10] compose*(F, G) >= F  because [11], by (Select) 
+  11] F >= F  by (Meta) 
+  12] X >= X  by (Meta) 
+
+  13] last > compose(_|_, _|_)  because [14], by definition 
+  14] last* >= compose(_|_, _|_)  because last > compose, [15] and [16], by (Copy) 
+  15] last* >= _|_  by (Bot) 
+  16] last* >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  last => compose(hd, reverse) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  compose(F, G, X) >? G (F X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o}, compose}, and the following precedence: compose > @_{o -> o}
+
+With these choices, we have:
+
+  1] compose(F, G, X) > @_{o -> o}(G, @_{o -> o}(F, X))  because [2], by definition 
+  2] compose*(F, G, X) >= @_{o -> o}(G, @_{o -> o}(F, X))  because compose > @_{o -> o}, [3] and [5], by (Copy) 
+  3] compose*(F, G, X) >= G  because [4], by (Select) 
+  4] G >= G  by (Meta) 
+  5] compose*(F, G, X) >= @_{o -> o}(F, X)  because compose > @_{o -> o}, [6] and [8], by (Copy) 
+  6] compose*(F, G, X) >= F  because [7], by (Select) 
+  7] F >= F  by (Meta) 
+  8] compose*(F, G, X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  compose(F, G, X) => G (F X) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

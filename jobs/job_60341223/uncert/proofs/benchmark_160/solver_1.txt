@@ -1,0 +1,353 @@
+YES
+We consider the system z5HGG.
+
+  Alphabet:
+
+    O : [] --> b 
+    cons : [b * a] --> a 
+    double : [] --> a -> a 
+    inc : [] --> a -> a 
+    map : [b -> b] --> a -> a 
+    nil : [] --> a 
+    plus : [b] --> b -> b 
+    s : [b] --> b 
+    times : [b] --> b -> b 
+
+  Rules:
+
+    plus(O) X => X 
+    plus(s(X)) Y => s(plus(X) Y) 
+    times(O) X => O 
+    times(s(X)) Y => plus(times(X) Y) Y 
+    map(F) nil => nil 
+    map(F) cons(X, Y) => cons(F X, map(F) Y) 
+    inc => map(plus(s(O))) 
+    double => map(times(s(s(O)))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O) X >? X 
+  plus(s(X)) Y >? s(plus(X) Y) 
+  times(O) X >? O 
+  times(s(X)) Y >? plus(times(X) Y) Y 
+  map(F) nil >? nil 
+  map(F) cons(X, Y) >? cons(F X, map(F) Y) 
+  inc >? map(plus(s(O))) 
+  double >? map(times(s(s(O)))) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[nil]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, cons, double, inc, map, plus, s, times}, and the following precedence: double > inc > times > plus > @_{o -> o} > cons > map > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(plus(_|_), X) >= X 
+  @_{o -> o}(plus(s(X)), Y) >= s(@_{o -> o}(plus(X), Y)) 
+  @_{o -> o}(times(_|_), X) >= _|_ 
+  @_{o -> o}(times(s(X)), Y) >= @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y) 
+  @_{o -> o}(map(F), _|_) >= _|_ 
+  @_{o -> o}(map(F), cons(X, Y)) > cons(@_{o -> o}(F, X), @_{o -> o}(map(F), Y)) 
+  inc > map(plus(s(_|_))) 
+  double > map(times(s(s(_|_)))) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(plus(_|_), X) >= X  because [2], by (Star) 
+  2] @_{o -> o}*(plus(_|_), X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] @_{o -> o}(plus(s(X)), Y) >= s(@_{o -> o}(plus(X), Y))  because [5], by (Star) 
+  5] @_{o -> o}*(plus(s(X)), Y) >= s(@_{o -> o}(plus(X), Y))  because @_{o -> o} > s and [6], by (Copy) 
+  6] @_{o -> o}*(plus(s(X)), Y) >= @_{o -> o}(plus(X), Y)  because [7], by (Select) 
+  7] plus(s(X)) @_{o -> o}*(plus(s(X)), Y) >= @_{o -> o}(plus(X), Y)  because [8] 
+  8] plus*(s(X), @_{o -> o}*(plus(s(X)), Y)) >= @_{o -> o}(plus(X), Y)  because plus > @_{o -> o}, [9] and [13], by (Copy) 
+  9] plus*(s(X), @_{o -> o}*(plus(s(X)), Y)) >= plus(X)  because plus in Mul and [10], by (Stat) 
+  10] s(X) > X  because [11], by definition 
+  11] s*(X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+  13] plus*(s(X), @_{o -> o}*(plus(s(X)), Y)) >= Y  because [14], by (Select) 
+  14] @_{o -> o}*(plus(s(X)), Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+
+  16] @_{o -> o}(times(_|_), X) >= _|_  by (Bot) 
+
+  17] @_{o -> o}(times(s(X)), Y) >= @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y)  because [18], by (Star) 
+  18] @_{o -> o}*(times(s(X)), Y) >= @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y)  because [19], by (Select) 
+  19] times(s(X)) @_{o -> o}*(times(s(X)), Y) >= @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y)  because [20] 
+  20] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y)  because times > @_{o -> o}, [21] and [27], by (Copy) 
+  21] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= plus(@_{o -> o}(times(X), Y))  because times > plus and [22], by (Copy) 
+  22] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= @_{o -> o}(times(X), Y)  because times > @_{o -> o}, [23] and [27], by (Copy) 
+  23] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= times(X)  because times in Mul and [24], by (Stat) 
+  24] s(X) > X  because [25], by definition 
+  25] s*(X) >= X  because [26], by (Select) 
+  26] X >= X  by (Meta) 
+  27] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= Y  because [28], by (Select) 
+  28] @_{o -> o}*(times(s(X)), Y) >= Y  because [29], by (Select) 
+  29] Y >= Y  by (Meta) 
+
+  30] @_{o -> o}(map(F), _|_) >= _|_  by (Bot) 
+
+  31] @_{o -> o}(map(F), cons(X, Y)) > cons(@_{o -> o}(F, X), @_{o -> o}(map(F), Y))  because [32], by definition 
+  32] @_{o -> o}*(map(F), cons(X, Y)) >= cons(@_{o -> o}(F, X), @_{o -> o}(map(F), Y))  because @_{o -> o} > cons, [33] and [43], by (Copy) 
+  33] @_{o -> o}*(map(F), cons(X, Y)) >= @_{o -> o}(F, X)  because [34], by (Select) 
+  34] map(F) @_{o -> o}*(map(F), cons(X, Y)) >= @_{o -> o}(F, X)  because [35] 
+  35] map*(F, @_{o -> o}*(map(F), cons(X, Y))) >= @_{o -> o}(F, X)  because [36], by (Select) 
+  36] @_{o -> o}*(map(F), cons(X, Y)) >= @_{o -> o}(F, X)  because @_{o -> o} in Mul, [37] and [40], by (Stat) 
+  37] map(F) >= F  because [38], by (Star) 
+  38] map*(F) >= F  because [39], by (Select) 
+  39] F >= F  by (Meta) 
+  40] cons(X, Y) > X  because [41], by definition 
+  41] cons*(X, Y) >= X  because [42], by (Select) 
+  42] X >= X  by (Meta) 
+  43] @_{o -> o}*(map(F), cons(X, Y)) >= @_{o -> o}(map(F), Y)  because @_{o -> o} in Mul, [44] and [46], by (Stat) 
+  44] map(F) >= map(F)  because map in Mul and [45], by (Fun) 
+  45] F >= F  by (Meta) 
+  46] cons(X, Y) > Y  because [47], by definition 
+  47] cons*(X, Y) >= Y  because [48], by (Select) 
+  48] Y >= Y  by (Meta) 
+
+  49] inc > map(plus(s(_|_)))  because [50], by definition 
+  50] inc* >= map(plus(s(_|_)))  because inc > map and [51], by (Copy) 
+  51] inc* >= plus(s(_|_))  because inc > plus and [52], by (Copy) 
+  52] inc* >= s(_|_)  because inc > s and [53], by (Copy) 
+  53] inc* >= _|_  by (Bot) 
+
+  54] double > map(times(s(s(_|_))))  because [55], by definition 
+  55] double* >= map(times(s(s(_|_))))  because double > map and [56], by (Copy) 
+  56] double* >= times(s(s(_|_)))  because double > times and [57], by (Copy) 
+  57] double* >= s(s(_|_))  because double > s and [58], by (Copy) 
+  58] double* >= s(_|_)  because double > s and [59], by (Copy) 
+  59] double* >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  map(F) cons(X, Y) => cons(F X, map(F) Y) 
+  inc => map(plus(s(O))) 
+  double => map(times(s(s(O)))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O, X) >? X 
+  plus(s(X), Y) >? s(plus(X, Y)) 
+  times(O, X) >? O 
+  times(s(X), Y) >? plus(times(X, Y), Y) 
+  map(F, nil) >? nil 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[nil]] = _|_ 
+
+We choose Lex = {} and Mul = {map, plus, s, times}, and the following precedence: map > times > plus > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  plus(_|_, X) >= X 
+  plus(s(X), Y) > s(plus(X, Y)) 
+  times(_|_, X) >= _|_ 
+  times(s(X), Y) >= plus(times(X, Y), Y) 
+  map(F, _|_) >= _|_ 
+
+With these choices, we have:
+
+  1] plus(_|_, X) >= X  because [2], by (Star) 
+  2] plus*(_|_, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] plus(s(X), Y) > s(plus(X, Y))  because [5], by definition 
+  5] plus*(s(X), Y) >= s(plus(X, Y))  because plus > s and [6], by (Copy) 
+  6] plus*(s(X), Y) >= plus(X, Y)  because plus in Mul, [7] and [10], by (Stat) 
+  7] s(X) > X  because [8], by definition 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] Y >= Y  by (Meta) 
+
+  11] times(_|_, X) >= _|_  by (Bot) 
+
+  12] times(s(X), Y) >= plus(times(X, Y), Y)  because [13], by (Star) 
+  13] times*(s(X), Y) >= plus(times(X, Y), Y)  because times > plus, [14] and [19], by (Copy) 
+  14] times*(s(X), Y) >= times(X, Y)  because times in Mul, [15] and [18], by (Stat) 
+  15] s(X) > X  because [16], by definition 
+  16] s*(X) >= X  because [17], by (Select) 
+  17] X >= X  by (Meta) 
+  18] Y >= Y  by (Meta) 
+  19] times*(s(X), Y) >= Y  because [18], by (Select) 
+
+  20] map(F, _|_) >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  plus(s(X), Y) => s(plus(X, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O, X) >? X 
+  times(O, X) >? O 
+  times(s(X), Y) >? plus(times(X, Y), Y) 
+  map(F, nil) >? nil 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[nil]] = _|_ 
+
+We choose Lex = {} and Mul = {map, plus, s, times}, and the following precedence: s > map > times > plus
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  plus(_|_, X) >= X 
+  times(_|_, X) > _|_ 
+  times(s(X), Y) >= plus(times(X, Y), Y) 
+  map(F, _|_) >= _|_ 
+
+With these choices, we have:
+
+  1] plus(_|_, X) >= X  because [2], by (Star) 
+  2] plus*(_|_, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] times(_|_, X) > _|_  because [5], by definition 
+  5] times*(_|_, X) >= _|_  by (Bot) 
+
+  6] times(s(X), Y) >= plus(times(X, Y), Y)  because [7], by (Star) 
+  7] times*(s(X), Y) >= plus(times(X, Y), Y)  because times > plus, [8] and [13], by (Copy) 
+  8] times*(s(X), Y) >= times(X, Y)  because times in Mul, [9] and [12], by (Stat) 
+  9] s(X) > X  because [10], by definition 
+  10] s*(X) >= X  because [11], by (Select) 
+  11] X >= X  by (Meta) 
+  12] Y >= Y  by (Meta) 
+  13] times*(s(X), Y) >= Y  because [12], by (Select) 
+
+  14] map(F, _|_) >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  times(O, X) => O 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O, X) >? X 
+  times(s(X), Y) >? plus(times(X, Y), Y) 
+  map(F, nil) >? nil 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[nil]] = _|_ 
+
+We choose Lex = {} and Mul = {O, map, plus, s, times}, and the following precedence: O > times > map > plus > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  plus(O, X) > X 
+  times(s(X), Y) >= plus(times(X, Y), Y) 
+  map(F, _|_) >= _|_ 
+
+With these choices, we have:
+
+  1] plus(O, X) > X  because [2], by definition 
+  2] plus*(O, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] times(s(X), Y) >= plus(times(X, Y), Y)  because [5], by (Star) 
+  5] times*(s(X), Y) >= plus(times(X, Y), Y)  because times > plus, [6] and [11], by (Copy) 
+  6] times*(s(X), Y) >= times(X, Y)  because times in Mul, [7] and [10], by (Stat) 
+  7] s(X) > X  because [8], by definition 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] Y >= Y  by (Meta) 
+  11] times*(s(X), Y) >= Y  because [10], by (Select) 
+
+  12] map(F, _|_) >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  plus(O, X) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  times(s(X), Y) >? plus(times(X, Y), Y) 
+  map(F, nil) >? nil 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[nil]] = _|_ 
+
+We choose Lex = {} and Mul = {map, plus, s, times}, and the following precedence: s > map > times > plus
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  times(s(X), Y) >= plus(times(X, Y), Y) 
+  map(F, _|_) > _|_ 
+
+With these choices, we have:
+
+  1] times(s(X), Y) >= plus(times(X, Y), Y)  because [2], by (Star) 
+  2] times*(s(X), Y) >= plus(times(X, Y), Y)  because times > plus, [3] and [8], by (Copy) 
+  3] times*(s(X), Y) >= times(X, Y)  because times in Mul, [4] and [7], by (Stat) 
+  4] s(X) > X  because [5], by definition 
+  5] s*(X) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+  7] Y >= Y  by (Meta) 
+  8] times*(s(X), Y) >= Y  because [7], by (Select) 
+
+  9] map(F, _|_) > _|_  because [10], by definition 
+  10] map*(F, _|_) >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  map(F, nil) => nil 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  times(s(X), Y) >? plus(times(X, Y), Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {plus, s, times}, and the following precedence: times > s > plus
+
+With these choices, we have:
+
+  1] times(s(X), Y) > plus(times(X, Y), Y)  because [2], by definition 
+  2] times*(s(X), Y) >= plus(times(X, Y), Y)  because times > plus, [3] and [8], by (Copy) 
+  3] times*(s(X), Y) >= times(X, Y)  because times in Mul, [4] and [7], by (Stat) 
+  4] s(X) > X  because [5], by definition 
+  5] s*(X) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+  7] Y >= Y  by (Meta) 
+  8] times*(s(X), Y) >= Y  because [7], by (Select) 
+
+We can thus remove the following rules:
+
+  times(s(X), Y) => plus(times(X, Y), Y) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

@@ -1,0 +1,250 @@
+YES
+We consider the system rW9Ol.
+
+  Alphabet:
+
+    I : [nat] --> nat 
+    O : [] --> nat 
+    s : [nat] --> nat 
+    twice : [nat -> nat] --> nat -> nat 
+
+  Rules:
+
+    I(O) => O 
+    I(s(X)) => s(twice(/\x.I(x)) X) 
+    twice(F) => /\x.F (F x) 
+
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with dynamic dependency pairs.
+
+To start, the system is beta-saturated by adding the following rules:
+
+  twice(F) X => F (F X) 
+
+After applying [Kop12, Thm. 7.22] to denote collapsing dependency pairs in an extended form, we thus obtain the following dependency pair problem (P_0, R_0, minimal, formative):
+
+  Dependency Pairs P_0:
+
+    0] I#(s(X)) =#> twice(/\x.I(x)) X   
+    1] I#(s(X)) =#> twice#(/\x.I(x))   
+    2] I#(s(X)) =#> I#(x)   
+    3] twice#(F) =#> F[F x]   
+    4] twice#(F) =#> F[x]   
+    5] twice(F) X =#> F[F X]   
+    6] twice(F) X =#> F[X]   
+
+  Rules R_0:
+
+    I(O) => O 
+    I(s(X)) => s(twice(/\x.I(x)) X) 
+    twice(F) => /\x.F (F x) 
+    twice(F) X => F (F X) 
+
+Thus, the original system is terminating if (P_0, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, minimal, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 5, 6 
+    * 1 : 3, 4 
+    * 2 :  
+    * 3 : 0, 1, 2, 3, 4, 5, 6 
+    * 4 : 0, 1, 2, 3, 4, 5, 6 
+    * 5 : 0, 1, 2, 3, 4, 5, 6 
+    * 6 : 0, 1, 2, 3, 4, 5, 6 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    I#(s(X)) =#> twice(/\x.I(x)) X   
+    I#(s(X)) =#> twice#(/\x.I(x))   
+    twice#(F) =#> F[F x]   
+    twice#(F) =#> F[x]   
+    twice(F) X =#> F[F X]   
+    twice(F) X =#> F[X]   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, minimal, formative).
+
+The formative rules of (P_1, R_0) are R_1 ::=
+
+  I(s(X)) => s(twice(/\x.I(x)) X) 
+  twice(F) X => F (F X) 
+
+By [Kop12, Thm. 7.17], we may replace the dependency pair problem (P_1, R_0, minimal, formative) by (P_1, R_1, minimal, formative).
+
+Thus, the original system is terminating if (P_1, R_1, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_1, minimal, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  As the system is abstraction-simple and the formative flag is set, it suffices to find a tagged reduction pair [Kop12, Def. 6.70].  Thus, we must orient:
+
+  I#(s(X)) >? twice(/\x.I-(x), X) 
+  I#(s(X)) >? twice#(/\x.I-(x)) ~c0 
+  twice#(F) X >? F[F ~c1] 
+  twice#(F) X >? F[~c2] 
+  twice(F, X) >? F[F X] 
+  twice(F, X) >? F[X] 
+  I(s(X)) >= s(twice(/\x.I-(x), X)) 
+  twice(F, X) >= F (F X) 
+  I-(X) >= I(X) 
+  I-(X) >= I#(X) 
+
+We apply [Kop12, Thm. 6.75] and use the following argument functions:
+
+  pi( twice(F, X) ) = #argfun-twice#(F (F X), F X, F (F X)) 
+  pi( twice#(F) ) = #argfun-twice##(/\x.F (F ~c1), /\y.F ~c2) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  #argfun-twice# = Lam[y0;y1;y2].max(y0, y1, y2) 
+  #argfun-twice## = Lam[G0;G1;y2].2 + max(G0(x0), G1(x0)) 
+  I = Lam[y0].y0 
+  I- = Lam[y0].y0 
+  I# = Lam[y0].y0 
+  s = Lam[y0].2 + 2*y0 
+  twice = Lam[G0;y1].0 
+  twice# = Lam[G0;y1].0 
+  ~c0 = 0 
+  ~c1 = 0 
+  ~c2 = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[I#(s(_x0))]] = 2 + 2*x0 > max(x0, x0) = [[#argfun-twice#((/\x.I-(x)) ((/\y.I-(y)) _x0), (/\z.I-(z)) _x0, (/\u.I-(u)) ((/\v.I-(v)) _x0))]] 
+  [[I#(s(_x0))]] = 2 + 2*x0 >= 2 = [[#argfun-twice##(/\x.(/\y.I-(y)) ((/\z.I-(z)) ~c1), /\u.(/\v.I-(v)) ~c2) ~c0]] 
+  [[#argfun-twice##(/\x._F0 (_F0 ~c1), /\y._F0 ~c2) _x1]] = max(x1, 2 + max(F0(0), F0(F0(0)))) >= F0(F0(0)) = [[_F0[_F0 ~c1]]] 
+  [[#argfun-twice##(/\x._F0 (_F0 ~c1), /\y._F0 ~c2) _x1]] = max(x1, 2 + max(F0(0), F0(F0(0)))) >= F0(0) = [[_F0[~c2]]] 
+  [[#argfun-twice#(_F0 (_F0 _x1), _F0 _x1, _F0 (_F0 _x1))]] = max(x1, x1, F0(x1), F0(x1), F0(max(x1, F0(x1)))) >= F0(max(x1, F0(x1))) = [[_F0[_F0 _x1]]] 
+  [[#argfun-twice#(_F0 (_F0 _x1), _F0 _x1, _F0 (_F0 _x1))]] = max(x1, x1, F0(x1), F0(x1), F0(max(x1, F0(x1)))) >= F0(x1) = [[_F0[_x1]]] 
+  [[I(s(_x0))]] = 2 + 2*x0 >= 2 + 2*max(x0, x0) = [[s(#argfun-twice#((/\x.I-(x)) ((/\y.I-(y)) _x0), (/\z.I-(z)) _x0, (/\u.I-(u)) ((/\v.I-(v)) _x0)))]] 
+  [[#argfun-twice#(_F0 (_F0 _x1), _F0 _x1, _F0 (_F0 _x1))]] = max(x1, x1, F0(x1), F0(x1), F0(max(x1, F0(x1)))) >= max(x1, F0(x1), F0(max(x1, F0(x1)))) = [[_F0 (_F0 _x1)]] 
+  [[I-(_x0)]] = x0 >= x0 = [[I(_x0)]] 
+  [[I-(_x0)]] = x0 >= x0 = [[I#(_x0)]] 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace the dependency pair problem (P_1, R_1, minimal, formative) by (P_2, R_1, minimal, formative), where P_2 consists of:
+
+  I#(s(X)) =#> twice#(/\x.I(x))   
+  twice#(F) =#> F[F x]   
+  twice(F) X =#> F[F X]   
+  twice(F) X =#> F[X]   
+
+Thus, the original system is terminating if (P_2, R_1, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_1, minimal, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  As the system is abstraction-simple and the formative flag is set, it suffices to find a tagged reduction pair [Kop12, Def. 6.70].  Thus, we must orient:
+
+  I#(s(X)) >? twice#(/\x.I-(x)) ~c0 
+  twice#(F) X >? F[F ~c1] 
+  twice(F, X) >? F[F X] 
+  twice(F, X) >? F[X] 
+  I(s(X)) >= s(twice(/\x.I-(x), X)) 
+  twice(F, X) >= F (F X) 
+  I-(X) >= I(X) 
+  I-(X) >= I#(X) 
+
+We apply [Kop12, Thm. 6.75] and use the following argument functions:
+
+  pi( twice(F, X) ) = #argfun-twice#(F (F X), F X, F (F X)) 
+  pi( twice#(F) ) = #argfun-twice##(/\x.F (F ~c1)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  #argfun-twice# = Lam[y0;y1;y2].1 + max(y0, y1, y2) 
+  #argfun-twice## = Lam[G0;y1].G0(x0) 
+  I = Lam[y0].0 
+  I- = Lam[y0].2*y0 
+  I# = Lam[y0].0 
+  s = Lam[y0].0 
+  twice = Lam[G0;y1].0 
+  twice# = Lam[G0;y1].0 
+  ~c0 = 0 
+  ~c1 = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[I#(s(_x0))]] = 0 >= 0 = [[#argfun-twice##(/\x.(/\y.I-(y)) ((/\z.I-(z)) ~c1)) ~c0]] 
+  [[#argfun-twice##(/\x._F0 (_F0 ~c1)) _x1]] = max(x1, F0(0), F0(F0(0))) >= F0(F0(0)) = [[_F0[_F0 ~c1]]] 
+  [[#argfun-twice#(_F0 (_F0 _x1), _F0 _x1, _F0 (_F0 _x1))]] = 1 + max(x1, x1, F0(x1), F0(x1), F0(max(x1, F0(x1)))) > F0(max(x1, F0(x1))) = [[_F0[_F0 _x1]]] 
+  [[#argfun-twice#(_F0 (_F0 _x1), _F0 _x1, _F0 (_F0 _x1))]] = 1 + max(x1, x1, F0(x1), F0(x1), F0(max(x1, F0(x1)))) > F0(x1) = [[_F0[_x1]]] 
+  [[I(s(_x0))]] = 0 >= 0 = [[s(#argfun-twice#((/\x.I-(x)) ((/\y.I-(y)) _x0), (/\z.I-(z)) _x0, (/\u.I-(u)) ((/\v.I-(v)) _x0)))]] 
+  [[#argfun-twice#(_F0 (_F0 _x1), _F0 _x1, _F0 (_F0 _x1))]] = 1 + max(x1, x1, F0(x1), F0(x1), F0(max(x1, F0(x1)))) >= max(x1, F0(x1), F0(max(x1, F0(x1)))) = [[_F0 (_F0 _x1)]] 
+  [[I-(_x0)]] = 2*x0 >= 0 = [[I(_x0)]] 
+  [[I-(_x0)]] = 2*x0 >= 0 = [[I#(_x0)]] 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace the dependency pair problem (P_2, R_1, minimal, formative) by (P_3, R_1, minimal, formative), where P_3 consists of:
+
+  I#(s(X)) =#> twice#(/\x.I(x))   
+  twice#(F) =#> F[F x]   
+
+Thus, the original system is terminating if (P_3, R_1, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_3, R_1, minimal, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  As the system is abstraction-simple and the formative flag is set, it suffices to find a tagged reduction pair [Kop12, Def. 6.70].  Thus, we must orient:
+
+  I#(s(X)) >? twice#(/\x.I-(x)) ~c0 
+  twice#(F) X >? F[F ~c1] 
+  I(s(X)) >= s(twice(/\x.I-(x), X)) 
+  twice(F, X) >= F (F X) 
+  I-(X) >= I(X) 
+  I-(X) >= I#(X) 
+
+We apply [Kop12, Thm. 6.75] and use the following argument functions:
+
+  pi( twice(F, X) ) = #argfun-twice#(F (F X)) 
+  pi( twice#(F) ) = #argfun-twice##(/\x.F (F ~c1)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  #argfun-twice# = Lam[y0].y0 
+  #argfun-twice## = Lam[G0;y1].1 + G0(x0) 
+  I = Lam[y0].2*y0 
+  I- = Lam[y0].2*y0 
+  I# = Lam[y0].y0 
+  s = Lam[y0].1 
+  twice = Lam[G0;y1].0 
+  twice# = Lam[G0;y1].0 
+  ~c0 = 0 
+  ~c1 = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[I#(s(_x0))]] = 1 >= 1 = [[#argfun-twice##(/\x.(/\y.I-(y)) ((/\z.I-(z)) ~c1)) ~c0]] 
+  [[#argfun-twice##(/\x._F0 (_F0 ~c1)) _x1]] = max(x1, 1 + max(F0(0), F0(F0(0)))) >= F0(F0(0)) = [[_F0[_F0 ~c1]]] 
+  [[I(s(_x0))]] = 2 >= 1 = [[s(#argfun-twice#((/\x.I-(x)) ((/\y.I-(y)) _x0)))]] 
+  [[#argfun-twice#(_F0 (_F0 _x1))]] = max(x1, F0(x1), F0(max(x1, F0(x1)))) >= max(x1, F0(x1), F0(max(x1, F0(x1)))) = [[_F0 (_F0 _x1)]] 
+  [[I-(_x0)]] = 2*x0 >= 2*x0 = [[I(_x0)]] 
+  [[I-(_x0)]] = 2*x0 >= x0 = [[I#(_x0)]] 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace the dependency pair problem (P_3, R_1, minimal, formative) by (P_4, R_1, minimal, formative), where P_4 consists of:
+
+  I#(s(X)) =#> twice#(/\x.I(x))   
+
+Thus, the original system is terminating if (P_4, R_1, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_4, R_1, minimal, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+
+This graph has no strongly connected components.  By [Kop12, Thm. 7.31], this implies finiteness of the dependency pair problem.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

@@ -1,0 +1,87 @@
+YES
+We consider the system SrpUn.
+
+  Alphabet:
+
+    cons : [a * c] --> c 
+    dropWhile : [a -> b * c] --> c 
+    if : [b * c * c] --> c 
+    nil : [] --> c 
+    takeWhile : [a -> b * c] --> c 
+    true : [] --> b 
+
+  Rules:
+
+    if(true, X, Y) => X 
+    if(true, X, Y) => Y 
+    takeWhile(F, nil) => nil 
+    takeWhile(F, cons(X, Y)) => if(F X, cons(X, takeWhile(F, Y)), nil) 
+    dropWhile(F, nil) => nil 
+    dropWhile(F, cons(X, Y)) => if(F X, dropWhile(F, Y), cons(X, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  if(true, X, Y) >? X 
+  if(true, X, Y) >? Y 
+  takeWhile(F, nil) >? nil 
+  takeWhile(F, cons(X, Y)) >? if(F X, cons(X, takeWhile(F, Y)), nil) 
+  dropWhile(F, nil) >? nil 
+  dropWhile(F, cons(X, Y)) >? if(F X, dropWhile(F, Y), cons(X, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  cons = Lam[y0;y1].2 + y0 + 2*y1 
+  dropWhile = Lam[G0;y1].3 + 2*y1 + 2*y1*G0(y1) + 2*G0(0) 
+  if = Lam[y0;y1;y2].y0 + y1 + y2 
+  nil = 0 
+  takeWhile = Lam[G0;y1].3*y1 + G0(0) + 2*y1*G0(y1) 
+  true = 3 
+
+Using this interpretation, the requirements translate to:
+
+  [[if(true, _x0, _x1)]] = 3 + x0 + x1 > x0 = [[_x0]] 
+  [[if(true, _x0, _x1)]] = 3 + x0 + x1 > x1 = [[_x1]] 
+  [[takeWhile(_F0, nil)]] = F0(0) >= 0 = [[nil]] 
+  [[takeWhile(_F0, cons(_x1, _x2))]] = 6 + 3*x1 + 6*x2 + F0(0) + 2*x1*F0(2 + x1 + 2*x2) + 4*x2*F0(2 + x1 + 2*x2) + 4*F0(2 + x1 + 2*x2) > 2 + 2*x1 + 6*x2 + F0(x1) + 2*F0(0) + 4*x2*F0(x2) = [[if(_F0 _x1, cons(_x1, takeWhile(_F0, _x2)), nil)]] 
+  [[dropWhile(_F0, nil)]] = 3 + 2*F0(0) > 0 = [[nil]] 
+  [[dropWhile(_F0, cons(_x1, _x2))]] = 7 + 2*x1 + 4*x2 + 2*x1*F0(2 + x1 + 2*x2) + 2*F0(0) + 4*x2*F0(2 + x1 + 2*x2) + 4*F0(2 + x1 + 2*x2) > 5 + 2*x1 + 4*x2 + F0(x1) + 2*x2*F0(x2) + 2*F0(0) = [[if(_F0 _x1, dropWhile(_F0, _x2), cons(_x1, _x2))]] 
+
+We can thus remove the following rules:
+
+  if(true, X, Y) => X 
+  if(true, X, Y) => Y 
+  takeWhile(F, cons(X, Y)) => if(F X, cons(X, takeWhile(F, Y)), nil) 
+  dropWhile(F, nil) => nil 
+  dropWhile(F, cons(X, Y)) => if(F X, dropWhile(F, Y), cons(X, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  takeWhile(F, nil) >? nil 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  nil = 0 
+  takeWhile = Lam[G0;y1].3 + 3*y1 + G0(0) 
+
+Using this interpretation, the requirements translate to:
+
+  [[takeWhile(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+
+We can thus remove the following rules:
+
+  takeWhile(F, nil) => nil 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

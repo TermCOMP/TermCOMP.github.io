@@ -1,0 +1,879 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/q8Zff.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 361 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 44 ms]
+        (9) QDP
+        (10) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (11) YES
+    (12) JBCTerminationSCC
+        (13) SCCToQDPProof [SOUND, 40 ms]
+        (14) QDP
+        (15) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (16) YES
+    (17) JBCTerminationSCC
+        (18) SCCToIRSProof [SOUND, 196 ms]
+        (19) IRSwT
+        (20) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (21) IRSwT
+        (22) IRSwTTerminationDigraphProof [EQUIVALENT, 0 ms]
+        (23) IRSwT
+        (24) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (25) IRSwT
+        (26) TempFilterProof [SOUND, 17 ms]
+        (27) IntTRS
+        (28) PolynomialOrderProcessor [EQUIVALENT, 4 ms]
+        (29) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+public class Entry
+{
+    private String item;
+    private int count;
+
+    public Entry(String itemData, int countData)
+    {
+        item = itemData;
+        count = countData;
+    }
+
+    public String toString( )
+    {
+        return (item + " " + count);
+    }
+
+    public boolean equals(Object otherObject)
+    {
+        if (otherObject == null)
+            return false;
+        else if (getClass( ) != otherObject.getClass( ))
+            return false;
+        else
+        {
+            Entry otherEntry = (Entry)otherObject;
+            return (item.equals(otherEntry.item) 
+                      && (count == otherEntry.count));
+        }
+    }
+
+   // <There should be other constructors and methods, including accessor and 
+   //                       mutator methods, but we do not use them in this demonstration.>
+}
+
+
+
+public class LinkedList<T>
+{
+    private class Node<T>
+    {
+        private T data;
+        private Node<T> link;
+
+        public Node( )
+        {
+             data = null;
+             link = null;
+        }
+
+        public Node(T newData, Node<T> linkValue)
+        {
+            data = newData;
+            link = linkValue;
+        }
+     }//End of Node<T> inner class
+
+    private Node<T> head;
+
+    public LinkedList( )
+    {
+        head = null;
+    }
+
+    /**
+     Adds a node at the start of the list with the specified data.
+     The added node will be the first node in the list.
+    */
+    public void addToStart(T itemData)
+    {
+        this.head = new Node<T>(itemData, this.head);
+    }
+
+    /**
+     Removes the head node and returns true if the list contains at least
+     one node. Returns false if the list is empty.
+    */
+    public boolean deleteHeadNode( )
+    {
+        if (head != null)
+        {
+            head = head.link;
+            return true;
+        }
+        else
+            return false;
+    }
+
+    /**
+     Returns the number of nodes in the list.
+    */
+    public int size( )
+    {
+        int count = 0;
+        Node<T> position = head;
+        while (position != null)
+        {
+            count++;
+            position = position.link;
+        }
+        return count;
+    }
+
+    public boolean contains(T item)
+    {
+        return (find(item) != null);
+    }
+
+    /**
+     Finds the first node containing the target item, and returns a
+     reference to that node. If target is not in the list, null is returned.
+    */
+    private Node<T> find(T target)
+    {
+        Node<T> position = head;
+        T itemAtPosition;
+        while (position != null)
+        {
+            itemAtPosition = position.data;
+            if (itemAtPosition.equals(target))
+                return position;
+            position = position.link;
+        }
+        return null; //target was not found
+    }
+
+    /**
+     Finds the first node containing the target and returns a reference
+      to the data in that node. If target is not in the list, null is returned.
+    */
+    public T findData(T target)
+    {
+        return find(target).data;
+    }
+
+    public void outputList( )
+    {
+        Node<T> position = head;
+        while (position != null)
+        {
+            //System.out.println(position.data);
+            position = position.link;
+        }
+    }
+
+    public boolean isEmpty( )
+    {
+        return (head == null);
+    }
+
+    public void clear( )
+    {
+        head = null;
+    }
+
+   /*
+    For two lists to be equal they must contain the same data items in
+    the same order. The equals method of T is used to compare data items.
+   */
+   public boolean equals(Object otherObject)
+    {
+        if (!(otherObject instanceof LinkedList))
+            return false;
+        else
+        {
+            LinkedList<T> otherList = (LinkedList<T>)otherObject;
+            if (size( ) != otherList.size( ))
+                return false;
+            Node<T> position = head;
+            Node<T> otherPosition = otherList.head;
+            while (position != null)
+            {
+                if (!(position.data.equals(otherPosition.data)))
+                    return false;
+                position = position.link;
+                otherPosition = otherPosition.link;
+            }
+            return true; //no mismatch was not found
+        }
+    }
+
+   public static void main(String[] args)
+    {
+        LinkedList<Entry> list = new LinkedList<Entry>( );
+
+	for (int i = 1; i < args.length; i++) {
+	    Entry entry = new Entry(args[i], i++);
+	    list.addToStart(entry);
+	    entry = new Entry(args[i], i++);
+	    list.addToStart(entry);
+	    entry = new Entry(args[i], i++);
+	    list.addToStart(entry);
+	}
+
+	list.size(); // remove it!
+        //System.out.println("List has " + list.size( ) 
+	//                  + " nodes.");
+        list.outputList( );
+        //System.out.println("End of list.");
+    }
+}
+
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+public class Entry
+{
+    private String item;
+    private int count;
+
+    public Entry(String itemData, int countData)
+    {
+        item = itemData;
+        count = countData;
+    }
+
+    public String toString( )
+    {
+        return (item + " " + count);
+    }
+
+    public boolean equals(Object otherObject)
+    {
+        if (otherObject == null)
+            return false;
+        else if (getClass( ) != otherObject.getClass( ))
+            return false;
+        else
+        {
+            Entry otherEntry = (Entry)otherObject;
+            return (item.equals(otherEntry.item) 
+                      && (count == otherEntry.count));
+        }
+    }
+
+   // <There should be other constructors and methods, including accessor and 
+   //                       mutator methods, but we do not use them in this demonstration.>
+}
+
+
+
+public class LinkedList<T>
+{
+    private class Node<T>
+    {
+        private T data;
+        private Node<T> link;
+
+        public Node( )
+        {
+             data = null;
+             link = null;
+        }
+
+        public Node(T newData, Node<T> linkValue)
+        {
+            data = newData;
+            link = linkValue;
+        }
+     }//End of Node<T> inner class
+
+    private Node<T> head;
+
+    public LinkedList( )
+    {
+        head = null;
+    }
+
+    /**
+     Adds a node at the start of the list with the specified data.
+     The added node will be the first node in the list.
+    */
+    public void addToStart(T itemData)
+    {
+        this.head = new Node<T>(itemData, this.head);
+    }
+
+    /**
+     Removes the head node and returns true if the list contains at least
+     one node. Returns false if the list is empty.
+    */
+    public boolean deleteHeadNode( )
+    {
+        if (head != null)
+        {
+            head = head.link;
+            return true;
+        }
+        else
+            return false;
+    }
+
+    /**
+     Returns the number of nodes in the list.
+    */
+    public int size( )
+    {
+        int count = 0;
+        Node<T> position = head;
+        while (position != null)
+        {
+            count++;
+            position = position.link;
+        }
+        return count;
+    }
+
+    public boolean contains(T item)
+    {
+        return (find(item) != null);
+    }
+
+    /**
+     Finds the first node containing the target item, and returns a
+     reference to that node. If target is not in the list, null is returned.
+    */
+    private Node<T> find(T target)
+    {
+        Node<T> position = head;
+        T itemAtPosition;
+        while (position != null)
+        {
+            itemAtPosition = position.data;
+            if (itemAtPosition.equals(target))
+                return position;
+            position = position.link;
+        }
+        return null; //target was not found
+    }
+
+    /**
+     Finds the first node containing the target and returns a reference
+      to the data in that node. If target is not in the list, null is returned.
+    */
+    public T findData(T target)
+    {
+        return find(target).data;
+    }
+
+    public void outputList( )
+    {
+        Node<T> position = head;
+        while (position != null)
+        {
+            //System.out.println(position.data);
+            position = position.link;
+        }
+    }
+
+    public boolean isEmpty( )
+    {
+        return (head == null);
+    }
+
+    public void clear( )
+    {
+        head = null;
+    }
+
+   /*
+    For two lists to be equal they must contain the same data items in
+    the same order. The equals method of T is used to compare data items.
+   */
+   public boolean equals(Object otherObject)
+    {
+        if (!(otherObject instanceof LinkedList))
+            return false;
+        else
+        {
+            LinkedList<T> otherList = (LinkedList<T>)otherObject;
+            if (size( ) != otherList.size( ))
+                return false;
+            Node<T> position = head;
+            Node<T> otherPosition = otherList.head;
+            while (position != null)
+            {
+                if (!(position.data.equals(otherPosition.data)))
+                    return false;
+                position = position.link;
+                otherPosition = otherPosition.link;
+            }
+            return true; //no mismatch was not found
+        }
+    }
+
+   public static void main(String[] args)
+    {
+        LinkedList<Entry> list = new LinkedList<Entry>( );
+
+	for (int i = 1; i < args.length; i++) {
+	    Entry entry = new Entry(args[i], i++);
+	    list.addToStart(entry);
+	    entry = new Entry(args[i], i++);
+	    list.addToStart(entry);
+	    entry = new Entry(args[i], i++);
+	    list.addToStart(entry);
+	}
+
+	list.size(); // remove it!
+        //System.out.println("List has " + list.size( ) 
+	//                  + " nodes.");
+        list.outputList( );
+        //System.out.println("End of list.");
+    }
+}
+
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+LinkedList.main([Ljava/lang/String;)V: Graph of 278 nodes with 3 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 3 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: LinkedList.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*LinkedList$Node: [link]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 12 rules for P and 0 rules for R.P rules:
+f2195_0_outputList_NULL(EOS(STATIC_2195), java.lang.Object(o871sub), java.lang.Object(o871sub)) -> f2205_0_outputList_NULL(EOS(STATIC_2205), java.lang.Object(o871sub), java.lang.Object(o871sub)) :|: TRUE
+f2205_0_outputList_NULL(EOS(STATIC_2205), java.lang.Object(o871sub), java.lang.Object(o871sub)) -> f2208_0_outputList_Load(EOS(STATIC_2208), java.lang.Object(o871sub)) :|: TRUE
+f2208_0_outputList_Load(EOS(STATIC_2208), java.lang.Object(o871sub)) -> f2212_0_outputList_InvokeMethod(EOS(STATIC_2212), java.lang.Object(o871sub)) :|: TRUE
+f2212_0_outputList_InvokeMethod(EOS(STATIC_2212), java.lang.Object(o871sub)) -> f2221_0_access$000_Load(EOS(STATIC_2221), java.lang.Object(o871sub)) :|: TRUE
+f2221_0_access$000_Load(EOS(STATIC_2221), java.lang.Object(o871sub)) -> f2227_0_access$000_FieldAccess(EOS(STATIC_2227), java.lang.Object(o871sub)) :|: TRUE
+f2227_0_access$000_FieldAccess(EOS(STATIC_2227), java.lang.Object(LinkedList$Node(EOC, o884))) -> f2230_0_access$000_FieldAccess(EOS(STATIC_2230), java.lang.Object(LinkedList$Node(EOC, o884))) :|: TRUE
+f2230_0_access$000_FieldAccess(EOS(STATIC_2230), java.lang.Object(LinkedList$Node(EOC, o884))) -> f2233_0_access$000_Return(EOS(STATIC_2233), o884) :|: TRUE
+f2233_0_access$000_Return(EOS(STATIC_2233), o884) -> f2236_0_outputList_Store(EOS(STATIC_2236), o884) :|: TRUE
+f2236_0_outputList_Store(EOS(STATIC_2236), o884) -> f2242_0_outputList_JMP(EOS(STATIC_2242), o884) :|: TRUE
+f2242_0_outputList_JMP(EOS(STATIC_2242), o884) -> f2245_0_outputList_Load(EOS(STATIC_2245), o884) :|: TRUE
+f2245_0_outputList_Load(EOS(STATIC_2245), o884) -> f2188_0_outputList_Load(EOS(STATIC_2188), o884) :|: TRUE
+f2188_0_outputList_Load(EOS(STATIC_2188), o844) -> f2195_0_outputList_NULL(EOS(STATIC_2195), o844, o844) :|: TRUE
+R rules:
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+f2195_0_outputList_NULL(EOS(STATIC_2195), java.lang.Object(LinkedList$Node(EOC, o884:0)), java.lang.Object(LinkedList$Node(EOC, o884:0))) -> f2195_0_outputList_NULL(EOS(STATIC_2195), o884:0, o884:0) :|: TRUE
+R rules:
+Filtered ground terms:
+   f2195_0_outputList_NULL(x1, x2, x3) -> f2195_0_outputList_NULL(x2, x3)
+   EOS(x1) -> EOS
+   LinkedList$Node(x1, x2) -> LinkedList$Node(x2)
+Filtered duplicate args:
+   f2195_0_outputList_NULL(x1, x2) -> f2195_0_outputList_NULL(x2)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F2195_0_OUTPUTLIST_NULL(java.lang.Object(LinkedList$Node(o884:0:0))) -> F2195_0_OUTPUTLIST_NULL(o884:0:0) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F2195_0_OUTPUTLIST_NULL(java.lang.Object(LinkedList$Node(o884:0:0))) -> F2195_0_OUTPUTLIST_NULL(o884:0:0)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F2195_0_OUTPUTLIST_NULL(java.lang.Object(LinkedList$Node(o884:0:0))) -> F2195_0_OUTPUTLIST_NULL(o884:0:0)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(11)
+YES
+
+----------------------------------------
+
+(12)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: LinkedList.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*LinkedList$Node: [link]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(13) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 14 rules for P and 0 rules for R.P rules:
+f2152_0_size_NULL(EOS(STATIC_2152), java.lang.Object(o848sub), java.lang.Object(o848sub)) -> f2154_0_size_NULL(EOS(STATIC_2154), java.lang.Object(o848sub), java.lang.Object(o848sub)) :|: TRUE
+f2154_0_size_NULL(EOS(STATIC_2154), java.lang.Object(o848sub), java.lang.Object(o848sub)) -> f2157_0_size_Inc(EOS(STATIC_2157), java.lang.Object(o848sub)) :|: TRUE
+f2157_0_size_Inc(EOS(STATIC_2157), java.lang.Object(o848sub)) -> f2161_0_size_Load(EOS(STATIC_2161), java.lang.Object(o848sub)) :|: TRUE
+f2161_0_size_Load(EOS(STATIC_2161), java.lang.Object(o848sub)) -> f2165_0_size_InvokeMethod(EOS(STATIC_2165), java.lang.Object(o848sub)) :|: TRUE
+f2165_0_size_InvokeMethod(EOS(STATIC_2165), java.lang.Object(o848sub)) -> f2168_0_access$000_Load(EOS(STATIC_2168), java.lang.Object(o848sub)) :|: TRUE
+f2168_0_access$000_Load(EOS(STATIC_2168), java.lang.Object(o848sub)) -> f2175_0_access$000_FieldAccess(EOS(STATIC_2175), java.lang.Object(o848sub)) :|: TRUE
+f2175_0_access$000_FieldAccess(EOS(STATIC_2175), java.lang.Object(o852sub)) -> f2177_0_access$000_FieldAccess(EOS(STATIC_2177), java.lang.Object(o852sub)) :|: TRUE
+f2177_0_access$000_FieldAccess(EOS(STATIC_2177), java.lang.Object(LinkedList$Node(EOC, o858))) -> f2180_0_access$000_FieldAccess(EOS(STATIC_2180), java.lang.Object(LinkedList$Node(EOC, o858))) :|: TRUE
+f2180_0_access$000_FieldAccess(EOS(STATIC_2180), java.lang.Object(LinkedList$Node(EOC, o858))) -> f2184_0_access$000_Return(EOS(STATIC_2184), o858) :|: TRUE
+f2184_0_access$000_Return(EOS(STATIC_2184), o858) -> f2187_0_size_Store(EOS(STATIC_2187), o858) :|: TRUE
+f2187_0_size_Store(EOS(STATIC_2187), o858) -> f2194_0_size_JMP(EOS(STATIC_2194), o858) :|: TRUE
+f2194_0_size_JMP(EOS(STATIC_2194), o858) -> f2204_0_size_Load(EOS(STATIC_2204), o858) :|: TRUE
+f2204_0_size_Load(EOS(STATIC_2204), o858) -> f2150_0_size_Load(EOS(STATIC_2150), o858) :|: TRUE
+f2150_0_size_Load(EOS(STATIC_2150), o842) -> f2152_0_size_NULL(EOS(STATIC_2152), o842, o842) :|: TRUE
+R rules:
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+f2152_0_size_NULL(EOS(STATIC_2152), java.lang.Object(LinkedList$Node(EOC, o858:0)), java.lang.Object(LinkedList$Node(EOC, o858:0))) -> f2152_0_size_NULL(EOS(STATIC_2152), o858:0, o858:0) :|: TRUE
+R rules:
+Filtered ground terms:
+   f2152_0_size_NULL(x1, x2, x3) -> f2152_0_size_NULL(x2, x3)
+   EOS(x1) -> EOS
+   LinkedList$Node(x1, x2) -> LinkedList$Node(x2)
+Filtered duplicate args:
+   f2152_0_size_NULL(x1, x2) -> f2152_0_size_NULL(x2)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F2152_0_SIZE_NULL(java.lang.Object(LinkedList$Node(o858:0:0))) -> F2152_0_SIZE_NULL(o858:0:0) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(14)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F2152_0_SIZE_NULL(java.lang.Object(LinkedList$Node(o858:0:0))) -> F2152_0_SIZE_NULL(o858:0:0)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(15) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F2152_0_SIZE_NULL(java.lang.Object(LinkedList$Node(o858:0:0))) -> F2152_0_SIZE_NULL(o858:0:0)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(16)
+YES
+
+----------------------------------------
+
+(17)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: LinkedList.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*LinkedList: [head]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(18) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 141 IRulesP rules:
+f1902_0_main_Load(EOS(STATIC_1902), java.lang.Object(o795sub), java.lang.Object(o795sub), i56, i56) -> f1903_0_main_ArrayLength(EOS(STATIC_1903), java.lang.Object(o795sub), java.lang.Object(o795sub), i56, i56, java.lang.Object(o795sub)) :|: TRUE
+f1903_0_main_ArrayLength(EOS(STATIC_1903), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, i56, java.lang.Object(ARRAY(i58))) -> f1904_0_main_ArrayLength(EOS(STATIC_1904), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, i56, java.lang.Object(ARRAY(i58))) :|: i58 >= 0
+f1904_0_main_ArrayLength(EOS(STATIC_1904), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, i56, java.lang.Object(ARRAY(i58))) -> f1905_0_main_GE(EOS(STATIC_1905), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, i56, i58) :|: i58 >= 0
+f1905_0_main_GE(EOS(STATIC_1905), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, i56, i58) -> f1907_0_main_GE(EOS(STATIC_1907), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, i56, i58) :|: i56 < i58
+f1907_0_main_GE(EOS(STATIC_1907), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, i56, i58) -> f1909_0_main_New(EOS(STATIC_1909), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56) :|: i56 < i58
+f1909_0_main_New(EOS(STATIC_1909), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56) -> f1911_0_main_Duplicate(EOS(STATIC_1911), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56) :|: TRUE
+f1911_0_main_Duplicate(EOS(STATIC_1911), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56) -> f1913_0_main_Load(EOS(STATIC_1913), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56) :|: TRUE
+f1913_0_main_Load(EOS(STATIC_1913), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56) -> f1914_0_main_Load(EOS(STATIC_1914), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, java.lang.Object(ARRAY(i58))) :|: TRUE
+f1914_0_main_Load(EOS(STATIC_1914), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, java.lang.Object(ARRAY(i58))) -> f1916_0_main_ArrayAccess(EOS(STATIC_1916), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, java.lang.Object(ARRAY(i58)), i56) :|: TRUE
+f1916_0_main_ArrayAccess(EOS(STATIC_1916), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, java.lang.Object(ARRAY(i58)), i56) -> f1918_0_main_ArrayAccess(EOS(STATIC_1918), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, java.lang.Object(ARRAY(i58)), i56) :|: TRUE
+f1918_0_main_ArrayAccess(EOS(STATIC_1918), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, java.lang.Object(ARRAY(i58)), i56) -> f1921_0_main_Load(EOS(STATIC_1921), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56) :|: i56 < i58
+f1921_0_main_Load(EOS(STATIC_1921), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56) -> f1926_0_main_Inc(EOS(STATIC_1926), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, i56) :|: TRUE
+f1926_0_main_Inc(EOS(STATIC_1926), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56, i56) -> f1929_0_main_InvokeMethod(EOS(STATIC_1929), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i56 + 1, i56) :|: TRUE
+f1929_0_main_InvokeMethod(EOS(STATIC_1929), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) -> f1933_0__init__Load(EOS(STATIC_1933), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) :|: TRUE
+f1933_0__init__Load(EOS(STATIC_1933), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) -> f1942_0__init__InvokeMethod(EOS(STATIC_1942), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) :|: TRUE
+f1942_0__init__InvokeMethod(EOS(STATIC_1942), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) -> f1949_0__init__Load(EOS(STATIC_1949), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) :|: TRUE
+f1949_0__init__Load(EOS(STATIC_1949), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) -> f1954_0__init__Load(EOS(STATIC_1954), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) :|: TRUE
+f1954_0__init__Load(EOS(STATIC_1954), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) -> f1958_0__init__FieldAccess(EOS(STATIC_1958), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) :|: TRUE
+f1958_0__init__FieldAccess(EOS(STATIC_1958), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) -> f1963_0__init__Load(EOS(STATIC_1963), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) :|: TRUE
+f1963_0__init__Load(EOS(STATIC_1963), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) -> f1968_0__init__Load(EOS(STATIC_1968), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) :|: TRUE
+f1968_0__init__Load(EOS(STATIC_1968), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) -> f1972_0__init__FieldAccess(EOS(STATIC_1972), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) :|: TRUE
+f1972_0__init__FieldAccess(EOS(STATIC_1972), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i56) -> f1980_0__init__Return(EOS(STATIC_1980), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f1980_0__init__Return(EOS(STATIC_1980), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f1985_0_main_Store(EOS(STATIC_1985), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f1985_0_main_Store(EOS(STATIC_1985), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f1990_0_main_Load(EOS(STATIC_1990), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f1990_0_main_Load(EOS(STATIC_1990), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2030_0_main_Load(EOS(STATIC_2030), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2030_0_main_Load(EOS(STATIC_2030), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2034_0_main_InvokeMethod(EOS(STATIC_2034), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2034_0_main_InvokeMethod(EOS(STATIC_2034), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2038_0_addToStart_Load(EOS(STATIC_2038), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2038_0_addToStart_Load(EOS(STATIC_2038), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2048_0_addToStart_New(EOS(STATIC_2048), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2048_0_addToStart_New(EOS(STATIC_2048), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2054_0_addToStart_Duplicate(EOS(STATIC_2054), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2054_0_addToStart_Duplicate(EOS(STATIC_2054), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2060_0_addToStart_Load(EOS(STATIC_2060), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2060_0_addToStart_Load(EOS(STATIC_2060), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2064_0_addToStart_Load(EOS(STATIC_2064), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2064_0_addToStart_Load(EOS(STATIC_2064), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2070_0_addToStart_Load(EOS(STATIC_2070), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2070_0_addToStart_Load(EOS(STATIC_2070), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2076_0_addToStart_FieldAccess(EOS(STATIC_2076), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2076_0_addToStart_FieldAccess(EOS(STATIC_2076), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2086_0_addToStart_InvokeMethod(EOS(STATIC_2086), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2086_0_addToStart_InvokeMethod(EOS(STATIC_2086), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2092_0__init__Load(EOS(STATIC_2092), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2092_0__init__Load(EOS(STATIC_2092), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2102_0__init__Load(EOS(STATIC_2102), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2102_0__init__Load(EOS(STATIC_2102), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2112_0__init__FieldAccess(EOS(STATIC_2112), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2112_0__init__FieldAccess(EOS(STATIC_2112), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2114_0__init__Load(EOS(STATIC_2114), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2114_0__init__Load(EOS(STATIC_2114), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2117_0__init__InvokeMethod(EOS(STATIC_2117), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2117_0__init__InvokeMethod(EOS(STATIC_2117), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2120_0__init__Load(EOS(STATIC_2120), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2120_0__init__Load(EOS(STATIC_2120), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2123_0__init__Load(EOS(STATIC_2123), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2123_0__init__Load(EOS(STATIC_2123), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2126_0__init__FieldAccess(EOS(STATIC_2126), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2126_0__init__FieldAccess(EOS(STATIC_2126), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2129_0__init__Load(EOS(STATIC_2129), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2129_0__init__Load(EOS(STATIC_2129), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2131_0__init__Load(EOS(STATIC_2131), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2131_0__init__Load(EOS(STATIC_2131), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2134_0__init__FieldAccess(EOS(STATIC_2134), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2134_0__init__FieldAccess(EOS(STATIC_2134), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2136_0__init__Return(EOS(STATIC_2136), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2136_0__init__Return(EOS(STATIC_2136), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2139_0_addToStart_FieldAccess(EOS(STATIC_2139), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2139_0_addToStart_FieldAccess(EOS(STATIC_2139), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2142_0_addToStart_Return(EOS(STATIC_2142), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2142_0_addToStart_Return(EOS(STATIC_2142), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2145_0_main_New(EOS(STATIC_2145), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2145_0_main_New(EOS(STATIC_2145), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2148_0_main_Duplicate(EOS(STATIC_2148), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2148_0_main_Duplicate(EOS(STATIC_2148), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2151_0_main_Load(EOS(STATIC_2151), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2151_0_main_Load(EOS(STATIC_2151), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2153_0_main_Load(EOS(STATIC_2153), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, java.lang.Object(ARRAY(i58))) :|: TRUE
+f2153_0_main_Load(EOS(STATIC_2153), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, java.lang.Object(ARRAY(i58))) -> f2156_0_main_ArrayAccess(EOS(STATIC_2156), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2156_0_main_ArrayAccess(EOS(STATIC_2156), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, java.lang.Object(ARRAY(i58)), i59) -> f2159_0_main_ArrayAccess(EOS(STATIC_2159), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, java.lang.Object(ARRAY(i58)), i59) :|: TRUE
+f2159_0_main_ArrayAccess(EOS(STATIC_2159), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, java.lang.Object(ARRAY(i58)), i59) -> f2163_0_main_Load(EOS(STATIC_2163), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) :|: i59 < i58
+f2163_0_main_Load(EOS(STATIC_2163), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59) -> f2167_0_main_Inc(EOS(STATIC_2167), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i59) :|: TRUE
+f2167_0_main_Inc(EOS(STATIC_2167), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59, i59) -> f2170_0_main_InvokeMethod(EOS(STATIC_2170), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i59 + 1, i59) :|: TRUE
+f2170_0_main_InvokeMethod(EOS(STATIC_2170), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) -> f2173_0__init__Load(EOS(STATIC_2173), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) :|: TRUE
+f2173_0__init__Load(EOS(STATIC_2173), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) -> f2178_0__init__InvokeMethod(EOS(STATIC_2178), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) :|: TRUE
+f2178_0__init__InvokeMethod(EOS(STATIC_2178), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) -> f2182_0__init__Load(EOS(STATIC_2182), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) :|: TRUE
+f2182_0__init__Load(EOS(STATIC_2182), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) -> f2186_0__init__Load(EOS(STATIC_2186), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) :|: TRUE
+f2186_0__init__Load(EOS(STATIC_2186), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) -> f2190_0__init__FieldAccess(EOS(STATIC_2190), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) :|: TRUE
+f2190_0__init__FieldAccess(EOS(STATIC_2190), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) -> f2200_0__init__Load(EOS(STATIC_2200), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) :|: TRUE
+f2200_0__init__Load(EOS(STATIC_2200), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) -> f2207_0__init__Load(EOS(STATIC_2207), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) :|: TRUE
+f2207_0__init__Load(EOS(STATIC_2207), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) -> f2210_0__init__FieldAccess(EOS(STATIC_2210), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) :|: TRUE
+f2210_0__init__FieldAccess(EOS(STATIC_2210), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i59) -> f2217_0__init__Return(EOS(STATIC_2217), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2217_0__init__Return(EOS(STATIC_2217), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2224_0_main_Store(EOS(STATIC_2224), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2224_0_main_Store(EOS(STATIC_2224), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2225_0_main_Load(EOS(STATIC_2225), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2225_0_main_Load(EOS(STATIC_2225), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2228_0_main_Load(EOS(STATIC_2228), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2228_0_main_Load(EOS(STATIC_2228), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2231_0_main_InvokeMethod(EOS(STATIC_2231), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2231_0_main_InvokeMethod(EOS(STATIC_2231), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2234_0_addToStart_Load(EOS(STATIC_2234), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2234_0_addToStart_Load(EOS(STATIC_2234), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2243_0_addToStart_New(EOS(STATIC_2243), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2243_0_addToStart_New(EOS(STATIC_2243), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2246_0_addToStart_Duplicate(EOS(STATIC_2246), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2246_0_addToStart_Duplicate(EOS(STATIC_2246), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2248_0_addToStart_Load(EOS(STATIC_2248), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2248_0_addToStart_Load(EOS(STATIC_2248), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2250_0_addToStart_Load(EOS(STATIC_2250), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2250_0_addToStart_Load(EOS(STATIC_2250), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2252_0_addToStart_Load(EOS(STATIC_2252), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2252_0_addToStart_Load(EOS(STATIC_2252), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2254_0_addToStart_FieldAccess(EOS(STATIC_2254), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2254_0_addToStart_FieldAccess(EOS(STATIC_2254), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2256_0_addToStart_InvokeMethod(EOS(STATIC_2256), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2256_0_addToStart_InvokeMethod(EOS(STATIC_2256), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2258_0__init__Load(EOS(STATIC_2258), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2258_0__init__Load(EOS(STATIC_2258), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2261_0__init__Load(EOS(STATIC_2261), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2261_0__init__Load(EOS(STATIC_2261), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2262_0__init__FieldAccess(EOS(STATIC_2262), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2262_0__init__FieldAccess(EOS(STATIC_2262), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2263_0__init__Load(EOS(STATIC_2263), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2263_0__init__Load(EOS(STATIC_2263), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2264_0__init__InvokeMethod(EOS(STATIC_2264), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2264_0__init__InvokeMethod(EOS(STATIC_2264), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2265_0__init__Load(EOS(STATIC_2265), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2265_0__init__Load(EOS(STATIC_2265), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2266_0__init__Load(EOS(STATIC_2266), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2266_0__init__Load(EOS(STATIC_2266), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2267_0__init__FieldAccess(EOS(STATIC_2267), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2267_0__init__FieldAccess(EOS(STATIC_2267), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2268_0__init__Load(EOS(STATIC_2268), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2268_0__init__Load(EOS(STATIC_2268), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2269_0__init__Load(EOS(STATIC_2269), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2269_0__init__Load(EOS(STATIC_2269), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2270_0__init__FieldAccess(EOS(STATIC_2270), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2270_0__init__FieldAccess(EOS(STATIC_2270), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2271_0__init__Return(EOS(STATIC_2271), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2271_0__init__Return(EOS(STATIC_2271), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2272_0_addToStart_FieldAccess(EOS(STATIC_2272), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2272_0_addToStart_FieldAccess(EOS(STATIC_2272), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2273_0_addToStart_Return(EOS(STATIC_2273), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2273_0_addToStart_Return(EOS(STATIC_2273), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2274_0_main_New(EOS(STATIC_2274), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2274_0_main_New(EOS(STATIC_2274), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2275_0_main_Duplicate(EOS(STATIC_2275), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2275_0_main_Duplicate(EOS(STATIC_2275), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2276_0_main_Load(EOS(STATIC_2276), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2276_0_main_Load(EOS(STATIC_2276), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2277_0_main_Load(EOS(STATIC_2277), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, java.lang.Object(ARRAY(i58))) :|: TRUE
+f2277_0_main_Load(EOS(STATIC_2277), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, java.lang.Object(ARRAY(i58))) -> f2278_0_main_ArrayAccess(EOS(STATIC_2278), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2278_0_main_ArrayAccess(EOS(STATIC_2278), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, java.lang.Object(ARRAY(i58)), i70) -> f2279_0_main_ArrayAccess(EOS(STATIC_2279), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, java.lang.Object(ARRAY(i58)), i70) :|: TRUE
+f2279_0_main_ArrayAccess(EOS(STATIC_2279), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, java.lang.Object(ARRAY(i58)), i70) -> f2281_0_main_Load(EOS(STATIC_2281), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) :|: i70 < i58
+f2281_0_main_Load(EOS(STATIC_2281), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70) -> f2283_0_main_Inc(EOS(STATIC_2283), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i70) :|: TRUE
+f2283_0_main_Inc(EOS(STATIC_2283), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70, i70) -> f2284_0_main_InvokeMethod(EOS(STATIC_2284), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i70 + 1, i70) :|: TRUE
+f2284_0_main_InvokeMethod(EOS(STATIC_2284), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) -> f2286_0__init__Load(EOS(STATIC_2286), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) :|: TRUE
+f2286_0__init__Load(EOS(STATIC_2286), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) -> f2288_0__init__InvokeMethod(EOS(STATIC_2288), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) :|: TRUE
+f2288_0__init__InvokeMethod(EOS(STATIC_2288), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) -> f2290_0__init__Load(EOS(STATIC_2290), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) :|: TRUE
+f2290_0__init__Load(EOS(STATIC_2290), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) -> f2292_0__init__Load(EOS(STATIC_2292), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) :|: TRUE
+f2292_0__init__Load(EOS(STATIC_2292), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) -> f2293_0__init__FieldAccess(EOS(STATIC_2293), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) :|: TRUE
+f2293_0__init__FieldAccess(EOS(STATIC_2293), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) -> f2295_0__init__Load(EOS(STATIC_2295), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) :|: TRUE
+f2295_0__init__Load(EOS(STATIC_2295), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) -> f2297_0__init__Load(EOS(STATIC_2297), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) :|: TRUE
+f2297_0__init__Load(EOS(STATIC_2297), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) -> f2298_0__init__FieldAccess(EOS(STATIC_2298), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) :|: TRUE
+f2298_0__init__FieldAccess(EOS(STATIC_2298), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72, i70) -> f2300_0__init__Return(EOS(STATIC_2300), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2300_0__init__Return(EOS(STATIC_2300), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2302_0_main_Store(EOS(STATIC_2302), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2302_0_main_Store(EOS(STATIC_2302), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2303_0_main_Load(EOS(STATIC_2303), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2303_0_main_Load(EOS(STATIC_2303), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2305_0_main_Load(EOS(STATIC_2305), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2305_0_main_Load(EOS(STATIC_2305), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2307_0_main_InvokeMethod(EOS(STATIC_2307), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2307_0_main_InvokeMethod(EOS(STATIC_2307), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2309_0_addToStart_Load(EOS(STATIC_2309), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2309_0_addToStart_Load(EOS(STATIC_2309), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2312_0_addToStart_New(EOS(STATIC_2312), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2312_0_addToStart_New(EOS(STATIC_2312), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2314_0_addToStart_Duplicate(EOS(STATIC_2314), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2314_0_addToStart_Duplicate(EOS(STATIC_2314), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2316_0_addToStart_Load(EOS(STATIC_2316), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2316_0_addToStart_Load(EOS(STATIC_2316), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2318_0_addToStart_Load(EOS(STATIC_2318), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2318_0_addToStart_Load(EOS(STATIC_2318), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2321_0_addToStart_Load(EOS(STATIC_2321), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2321_0_addToStart_Load(EOS(STATIC_2321), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2323_0_addToStart_FieldAccess(EOS(STATIC_2323), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2323_0_addToStart_FieldAccess(EOS(STATIC_2323), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2325_0_addToStart_InvokeMethod(EOS(STATIC_2325), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2325_0_addToStart_InvokeMethod(EOS(STATIC_2325), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2327_0__init__Load(EOS(STATIC_2327), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2327_0__init__Load(EOS(STATIC_2327), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2330_0__init__Load(EOS(STATIC_2330), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2330_0__init__Load(EOS(STATIC_2330), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2331_0__init__FieldAccess(EOS(STATIC_2331), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2331_0__init__FieldAccess(EOS(STATIC_2331), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2332_0__init__Load(EOS(STATIC_2332), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2332_0__init__Load(EOS(STATIC_2332), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2333_0__init__InvokeMethod(EOS(STATIC_2333), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2333_0__init__InvokeMethod(EOS(STATIC_2333), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2334_0__init__Load(EOS(STATIC_2334), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2334_0__init__Load(EOS(STATIC_2334), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2335_0__init__Load(EOS(STATIC_2335), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2335_0__init__Load(EOS(STATIC_2335), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2336_0__init__FieldAccess(EOS(STATIC_2336), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2336_0__init__FieldAccess(EOS(STATIC_2336), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2337_0__init__Load(EOS(STATIC_2337), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2337_0__init__Load(EOS(STATIC_2337), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2338_0__init__Load(EOS(STATIC_2338), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2338_0__init__Load(EOS(STATIC_2338), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2339_0__init__FieldAccess(EOS(STATIC_2339), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2339_0__init__FieldAccess(EOS(STATIC_2339), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2340_0__init__Return(EOS(STATIC_2340), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2340_0__init__Return(EOS(STATIC_2340), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2341_0_addToStart_FieldAccess(EOS(STATIC_2341), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2341_0_addToStart_FieldAccess(EOS(STATIC_2341), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2344_0_addToStart_Return(EOS(STATIC_2344), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2344_0_addToStart_Return(EOS(STATIC_2344), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2345_0_main_Inc(EOS(STATIC_2345), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) :|: TRUE
+f2345_0_main_Inc(EOS(STATIC_2345), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72) -> f2346_0_main_JMP(EOS(STATIC_2346), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i72 + 1) :|: TRUE
+f2346_0_main_JMP(EOS(STATIC_2346), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i73) -> f2359_0_main_Load(EOS(STATIC_2359), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i73) :|: TRUE
+f2359_0_main_Load(EOS(STATIC_2359), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i73) -> f1901_0_main_Load(EOS(STATIC_1901), java.lang.Object(ARRAY(i58)), java.lang.Object(ARRAY(i58)), i73) :|: TRUE
+f1901_0_main_Load(EOS(STATIC_1901), java.lang.Object(o795sub), java.lang.Object(o795sub), i56) -> f1902_0_main_Load(EOS(STATIC_1902), java.lang.Object(o795sub), java.lang.Object(o795sub), i56, i56) :|: TRUE
+Combined rules. Obtained 1 IRulesP rules:
+f1902_0_main_Load(EOS(STATIC_1902), java.lang.Object(ARRAY(i58:0)), java.lang.Object(ARRAY(i58:0)), i56:0, i56:0) -> f1902_0_main_Load(EOS(STATIC_1902), java.lang.Object(ARRAY(i58:0)), java.lang.Object(ARRAY(i58:0)), i56:0 + 4, i56:0 + 4) :|: i58:0 > i56:0 + 1 && i58:0 > i56:0 + 2 && i58:0 > -1
+Filtered constant ground arguments:
+   f1902_0_main_Load(x1, x2, x3, x4, x5) -> f1902_0_main_Load(x2, x3, x4, x5)
+   EOS(x1) -> EOS
+Filtered duplicate arguments:
+   f1902_0_main_Load(x1, x2, x3, x4) -> f1902_0_main_Load(x2, x4)
+Finished conversion. Obtained 1 rules.P rules:
+f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), i56:0, i58:0) -> f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), i56:0 + 4, i58:0) :|: i58:0 > i56:0 + 2 && i58:0 > -1 && i58:0 > i56:0 + 1
+
+----------------------------------------
+
+(19)
+Obligation:
+Rules:
+f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), i56:0, i58:0) -> f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), i56:0 + 4, i58:0) :|: i58:0 > i56:0 + 2 && i58:0 > -1 && i58:0 > i56:0 + 1
+
+----------------------------------------
+
+(20) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(21)
+Obligation:
+Rules:
+f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), i56:0, i58:0) -> f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), arith, i58:0) :|: i58:0 > i56:0 + 2 && i58:0 > -1 && i58:0 > i56:0 + 1 && arith = i56:0 + 4
+
+----------------------------------------
+
+(22) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), i56:0, i58:0) -> f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), arith, i58:0) :|: i58:0 > i56:0 + 2 && i58:0 > -1 && i58:0 > i56:0 + 1 && arith = i56:0 + 4
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(23)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), i56:0, i58:0) -> f1902_0_main_Load(java.lang.Object(ARRAY(i58:0)), arith, i58:0) :|: i58:0 > i56:0 + 2 && i58:0 > -1 && i58:0 > i56:0 + 1 && arith = i56:0 + 4
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(24) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(25)
+Obligation:
+Rules:
+f1902_0_main_Load(java.lang.Object(ARRAY(i58:0:0)), i56:0:0, i58:0:0) -> f1902_0_main_Load(java.lang.Object(ARRAY(i58:0:0)), i56:0:0 + 4, i58:0:0) :|: i58:0:0 > i56:0:0 + 2 && i58:0:0 > -1 && i58:0:0 > i56:0:0 + 1
+
+----------------------------------------
+
+(26) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f1902_0_main_Load(VARIABLE, INTEGER, INTEGER)
+java.lang.Object(VARIABLE)
+ARRAY(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(27)
+Obligation:
+Rules:
+f1902_0_main_Load(c, i56:0:0, i58:0:0) -> f1902_0_main_Load(c1, c2, i58:0:0) :|: c2 = i56:0:0 + 4 && (c1 = 0 && c = 0) && (i58:0:0 > i56:0:0 + 2 && i58:0:0 > -1 && i58:0:0 > i56:0:0 + 1)
+
+----------------------------------------
+
+(28) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f1902_0_main_Load(x, x1, x2)] = c*x - x1 + x2
+
+The following rules are decreasing:
+f1902_0_main_Load(c, i56:0:0, i58:0:0) -> f1902_0_main_Load(c1, c2, i58:0:0) :|: c2 = i56:0:0 + 4 && (c1 = 0 && c = 0) && (i58:0:0 > i56:0:0 + 2 && i58:0:0 > -1 && i58:0:0 > i56:0:0 + 1)
+The following rules are bounded:
+f1902_0_main_Load(c, i56:0:0, i58:0:0) -> f1902_0_main_Load(c1, c2, i58:0:0) :|: c2 = i56:0:0 + 4 && (c1 = 0 && c = 0) && (i58:0:0 > i56:0:0 + 2 && i58:0:0 > -1 && i58:0:0 > i56:0:0 + 1)
+
+----------------------------------------
+
+(29)
+YES

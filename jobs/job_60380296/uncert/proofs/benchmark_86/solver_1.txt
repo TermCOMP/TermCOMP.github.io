@@ -1,0 +1,245 @@
+MAYBE
+proof of /hpcwork/ff862203/termcomp25/benchmarks/RfgS7.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could not be shown:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+public class Sudoku {
+    private int grid[][];
+
+    public Sudoku (int aGrid[][]) {
+	grid = new int[9][9];
+	for (int i = 0; i < 9; i++)
+	    for (int j = 0; j < 9; j++)
+		grid[i][j] = aGrid[i][j];
+    }
+
+    /*
+    public String toString () {
+	String ch = "+---------+---------+---------+\n";
+	for (int i = 0; i < 9; i++) {
+	    ch += "|";
+	    for (int j = 0; j < 9; j++) {
+		if (grid[i][j] == 0) ch += "   ";
+		else ch += " " + grid[i][j] + " ";
+		if (j % 3 == 2) ch += "|";
+	    }
+	    ch += "\n";
+	    if (i % 3 == 2)
+		ch += "+---------+---------+---------+\n";
+	}
+	ch += "\n";
+	return ch;
+    }
+    */
+
+    public boolean resolve () {
+	int n = 0;
+	for (int i = 0; i < 9; i++)
+	    for (int j = 0; j < 9; j++)
+		if (grid[i][j] == 0) n++;
+	return resolve_aux(n);
+    }
+
+    private  boolean resolve_aux (int nbEmpty) {
+	if (nbEmpty > 0) {
+	    int i = 0, j = 0;
+	    boolean emptyCell = false;
+	    for (i = 0; i < 9; i++) {
+		for (j = 0; j < 9; j++)
+		    if (grid[i][j] == 0) { emptyCell = true; break; }
+		if (emptyCell) break;
+	    }
+
+	    boolean T[] = new boolean[9];
+	    possibleValues(i, j, T);
+	    for (int k = 0; k < 9; k++)
+		if (T[k]) {
+		    grid[i][j] = k+1;
+		    if (resolve_aux(nbEmpty - 1))
+			return true;
+		    else
+			grid[i][j] = 0;
+		}
+	    return false;
+	}
+	else return true;
+    }
+    
+    private void possibleValues (int l, int c, boolean T[]) {
+	for (int k = 0; k < 9; k++) T[k] = true;
+
+	for (int j = 0; j < 9; j++)
+	    if (grid[l][j] != 0) T[grid[l][j]-1] = false;
+
+	for (int i = 0; i < 9; i++)
+	    if (grid[i][c] != 0) T[grid[i][c]-1] = false;
+
+	l = l - (l % 3);
+	c = c - (c % 3);
+	int l3 = l+3, c3 = c+3;
+	for (int i = l; i < l3; i++)
+	    for (int j = c; j < c3; j++)
+		if (grid[i][j] != 0) T[grid[i][j]-1] = false;
+    }
+
+    public static void main(String args[]) {
+	if (args.length >= 2) {
+	    int n = args[0].length() % 10;
+	    int m = args[1].length() % 10;
+	    int example[][] = {
+		{0, 3, 0,  0, 0, 0,  0, 6, 0},
+		{7, 0, 0,  0, 1, 0,  0, 0, 9},
+		{4, 0, 0,  7, 0, 6,  0, 0, 5},
+		
+		{0, 0, n,  3, 0, 9,  7, 0, 0},
+		{0, 0, 0,  0, 2, 0,  0, 0, 0},
+		{0, 0, m,  1, 0, 4,  9, 0, 0},
+		
+		{6, 0, 0,  2, 0, 8,  0, 0, 1},
+		{8, 0, 0,  0, 5, 0,  0, 0, 2},
+		{0, 5, 0,  0, 0, 0,  0, 4 ,0}
+	    };
+	    
+	    (new Sudoku(example)).resolve();
+	    /*
+	      Sudoku S = new Sudoku(example);
+	      System.out.println(S);
+	      if (S.resolve()) System.out.println(S);
+	      else System.out.println("No solution !\n\n");
+	    */
+	}
+    }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+public class Sudoku {
+    private int grid[][];
+
+    public Sudoku (int aGrid[][]) {
+	grid = new int[9][9];
+	for (int i = 0; i < 9; i++)
+	    for (int j = 0; j < 9; j++)
+		grid[i][j] = aGrid[i][j];
+    }
+
+    /*
+    public String toString () {
+	String ch = "+---------+---------+---------+\n";
+	for (int i = 0; i < 9; i++) {
+	    ch += "|";
+	    for (int j = 0; j < 9; j++) {
+		if (grid[i][j] == 0) ch += "   ";
+		else ch += " " + grid[i][j] + " ";
+		if (j % 3 == 2) ch += "|";
+	    }
+	    ch += "\n";
+	    if (i % 3 == 2)
+		ch += "+---------+---------+---------+\n";
+	}
+	ch += "\n";
+	return ch;
+    }
+    */
+
+    public boolean resolve () {
+	int n = 0;
+	for (int i = 0; i < 9; i++)
+	    for (int j = 0; j < 9; j++)
+		if (grid[i][j] == 0) n++;
+	return resolve_aux(n);
+    }
+
+    private  boolean resolve_aux (int nbEmpty) {
+	if (nbEmpty > 0) {
+	    int i = 0, j = 0;
+	    boolean emptyCell = false;
+	    for (i = 0; i < 9; i++) {
+		for (j = 0; j < 9; j++)
+		    if (grid[i][j] == 0) { emptyCell = true; break; }
+		if (emptyCell) break;
+	    }
+
+	    boolean T[] = new boolean[9];
+	    possibleValues(i, j, T);
+	    for (int k = 0; k < 9; k++)
+		if (T[k]) {
+		    grid[i][j] = k+1;
+		    if (resolve_aux(nbEmpty - 1))
+			return true;
+		    else
+			grid[i][j] = 0;
+		}
+	    return false;
+	}
+	else return true;
+    }
+    
+    private void possibleValues (int l, int c, boolean T[]) {
+	for (int k = 0; k < 9; k++) T[k] = true;
+
+	for (int j = 0; j < 9; j++)
+	    if (grid[l][j] != 0) T[grid[l][j]-1] = false;
+
+	for (int i = 0; i < 9; i++)
+	    if (grid[i][c] != 0) T[grid[i][c]-1] = false;
+
+	l = l - (l % 3);
+	c = c - (c % 3);
+	int l3 = l+3, c3 = c+3;
+	for (int i = l; i < l3; i++)
+	    for (int j = c; j < c3; j++)
+		if (grid[i][j] != 0) T[grid[i][j]-1] = false;
+    }
+
+    public static void main(String args[]) {
+	if (args.length >= 2) {
+	    int n = args[0].length() % 10;
+	    int m = args[1].length() % 10;
+	    int example[][] = {
+		{0, 3, 0,  0, 0, 0,  0, 6, 0},
+		{7, 0, 0,  0, 1, 0,  0, 0, 9},
+		{4, 0, 0,  7, 0, 6,  0, 0, 5},
+		
+		{0, 0, n,  3, 0, 9,  7, 0, 0},
+		{0, 0, 0,  0, 2, 0,  0, 0, 0},
+		{0, 0, m,  1, 0, 4,  9, 0, 0},
+		
+		{6, 0, 0,  2, 0, 8,  0, 0, 1},
+		{8, 0, 0,  0, 5, 0,  0, 0, 2},
+		{0, 5, 0,  0, 0, 0,  0, 4 ,0}
+	    };
+	    
+	    (new Sudoku(example)).resolve();
+	    /*
+	      Sudoku S = new Sudoku(example);
+	      System.out.println(S);
+	      if (S.resolve()) System.out.println(S);
+	      else System.out.println("No solution !\n\n");
+	    */
+	}
+    }
+}
+
+

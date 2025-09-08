@@ -1,0 +1,207 @@
+YES
+We consider the system p8nTd.
+
+  Alphabet:
+
+    O : [] --> a 
+    cons : [a * b] --> b 
+    double : [b] --> b 
+    inc : [b] --> b 
+    map : [a -> a * b] --> b 
+    nil : [] --> b 
+    plus : [a] --> a -> a 
+    s : [a] --> a 
+    times : [a] --> a -> a 
+
+  Rules:
+
+    plus(O) X => X 
+    plus(s(X)) Y => s(plus(X) Y) 
+    times(O) X => O 
+    times(s(X)) Y => plus(times(X) Y) Y 
+    inc(X) => map(plus(s(O)), X) 
+    double(X) => map(times(s(s(O))), X) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O) X >? X 
+  plus(s(X)) Y >? s(plus(X) Y) 
+  times(O) X >? O 
+  times(s(X)) Y >? plus(times(X) Y) Y 
+  inc(X) >? map(plus(s(O)), X) 
+  double(X) >? map(times(s(s(O))), X) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[nil]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o}, cons, double, inc, map, plus, s, times}, and the following precedence: double > inc > map > cons > times > plus > s > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(plus(_|_), X) >= X 
+  @_{o -> o}(plus(s(X)), Y) >= s(@_{o -> o}(plus(X), Y)) 
+  @_{o -> o}(times(_|_), X) >= _|_ 
+  @_{o -> o}(times(s(X)), Y) > @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y) 
+  inc(X) >= map(plus(s(_|_)), X) 
+  double(X) >= map(times(s(s(_|_))), X) 
+  map(F, _|_) >= _|_ 
+  map(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map(F, Y)) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(plus(_|_), X) >= X  because [2], by (Star) 
+  2] @_{o -> o}*(plus(_|_), X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] @_{o -> o}(plus(s(X)), Y) >= s(@_{o -> o}(plus(X), Y))  because [5], by (Star) 
+  5] @_{o -> o}*(plus(s(X)), Y) >= s(@_{o -> o}(plus(X), Y))  because [6], by (Select) 
+  6] plus(s(X)) @_{o -> o}*(plus(s(X)), Y) >= s(@_{o -> o}(plus(X), Y))  because [7] 
+  7] plus*(s(X), @_{o -> o}*(plus(s(X)), Y)) >= s(@_{o -> o}(plus(X), Y))  because plus > s and [8], by (Copy) 
+  8] plus*(s(X), @_{o -> o}*(plus(s(X)), Y)) >= @_{o -> o}(plus(X), Y)  because plus > @_{o -> o}, [9] and [13], by (Copy) 
+  9] plus*(s(X), @_{o -> o}*(plus(s(X)), Y)) >= plus(X)  because plus in Mul and [10], by (Stat) 
+  10] s(X) > X  because [11], by definition 
+  11] s*(X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+  13] plus*(s(X), @_{o -> o}*(plus(s(X)), Y)) >= Y  because [14], by (Select) 
+  14] @_{o -> o}*(plus(s(X)), Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+
+  16] @_{o -> o}(times(_|_), X) >= _|_  by (Bot) 
+
+  17] @_{o -> o}(times(s(X)), Y) > @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y)  because [18], by definition 
+  18] @_{o -> o}*(times(s(X)), Y) >= @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y)  because [19], by (Select) 
+  19] times(s(X)) @_{o -> o}*(times(s(X)), Y) >= @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y)  because [20] 
+  20] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= @_{o -> o}(plus(@_{o -> o}(times(X), Y)), Y)  because times > @_{o -> o}, [21] and [27], by (Copy) 
+  21] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= plus(@_{o -> o}(times(X), Y))  because times > plus and [22], by (Copy) 
+  22] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= @_{o -> o}(times(X), Y)  because times > @_{o -> o}, [23] and [27], by (Copy) 
+  23] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= times(X)  because times in Mul and [24], by (Stat) 
+  24] s(X) > X  because [25], by definition 
+  25] s*(X) >= X  because [26], by (Select) 
+  26] X >= X  by (Meta) 
+  27] times*(s(X), @_{o -> o}*(times(s(X)), Y)) >= Y  because [28], by (Select) 
+  28] @_{o -> o}*(times(s(X)), Y) >= Y  because [29], by (Select) 
+  29] Y >= Y  by (Meta) 
+
+  30] inc(X) >= map(plus(s(_|_)), X)  because [31], by (Star) 
+  31] inc*(X) >= map(plus(s(_|_)), X)  because inc > map, [32] and [35], by (Copy) 
+  32] inc*(X) >= plus(s(_|_))  because inc > plus and [33], by (Copy) 
+  33] inc*(X) >= s(_|_)  because inc > s and [34], by (Copy) 
+  34] inc*(X) >= _|_  by (Bot) 
+  35] inc*(X) >= X  because [36], by (Select) 
+  36] X >= X  by (Meta) 
+
+  37] double(X) >= map(times(s(s(_|_))), X)  because [38], by (Star) 
+  38] double*(X) >= map(times(s(s(_|_))), X)  because double > map, [39] and [43], by (Copy) 
+  39] double*(X) >= times(s(s(_|_)))  because double > times and [40], by (Copy) 
+  40] double*(X) >= s(s(_|_))  because double > s and [41], by (Copy) 
+  41] double*(X) >= s(_|_)  because double > s and [42], by (Copy) 
+  42] double*(X) >= _|_  by (Bot) 
+  43] double*(X) >= X  because [44], by (Select) 
+  44] X >= X  by (Meta) 
+
+  45] map(F, _|_) >= _|_  by (Bot) 
+
+  46] map(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map(F, Y))  because [47], by definition 
+  47] map*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because map > cons, [48] and [55], by (Copy) 
+  48] map*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because map > @_{o -> o}, [49] and [51], by (Copy) 
+  49] map*(F, cons(X, Y)) >= F  because [50], by (Select) 
+  50] F >= F  by (Meta) 
+  51] map*(F, cons(X, Y)) >= X  because [52], by (Select) 
+  52] cons(X, Y) >= X  because [53], by (Star) 
+  53] cons*(X, Y) >= X  because [54], by (Select) 
+  54] X >= X  by (Meta) 
+  55] map*(F, cons(X, Y)) >= map(F, Y)  because map in Mul, [56] and [57], by (Stat) 
+  56] F >= F  by (Meta) 
+  57] cons(X, Y) > Y  because [58], by definition 
+  58] cons*(X, Y) >= Y  because [59], by (Select) 
+  59] Y >= Y  by (Meta) 
+
+We can thus remove the following rules:
+
+  times(s(X)) Y => plus(times(X) Y) Y 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O) X >? X 
+  plus(s(X)) Y >? s(plus(X) Y) 
+  times(O) X >? O 
+  inc(X) >? map(plus(s(O)), X) 
+  double(X) >? map(times(s(s(O))), X) 
+  map(F, nil) >? nil 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  double = Lam[y0].3 + 3*y0 
+  inc = Lam[y0].3 + 3*y0 
+  map = Lam[G0;y1].1 + y1 + 2*G0(y1) 
+  nil = 0 
+  plus = Lam[y0;y1].y0 
+  s = Lam[y0].y0 
+  times = Lam[y0;y1].2*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[plus(O) _x0]] = x0 >= x0 = [[_x0]] 
+  [[plus(s(_x0)) _x1]] = x0 + x1 >= x0 + x1 = [[s(plus(_x0) _x1)]] 
+  [[times(O) _x0]] = x0 >= 0 = [[O]] 
+  [[inc(_x0)]] = 3 + 3*x0 > 1 + x0 = [[map(plus(s(O)), _x0)]] 
+  [[double(_x0)]] = 3 + 3*x0 > 1 + x0 = [[map(times(s(s(O))), _x0)]] 
+  [[map(_F0, nil)]] = 1 + 2*F0(0) > 0 = [[nil]] 
+
+We can thus remove the following rules:
+
+  inc(X) => map(plus(s(O)), X) 
+  double(X) => map(times(s(s(O))), X) 
+  map(F, nil) => nil 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O, X) >? X 
+  plus(s(X), Y) >? s(plus(X, Y)) 
+  times(O, X) >? O 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  plus = Lam[y0;y1].3 + y1 + 3*y0 
+  s = Lam[y0].3 + y0 
+  times = Lam[y0;y1].3 + y1 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[plus(O, _x0)]] = 3 + x0 > x0 = [[_x0]] 
+  [[plus(s(_x0), _x1)]] = 12 + x1 + 3*x0 > 6 + x1 + 3*x0 = [[s(plus(_x0, _x1))]] 
+  [[times(O, _x0)]] = 3 + x0 > 0 = [[O]] 
+
+We can thus remove the following rules:
+
+  plus(O, X) => X 
+  plus(s(X), Y) => s(plus(X, Y)) 
+  times(O, X) => O 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

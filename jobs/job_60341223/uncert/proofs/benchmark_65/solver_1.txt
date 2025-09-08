@@ -1,0 +1,400 @@
+YES
+We consider the system SceEj.
+
+  Alphabet:
+
+    O : [] --> nat 
+    mult : [nat * nat] --> nat 
+    plus : [nat * nat] --> nat 
+    plus3 : [nat * nat * nat] --> nat 
+    rec : [nat * nat * nat -> nat -> nat] --> nat 
+    s : [nat] --> nat 
+    succ2 : [nat * nat] --> nat 
+
+  Rules:
+
+    rec(O, X, F) => X 
+    rec(s(X), Y, F) => F X rec(X, Y, F) 
+    succ2(X, Y) => s(Y) 
+    plus(X, Y) => rec(X, Y, /\x./\y.succ2(x, y)) 
+    plus3(X, Y, Z) => plus(X, plus(Y, Z)) 
+    mult(X, Y) => rec(X, O, /\x./\y.plus3(Y, x, y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(O, X, F) >? X 
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+  succ2(X, Y) >? s(Y) 
+  plus(X, Y) >? rec(X, Y, /\x./\y.succ2(x, y)) 
+  plus3(X, Y, Z) >? plus(X, plus(Y, Z)) 
+  mult(X, Y) >? rec(X, O, /\x./\y.plus3(Y, x, y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, mult, plus, plus3, rec, s, succ2}, and the following precedence: mult > plus3 > plus > @_{o -> o -> o} = rec > @_{o -> o} > succ2 > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  rec(_|_, X, F) > X 
+  rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F)) 
+  succ2(X, Y) >= s(Y) 
+  plus(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y)) 
+  plus3(X, Y, Z) >= plus(X, plus(Y, Z)) 
+  mult(X, Y) >= rec(X, _|_, /\x./\y.plus3(Y, x, y)) 
+
+With these choices, we have:
+
+  1] rec(_|_, X, F) > X  because [2], by definition 
+  2] rec*(_|_, X, F) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [5], by (Star) 
+  5] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [6] and [11], by (Copy) 
+  6] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec = @_{o -> o -> o}, rec in Mul, [7] and [10], by (Stat) 
+  7] s(X) > X  because [8], by definition 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] F >= F  by (Meta) 
+  11] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [7], [12] and [10], by (Stat) 
+  12] Y >= Y  by (Meta) 
+
+  13] succ2(X, Y) >= s(Y)  because [14], by (Star) 
+  14] succ2*(X, Y) >= s(Y)  because succ2 > s and [15], by (Copy) 
+  15] succ2*(X, Y) >= Y  because [16], by (Select) 
+  16] Y >= Y  by (Meta) 
+
+  17] plus(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y))  because [18], by (Star) 
+  18] plus*(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y))  because plus > rec, [19], [21] and [23], by (Copy) 
+  19] plus*(X, Y) >= X  because [20], by (Select) 
+  20] X >= X  by (Meta) 
+  21] plus*(X, Y) >= Y  because [22], by (Select) 
+  22] Y >= Y  by (Meta) 
+  23] plus*(X, Y) >= /\y./\z.succ2(y, z)  because [24], by (F-Abs) 
+  24] plus*(X, Y, x) >= /\z.succ2(x, z)  because [25], by (F-Abs) 
+  25] plus*(X, Y, x, y) >= succ2(x, y)  because plus > succ2, [26] and [28], by (Copy) 
+  26] plus*(X, Y, x, y) >= x  because [27], by (Select) 
+  27] x >= x  by (Var) 
+  28] plus*(X, Y, x, y) >= y  because [29], by (Select) 
+  29] y >= y  by (Var) 
+
+  30] plus3(X, Y, Z) >= plus(X, plus(Y, Z))  because [31], by (Star) 
+  31] plus3*(X, Y, Z) >= plus(X, plus(Y, Z))  because plus3 > plus, [32] and [34], by (Copy) 
+  32] plus3*(X, Y, Z) >= X  because [33], by (Select) 
+  33] X >= X  by (Meta) 
+  34] plus3*(X, Y, Z) >= plus(Y, Z)  because plus3 > plus, [35] and [37], by (Copy) 
+  35] plus3*(X, Y, Z) >= Y  because [36], by (Select) 
+  36] Y >= Y  by (Meta) 
+  37] plus3*(X, Y, Z) >= Z  because [38], by (Select) 
+  38] Z >= Z  by (Meta) 
+
+  39] mult(X, Y) >= rec(X, _|_, /\x./\y.plus3(Y, x, y))  because [40], by (Star) 
+  40] mult*(X, Y) >= rec(X, _|_, /\x./\y.plus3(Y, x, y))  because mult > rec, [41], [43] and [44], by (Copy) 
+  41] mult*(X, Y) >= X  because [42], by (Select) 
+  42] X >= X  by (Meta) 
+  43] mult*(X, Y) >= _|_  by (Bot) 
+  44] mult*(X, Y) >= /\y./\z.plus3(Y, y, z)  because [45], by (F-Abs) 
+  45] mult*(X, Y, x) >= /\z.plus3(Y, x, z)  because [46], by (F-Abs) 
+  46] mult*(X, Y, x, y) >= plus3(Y, x, y)  because mult > plus3, [47], [49] and [51], by (Copy) 
+  47] mult*(X, Y, x, y) >= Y  because [48], by (Select) 
+  48] Y >= Y  by (Meta) 
+  49] mult*(X, Y, x, y) >= x  because [50], by (Select) 
+  50] x >= x  by (Var) 
+  51] mult*(X, Y, x, y) >= y  because [52], by (Select) 
+  52] y >= y  by (Var) 
+
+We can thus remove the following rules:
+
+  rec(O, X, F) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+  succ2(X, Y) >? s(Y) 
+  plus(X, Y) >? rec(X, Y, /\x./\y.succ2(x, y)) 
+  plus3(X, Y, Z) >? plus(X, plus(Y, Z)) 
+  mult(X, Y) >? rec(X, O, /\x./\y.plus3(Y, x, y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, mult, plus, plus3, rec, s, succ2}, and the following precedence: mult > plus3 > plus > rec > @_{o -> o -> o} > @_{o -> o} > succ2 > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F)) 
+  succ2(X, Y) >= s(Y) 
+  plus(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y)) 
+  plus3(X, Y, Z) > plus(X, plus(Y, Z)) 
+  mult(X, Y) >= rec(X, _|_, /\x./\y.plus3(Y, x, y)) 
+
+With these choices, we have:
+
+  1] rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [2], by (Star) 
+  2] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [3] and [10], by (Copy) 
+  3] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec > @_{o -> o -> o}, [4] and [6], by (Copy) 
+  4] rec*(s(X), Y, F) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] rec*(s(X), Y, F) >= X  because [7], by (Select) 
+  7] s(X) >= X  because [8], by (Star) 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [11], [13] and [14], by (Stat) 
+  11] s(X) > X  because [12], by definition 
+  12] s*(X) >= X  because [9], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] F >= F  by (Meta) 
+
+  15] succ2(X, Y) >= s(Y)  because [16], by (Star) 
+  16] succ2*(X, Y) >= s(Y)  because succ2 > s and [17], by (Copy) 
+  17] succ2*(X, Y) >= Y  because [18], by (Select) 
+  18] Y >= Y  by (Meta) 
+
+  19] plus(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y))  because [20], by (Star) 
+  20] plus*(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y))  because plus > rec, [21], [23] and [25], by (Copy) 
+  21] plus*(X, Y) >= X  because [22], by (Select) 
+  22] X >= X  by (Meta) 
+  23] plus*(X, Y) >= Y  because [24], by (Select) 
+  24] Y >= Y  by (Meta) 
+  25] plus*(X, Y) >= /\y./\z.succ2(y, z)  because [26], by (F-Abs) 
+  26] plus*(X, Y, x) >= /\z.succ2(x, z)  because [27], by (F-Abs) 
+  27] plus*(X, Y, x, y) >= succ2(x, y)  because plus > succ2, [28] and [30], by (Copy) 
+  28] plus*(X, Y, x, y) >= x  because [29], by (Select) 
+  29] x >= x  by (Var) 
+  30] plus*(X, Y, x, y) >= y  because [31], by (Select) 
+  31] y >= y  by (Var) 
+
+  32] plus3(X, Y, Z) > plus(X, plus(Y, Z))  because [33], by definition 
+  33] plus3*(X, Y, Z) >= plus(X, plus(Y, Z))  because plus3 > plus, [34] and [36], by (Copy) 
+  34] plus3*(X, Y, Z) >= X  because [35], by (Select) 
+  35] X >= X  by (Meta) 
+  36] plus3*(X, Y, Z) >= plus(Y, Z)  because plus3 > plus, [37] and [39], by (Copy) 
+  37] plus3*(X, Y, Z) >= Y  because [38], by (Select) 
+  38] Y >= Y  by (Meta) 
+  39] plus3*(X, Y, Z) >= Z  because [40], by (Select) 
+  40] Z >= Z  by (Meta) 
+
+  41] mult(X, Y) >= rec(X, _|_, /\x./\y.plus3(Y, x, y))  because [42], by (Star) 
+  42] mult*(X, Y) >= rec(X, _|_, /\x./\y.plus3(Y, x, y))  because mult > rec, [43], [45] and [46], by (Copy) 
+  43] mult*(X, Y) >= X  because [44], by (Select) 
+  44] X >= X  by (Meta) 
+  45] mult*(X, Y) >= _|_  by (Bot) 
+  46] mult*(X, Y) >= /\y./\z.plus3(Y, y, z)  because [47], by (F-Abs) 
+  47] mult*(X, Y, x) >= /\z.plus3(Y, x, z)  because [48], by (F-Abs) 
+  48] mult*(X, Y, x, y) >= plus3(Y, x, y)  because mult > plus3, [49], [51] and [53], by (Copy) 
+  49] mult*(X, Y, x, y) >= Y  because [50], by (Select) 
+  50] Y >= Y  by (Meta) 
+  51] mult*(X, Y, x, y) >= x  because [52], by (Select) 
+  52] x >= x  by (Var) 
+  53] mult*(X, Y, x, y) >= y  because [54], by (Select) 
+  54] y >= y  by (Var) 
+
+We can thus remove the following rules:
+
+  plus3(X, Y, Z) => plus(X, plus(Y, Z)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+  succ2(X, Y) >? s(Y) 
+  plus(X, Y) >? rec(X, Y, /\x./\y.succ2(x, y)) 
+  mult(X, Y) >? rec(X, O, /\x./\y.plus3(Y, x, y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, mult, plus, plus3, rec, s, succ2}, and the following precedence: mult > plus > rec > @_{o -> o} > succ2 > plus3 > @_{o -> o -> o} > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F)) 
+  succ2(X, Y) >= s(Y) 
+  plus(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y)) 
+  mult(X, Y) > rec(X, _|_, /\x./\y.plus3(Y, x, y)) 
+
+With these choices, we have:
+
+  1] rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [2], by (Star) 
+  2] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [3] and [10], by (Copy) 
+  3] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec > @_{o -> o -> o}, [4] and [6], by (Copy) 
+  4] rec*(s(X), Y, F) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] rec*(s(X), Y, F) >= X  because [7], by (Select) 
+  7] s(X) >= X  because [8], by (Star) 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [11], [13] and [14], by (Stat) 
+  11] s(X) > X  because [12], by definition 
+  12] s*(X) >= X  because [9], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] F >= F  by (Meta) 
+
+  15] succ2(X, Y) >= s(Y)  because [16], by (Star) 
+  16] succ2*(X, Y) >= s(Y)  because succ2 > s and [17], by (Copy) 
+  17] succ2*(X, Y) >= Y  because [18], by (Select) 
+  18] Y >= Y  by (Meta) 
+
+  19] plus(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y))  because [20], by (Star) 
+  20] plus*(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y))  because plus > rec, [21], [23] and [25], by (Copy) 
+  21] plus*(X, Y) >= X  because [22], by (Select) 
+  22] X >= X  by (Meta) 
+  23] plus*(X, Y) >= Y  because [24], by (Select) 
+  24] Y >= Y  by (Meta) 
+  25] plus*(X, Y) >= /\y./\z.succ2(y, z)  because [26], by (F-Abs) 
+  26] plus*(X, Y, x) >= /\z.succ2(x, z)  because [27], by (F-Abs) 
+  27] plus*(X, Y, x, y) >= succ2(x, y)  because plus > succ2, [28] and [30], by (Copy) 
+  28] plus*(X, Y, x, y) >= x  because [29], by (Select) 
+  29] x >= x  by (Var) 
+  30] plus*(X, Y, x, y) >= y  because [31], by (Select) 
+  31] y >= y  by (Var) 
+
+  32] mult(X, Y) > rec(X, _|_, /\x./\y.plus3(Y, x, y))  because [33], by definition 
+  33] mult*(X, Y) >= rec(X, _|_, /\x./\y.plus3(Y, x, y))  because mult > rec, [34], [36] and [37], by (Copy) 
+  34] mult*(X, Y) >= X  because [35], by (Select) 
+  35] X >= X  by (Meta) 
+  36] mult*(X, Y) >= _|_  by (Bot) 
+  37] mult*(X, Y) >= /\y./\z.plus3(Y, y, z)  because [38], by (F-Abs) 
+  38] mult*(X, Y, x) >= /\z.plus3(Y, x, z)  because [39], by (F-Abs) 
+  39] mult*(X, Y, x, y) >= plus3(Y, x, y)  because mult > plus3, [40], [42] and [44], by (Copy) 
+  40] mult*(X, Y, x, y) >= Y  because [41], by (Select) 
+  41] Y >= Y  by (Meta) 
+  42] mult*(X, Y, x, y) >= x  because [43], by (Select) 
+  43] x >= x  by (Var) 
+  44] mult*(X, Y, x, y) >= y  because [45], by (Select) 
+  45] y >= y  by (Var) 
+
+We can thus remove the following rules:
+
+  mult(X, Y) => rec(X, O, /\x./\y.plus3(Y, x, y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+  succ2(X, Y) >? s(Y) 
+  plus(X, Y) >? rec(X, Y, /\x./\y.succ2(x, y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, plus, rec, s, succ2}, and the following precedence: plus > rec > @_{o -> o -> o} > @_{o -> o} > succ2 > s
+
+With these choices, we have:
+
+  1] rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [2], by (Star) 
+  2] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [3] and [10], by (Copy) 
+  3] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec > @_{o -> o -> o}, [4] and [6], by (Copy) 
+  4] rec*(s(X), Y, F) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] rec*(s(X), Y, F) >= X  because [7], by (Select) 
+  7] s(X) >= X  because [8], by (Star) 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [11], [13] and [14], by (Stat) 
+  11] s(X) > X  because [12], by definition 
+  12] s*(X) >= X  because [9], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] F >= F  by (Meta) 
+
+  15] succ2(X, Y) >= s(Y)  because [16], by (Star) 
+  16] succ2*(X, Y) >= s(Y)  because succ2 > s and [17], by (Copy) 
+  17] succ2*(X, Y) >= Y  because [18], by (Select) 
+  18] Y >= Y  by (Meta) 
+
+  19] plus(X, Y) > rec(X, Y, /\x./\y.succ2(x, y))  because [20], by definition 
+  20] plus*(X, Y) >= rec(X, Y, /\x./\y.succ2(x, y))  because plus > rec, [21], [23] and [25], by (Copy) 
+  21] plus*(X, Y) >= X  because [22], by (Select) 
+  22] X >= X  by (Meta) 
+  23] plus*(X, Y) >= Y  because [24], by (Select) 
+  24] Y >= Y  by (Meta) 
+  25] plus*(X, Y) >= /\y./\z.succ2(y, z)  because [26], by (F-Abs) 
+  26] plus*(X, Y, x) >= /\z.succ2(x, z)  because [27], by (F-Abs) 
+  27] plus*(X, Y, x, y) >= succ2(x, y)  because plus > succ2, [28] and [30], by (Copy) 
+  28] plus*(X, Y, x, y) >= x  because [29], by (Select) 
+  29] x >= x  by (Var) 
+  30] plus*(X, Y, x, y) >= y  because [31], by (Select) 
+  31] y >= y  by (Var) 
+
+We can thus remove the following rules:
+
+  plus(X, Y) => rec(X, Y, /\x./\y.succ2(x, y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+  succ2(X, Y) >? s(Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, rec, s, succ2}, and the following precedence: rec > @_{o -> o -> o} > @_{o -> o} > succ2 > s
+
+With these choices, we have:
+
+  1] rec(s(X), Y, F) > @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [2], by definition 
+  2] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [3] and [10], by (Copy) 
+  3] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec > @_{o -> o -> o}, [4] and [6], by (Copy) 
+  4] rec*(s(X), Y, F) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] rec*(s(X), Y, F) >= X  because [7], by (Select) 
+  7] s(X) >= X  because [8], by (Star) 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [11], [13] and [14], by (Stat) 
+  11] s(X) > X  because [12], by definition 
+  12] s*(X) >= X  because [9], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] F >= F  by (Meta) 
+
+  15] succ2(X, Y) >= s(Y)  because [16], by (Star) 
+  16] succ2*(X, Y) >= s(Y)  because succ2 > s and [17], by (Copy) 
+  17] succ2*(X, Y) >= Y  because [18], by (Select) 
+  18] Y >= Y  by (Meta) 
+
+We can thus remove the following rules:
+
+  rec(s(X), Y, F) => F X rec(X, Y, F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ2(X, Y) >? s(Y) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  s = Lam[y0].y0 
+  succ2 = Lam[y0;y1].3 + y0 + 3*y1 
+
+Using this interpretation, the requirements translate to:
+
+  [[succ2(_x0, _x1)]] = 3 + x0 + 3*x1 > x1 = [[s(_x1)]] 
+
+We can thus remove the following rules:
+
+  succ2(X, Y) => s(Y) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

@@ -1,0 +1,118 @@
+YES
+We consider the system RtCJE.
+
+  Alphabet:
+
+    !plus : [nat * nat] --> nat 
+    cons : [nat * list] --> list 
+    map : [nat -> nat * list] --> list 
+    nil : [] --> list 
+    ps : [list] --> list 
+
+  Rules:
+
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    ps(nil) => nil 
+    ps(cons(X, Y)) => cons(X, ps(map(/\x.!plus(X, x), Y))) 
+
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] map#(F, cons(X, Y)) =#> map#(F, Y)   
+    1] ps#(cons(X, Y)) =#> ps#(map(/\x.!plus(X, x), Y))   
+    2] ps#(cons(X, Y)) =#> map#(/\x.!plus(X, x), Y)   
+
+  Rules R_0:
+
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    ps(nil) => nil 
+    ps(cons(X, Y)) => cons(X, ps(map(/\x.!plus(X, x), Y))) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0 
+    * 1 : 1, 2 
+    * 2 : 0 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    map#(F, cons(X, Y)) =#> map#(F, Y)   
+
+  P_2:
+
+    ps#(cons(X, Y)) =#> ps#(map(/\x.!plus(X, x), Y))   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f) and (P_2, R_0, m, f).
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_2, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_0, computable, formative).
+
+The formative rules of (P_2, R_0) are R_1 ::=
+
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  ps(cons(X, Y)) => cons(X, ps(map(/\x.!plus(X, x), Y))) 
+
+By [Kop12, Thm. 7.17], we may replace the dependency pair problem (P_2, R_0, computable, formative) by (P_2, R_1, computable, formative).
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_2, R_1, computable, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_1, computable, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  It suffices to find a standard reduction pair [Kop12, Def. 6.69].  Thus, we must orient:
+
+  ps#(cons(X, Y)) >? ps#(map(/\x.!plus(X, x), Y)) 
+  map(F, cons(X, Y)) >= cons(F X, map(F, Y)) 
+  ps(cons(X, Y)) >= cons(X, ps(map(/\x.!plus(X, x), Y))) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  !plus = Lam[y0;y1].0 
+  cons = Lam[y0;y1].1 + y1 
+  map = Lam[G0;y1].y1 
+  ps = Lam[y0].y0 
+  ps# = Lam[y0].2*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[ps#(cons(_x0, _x1))]] = 2 + 2*x1 > 2*x1 = [[ps#(map(/\x.!plus(_x0, x), _x1))]] 
+  [[map(_F0, cons(_x1, _x2))]] = 1 + x2 >= 1 + x2 = [[cons(_F0 _x1, map(_F0, _x2))]] 
+  [[ps(cons(_x0, _x1))]] = 1 + x1 >= 1 + x1 = [[cons(_x0, ps(map(/\x.!plus(_x0, x), _x1)))]] 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace a dependency pair problem (P_2, R_1) by ({}, R_1).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(map#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(map#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(map#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

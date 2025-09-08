@@ -1,0 +1,973 @@
+MAYBE
+proof of /hpcwork/ff862203/termcomp25/benchmarks/tprtY.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could not be shown:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 407 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 40 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 9 ms]
+        (13) IRSwT
+        (14) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (15) IRSwT
+        (16) TempFilterProof [SOUND, 10 ms]
+        (17) IntTRS
+        (18) PolynomialOrderProcessor [EQUIVALENT, 5 ms]
+        (19) YES
+    (20) JBCTerminationSCC
+        (21) SCCToIRSProof [SOUND, 55 ms]
+        (22) IRSwT
+        (23) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (24) IRSwT
+        (25) IRSwTTerminationDigraphProof [EQUIVALENT, 34 ms]
+        (26) IRSwT
+        (27) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (28) IRSwT
+        (29) FilterProof [EQUIVALENT, 0 ms]
+        (30) IntTRS
+        (31) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (32) IntTRS
+        (33) IntTRSPeriodicNontermProof [COMPLETE, 19 ms]
+        (34) NO
+    (35) JBCTerminationSCC
+        (36) SCCToIRSProof [SOUND, 66 ms]
+        (37) IRSwT
+        (38) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (39) IRSwT
+        (40) IRSwTTerminationDigraphProof [EQUIVALENT, 69 ms]
+        (41) IRSwT
+        (42) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (43) IRSwT
+        (44) FilterProof [EQUIVALENT, 0 ms]
+        (45) IntTRS
+        (46) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (47) IntTRS
+        (48) IntTRSPeriodicNontermProof [COMPLETE, 5 ms]
+        (49) NO
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+/**
+ * Parts of the below code have been adapted from
+ *
+ * http://www0.cs.ucl.ac.uk/staff/p.ohearn/Talks/SAStalk.pdf
+ *
+ * Based on the motivating example of the paper
+ *
+ * Automatic termination proofs for programs with shape-shifting heaps
+ * Josh Berdine, Byron Cook, Dino Distefano, and Peter W. O???Hearn
+ * In Proc. CAV'06, LNCS 4144, pp. 386 - 400, 2006.
+ */
+public class Kernel93 {
+    /**
+     * A reference to the next list element.
+     */
+    private Kernel93 next;
+    
+    public static void main(String[] args) {
+        int random1 = args[0].length();
+        int random2 = args[1].length();
+
+        //slide68(random1, random2);
+        //slide88(random1, random2);
+        slide93(random1, random2);
+        //slide95(random1, random2);
+    }
+    
+    /**
+     * Create a new list element.
+     * @param n a reference to the next element.
+     */
+    public Kernel93(final Kernel93 n) {
+        this.next = n;
+    }
+    
+    /**
+     * Create a new cyclical list of a length x.
+     * @param x some length
+     * @return cyclical list of length max(1, x)
+     */
+    public static Kernel93 create(int x) {
+        Kernel93 last, current;
+        last = current = new Kernel93(null);
+        while (--x > 0)
+            current = new Kernel93(current);
+        return last.next = current;
+    }
+
+    /**
+     * Check if the last bit of x is &gt; 0.
+     */
+    private static boolean check(int x) {
+        return x % 2 > 0;
+    }
+
+    public static void slide68(int random1, int random2) {
+        Kernel93 h = create(random1);
+        Kernel93 p = h;
+        Kernel93 c = p.next;
+        while (c != h) {
+            Kernel93 o = c;
+            c = c.next;
+            if (check(random2)) { // nondet()
+                p.next = c;
+                //dispose(o);
+                o = null;
+                // Java's garbage collector will notice that the object
+                // previously referenced by o is not referenced any more
+                // and will release it (of course, in the next loop iteration
+                // this would happen anyway); obviously, this does not have
+                // quite the impact of a proper "dispose" operation, which
+                // also renders all other pointer invalid that happen to point
+                // to the same address
+            } else {
+                p = o;
+            }
+
+            // get a fresh random bit to the end of random2
+            random2 = random2 / 2;
+       }
+    }
+
+    public static void slide88(int random1, int random2) {
+        Kernel93 h = create(random1);
+        Kernel93 p = h;
+        Kernel93 c = p.next;
+        while (c != h) {
+            Kernel93 o = c;
+            //c = c.next;
+            if (check(random2)) { // nondet()
+                Kernel93 e = o.next;
+                p.next = e;
+                //dispose(o);
+                o = null;
+                // Java's garbage collector will notice that the object
+                // previously referenced by o is not referenced any more
+                // and will release it
+                c = o;
+                // for a faithful translation of the original C code,
+                // let c point to whatever o points to -- the interesting
+                // aspect is that dereferencing this memory location 
+                // henceforth is a very bad idea (in C, obviously, this would
+                // not necessarily lead to a clean exception at runtime)
+            } else {
+                p = o;
+            }
+            c = c.next;
+
+            // get a fresh random bit to the end of random2
+            random2 = random2 / 2;
+        }
+    }
+
+    /**
+     * Non-terminating.
+     */
+    public static void slide93(int random1, int random2) {
+        Kernel93 h = create(random1);
+        Kernel93 p = h;
+        Kernel93 c = p.next;
+        while (c != h) {
+            Kernel93 o = c;
+            //c = c.next;
+
+            if (check(random2)) { // nondet()
+                Kernel93 e = o.next;
+                p.next = e;
+                o.next = o;
+            } else {
+                p = o;
+            }
+            c = c.next;
+
+            // get a fresh random bit to the end of random2
+            random2 = random2 / 2;
+        }
+    }
+
+    public static void slide95(int random1, int random2) {
+        Kernel93 h = create(random1);
+        Kernel93 p = h;
+        Kernel93 c = p.next;
+        while (c != h) {
+            Kernel93 o = c;
+            c = c.next;
+
+            if (check(random2)) { // nondet()
+                Kernel93 e = o.next;
+                p.next = e;
+                o.next = o;
+            } else {
+                p = o;
+            }
+
+            // get a fresh random bit to the end of random2
+            random2 = random2 / 2;
+        }
+    }
+
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+/**
+ * Parts of the below code have been adapted from
+ *
+ * http://www0.cs.ucl.ac.uk/staff/p.ohearn/Talks/SAStalk.pdf
+ *
+ * Based on the motivating example of the paper
+ *
+ * Automatic termination proofs for programs with shape-shifting heaps
+ * Josh Berdine, Byron Cook, Dino Distefano, and Peter W. O???Hearn
+ * In Proc. CAV'06, LNCS 4144, pp. 386 - 400, 2006.
+ */
+public class Kernel93 {
+    /**
+     * A reference to the next list element.
+     */
+    private Kernel93 next;
+    
+    public static void main(String[] args) {
+        int random1 = args[0].length();
+        int random2 = args[1].length();
+
+        //slide68(random1, random2);
+        //slide88(random1, random2);
+        slide93(random1, random2);
+        //slide95(random1, random2);
+    }
+    
+    /**
+     * Create a new list element.
+     * @param n a reference to the next element.
+     */
+    public Kernel93(final Kernel93 n) {
+        this.next = n;
+    }
+    
+    /**
+     * Create a new cyclical list of a length x.
+     * @param x some length
+     * @return cyclical list of length max(1, x)
+     */
+    public static Kernel93 create(int x) {
+        Kernel93 last, current;
+        last = current = new Kernel93(null);
+        while (--x > 0)
+            current = new Kernel93(current);
+        return last.next = current;
+    }
+
+    /**
+     * Check if the last bit of x is &gt; 0.
+     */
+    private static boolean check(int x) {
+        return x % 2 > 0;
+    }
+
+    public static void slide68(int random1, int random2) {
+        Kernel93 h = create(random1);
+        Kernel93 p = h;
+        Kernel93 c = p.next;
+        while (c != h) {
+            Kernel93 o = c;
+            c = c.next;
+            if (check(random2)) { // nondet()
+                p.next = c;
+                //dispose(o);
+                o = null;
+                // Java's garbage collector will notice that the object
+                // previously referenced by o is not referenced any more
+                // and will release it (of course, in the next loop iteration
+                // this would happen anyway); obviously, this does not have
+                // quite the impact of a proper "dispose" operation, which
+                // also renders all other pointer invalid that happen to point
+                // to the same address
+            } else {
+                p = o;
+            }
+
+            // get a fresh random bit to the end of random2
+            random2 = random2 / 2;
+       }
+    }
+
+    public static void slide88(int random1, int random2) {
+        Kernel93 h = create(random1);
+        Kernel93 p = h;
+        Kernel93 c = p.next;
+        while (c != h) {
+            Kernel93 o = c;
+            //c = c.next;
+            if (check(random2)) { // nondet()
+                Kernel93 e = o.next;
+                p.next = e;
+                //dispose(o);
+                o = null;
+                // Java's garbage collector will notice that the object
+                // previously referenced by o is not referenced any more
+                // and will release it
+                c = o;
+                // for a faithful translation of the original C code,
+                // let c point to whatever o points to -- the interesting
+                // aspect is that dereferencing this memory location 
+                // henceforth is a very bad idea (in C, obviously, this would
+                // not necessarily lead to a clean exception at runtime)
+            } else {
+                p = o;
+            }
+            c = c.next;
+
+            // get a fresh random bit to the end of random2
+            random2 = random2 / 2;
+        }
+    }
+
+    /**
+     * Non-terminating.
+     */
+    public static void slide93(int random1, int random2) {
+        Kernel93 h = create(random1);
+        Kernel93 p = h;
+        Kernel93 c = p.next;
+        while (c != h) {
+            Kernel93 o = c;
+            //c = c.next;
+
+            if (check(random2)) { // nondet()
+                Kernel93 e = o.next;
+                p.next = e;
+                o.next = o;
+            } else {
+                p = o;
+            }
+            c = c.next;
+
+            // get a fresh random bit to the end of random2
+            random2 = random2 / 2;
+        }
+    }
+
+    public static void slide95(int random1, int random2) {
+        Kernel93 h = create(random1);
+        Kernel93 p = h;
+        Kernel93 c = p.next;
+        while (c != h) {
+            Kernel93 o = c;
+            c = c.next;
+
+            if (check(random2)) { // nondet()
+                Kernel93 e = o.next;
+                p.next = e;
+                o.next = o;
+            } else {
+                p = o;
+            }
+
+            // get a fresh random bit to the end of random2
+            random2 = random2 / 2;
+        }
+    }
+
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+Kernel93.main([Ljava/lang/String;)V: Graph of 297 nodes with 2 SCCs.
+
+
+
+Kernel93.create(I)LKernel93;: Graph of 42 nodes with 1 SCC.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 3 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Kernel93.create(I)LKernel93;
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 17 IRulesP rules:
+f2141_0_create_Load(EOS(STATIC_2141), i153, o74[Kernel93.next]o73) -> f2147_0_create_LE(EOS(STATIC_2147), i153, i153, o74[Kernel93.next]o73) :|: TRUE
+f2147_0_create_LE(EOS(STATIC_2147), i155, i155, o74[Kernel93.next]o73) -> f2156_0_create_LE(EOS(STATIC_2156), i155, i155, o74[Kernel93.next]o73) :|: TRUE
+f2156_0_create_LE(EOS(STATIC_2156), i155, i155, o74[Kernel93.next]o73) -> f2164_0_create_New(EOS(STATIC_2164), i155, o74[Kernel93.next]o73) :|: i155 > 0
+f2164_0_create_New(EOS(STATIC_2164), i155, o74[Kernel93.next]o73) -> f2172_0_create_Duplicate(EOS(STATIC_2172), i155, o74[Kernel93.next]o73) :|: TRUE
+f2172_0_create_Duplicate(EOS(STATIC_2172), i155, o74[Kernel93.next]o73) -> f2178_0_create_Load(EOS(STATIC_2178), i155, o74[Kernel93.next]o73) :|: TRUE
+f2178_0_create_Load(EOS(STATIC_2178), i155, o74[Kernel93.next]o73) -> f2183_0_create_InvokeMethod(EOS(STATIC_2183), i155, o74[Kernel93.next]o73) :|: TRUE
+f2183_0_create_InvokeMethod(EOS(STATIC_2183), i155, o74[Kernel93.next]o73) -> f2190_0__init__Load(EOS(STATIC_2190), i155, o74[Kernel93.next]o73) :|: TRUE
+f2190_0__init__Load(EOS(STATIC_2190), i155, o74[Kernel93.next]o73) -> f2202_0__init__InvokeMethod(EOS(STATIC_2202), i155, o74[Kernel93.next]o73) :|: TRUE
+f2202_0__init__InvokeMethod(EOS(STATIC_2202), i155, o74[Kernel93.next]o73) -> f2238_0__init__Load(EOS(STATIC_2238), i155, o74[Kernel93.next]o73) :|: TRUE
+f2238_0__init__Load(EOS(STATIC_2238), i155, o74[Kernel93.next]o73) -> f2295_0__init__Load(EOS(STATIC_2295), i155, o74[Kernel93.next]o73) :|: TRUE
+f2295_0__init__Load(EOS(STATIC_2295), i155, o74[Kernel93.next]o73) -> f2301_0__init__FieldAccess(EOS(STATIC_2301), i155, o74[Kernel93.next]o73) :|: TRUE
+f2301_0__init__FieldAccess(EOS(STATIC_2301), i155, o74[Kernel93.next]o73) -> f2305_0__init__Return(EOS(STATIC_2305), i155, o74[Kernel93.next]o73) :|: TRUE
+f2305_0__init__Return(EOS(STATIC_2305), i155, o74[Kernel93.next]o73) -> f2318_0_create_Store(EOS(STATIC_2318), i155, o74[Kernel93.next]o73) :|: TRUE
+f2318_0_create_Store(EOS(STATIC_2318), i155, o74[Kernel93.next]o73) -> f2325_0_create_JMP(EOS(STATIC_2325), i155, o74[Kernel93.next]o73) :|: TRUE
+f2325_0_create_JMP(EOS(STATIC_2325), i155, o74[Kernel93.next]o73) -> f2660_0_create_Inc(EOS(STATIC_2660), i155, o74[Kernel93.next]o73) :|: TRUE
+f2660_0_create_Inc(EOS(STATIC_2660), i155, o74[Kernel93.next]o73) -> f2135_0_create_Inc(EOS(STATIC_2135), i155, o84[Kernel93.next]o73) :|: TRUE
+f2135_0_create_Inc(EOS(STATIC_2135), i58, o74[Kernel93.next]o73) -> f2141_0_create_Load(EOS(STATIC_2141), i58 + -1, o74[Kernel93.next]o73) :|: TRUE
+Combined rules. Obtained 1 IRulesP rules:
+f2141_0_create_Load(EOS(STATIC_2141), i153:0, o74[Kernel93.next]o73:0) -> f2141_0_create_Load(EOS(STATIC_2141), i153:0 - 1, o84[Kernel93.next]o73:0) :|: i153:0 > 0
+Filtered constant ground arguments:
+   f2141_0_create_Load(x1, x2, x3) -> f2141_0_create_Load(x2, x3)
+   EOS(x1) -> EOS
+Filtered unneeded arguments:
+   f2141_0_create_Load(x1, x2) -> f2141_0_create_Load(x1)
+Finished conversion. Obtained 1 rules.P rules:
+f2141_0_create_Load(i153:0) -> f2141_0_create_Load(i153:0 - 1) :|: i153:0 > 0
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f2141_0_create_Load(i153:0) -> f2141_0_create_Load(i153:0 - 1) :|: i153:0 > 0
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f2141_0_create_Load(i153:0) -> f2141_0_create_Load(arith) :|: i153:0 > 0 && arith = i153:0 - 1
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f2141_0_create_Load(i153:0) -> f2141_0_create_Load(arith) :|: i153:0 > 0 && arith = i153:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f2141_0_create_Load(i153:0) -> f2141_0_create_Load(arith) :|: i153:0 > 0 && arith = i153:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(14) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(15)
+Obligation:
+Rules:
+f2141_0_create_Load(i153:0:0) -> f2141_0_create_Load(i153:0:0 - 1) :|: i153:0:0 > 0
+
+----------------------------------------
+
+(16) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f2141_0_create_Load(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(17)
+Obligation:
+Rules:
+f2141_0_create_Load(i153:0:0) -> f2141_0_create_Load(c) :|: c = i153:0:0 - 1 && i153:0:0 > 0
+
+----------------------------------------
+
+(18) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f2141_0_create_Load(x)] = x
+
+The following rules are decreasing:
+f2141_0_create_Load(i153:0:0) -> f2141_0_create_Load(c) :|: c = i153:0:0 - 1 && i153:0:0 > 0
+The following rules are bounded:
+f2141_0_create_Load(i153:0:0) -> f2141_0_create_Load(c) :|: c = i153:0:0 - 1 && i153:0:0 > 0
+
+----------------------------------------
+
+(19)
+YES
+
+----------------------------------------
+
+(20)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Kernel93.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*Kernel93: [next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(21) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 77 IRulesP rules:
+f8904_0_slide93_EQ(EOS(STATIC_8904), i735) -> f8912_0_slide93_Load(EOS(STATIC_8912), i735) :|: TRUE
+f8912_0_slide93_Load(EOS(STATIC_8912), i735) -> f8928_0_slide93_Store(EOS(STATIC_8928), i735) :|: TRUE
+f8928_0_slide93_Store(EOS(STATIC_8928), i735) -> f8933_0_slide93_Load(EOS(STATIC_8933), i735) :|: TRUE
+f8933_0_slide93_Load(EOS(STATIC_8933), i735) -> f8936_0_slide93_InvokeMethod(EOS(STATIC_8936), i735, i735) :|: TRUE
+f8936_0_slide93_InvokeMethod(EOS(STATIC_8936), i735, i735) -> f8937_0_check_Load(EOS(STATIC_8937), i735, i735) :|: TRUE
+f8937_0_check_Load(EOS(STATIC_8937), i735, i735) -> f8938_0_check_ConstantStackPush(EOS(STATIC_8938), i735, i735) :|: TRUE
+f8938_0_check_ConstantStackPush(EOS(STATIC_8938), i735, i735) -> f8939_0_check_IntArithmetic(EOS(STATIC_8939), i735, i735, 2) :|: TRUE
+f8939_0_check_IntArithmetic(EOS(STATIC_8939), i735, i735, matching1) -> f8951_0_check_LE(EOS(STATIC_8951), i735, i735 % 2) :|: TRUE && matching1 = 2
+f8951_0_check_LE(EOS(STATIC_8951), i735, matching1) -> f8955_0_check_LE(EOS(STATIC_8955), i735, 0) :|: TRUE && matching1 = 0
+f8951_0_check_LE(EOS(STATIC_8951), i735, matching1) -> f8956_0_check_LE(EOS(STATIC_8956), i735, 1) :|: TRUE && matching1 = 1
+f8955_0_check_LE(EOS(STATIC_8955), i735, matching1) -> f8962_0_check_ConstantStackPush(EOS(STATIC_8962), i735) :|: 0 <= 0 && matching1 = 0
+f8962_0_check_ConstantStackPush(EOS(STATIC_8962), i735) -> f8972_0_check_Return(EOS(STATIC_8972), i735, 0) :|: TRUE
+f8972_0_check_Return(EOS(STATIC_8972), i735, matching1) -> f8981_0_slide93_EQ(EOS(STATIC_8981), i735, 0) :|: TRUE && matching1 = 0
+f8981_0_slide93_EQ(EOS(STATIC_8981), i735, matching1) -> f8990_0_slide93_Load(EOS(STATIC_8990), i735) :|: TRUE && matching1 = 0
+f8990_0_slide93_Load(EOS(STATIC_8990), i735) -> f9000_0_slide93_Store(EOS(STATIC_9000), i735) :|: TRUE
+f9000_0_slide93_Store(EOS(STATIC_9000), i735) -> f9019_0_slide93_Load(EOS(STATIC_9019), i735) :|: TRUE
+f9019_0_slide93_Load(EOS(STATIC_9019), i735) -> f9038_0_slide93_FieldAccess(EOS(STATIC_9038), i735) :|: TRUE
+f9038_0_slide93_FieldAccess(EOS(STATIC_9038), i735) -> f9108_0_slide93_Store(EOS(STATIC_9108), i735) :|: TRUE
+f9108_0_slide93_Store(EOS(STATIC_9108), i735) -> f9125_0_slide93_Load(EOS(STATIC_9125), i735) :|: TRUE
+f9125_0_slide93_Load(EOS(STATIC_9125), i735) -> f9136_0_slide93_ConstantStackPush(EOS(STATIC_9136), i735) :|: TRUE
+f9136_0_slide93_ConstantStackPush(EOS(STATIC_9136), i735) -> f9165_0_slide93_IntArithmetic(EOS(STATIC_9165), i735, 2) :|: TRUE
+f9165_0_slide93_IntArithmetic(EOS(STATIC_9165), i735, matching1) -> f9177_0_slide93_Store(EOS(STATIC_9177), i843) :|: i843 = i735 / 2 && i843 <= i735 && matching1 = 2
+f9177_0_slide93_Store(EOS(STATIC_9177), i843) -> f9292_0_slide93_JMP(EOS(STATIC_9292), i843) :|: TRUE
+f9292_0_slide93_JMP(EOS(STATIC_9292), i843) -> f9371_0_slide93_Load(EOS(STATIC_9371), i843) :|: TRUE
+f9371_0_slide93_Load(EOS(STATIC_9371), i843) -> f8766_0_slide93_Load(EOS(STATIC_8766), i843) :|: TRUE
+f8766_0_slide93_Load(EOS(STATIC_8766), i735) -> f8843_0_slide93_Load(EOS(STATIC_8843), i735) :|: TRUE
+f8843_0_slide93_Load(EOS(STATIC_8843), i735) -> f8879_0_slide93_EQ(EOS(STATIC_8879), i735) :|: TRUE
+f8879_0_slide93_EQ(EOS(STATIC_8879), i735) -> f8904_0_slide93_EQ(EOS(STATIC_8904), i735) :|: TRUE
+f8956_0_check_LE(EOS(STATIC_8956), i735, matching1) -> f8967_0_check_ConstantStackPush(EOS(STATIC_8967), i735) :|: 1 > 0 && matching1 = 1
+f8967_0_check_ConstantStackPush(EOS(STATIC_8967), i735) -> f8976_0_check_JMP(EOS(STATIC_8976), i735, 1) :|: TRUE
+f8976_0_check_JMP(EOS(STATIC_8976), i735, matching1) -> f8986_0_check_Return(EOS(STATIC_8986), i735, 1) :|: TRUE && matching1 = 1
+f8986_0_check_Return(EOS(STATIC_8986), i735, matching1) -> f8997_0_slide93_EQ(EOS(STATIC_8997), i735, 1) :|: TRUE && matching1 = 1
+f8997_0_slide93_EQ(EOS(STATIC_8997), i735, matching1) -> f9004_0_slide93_Load(EOS(STATIC_9004), i735) :|: 1 > 0 && matching1 = 1
+f9004_0_slide93_Load(EOS(STATIC_9004), i735) -> f9024_0_slide93_FieldAccess(EOS(STATIC_9024), i735) :|: TRUE
+f9024_0_slide93_FieldAccess(EOS(STATIC_9024), i735) -> f9070_0_slide93_Store(EOS(STATIC_9070), i735) :|: TRUE
+f9070_0_slide93_Store(EOS(STATIC_9070), i735) -> f9118_0_slide93_Load(EOS(STATIC_9118), i735) :|: TRUE
+f9118_0_slide93_Load(EOS(STATIC_9118), i735) -> f9129_0_slide93_Load(EOS(STATIC_9129), i735) :|: TRUE
+f9129_0_slide93_Load(EOS(STATIC_9129), i735) -> f9159_0_slide93_FieldAccess(EOS(STATIC_9159), i735) :|: TRUE
+f9159_0_slide93_FieldAccess(EOS(STATIC_9159), i735) -> f9169_0_slide93_FieldAccess(EOS(STATIC_9169), i735) :|: TRUE
+f9169_0_slide93_FieldAccess(EOS(STATIC_9169), i735) -> f9202_0_slide93_FieldAccess(EOS(STATIC_9202), i735) :|: TRUE
+f9169_0_slide93_FieldAccess(EOS(STATIC_9169), i735) -> f9203_0_slide93_FieldAccess(EOS(STATIC_9203), i735) :|: TRUE
+f9202_0_slide93_FieldAccess(EOS(STATIC_9202), i735) -> f9320_0_slide93_FieldAccess(EOS(STATIC_9320), i735) :|: TRUE
+f9202_0_slide93_FieldAccess(EOS(STATIC_9202), i735) -> f9322_0_slide93_FieldAccess(EOS(STATIC_9322), i735) :|: TRUE
+f9320_0_slide93_FieldAccess(EOS(STATIC_9320), i735) -> f9395_0_slide93_Load(EOS(STATIC_9395), i735) :|: TRUE
+f9395_0_slide93_Load(EOS(STATIC_9395), i735) -> f9425_0_slide93_Load(EOS(STATIC_9425), i735) :|: TRUE
+f9425_0_slide93_Load(EOS(STATIC_9425), i735) -> f9454_0_slide93_FieldAccess(EOS(STATIC_9454), i735) :|: TRUE
+f9454_0_slide93_FieldAccess(EOS(STATIC_9454), i735) -> f9486_0_slide93_JMP(EOS(STATIC_9486), i735) :|: TRUE
+f9486_0_slide93_JMP(EOS(STATIC_9486), i735) -> f9514_0_slide93_Load(EOS(STATIC_9514), i735) :|: TRUE
+f9514_0_slide93_Load(EOS(STATIC_9514), i735) -> f9547_0_slide93_FieldAccess(EOS(STATIC_9547), i735) :|: TRUE
+f9547_0_slide93_FieldAccess(EOS(STATIC_9547), i735) -> f9578_0_slide93_Store(EOS(STATIC_9578), i735) :|: TRUE
+f9578_0_slide93_Store(EOS(STATIC_9578), i735) -> f9599_0_slide93_Load(EOS(STATIC_9599), i735) :|: TRUE
+f9599_0_slide93_Load(EOS(STATIC_9599), i735) -> f9616_0_slide93_ConstantStackPush(EOS(STATIC_9616), i735) :|: TRUE
+f9616_0_slide93_ConstantStackPush(EOS(STATIC_9616), i735) -> f9633_0_slide93_IntArithmetic(EOS(STATIC_9633), i735, 2) :|: TRUE
+f9633_0_slide93_IntArithmetic(EOS(STATIC_9633), i735, matching1) -> f9651_0_slide93_Store(EOS(STATIC_9651), i919) :|: i919 = i735 / 2 && i919 <= i735 && matching1 = 2
+f9651_0_slide93_Store(EOS(STATIC_9651), i919) -> f9665_0_slide93_JMP(EOS(STATIC_9665), i919) :|: TRUE
+f9665_0_slide93_JMP(EOS(STATIC_9665), i919) -> f9769_0_slide93_Load(EOS(STATIC_9769), i919) :|: TRUE
+f9769_0_slide93_Load(EOS(STATIC_9769), i919) -> f8766_0_slide93_Load(EOS(STATIC_8766), i919) :|: TRUE
+f9322_0_slide93_FieldAccess(EOS(STATIC_9322), i735) -> f9408_0_slide93_Load(EOS(STATIC_9408), i735) :|: TRUE
+f9408_0_slide93_Load(EOS(STATIC_9408), i735) -> f9439_0_slide93_Load(EOS(STATIC_9439), i735) :|: TRUE
+f9439_0_slide93_Load(EOS(STATIC_9439), i735) -> f9469_0_slide93_FieldAccess(EOS(STATIC_9469), i735) :|: TRUE
+f9469_0_slide93_FieldAccess(EOS(STATIC_9469), i735) -> f9499_0_slide93_JMP(EOS(STATIC_9499), i735) :|: TRUE
+f9499_0_slide93_JMP(EOS(STATIC_9499), i735) -> f9532_0_slide93_Load(EOS(STATIC_9532), i735) :|: TRUE
+f9532_0_slide93_Load(EOS(STATIC_9532), i735) -> f9019_0_slide93_Load(EOS(STATIC_9019), i735) :|: TRUE
+f9203_0_slide93_FieldAccess(EOS(STATIC_9203), i735) -> f9337_0_slide93_Load(EOS(STATIC_9337), i735) :|: TRUE
+f9337_0_slide93_Load(EOS(STATIC_9337), i735) -> f9414_0_slide93_Load(EOS(STATIC_9414), i735) :|: TRUE
+f9414_0_slide93_Load(EOS(STATIC_9414), i735) -> f9445_0_slide93_FieldAccess(EOS(STATIC_9445), i735) :|: TRUE
+f9445_0_slide93_FieldAccess(EOS(STATIC_9445), i735) -> f9475_0_slide93_JMP(EOS(STATIC_9475), i735) :|: TRUE
+f9475_0_slide93_JMP(EOS(STATIC_9475), i735) -> f9503_0_slide93_Load(EOS(STATIC_9503), i735) :|: TRUE
+f9503_0_slide93_Load(EOS(STATIC_9503), i735) -> f9538_0_slide93_FieldAccess(EOS(STATIC_9538), i735) :|: TRUE
+f9538_0_slide93_FieldAccess(EOS(STATIC_9538), i735) -> f9552_0_slide93_Store(EOS(STATIC_9552), i735) :|: TRUE
+f9552_0_slide93_Store(EOS(STATIC_9552), i735) -> f9585_0_slide93_Load(EOS(STATIC_9585), i735) :|: TRUE
+f9585_0_slide93_Load(EOS(STATIC_9585), i735) -> f9604_0_slide93_ConstantStackPush(EOS(STATIC_9604), i735) :|: TRUE
+f9604_0_slide93_ConstantStackPush(EOS(STATIC_9604), i735) -> f9620_0_slide93_IntArithmetic(EOS(STATIC_9620), i735, 2) :|: TRUE
+f9620_0_slide93_IntArithmetic(EOS(STATIC_9620), i735, matching1) -> f9640_0_slide93_Store(EOS(STATIC_9640), i918) :|: i918 = i735 / 2 && i918 <= i735 && matching1 = 2
+f9640_0_slide93_Store(EOS(STATIC_9640), i918) -> f9656_0_slide93_JMP(EOS(STATIC_9656), i918) :|: TRUE
+f9656_0_slide93_JMP(EOS(STATIC_9656), i918) -> f9767_0_slide93_Load(EOS(STATIC_9767), i918) :|: TRUE
+f9767_0_slide93_Load(EOS(STATIC_9767), i918) -> f8766_0_slide93_Load(EOS(STATIC_8766), i918) :|: TRUE
+Combined rules. Obtained 4 IRulesP rules:
+f8904_0_slide93_EQ(EOS(STATIC_8904), i735:0) -> f8904_0_slide93_EQ'(EOS(STATIC_8904), i735:0) :|: i735:0 >= div1 && i735:0 - 2 * div = 1
+f8904_0_slide93_EQ'(EOS(STATIC_8904), i735:0) -> f8904_0_slide93_EQ(EOS(STATIC_8904), div1) :|: i735:0 - 2 * div = 1 && i735:0 >= div1 && i735:0 - 2 * div > -2 && i735:0 - 2 * div < 2 && i735:0 - 2 * div1 < 2 && i735:0 - 2 * div1 > -2
+f8904_0_slide93_EQ(EOS(STATIC_8904), i735:0) -> f8904_0_slide93_EQ'(EOS(STATIC_8904), i735:0) :|: i735:0 >= div1 && i735:0 - 2 * div = 0
+f8904_0_slide93_EQ'(EOS(STATIC_8904), i735:0) -> f8904_0_slide93_EQ(EOS(STATIC_8904), div1) :|: i735:0 - 2 * div = 0 && i735:0 >= div1 && i735:0 - 2 * div > -2 && i735:0 - 2 * div < 2 && i735:0 - 2 * div1 < 2 && i735:0 - 2 * div1 > -2
+Filtered constant ground arguments:
+   f8904_0_slide93_EQ(x1, x2) -> f8904_0_slide93_EQ(x2)
+   f8904_0_slide93_EQ'(x1, x2) -> f8904_0_slide93_EQ'(x2)
+   EOS(x1) -> EOS
+Finished conversion. Obtained 4 rules.P rules:
+f8904_0_slide93_EQ(i735:0) -> f8904_0_slide93_EQ'(i735:0) :|: i735:0 >= div1 && i735:0 - 2 * div = 1
+f8904_0_slide93_EQ'(i735:0) -> f8904_0_slide93_EQ(div1) :|: i735:0 >= div1 && i735:0 - 2 * div = 1 && i735:0 - 2 * div > -2 && i735:0 - 2 * div < 2 && i735:0 - 2 * div1 > -2 && i735:0 - 2 * div1 < 2
+f8904_0_slide93_EQ(i735:0) -> f8904_0_slide93_EQ'(i735:0) :|: i735:0 >= div1 && i735:0 - 2 * div = 0
+f8904_0_slide93_EQ'(i735:0) -> f8904_0_slide93_EQ(div1) :|: i735:0 >= div1 && i735:0 - 2 * div = 0 && i735:0 - 2 * div > -2 && i735:0 - 2 * div < 2 && i735:0 - 2 * div1 > -2 && i735:0 - 2 * div1 < 2
+
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f8904_0_slide93_EQ(x) -> f8904_0_slide93_EQ'(x) :|: x >= x1 && x - 2 * x2 = 1
+f8904_0_slide93_EQ'(x3) -> f8904_0_slide93_EQ(x4) :|: x3 >= x4 && x3 - 2 * x5 = 1 && x3 - 2 * x5 > -2 && x3 - 2 * x5 < 2 && x3 - 2 * x4 > -2 && x3 - 2 * x4 < 2
+f8904_0_slide93_EQ(x6) -> f8904_0_slide93_EQ'(x6) :|: x6 >= x7 && x6 - 2 * x8 = 0
+f8904_0_slide93_EQ'(x9) -> f8904_0_slide93_EQ(x10) :|: x9 >= x10 && x9 - 2 * x11 = 0 && x9 - 2 * x11 > -2 && x9 - 2 * x11 < 2 && x9 - 2 * x10 > -2 && x9 - 2 * x10 < 2
+
+----------------------------------------
+
+(23) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(24)
+Obligation:
+Rules:
+f8904_0_slide93_EQ(x) -> f8904_0_slide93_EQ'(x) :|: x >= x1 && x - 2 * x2 = 1
+f8904_0_slide93_EQ'(x3) -> f8904_0_slide93_EQ(x4) :|: x3 >= x4 && x3 - 2 * x5 = 1 && x3 - 2 * x5 > -2 && x3 - 2 * x5 < 2 && x3 - 2 * x4 > -2 && x3 - 2 * x4 < 2
+f8904_0_slide93_EQ(x6) -> f8904_0_slide93_EQ'(x6) :|: x6 >= x7 && x6 - 2 * x8 = 0
+f8904_0_slide93_EQ'(x9) -> f8904_0_slide93_EQ(x10) :|: x9 >= x10 && x9 - 2 * x11 = 0 && x9 - 2 * x11 > -2 && x9 - 2 * x11 < 2 && x9 - 2 * x10 > -2 && x9 - 2 * x10 < 2
+
+----------------------------------------
+
+(25) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f8904_0_slide93_EQ(x) -> f8904_0_slide93_EQ'(x) :|: x >= x1 && x - 2 * x2 = 1
+(2) f8904_0_slide93_EQ'(x3) -> f8904_0_slide93_EQ(x4) :|: x3 >= x4 && x3 - 2 * x5 = 1 && x3 - 2 * x5 > -2 && x3 - 2 * x5 < 2 && x3 - 2 * x4 > -2 && x3 - 2 * x4 < 2
+(3) f8904_0_slide93_EQ(x6) -> f8904_0_slide93_EQ'(x6) :|: x6 >= x7 && x6 - 2 * x8 = 0
+(4) f8904_0_slide93_EQ'(x9) -> f8904_0_slide93_EQ(x10) :|: x9 >= x10 && x9 - 2 * x11 = 0 && x9 - 2 * x11 > -2 && x9 - 2 * x11 < 2 && x9 - 2 * x10 > -2 && x9 - 2 * x10 < 2
+
+Arcs:
+(1) -> (2)
+(2) -> (1), (3)
+(3) -> (4)
+(4) -> (1), (3)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(26)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f8904_0_slide93_EQ(x) -> f8904_0_slide93_EQ'(x) :|: x >= x1 && x - 2 * x2 = 1
+(2) f8904_0_slide93_EQ'(x9) -> f8904_0_slide93_EQ(x10) :|: x9 >= x10 && x9 - 2 * x11 = 0 && x9 - 2 * x11 > -2 && x9 - 2 * x11 < 2 && x9 - 2 * x10 > -2 && x9 - 2 * x10 < 2
+(3) f8904_0_slide93_EQ(x6) -> f8904_0_slide93_EQ'(x6) :|: x6 >= x7 && x6 - 2 * x8 = 0
+(4) f8904_0_slide93_EQ'(x3) -> f8904_0_slide93_EQ(x4) :|: x3 >= x4 && x3 - 2 * x5 = 1 && x3 - 2 * x5 > -2 && x3 - 2 * x5 < 2 && x3 - 2 * x4 > -2 && x3 - 2 * x4 < 2
+
+Arcs:
+(1) -> (4)
+(2) -> (1), (3)
+(3) -> (2)
+(4) -> (1), (3)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(27) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(28)
+Obligation:
+Rules:
+f8904_0_slide93_EQ'(x9:0) -> f8904_0_slide93_EQ(x10:0) :|: x9:0 - 2 * x10:0 > -2 && x9:0 - 2 * x10:0 < 2 && x9:0 - 2 * x11:0 < 2 && x9:0 - 2 * x11:0 > -2 && x9:0 - 2 * x11:0 = 0 && x9:0 >= x10:0
+f8904_0_slide93_EQ'(x3:0) -> f8904_0_slide93_EQ(x4:0) :|: x3:0 - 2 * x4:0 > -2 && x3:0 - 2 * x4:0 < 2 && x3:0 - 2 * x5:0 < 2 && x3:0 - 2 * x5:0 > -2 && x3:0 - 2 * x5:0 = 1 && x4:0 <= x3:0
+f8904_0_slide93_EQ(x6:0) -> f8904_0_slide93_EQ'(x6:0) :|: x7:0 <= x6:0 && x6:0 - 2 * x8:0 = 0
+f8904_0_slide93_EQ(x:0) -> f8904_0_slide93_EQ'(x:0) :|: x:0 >= x1:0 && x:0 - 2 * x2:0 = 1
+
+----------------------------------------
+
+(29) FilterProof (EQUIVALENT)
+Used the following sort dictionary for filtering: 
+f8904_0_slide93_EQ'(INTEGER)
+f8904_0_slide93_EQ(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(30)
+Obligation:
+Rules:
+f8904_0_slide93_EQ'(x9:0) -> f8904_0_slide93_EQ(x10:0) :|: x9:0 - 2 * x10:0 > -2 && x9:0 - 2 * x10:0 < 2 && x9:0 - 2 * x11:0 < 2 && x9:0 - 2 * x11:0 > -2 && x9:0 - 2 * x11:0 = 0 && x9:0 >= x10:0
+f8904_0_slide93_EQ'(x3:0) -> f8904_0_slide93_EQ(x4:0) :|: x3:0 - 2 * x4:0 > -2 && x3:0 - 2 * x4:0 < 2 && x3:0 - 2 * x5:0 < 2 && x3:0 - 2 * x5:0 > -2 && x3:0 - 2 * x5:0 = 1 && x4:0 <= x3:0
+f8904_0_slide93_EQ(x6:0) -> f8904_0_slide93_EQ'(x6:0) :|: x7:0 <= x6:0 && x6:0 - 2 * x8:0 = 0
+f8904_0_slide93_EQ(x:0) -> f8904_0_slide93_EQ'(x:0) :|: x:0 >= x1:0 && x:0 - 2 * x2:0 = 1
+
+----------------------------------------
+
+(31) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(32)
+Obligation:
+Rules:
+f8904_0_slide93_EQ'(x9:0:0) -> f8904_0_slide93_EQ(x10:0:0) :|: x9:0:0 - 2 * x11:0:0 = 0 && x9:0:0 >= x10:0:0 && x9:0:0 - 2 * x11:0:0 > -2 && x9:0:0 - 2 * x11:0:0 < 2 && x9:0:0 - 2 * x10:0:0 < 2 && x9:0:0 - 2 * x10:0:0 > -2
+f8904_0_slide93_EQ(x6:0:0) -> f8904_0_slide93_EQ'(x6:0:0) :|: x7:0:0 <= x6:0:0 && x6:0:0 - 2 * x8:0:0 = 0
+f8904_0_slide93_EQ'(x3:0:0) -> f8904_0_slide93_EQ(x4:0:0) :|: x3:0:0 - 2 * x5:0:0 = 1 && x4:0:0 <= x3:0:0 && x3:0:0 - 2 * x5:0:0 > -2 && x3:0:0 - 2 * x5:0:0 < 2 && x3:0:0 - 2 * x4:0:0 < 2 && x3:0:0 - 2 * x4:0:0 > -2
+f8904_0_slide93_EQ(x:0:0) -> f8904_0_slide93_EQ'(x:0:0) :|: x:0:0 >= x1:0:0 && x:0:0 - 2 * x2:0:0 = 1
+
+----------------------------------------
+
+(33) IntTRSPeriodicNontermProof (COMPLETE)
+Normalized system to the following form:
+f(pc, x9:0:0) -> f(2, x10:0:0) :|: pc = 1 && (x9:0:0 - 2 * x11:0:0 = 0 && x9:0:0 >= x10:0:0 && x9:0:0 - 2 * x11:0:0 > -2 && x9:0:0 - 2 * x11:0:0 < 2 && x9:0:0 - 2 * x10:0:0 < 2 && x9:0:0 - 2 * x10:0:0 > -2)
+f(pc, x6:0:0) -> f(1, x6:0:0) :|: pc = 2 && (x7:0:0 <= x6:0:0 && x6:0:0 - 2 * x8:0:0 = 0)
+f(pc, x3:0:0) -> f(2, x4:0:0) :|: pc = 1 && (x3:0:0 - 2 * x5:0:0 = 1 && x4:0:0 <= x3:0:0 && x3:0:0 - 2 * x5:0:0 > -2 && x3:0:0 - 2 * x5:0:0 < 2 && x3:0:0 - 2 * x4:0:0 < 2 && x3:0:0 - 2 * x4:0:0 > -2)
+f(pc, x:0:0) -> f(1, x:0:0) :|: pc = 2 && (x:0:0 >= x1:0:0 && x:0:0 - 2 * x2:0:0 = 1)
+Witness term starting non-terminating reduction: f(1, 1)
+----------------------------------------
+
+(34)
+NO
+
+----------------------------------------
+
+(35)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Kernel93.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*Kernel93: [next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(36) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 57 IRulesP rules:
+f7061_0_slide93_EQ(EOS(STATIC_7061), i525, o1530[Kernel93.next]o1530) -> f7083_0_slide93_Load(EOS(STATIC_7083), i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7083_0_slide93_Load(EOS(STATIC_7083), i525, o1530[Kernel93.next]o1530) -> f7103_0_slide93_Store(EOS(STATIC_7103), i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7103_0_slide93_Store(EOS(STATIC_7103), i525, o1530[Kernel93.next]o1530) -> f7115_0_slide93_Load(EOS(STATIC_7115), i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7115_0_slide93_Load(EOS(STATIC_7115), i525, o1530[Kernel93.next]o1530) -> f7125_0_slide93_InvokeMethod(EOS(STATIC_7125), i525, i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7125_0_slide93_InvokeMethod(EOS(STATIC_7125), i525, i525, o1530[Kernel93.next]o1530) -> f7133_0_check_Load(EOS(STATIC_7133), i525, i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7133_0_check_Load(EOS(STATIC_7133), i525, i525, o1530[Kernel93.next]o1530) -> f7147_0_check_ConstantStackPush(EOS(STATIC_7147), i525, i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7147_0_check_ConstantStackPush(EOS(STATIC_7147), i525, i525, o1530[Kernel93.next]o1530) -> f7159_0_check_IntArithmetic(EOS(STATIC_7159), i525, i525, 2, o1530[Kernel93.next]o1530) :|: TRUE
+f7159_0_check_IntArithmetic(EOS(STATIC_7159), i525, i525, matching1, o1530[Kernel93.next]o1530) -> f7169_0_check_LE(EOS(STATIC_7169), i525, i525 % 2, o1530[Kernel93.next]o1530) :|: TRUE && matching1 = 2
+f7169_0_check_LE(EOS(STATIC_7169), i525, matching1, o1530[Kernel93.next]o1530) -> f7172_0_check_LE(EOS(STATIC_7172), i525, 0, o1530[Kernel93.next]o1530) :|: TRUE && matching1 = 0
+f7169_0_check_LE(EOS(STATIC_7169), i525, matching1, o1530[Kernel93.next]o1530) -> f7173_0_check_LE(EOS(STATIC_7173), i525, 1, o1530[Kernel93.next]o1530) :|: TRUE && matching1 = 1
+f7172_0_check_LE(EOS(STATIC_7172), i525, matching1, o1530[Kernel93.next]o1530) -> f7188_0_check_ConstantStackPush(EOS(STATIC_7188), i525, o1530[Kernel93.next]o1530) :|: 0 <= 0 && matching1 = 0
+f7188_0_check_ConstantStackPush(EOS(STATIC_7188), i525, o1530[Kernel93.next]o1530) -> f7208_0_check_Return(EOS(STATIC_7208), i525, 0, o1530[Kernel93.next]o1530) :|: TRUE
+f7208_0_check_Return(EOS(STATIC_7208), i525, matching1, o1530[Kernel93.next]o1530) -> f7232_0_slide93_EQ(EOS(STATIC_7232), i525, 0, o1530[Kernel93.next]o1530) :|: TRUE && matching1 = 0
+f7232_0_slide93_EQ(EOS(STATIC_7232), i525, matching1, o1530[Kernel93.next]o1530) -> f7291_0_slide93_Load(EOS(STATIC_7291), i525, o1530[Kernel93.next]o1530) :|: TRUE && matching1 = 0
+f7291_0_slide93_Load(EOS(STATIC_7291), i525, o1530[Kernel93.next]o1530) -> f7327_0_slide93_Store(EOS(STATIC_7327), i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7327_0_slide93_Store(EOS(STATIC_7327), i525, o1530[Kernel93.next]o1530) -> f7329_0_slide93_Load(EOS(STATIC_7329), i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7329_0_slide93_Load(EOS(STATIC_7329), i525, o1530[Kernel93.next]o1530) -> f7347_0_slide93_FieldAccess(EOS(STATIC_7347), i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7347_0_slide93_FieldAccess(EOS(STATIC_7347), i525, o1729[Kernel93.next]o1729) -> f7356_0_slide93_FieldAccess(EOS(STATIC_7356), i525, o1730[Kernel93.next]o1729) :|: o1730[Kernel93.next]o1729 < o1729[Kernel93.next]o1729 && o1729[Kernel93.next]o1729 >= 0
+f7356_0_slide93_FieldAccess(EOS(STATIC_7356), i525, o1730[Kernel93.next]o1729) -> f7408_0_slide93_FieldAccess(EOS(STATIC_7408), i525, o1730[Kernel93.next]o1729) :|: o1730[Kernel93.next]o1729 > 0
+f7408_0_slide93_FieldAccess(EOS(STATIC_7408), i525, o1730[Kernel93.next]o1729) -> f7435_0_slide93_Store(EOS(STATIC_7435), i525, o1730[Kernel93.next]o1729) :|: TRUE
+f7435_0_slide93_Store(EOS(STATIC_7435), i525, o1730[Kernel93.next]o1729) -> f7462_0_slide93_Load(EOS(STATIC_7462), i525, o1730[Kernel93.next]o1729) :|: TRUE
+f7462_0_slide93_Load(EOS(STATIC_7462), i525, o1730[Kernel93.next]o1729) -> f7496_0_slide93_ConstantStackPush(EOS(STATIC_7496), i525, o1730[Kernel93.next]o1729) :|: TRUE
+f7496_0_slide93_ConstantStackPush(EOS(STATIC_7496), i525, o1730[Kernel93.next]o1729) -> f7631_0_slide93_IntArithmetic(EOS(STATIC_7631), i525, 2, o1730[Kernel93.next]o1729) :|: TRUE
+f7631_0_slide93_IntArithmetic(EOS(STATIC_7631), i525, matching1, o1730[Kernel93.next]o1729) -> f7692_0_slide93_Store(EOS(STATIC_7692), i633, o1730[Kernel93.next]o1729) :|: i633 = i525 / 2 && i633 <= i525 && matching1 = 2
+f7692_0_slide93_Store(EOS(STATIC_7692), i633, o1730[Kernel93.next]o1729) -> f7805_0_slide93_JMP(EOS(STATIC_7805), i633, o1730[Kernel93.next]o1729) :|: TRUE
+f7805_0_slide93_JMP(EOS(STATIC_7805), i633, o1730[Kernel93.next]o1729) -> f7870_0_slide93_Load(EOS(STATIC_7870), i633, o1730[Kernel93.next]o1729) :|: TRUE
+f7870_0_slide93_Load(EOS(STATIC_7870), i633, o1730[Kernel93.next]o1729) -> f6947_0_slide93_Load(EOS(STATIC_6947), i633, o1730[Kernel93.next]o1730) :|: TRUE
+f6947_0_slide93_Load(EOS(STATIC_6947), i525, o1530[Kernel93.next]o1530) -> f6974_0_slide93_Load(EOS(STATIC_6974), i525, o1530[Kernel93.next]o1530) :|: TRUE
+f6974_0_slide93_Load(EOS(STATIC_6974), i525, o1530[Kernel93.next]o1530) -> f7021_0_slide93_EQ(EOS(STATIC_7021), i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7021_0_slide93_EQ(EOS(STATIC_7021), i525, o1530[Kernel93.next]o1530) -> f7061_0_slide93_EQ(EOS(STATIC_7061), i525, o1530[Kernel93.next]o1530) :|: o1530[Kernel93.next]o1530 > 0
+f7173_0_check_LE(EOS(STATIC_7173), i525, matching1, o1530[Kernel93.next]o1530) -> f7193_0_check_ConstantStackPush(EOS(STATIC_7193), i525, o1530[Kernel93.next]o1530) :|: 1 > 0 && matching1 = 1
+f7193_0_check_ConstantStackPush(EOS(STATIC_7193), i525, o1530[Kernel93.next]o1530) -> f7216_0_check_JMP(EOS(STATIC_7216), i525, 1, o1530[Kernel93.next]o1530) :|: TRUE
+f7216_0_check_JMP(EOS(STATIC_7216), i525, matching1, o1530[Kernel93.next]o1530) -> f7244_0_check_Return(EOS(STATIC_7244), i525, 1, o1530[Kernel93.next]o1530) :|: TRUE && matching1 = 1
+f7244_0_check_Return(EOS(STATIC_7244), i525, matching1, o1530[Kernel93.next]o1530) -> f7302_0_slide93_EQ(EOS(STATIC_7302), i525, 1, o1530[Kernel93.next]o1530) :|: TRUE && matching1 = 1
+f7302_0_slide93_EQ(EOS(STATIC_7302), i525, matching1, o1530[Kernel93.next]o1530) -> f7328_0_slide93_Load(EOS(STATIC_7328), i525, o1530[Kernel93.next]o1530) :|: 1 > 0 && matching1 = 1
+f7328_0_slide93_Load(EOS(STATIC_7328), i525, o1530[Kernel93.next]o1530) -> f7345_0_slide93_FieldAccess(EOS(STATIC_7345), i525, o1530[Kernel93.next]o1530) :|: TRUE
+f7345_0_slide93_FieldAccess(EOS(STATIC_7345), i525, o1727[Kernel93.next]o1727) -> f7352_0_slide93_FieldAccess(EOS(STATIC_7352), i525, o1728[Kernel93.next]o1727) :|: o1728[Kernel93.next]o1727 < o1727[Kernel93.next]o1727 && o1727[Kernel93.next]o1727 >= 0
+f7352_0_slide93_FieldAccess(EOS(STATIC_7352), i525, o1728[Kernel93.next]o1727) -> f7388_0_slide93_FieldAccess(EOS(STATIC_7388), i525, o1728[Kernel93.next]o1727) :|: o1728[Kernel93.next]o1727 > 0
+f7388_0_slide93_FieldAccess(EOS(STATIC_7388), i525, o1728[Kernel93.next]o1727) -> f7419_0_slide93_Store(EOS(STATIC_7419), i525, o1728[Kernel93.next]o1727) :|: TRUE
+f7419_0_slide93_Store(EOS(STATIC_7419), i525, o1728[Kernel93.next]o1727) -> f7449_0_slide93_Load(EOS(STATIC_7449), i525, o1728[Kernel93.next]o1727) :|: TRUE
+f7449_0_slide93_Load(EOS(STATIC_7449), i525, o1728[Kernel93.next]o1727) -> f7474_0_slide93_Load(EOS(STATIC_7474), i525, o1728[Kernel93.next]o1727) :|: TRUE
+f7474_0_slide93_Load(EOS(STATIC_7474), i525, o1728[Kernel93.next]o1727) -> f7552_0_slide93_FieldAccess(EOS(STATIC_7552), i525, o1728[Kernel93.next]o1727) :|: TRUE
+f7552_0_slide93_FieldAccess(EOS(STATIC_7552), i525, o1728[Kernel93.next]o1727) -> f7661_0_slide93_FieldAccess(EOS(STATIC_7661), i525, o1728[Kernel93.next]o1727) :|: TRUE
+f7661_0_slide93_FieldAccess(EOS(STATIC_7661), i525, o1728[Kernel93.next]o1727) -> f7743_0_slide93_Load(EOS(STATIC_7743), i525) :|: TRUE
+f7743_0_slide93_Load(EOS(STATIC_7743), i525) -> f7816_0_slide93_Load(EOS(STATIC_7816), i525) :|: TRUE
+f7816_0_slide93_Load(EOS(STATIC_7816), i525) -> f7961_0_slide93_FieldAccess(EOS(STATIC_7961), i525) :|: TRUE
+f7961_0_slide93_FieldAccess(EOS(STATIC_7961), i525) -> f8234_0_slide93_JMP(EOS(STATIC_8234), i525) :|: TRUE
+f8234_0_slide93_JMP(EOS(STATIC_8234), i525) -> f8326_0_slide93_Load(EOS(STATIC_8326), i525) :|: TRUE
+f8326_0_slide93_Load(EOS(STATIC_8326), i525) -> f8352_0_slide93_FieldAccess(EOS(STATIC_8352), i525) :|: TRUE
+f8352_0_slide93_FieldAccess(EOS(STATIC_8352), i525) -> f8375_0_slide93_Store(EOS(STATIC_8375), i525) :|: TRUE
+f8375_0_slide93_Store(EOS(STATIC_8375), i525) -> f8412_0_slide93_Load(EOS(STATIC_8412), i525) :|: TRUE
+f8412_0_slide93_Load(EOS(STATIC_8412), i525) -> f8447_0_slide93_ConstantStackPush(EOS(STATIC_8447), i525) :|: TRUE
+f8447_0_slide93_ConstantStackPush(EOS(STATIC_8447), i525) -> f8489_0_slide93_IntArithmetic(EOS(STATIC_8489), i525, 2) :|: TRUE
+f8489_0_slide93_IntArithmetic(EOS(STATIC_8489), i525, matching1) -> f8561_0_slide93_Store(EOS(STATIC_8561), i698) :|: i698 = i525 / 2 && i698 <= i525 && matching1 = 2
+f8561_0_slide93_Store(EOS(STATIC_8561), i698) -> f8603_0_slide93_JMP(EOS(STATIC_8603), i698) :|: TRUE
+f8603_0_slide93_JMP(EOS(STATIC_8603), i698) -> f8681_0_slide93_Load(EOS(STATIC_8681), i698) :|: TRUE
+f8681_0_slide93_Load(EOS(STATIC_8681), i698) -> f6947_0_slide93_Load(EOS(STATIC_6947), i698, o1727[Kernel93.next]o1727) :|: o1727[Kernel93.next]o1727 = 1
+Combined rules. Obtained 4 IRulesP rules:
+f7061_0_slide93_EQ(EOS(STATIC_7061), i525:0, o1530[Kernel93.next]o1530:0) -> f7061_0_slide93_EQ'(EOS(STATIC_7061), i525:0, o1530[Kernel93.next]o1530:0) :|: i525:0 - 2 * div = 1 && o1530[Kernel93.next]o1530:0 > -1 && o1728[Kernel93.next]o1727:0 < o1530[Kernel93.next]o1530:0 && i525:0 >= div1 && o1728[Kernel93.next]o1727:0 > 0
+f7061_0_slide93_EQ'(EOS(STATIC_7061), i525:0, o1530[Kernel93.next]o1530:0) -> f7061_0_slide93_EQ(EOS(STATIC_7061), div1, 1) :|: i525:0 - 2 * div = 1 && o1530[Kernel93.next]o1530:0 > -1 && o1728[Kernel93.next]o1727:0 < o1530[Kernel93.next]o1530:0 && o1728[Kernel93.next]o1727:0 > 0 && i525:0 >= div1 && i525:0 - 2 * div > -2 && i525:0 - 2 * div < 2 && i525:0 - 2 * div1 < 2 && i525:0 - 2 * div1 > -2
+f7061_0_slide93_EQ(EOS(STATIC_7061), i525:0, o1530[Kernel93.next]o1530:0) -> f7061_0_slide93_EQ'(EOS(STATIC_7061), i525:0, o1530[Kernel93.next]o1530:0) :|: i525:0 - 2 * div = 0 && o1530[Kernel93.next]o1530:0 > -1 && o1730[Kernel93.next]o1729:0 < o1530[Kernel93.next]o1530:0 && o1730[Kernel93.next]o1729:0 > 0 && o1730[Kernel93.next]o1730:0 > 0 && i525:0 >= div1
+f7061_0_slide93_EQ'(EOS(STATIC_7061), i525:0, o1530[Kernel93.next]o1530:0) -> f7061_0_slide93_EQ(EOS(STATIC_7061), div1, o1730[Kernel93.next]o1730:0) :|: i525:0 - 2 * div = 0 && o1530[Kernel93.next]o1530:0 > -1 && o1730[Kernel93.next]o1729:0 < o1530[Kernel93.next]o1530:0 && o1730[Kernel93.next]o1729:0 > 0 && i525:0 >= div1 && o1730[Kernel93.next]o1730:0 > 0 && i525:0 - 2 * div > -2 && i525:0 - 2 * div < 2 && i525:0 - 2 * div1 < 2 && i525:0 - 2 * div1 > -2
+Filtered constant ground arguments:
+   f7061_0_slide93_EQ(x1, x2, x3) -> f7061_0_slide93_EQ(x2, x3)
+   f7061_0_slide93_EQ'(x1, x2, x3) -> f7061_0_slide93_EQ'(x2, x3)
+   EOS(x1) -> EOS
+Finished conversion. Obtained 4 rules.P rules:
+f7061_0_slide93_EQ(i525:0, o1530[Kernel93.next]o1530:0) -> f7061_0_slide93_EQ'(i525:0, o1530[Kernel93.next]o1530:0) :|: o1530[Kernel93.next]o1530:0 > -1 && i525:0 - 2 * div = 1 && o1728[Kernel93.next]o1727:0 < o1530[Kernel93.next]o1530:0 && o1728[Kernel93.next]o1727:0 > 0 && i525:0 >= div1
+f7061_0_slide93_EQ'(i525:0, o1530[Kernel93.next]o1530:0) -> f7061_0_slide93_EQ(div1, 1) :|: o1530[Kernel93.next]o1530:0 > -1 && i525:0 - 2 * div = 1 && o1728[Kernel93.next]o1727:0 < o1530[Kernel93.next]o1530:0 && o1728[Kernel93.next]o1727:0 > 0 && i525:0 >= div1 && i525:0 - 2 * div > -2 && i525:0 - 2 * div < 2 && i525:0 - 2 * div1 > -2 && i525:0 - 2 * div1 < 2
+f7061_0_slide93_EQ(i525:0, o1530[Kernel93.next]o1530:0) -> f7061_0_slide93_EQ'(i525:0, o1530[Kernel93.next]o1530:0) :|: o1530[Kernel93.next]o1530:0 > -1 && i525:0 - 2 * div = 0 && o1730[Kernel93.next]o1729:0 < o1530[Kernel93.next]o1530:0 && o1730[Kernel93.next]o1729:0 > 0 && i525:0 >= div1 && o1730[Kernel93.next]o1730:0 > 0
+f7061_0_slide93_EQ'(i525:0, o1530[Kernel93.next]o1530:0) -> f7061_0_slide93_EQ(div1, o1730[Kernel93.next]o1730:0) :|: o1530[Kernel93.next]o1530:0 > -1 && i525:0 - 2 * div = 0 && o1730[Kernel93.next]o1729:0 < o1530[Kernel93.next]o1530:0 && o1730[Kernel93.next]o1729:0 > 0 && i525:0 >= div1 && o1730[Kernel93.next]o1730:0 > 0 && i525:0 - 2 * div > -2 && i525:0 - 2 * div < 2 && i525:0 - 2 * div1 > -2 && i525:0 - 2 * div1 < 2
+
+----------------------------------------
+
+(37)
+Obligation:
+Rules:
+f7061_0_slide93_EQ(x, x1) -> f7061_0_slide93_EQ'(x, x1) :|: x1 > -1 && x - 2 * x2 = 1 && x3 < x1 && x3 > 0 && x >= x4
+f7061_0_slide93_EQ'(x5, x6) -> f7061_0_slide93_EQ(x7, 1) :|: x6 > -1 && x5 - 2 * x8 = 1 && x9 < x6 && x9 > 0 && x5 >= x7 && x5 - 2 * x8 > -2 && x5 - 2 * x8 < 2 && x5 - 2 * x7 > -2 && x5 - 2 * x7 < 2
+f7061_0_slide93_EQ(x10, x11) -> f7061_0_slide93_EQ'(x10, x11) :|: x11 > -1 && x10 - 2 * x12 = 0 && x13 < x11 && x13 > 0 && x10 >= x14 && x15 > 0
+f7061_0_slide93_EQ'(x16, x17) -> f7061_0_slide93_EQ(x18, x19) :|: x17 > -1 && x16 - 2 * x20 = 0 && x21 < x17 && x21 > 0 && x16 >= x18 && x19 > 0 && x16 - 2 * x20 > -2 && x16 - 2 * x20 < 2 && x16 - 2 * x18 > -2 && x16 - 2 * x18 < 2
+
+----------------------------------------
+
+(38) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(39)
+Obligation:
+Rules:
+f7061_0_slide93_EQ(x, x1) -> f7061_0_slide93_EQ'(x, x1) :|: x1 > -1 && x - 2 * x2 = 1 && x3 < x1 && x3 > 0 && x >= x4
+f7061_0_slide93_EQ'(x5, x6) -> f7061_0_slide93_EQ(x7, 1) :|: x6 > -1 && x5 - 2 * x8 = 1 && x9 < x6 && x9 > 0 && x5 >= x7 && x5 - 2 * x8 > -2 && x5 - 2 * x8 < 2 && x5 - 2 * x7 > -2 && x5 - 2 * x7 < 2
+f7061_0_slide93_EQ(x10, x11) -> f7061_0_slide93_EQ'(x10, x11) :|: x11 > -1 && x10 - 2 * x12 = 0 && x13 < x11 && x13 > 0 && x10 >= x14 && x15 > 0
+f7061_0_slide93_EQ'(x16, x17) -> f7061_0_slide93_EQ(x18, x19) :|: x17 > -1 && x16 - 2 * x20 = 0 && x21 < x17 && x21 > 0 && x16 >= x18 && x19 > 0 && x16 - 2 * x20 > -2 && x16 - 2 * x20 < 2 && x16 - 2 * x18 > -2 && x16 - 2 * x18 < 2
+
+----------------------------------------
+
+(40) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f7061_0_slide93_EQ(x, x1) -> f7061_0_slide93_EQ'(x, x1) :|: x1 > -1 && x - 2 * x2 = 1 && x3 < x1 && x3 > 0 && x >= x4
+(2) f7061_0_slide93_EQ'(x5, x6) -> f7061_0_slide93_EQ(x7, 1) :|: x6 > -1 && x5 - 2 * x8 = 1 && x9 < x6 && x9 > 0 && x5 >= x7 && x5 - 2 * x8 > -2 && x5 - 2 * x8 < 2 && x5 - 2 * x7 > -2 && x5 - 2 * x7 < 2
+(3) f7061_0_slide93_EQ(x10, x11) -> f7061_0_slide93_EQ'(x10, x11) :|: x11 > -1 && x10 - 2 * x12 = 0 && x13 < x11 && x13 > 0 && x10 >= x14 && x15 > 0
+(4) f7061_0_slide93_EQ'(x16, x17) -> f7061_0_slide93_EQ(x18, x19) :|: x17 > -1 && x16 - 2 * x20 = 0 && x21 < x17 && x21 > 0 && x16 >= x18 && x19 > 0 && x16 - 2 * x20 > -2 && x16 - 2 * x20 < 2 && x16 - 2 * x18 > -2 && x16 - 2 * x18 < 2
+
+Arcs:
+(1) -> (2)
+(3) -> (4)
+(4) -> (1), (3)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(41)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f7061_0_slide93_EQ(x10, x11) -> f7061_0_slide93_EQ'(x10, x11) :|: x11 > -1 && x10 - 2 * x12 = 0 && x13 < x11 && x13 > 0 && x10 >= x14 && x15 > 0
+(2) f7061_0_slide93_EQ'(x16, x17) -> f7061_0_slide93_EQ(x18, x19) :|: x17 > -1 && x16 - 2 * x20 = 0 && x21 < x17 && x21 > 0 && x16 >= x18 && x19 > 0 && x16 - 2 * x20 > -2 && x16 - 2 * x20 < 2 && x16 - 2 * x18 > -2 && x16 - 2 * x18 < 2
+
+Arcs:
+(1) -> (2)
+(2) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(42) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(43)
+Obligation:
+Rules:
+f7061_0_slide93_EQ(x10:0, x11:0) -> f7061_0_slide93_EQ(x18:0, x19:0) :|: x10:0 - 2 * x18:0 < 2 && x15:0 > 0 && x14:0 <= x10:0 && x10:0 - 2 * x18:0 > -2 && x13:0 > 0 && x10:0 - 2 * x20:0 < 2 && x13:0 < x11:0 && x10:0 - 2 * x20:0 > -2 && x10:0 - 2 * x12:0 = 0 && x19:0 > 0 && x18:0 <= x10:0 && x21:0 > 0 && x21:0 < x11:0 && x10:0 - 2 * x20:0 = 0 && x11:0 > -1
+
+----------------------------------------
+
+(44) FilterProof (EQUIVALENT)
+Used the following sort dictionary for filtering: 
+f7061_0_slide93_EQ(INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(45)
+Obligation:
+Rules:
+f7061_0_slide93_EQ(x10:0, x11:0) -> f7061_0_slide93_EQ(x18:0, x19:0) :|: x10:0 - 2 * x18:0 < 2 && x15:0 > 0 && x14:0 <= x10:0 && x10:0 - 2 * x18:0 > -2 && x13:0 > 0 && x10:0 - 2 * x20:0 < 2 && x13:0 < x11:0 && x10:0 - 2 * x20:0 > -2 && x10:0 - 2 * x12:0 = 0 && x19:0 > 0 && x18:0 <= x10:0 && x21:0 > 0 && x21:0 < x11:0 && x10:0 - 2 * x20:0 = 0 && x11:0 > -1
+
+----------------------------------------
+
+(46) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(47)
+Obligation:
+Rules:
+f7061_0_slide93_EQ(x10:0:0, x11:0:0) -> f7061_0_slide93_EQ(x18:0:0, x19:0:0) :|: x10:0:0 - 2 * x20:0:0 = 0 && x11:0:0 > -1 && x21:0:0 < x11:0:0 && x21:0:0 > 0 && x18:0:0 <= x10:0:0 && x19:0:0 > 0 && x10:0:0 - 2 * x12:0:0 = 0 && x10:0:0 - 2 * x20:0:0 > -2 && x13:0:0 < x11:0:0 && x10:0:0 - 2 * x20:0:0 < 2 && x13:0:0 > 0 && x10:0:0 - 2 * x18:0:0 > -2 && x14:0:0 <= x10:0:0 && x15:0:0 > 0 && x10:0:0 - 2 * x18:0:0 < 2
+
+----------------------------------------
+
+(48) IntTRSPeriodicNontermProof (COMPLETE)
+Normalized system to the following form:
+f(pc, x10:0:0, x11:0:0) -> f(1, x18:0:0, x19:0:0) :|: pc = 1 && (x10:0:0 - 2 * x20:0:0 = 0 && x11:0:0 > -1 && x21:0:0 < x11:0:0 && x21:0:0 > 0 && x18:0:0 <= x10:0:0 && x19:0:0 > 0 && x10:0:0 - 2 * x12:0:0 = 0 && x10:0:0 - 2 * x20:0:0 > -2 && x13:0:0 < x11:0:0 && x10:0:0 - 2 * x20:0:0 < 2 && x13:0:0 > 0 && x10:0:0 - 2 * x18:0:0 > -2 && x14:0:0 <= x10:0:0 && x15:0:0 > 0 && x10:0:0 - 2 * x18:0:0 < 2)
+Witness term starting non-terminating reduction: f(1, 0, 15)
+----------------------------------------
+
+(49)
+NO

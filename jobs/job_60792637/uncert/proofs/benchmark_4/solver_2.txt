@@ -1,0 +1,805 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/pTZfC.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+delete(g,g,a)
+
+w.r.t. the given Prolog program could successfully be proven:
+
+(0) Prolog
+(1) PrologToPiTRSProof [SOUND, 0 ms]
+(2) PiTRS
+(3) DependencyPairsProof [EQUIVALENT, 0 ms]
+(4) PiDP
+(5) DependencyGraphProof [EQUIVALENT, 0 ms]
+(6) AND
+    (7) PiDP
+        (8) UsableRulesProof [EQUIVALENT, 0 ms]
+        (9) PiDP
+        (10) PiDPToQDPProof [EQUIVALENT, 0 ms]
+        (11) QDP
+        (12) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (13) YES
+    (14) PiDP
+        (15) UsableRulesProof [EQUIVALENT, 0 ms]
+        (16) PiDP
+        (17) PiDPToQDPProof [SOUND, 0 ms]
+        (18) QDP
+        (19) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (20) YES
+    (21) PiDP
+        (22) UsableRulesProof [EQUIVALENT, 0 ms]
+        (23) PiDP
+        (24) PiDPToQDPProof [SOUND, 0 ms]
+        (25) QDP
+        (26) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (27) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+delete(X, tree(X, void, Right), Right).
+delete(X, tree(X, Left, void), Left).
+delete(X, tree(X, Left, Right), tree(Y, Left, Right1)) :- delmin(Right, Y, Right1).
+delete(X, tree(Y, Left, Right), tree(Y, Left1, Right)) :- ','(less(X, Y), delete(X, Left, Left1)).
+delete(X, tree(Y, Left, Right), tree(Y, Left, Right1)) :- ','(less(Y, X), delete(X, Right, Right1)).
+delmin(tree(Y, void, Right), Y, Right).
+delmin(tree(X, Left, X1), Y, tree(X, Left1, X2)) :- delmin(Left, Y, Left1).
+less(0, s(X3)).
+less(s(X), s(Y)) :- less(X, Y).
+
+
+Query: delete(g,g,a)
+----------------------------------------
+
+(1) PrologToPiTRSProof (SOUND)
+We use the technique of [TOCL09]. With regard to the inferred argument filtering the predicates were used in the following modes:
+
+delete_in_3: (b,b,f)
+
+delmin_in_3: (b,f,f)
+
+less_in_2: (b,b)
+
+Transforming Prolog into the following Term Rewriting System:
+
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   delete_in_gga(X, tree(X, void, Right), Right) -> delete_out_gga(X, tree(X, void, Right), Right)
+   delete_in_gga(X, tree(X, Left, void), Left) -> delete_out_gga(X, tree(X, Left, void), Left)
+   delete_in_gga(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> U1_gga(X, Left, Right, Y, Right1, delmin_in_gaa(Right, Y, Right1))
+   delmin_in_gaa(tree(Y, void, Right), Y, Right) -> delmin_out_gaa(tree(Y, void, Right), Y, Right)
+   delmin_in_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> U6_gaa(X, Left, X1, Y, Left1, X2, delmin_in_gaa(Left, Y, Left1))
+   U6_gaa(X, Left, X1, Y, Left1, X2, delmin_out_gaa(Left, Y, Left1)) -> delmin_out_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2))
+   U1_gga(X, Left, Right, Y, Right1, delmin_out_gaa(Right, Y, Right1)) -> delete_out_gga(X, tree(X, Left, Right), tree(Y, Left, Right1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_gga(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U7_gg(X, Y, less_in_gg(X, Y))
+   U7_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U2_gga(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> U3_gga(X, Y, Left, Right, Left1, delete_in_gga(X, Left, Left1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_gga(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   U4_gga(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> U5_gga(X, Y, Left, Right, Right1, delete_in_gga(X, Right, Right1))
+   U5_gga(X, Y, Left, Right, Right1, delete_out_gga(X, Right, Right1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1))
+   U3_gga(X, Y, Left, Right, Left1, delete_out_gga(X, Left, Left1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right))
+
+The argument filtering Pi contains the following mapping:
+delete_in_gga(x1, x2, x3)  =  delete_in_gga(x1, x2)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+void  =  void
+
+delete_out_gga(x1, x2, x3)  =  delete_out_gga(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+delmin_in_gaa(x1, x2, x3)  =  delmin_in_gaa(x1)
+
+delmin_out_gaa(x1, x2, x3)  =  delmin_out_gaa(x1, x2)
+
+U6_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U6_gaa(x1, x2, x3, x7)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x4, x6)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U7_gg(x1, x2, x3)  =  U7_gg(x1, x2, x3)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x4, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x4, x6)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+
+
+
+
+Infinitary Constructor Rewriting Termination of PiTRS implies Termination of Prolog
+
+
+
+----------------------------------------
+
+(2)
+Obligation:
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   delete_in_gga(X, tree(X, void, Right), Right) -> delete_out_gga(X, tree(X, void, Right), Right)
+   delete_in_gga(X, tree(X, Left, void), Left) -> delete_out_gga(X, tree(X, Left, void), Left)
+   delete_in_gga(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> U1_gga(X, Left, Right, Y, Right1, delmin_in_gaa(Right, Y, Right1))
+   delmin_in_gaa(tree(Y, void, Right), Y, Right) -> delmin_out_gaa(tree(Y, void, Right), Y, Right)
+   delmin_in_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> U6_gaa(X, Left, X1, Y, Left1, X2, delmin_in_gaa(Left, Y, Left1))
+   U6_gaa(X, Left, X1, Y, Left1, X2, delmin_out_gaa(Left, Y, Left1)) -> delmin_out_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2))
+   U1_gga(X, Left, Right, Y, Right1, delmin_out_gaa(Right, Y, Right1)) -> delete_out_gga(X, tree(X, Left, Right), tree(Y, Left, Right1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_gga(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U7_gg(X, Y, less_in_gg(X, Y))
+   U7_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U2_gga(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> U3_gga(X, Y, Left, Right, Left1, delete_in_gga(X, Left, Left1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_gga(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   U4_gga(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> U5_gga(X, Y, Left, Right, Right1, delete_in_gga(X, Right, Right1))
+   U5_gga(X, Y, Left, Right, Right1, delete_out_gga(X, Right, Right1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1))
+   U3_gga(X, Y, Left, Right, Left1, delete_out_gga(X, Left, Left1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right))
+
+The argument filtering Pi contains the following mapping:
+delete_in_gga(x1, x2, x3)  =  delete_in_gga(x1, x2)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+void  =  void
+
+delete_out_gga(x1, x2, x3)  =  delete_out_gga(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+delmin_in_gaa(x1, x2, x3)  =  delmin_in_gaa(x1)
+
+delmin_out_gaa(x1, x2, x3)  =  delmin_out_gaa(x1, x2)
+
+U6_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U6_gaa(x1, x2, x3, x7)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x4, x6)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U7_gg(x1, x2, x3)  =  U7_gg(x1, x2, x3)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x4, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x4, x6)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+
+
+----------------------------------------
+
+(3) DependencyPairsProof (EQUIVALENT)
+Using Dependency Pairs [AG00,LOPSTR] we result in the following initial DP problem:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_GGA(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> U1_GGA(X, Left, Right, Y, Right1, delmin_in_gaa(Right, Y, Right1))
+   DELETE_IN_GGA(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> DELMIN_IN_GAA(Right, Y, Right1)
+   DELMIN_IN_GAA(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> U6_GAA(X, Left, X1, Y, Left1, X2, delmin_in_gaa(Left, Y, Left1))
+   DELMIN_IN_GAA(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> DELMIN_IN_GAA(Left, Y, Left1)
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_GGA(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> LESS_IN_GG(X, Y)
+   LESS_IN_GG(s(X), s(Y)) -> U7_GG(X, Y, less_in_gg(X, Y))
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+   U2_GGA(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> U3_GGA(X, Y, Left, Right, Left1, delete_in_gga(X, Left, Left1))
+   U2_GGA(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> DELETE_IN_GGA(X, Left, Left1)
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_GGA(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> LESS_IN_GG(Y, X)
+   U4_GGA(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> U5_GGA(X, Y, Left, Right, Right1, delete_in_gga(X, Right, Right1))
+   U4_GGA(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> DELETE_IN_GGA(X, Right, Right1)
+
+The TRS R consists of the following rules:
+
+   delete_in_gga(X, tree(X, void, Right), Right) -> delete_out_gga(X, tree(X, void, Right), Right)
+   delete_in_gga(X, tree(X, Left, void), Left) -> delete_out_gga(X, tree(X, Left, void), Left)
+   delete_in_gga(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> U1_gga(X, Left, Right, Y, Right1, delmin_in_gaa(Right, Y, Right1))
+   delmin_in_gaa(tree(Y, void, Right), Y, Right) -> delmin_out_gaa(tree(Y, void, Right), Y, Right)
+   delmin_in_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> U6_gaa(X, Left, X1, Y, Left1, X2, delmin_in_gaa(Left, Y, Left1))
+   U6_gaa(X, Left, X1, Y, Left1, X2, delmin_out_gaa(Left, Y, Left1)) -> delmin_out_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2))
+   U1_gga(X, Left, Right, Y, Right1, delmin_out_gaa(Right, Y, Right1)) -> delete_out_gga(X, tree(X, Left, Right), tree(Y, Left, Right1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_gga(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U7_gg(X, Y, less_in_gg(X, Y))
+   U7_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U2_gga(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> U3_gga(X, Y, Left, Right, Left1, delete_in_gga(X, Left, Left1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_gga(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   U4_gga(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> U5_gga(X, Y, Left, Right, Right1, delete_in_gga(X, Right, Right1))
+   U5_gga(X, Y, Left, Right, Right1, delete_out_gga(X, Right, Right1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1))
+   U3_gga(X, Y, Left, Right, Left1, delete_out_gga(X, Left, Left1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right))
+
+The argument filtering Pi contains the following mapping:
+delete_in_gga(x1, x2, x3)  =  delete_in_gga(x1, x2)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+void  =  void
+
+delete_out_gga(x1, x2, x3)  =  delete_out_gga(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+delmin_in_gaa(x1, x2, x3)  =  delmin_in_gaa(x1)
+
+delmin_out_gaa(x1, x2, x3)  =  delmin_out_gaa(x1, x2)
+
+U6_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U6_gaa(x1, x2, x3, x7)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x4, x6)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U7_gg(x1, x2, x3)  =  U7_gg(x1, x2, x3)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x4, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x4, x6)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+DELETE_IN_GGA(x1, x2, x3)  =  DELETE_IN_GGA(x1, x2)
+
+U1_GGA(x1, x2, x3, x4, x5, x6)  =  U1_GGA(x1, x2, x3, x6)
+
+DELMIN_IN_GAA(x1, x2, x3)  =  DELMIN_IN_GAA(x1)
+
+U6_GAA(x1, x2, x3, x4, x5, x6, x7)  =  U6_GAA(x1, x2, x3, x7)
+
+U2_GGA(x1, x2, x3, x4, x5, x6)  =  U2_GGA(x1, x2, x3, x4, x6)
+
+LESS_IN_GG(x1, x2)  =  LESS_IN_GG(x1, x2)
+
+U7_GG(x1, x2, x3)  =  U7_GG(x1, x2, x3)
+
+U3_GGA(x1, x2, x3, x4, x5, x6)  =  U3_GGA(x1, x2, x3, x4, x6)
+
+U4_GGA(x1, x2, x3, x4, x5, x6)  =  U4_GGA(x1, x2, x3, x4, x6)
+
+U5_GGA(x1, x2, x3, x4, x5, x6)  =  U5_GGA(x1, x2, x3, x4, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(4)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_GGA(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> U1_GGA(X, Left, Right, Y, Right1, delmin_in_gaa(Right, Y, Right1))
+   DELETE_IN_GGA(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> DELMIN_IN_GAA(Right, Y, Right1)
+   DELMIN_IN_GAA(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> U6_GAA(X, Left, X1, Y, Left1, X2, delmin_in_gaa(Left, Y, Left1))
+   DELMIN_IN_GAA(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> DELMIN_IN_GAA(Left, Y, Left1)
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_GGA(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> LESS_IN_GG(X, Y)
+   LESS_IN_GG(s(X), s(Y)) -> U7_GG(X, Y, less_in_gg(X, Y))
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+   U2_GGA(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> U3_GGA(X, Y, Left, Right, Left1, delete_in_gga(X, Left, Left1))
+   U2_GGA(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> DELETE_IN_GGA(X, Left, Left1)
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_GGA(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> LESS_IN_GG(Y, X)
+   U4_GGA(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> U5_GGA(X, Y, Left, Right, Right1, delete_in_gga(X, Right, Right1))
+   U4_GGA(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> DELETE_IN_GGA(X, Right, Right1)
+
+The TRS R consists of the following rules:
+
+   delete_in_gga(X, tree(X, void, Right), Right) -> delete_out_gga(X, tree(X, void, Right), Right)
+   delete_in_gga(X, tree(X, Left, void), Left) -> delete_out_gga(X, tree(X, Left, void), Left)
+   delete_in_gga(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> U1_gga(X, Left, Right, Y, Right1, delmin_in_gaa(Right, Y, Right1))
+   delmin_in_gaa(tree(Y, void, Right), Y, Right) -> delmin_out_gaa(tree(Y, void, Right), Y, Right)
+   delmin_in_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> U6_gaa(X, Left, X1, Y, Left1, X2, delmin_in_gaa(Left, Y, Left1))
+   U6_gaa(X, Left, X1, Y, Left1, X2, delmin_out_gaa(Left, Y, Left1)) -> delmin_out_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2))
+   U1_gga(X, Left, Right, Y, Right1, delmin_out_gaa(Right, Y, Right1)) -> delete_out_gga(X, tree(X, Left, Right), tree(Y, Left, Right1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_gga(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U7_gg(X, Y, less_in_gg(X, Y))
+   U7_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U2_gga(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> U3_gga(X, Y, Left, Right, Left1, delete_in_gga(X, Left, Left1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_gga(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   U4_gga(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> U5_gga(X, Y, Left, Right, Right1, delete_in_gga(X, Right, Right1))
+   U5_gga(X, Y, Left, Right, Right1, delete_out_gga(X, Right, Right1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1))
+   U3_gga(X, Y, Left, Right, Left1, delete_out_gga(X, Left, Left1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right))
+
+The argument filtering Pi contains the following mapping:
+delete_in_gga(x1, x2, x3)  =  delete_in_gga(x1, x2)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+void  =  void
+
+delete_out_gga(x1, x2, x3)  =  delete_out_gga(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+delmin_in_gaa(x1, x2, x3)  =  delmin_in_gaa(x1)
+
+delmin_out_gaa(x1, x2, x3)  =  delmin_out_gaa(x1, x2)
+
+U6_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U6_gaa(x1, x2, x3, x7)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x4, x6)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U7_gg(x1, x2, x3)  =  U7_gg(x1, x2, x3)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x4, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x4, x6)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+DELETE_IN_GGA(x1, x2, x3)  =  DELETE_IN_GGA(x1, x2)
+
+U1_GGA(x1, x2, x3, x4, x5, x6)  =  U1_GGA(x1, x2, x3, x6)
+
+DELMIN_IN_GAA(x1, x2, x3)  =  DELMIN_IN_GAA(x1)
+
+U6_GAA(x1, x2, x3, x4, x5, x6, x7)  =  U6_GAA(x1, x2, x3, x7)
+
+U2_GGA(x1, x2, x3, x4, x5, x6)  =  U2_GGA(x1, x2, x3, x4, x6)
+
+LESS_IN_GG(x1, x2)  =  LESS_IN_GG(x1, x2)
+
+U7_GG(x1, x2, x3)  =  U7_GG(x1, x2, x3)
+
+U3_GGA(x1, x2, x3, x4, x5, x6)  =  U3_GGA(x1, x2, x3, x4, x6)
+
+U4_GGA(x1, x2, x3, x4, x5, x6)  =  U4_GGA(x1, x2, x3, x4, x6)
+
+U5_GGA(x1, x2, x3, x4, x5, x6)  =  U5_GGA(x1, x2, x3, x4, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(5) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LOPSTR] contains 3 SCCs with 8 less nodes.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+
+The TRS R consists of the following rules:
+
+   delete_in_gga(X, tree(X, void, Right), Right) -> delete_out_gga(X, tree(X, void, Right), Right)
+   delete_in_gga(X, tree(X, Left, void), Left) -> delete_out_gga(X, tree(X, Left, void), Left)
+   delete_in_gga(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> U1_gga(X, Left, Right, Y, Right1, delmin_in_gaa(Right, Y, Right1))
+   delmin_in_gaa(tree(Y, void, Right), Y, Right) -> delmin_out_gaa(tree(Y, void, Right), Y, Right)
+   delmin_in_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> U6_gaa(X, Left, X1, Y, Left1, X2, delmin_in_gaa(Left, Y, Left1))
+   U6_gaa(X, Left, X1, Y, Left1, X2, delmin_out_gaa(Left, Y, Left1)) -> delmin_out_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2))
+   U1_gga(X, Left, Right, Y, Right1, delmin_out_gaa(Right, Y, Right1)) -> delete_out_gga(X, tree(X, Left, Right), tree(Y, Left, Right1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_gga(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U7_gg(X, Y, less_in_gg(X, Y))
+   U7_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U2_gga(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> U3_gga(X, Y, Left, Right, Left1, delete_in_gga(X, Left, Left1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_gga(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   U4_gga(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> U5_gga(X, Y, Left, Right, Right1, delete_in_gga(X, Right, Right1))
+   U5_gga(X, Y, Left, Right, Right1, delete_out_gga(X, Right, Right1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1))
+   U3_gga(X, Y, Left, Right, Left1, delete_out_gga(X, Left, Left1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right))
+
+The argument filtering Pi contains the following mapping:
+delete_in_gga(x1, x2, x3)  =  delete_in_gga(x1, x2)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+void  =  void
+
+delete_out_gga(x1, x2, x3)  =  delete_out_gga(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+delmin_in_gaa(x1, x2, x3)  =  delmin_in_gaa(x1)
+
+delmin_out_gaa(x1, x2, x3)  =  delmin_out_gaa(x1, x2)
+
+U6_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U6_gaa(x1, x2, x3, x7)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x4, x6)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U7_gg(x1, x2, x3)  =  U7_gg(x1, x2, x3)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x4, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x4, x6)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+LESS_IN_GG(x1, x2)  =  LESS_IN_GG(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(8) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(9)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+
+R is empty.
+Pi is empty.
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(10) PiDPToQDPProof (EQUIVALENT)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(12) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+The graph contains the following edges 1 > 1, 2 > 2
+
+
+----------------------------------------
+
+(13)
+YES
+
+----------------------------------------
+
+(14)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELMIN_IN_GAA(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> DELMIN_IN_GAA(Left, Y, Left1)
+
+The TRS R consists of the following rules:
+
+   delete_in_gga(X, tree(X, void, Right), Right) -> delete_out_gga(X, tree(X, void, Right), Right)
+   delete_in_gga(X, tree(X, Left, void), Left) -> delete_out_gga(X, tree(X, Left, void), Left)
+   delete_in_gga(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> U1_gga(X, Left, Right, Y, Right1, delmin_in_gaa(Right, Y, Right1))
+   delmin_in_gaa(tree(Y, void, Right), Y, Right) -> delmin_out_gaa(tree(Y, void, Right), Y, Right)
+   delmin_in_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> U6_gaa(X, Left, X1, Y, Left1, X2, delmin_in_gaa(Left, Y, Left1))
+   U6_gaa(X, Left, X1, Y, Left1, X2, delmin_out_gaa(Left, Y, Left1)) -> delmin_out_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2))
+   U1_gga(X, Left, Right, Y, Right1, delmin_out_gaa(Right, Y, Right1)) -> delete_out_gga(X, tree(X, Left, Right), tree(Y, Left, Right1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_gga(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U7_gg(X, Y, less_in_gg(X, Y))
+   U7_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U2_gga(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> U3_gga(X, Y, Left, Right, Left1, delete_in_gga(X, Left, Left1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_gga(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   U4_gga(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> U5_gga(X, Y, Left, Right, Right1, delete_in_gga(X, Right, Right1))
+   U5_gga(X, Y, Left, Right, Right1, delete_out_gga(X, Right, Right1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1))
+   U3_gga(X, Y, Left, Right, Left1, delete_out_gga(X, Left, Left1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right))
+
+The argument filtering Pi contains the following mapping:
+delete_in_gga(x1, x2, x3)  =  delete_in_gga(x1, x2)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+void  =  void
+
+delete_out_gga(x1, x2, x3)  =  delete_out_gga(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+delmin_in_gaa(x1, x2, x3)  =  delmin_in_gaa(x1)
+
+delmin_out_gaa(x1, x2, x3)  =  delmin_out_gaa(x1, x2)
+
+U6_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U6_gaa(x1, x2, x3, x7)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x4, x6)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U7_gg(x1, x2, x3)  =  U7_gg(x1, x2, x3)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x4, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x4, x6)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+DELMIN_IN_GAA(x1, x2, x3)  =  DELMIN_IN_GAA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(15) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(16)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELMIN_IN_GAA(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> DELMIN_IN_GAA(Left, Y, Left1)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+DELMIN_IN_GAA(x1, x2, x3)  =  DELMIN_IN_GAA(x1)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(17) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(18)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   DELMIN_IN_GAA(tree(X, Left, X1)) -> DELMIN_IN_GAA(Left)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(19) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*DELMIN_IN_GAA(tree(X, Left, X1)) -> DELMIN_IN_GAA(Left)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(20)
+YES
+
+----------------------------------------
+
+(21)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_GGA(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   U2_GGA(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> DELETE_IN_GGA(X, Left, Left1)
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_GGA(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   U4_GGA(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> DELETE_IN_GGA(X, Right, Right1)
+
+The TRS R consists of the following rules:
+
+   delete_in_gga(X, tree(X, void, Right), Right) -> delete_out_gga(X, tree(X, void, Right), Right)
+   delete_in_gga(X, tree(X, Left, void), Left) -> delete_out_gga(X, tree(X, Left, void), Left)
+   delete_in_gga(X, tree(X, Left, Right), tree(Y, Left, Right1)) -> U1_gga(X, Left, Right, Y, Right1, delmin_in_gaa(Right, Y, Right1))
+   delmin_in_gaa(tree(Y, void, Right), Y, Right) -> delmin_out_gaa(tree(Y, void, Right), Y, Right)
+   delmin_in_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2)) -> U6_gaa(X, Left, X1, Y, Left1, X2, delmin_in_gaa(Left, Y, Left1))
+   U6_gaa(X, Left, X1, Y, Left1, X2, delmin_out_gaa(Left, Y, Left1)) -> delmin_out_gaa(tree(X, Left, X1), Y, tree(X, Left1, X2))
+   U1_gga(X, Left, Right, Y, Right1, delmin_out_gaa(Right, Y, Right1)) -> delete_out_gga(X, tree(X, Left, Right), tree(Y, Left, Right1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_gga(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U7_gg(X, Y, less_in_gg(X, Y))
+   U7_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U2_gga(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> U3_gga(X, Y, Left, Right, Left1, delete_in_gga(X, Left, Left1))
+   delete_in_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_gga(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   U4_gga(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> U5_gga(X, Y, Left, Right, Right1, delete_in_gga(X, Right, Right1))
+   U5_gga(X, Y, Left, Right, Right1, delete_out_gga(X, Right, Right1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left, Right1))
+   U3_gga(X, Y, Left, Right, Left1, delete_out_gga(X, Left, Left1)) -> delete_out_gga(X, tree(Y, Left, Right), tree(Y, Left1, Right))
+
+The argument filtering Pi contains the following mapping:
+delete_in_gga(x1, x2, x3)  =  delete_in_gga(x1, x2)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+void  =  void
+
+delete_out_gga(x1, x2, x3)  =  delete_out_gga(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+delmin_in_gaa(x1, x2, x3)  =  delmin_in_gaa(x1)
+
+delmin_out_gaa(x1, x2, x3)  =  delmin_out_gaa(x1, x2)
+
+U6_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U6_gaa(x1, x2, x3, x7)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x4, x6)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U7_gg(x1, x2, x3)  =  U7_gg(x1, x2, x3)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x4, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x4, x6)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+DELETE_IN_GGA(x1, x2, x3)  =  DELETE_IN_GGA(x1, x2)
+
+U2_GGA(x1, x2, x3, x4, x5, x6)  =  U2_GGA(x1, x2, x3, x4, x6)
+
+U4_GGA(x1, x2, x3, x4, x5, x6)  =  U4_GGA(x1, x2, x3, x4, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(22) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(23)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left1, Right)) -> U2_GGA(X, Y, Left, Right, Left1, less_in_gg(X, Y))
+   U2_GGA(X, Y, Left, Right, Left1, less_out_gg(X, Y)) -> DELETE_IN_GGA(X, Left, Left1)
+   DELETE_IN_GGA(X, tree(Y, Left, Right), tree(Y, Left, Right1)) -> U4_GGA(X, Y, Left, Right, Right1, less_in_gg(Y, X))
+   U4_GGA(X, Y, Left, Right, Right1, less_out_gg(Y, X)) -> DELETE_IN_GGA(X, Right, Right1)
+
+The TRS R consists of the following rules:
+
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U7_gg(X, Y, less_in_gg(X, Y))
+   U7_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+
+The argument filtering Pi contains the following mapping:
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U7_gg(x1, x2, x3)  =  U7_gg(x1, x2, x3)
+
+DELETE_IN_GGA(x1, x2, x3)  =  DELETE_IN_GGA(x1, x2)
+
+U2_GGA(x1, x2, x3, x4, x5, x6)  =  U2_GGA(x1, x2, x3, x4, x6)
+
+U4_GGA(x1, x2, x3, x4, x5, x6)  =  U4_GGA(x1, x2, x3, x4, x6)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(24) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(25)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_GGA(X, tree(Y, Left, Right)) -> U2_GGA(X, Y, Left, Right, less_in_gg(X, Y))
+   U2_GGA(X, Y, Left, Right, less_out_gg(X, Y)) -> DELETE_IN_GGA(X, Left)
+   DELETE_IN_GGA(X, tree(Y, Left, Right)) -> U4_GGA(X, Y, Left, Right, less_in_gg(Y, X))
+   U4_GGA(X, Y, Left, Right, less_out_gg(Y, X)) -> DELETE_IN_GGA(X, Right)
+
+The TRS R consists of the following rules:
+
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U7_gg(X, Y, less_in_gg(X, Y))
+   U7_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+
+The set Q consists of the following terms:
+
+   less_in_gg(x0, x1)
+   U7_gg(x0, x1, x2)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(26) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*U2_GGA(X, Y, Left, Right, less_out_gg(X, Y)) -> DELETE_IN_GGA(X, Left)
+The graph contains the following edges 1 >= 1, 5 > 1, 3 >= 2
+
+
+*U4_GGA(X, Y, Left, Right, less_out_gg(Y, X)) -> DELETE_IN_GGA(X, Right)
+The graph contains the following edges 1 >= 1, 5 > 1, 4 >= 2
+
+
+*DELETE_IN_GGA(X, tree(Y, Left, Right)) -> U2_GGA(X, Y, Left, Right, less_in_gg(X, Y))
+The graph contains the following edges 1 >= 1, 2 > 2, 2 > 3, 2 > 4
+
+
+*DELETE_IN_GGA(X, tree(Y, Left, Right)) -> U4_GGA(X, Y, Left, Right, less_in_gg(Y, X))
+The graph contains the following edges 1 >= 1, 2 > 2, 2 > 3, 2 > 4
+
+
+----------------------------------------
+
+(27)
+YES

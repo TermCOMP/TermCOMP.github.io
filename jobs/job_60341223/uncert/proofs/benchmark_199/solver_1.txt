@@ -1,0 +1,127 @@
+YES
+We consider the system pDXga.
+
+  Alphabet:
+
+    append : [a * a] --> a 
+    combine : [a * a] --> a 
+    cons : [a * a] --> a 
+    levels : [] --> a -> a 
+    map : [a -> a * a] --> a 
+    nil : [] --> a 
+    node : [a * a] --> a 
+    zip : [a * a] --> a 
+
+  Rules:
+
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    append(X, nil) => X 
+    append(nil, X) => X 
+    append(cons(X, Y), Z) => cons(X, append(Y, Z)) 
+    zip(nil, X) => X 
+    zip(X, nil) => X 
+    zip(cons(X, Y), cons(Z, U)) => cons(append(X, Z), zip(Y, U)) 
+    combine(X, nil) => X 
+    combine(X, cons(Y, Z)) => combine(zip(X, Y), Z) 
+    levels node(X, Y) => cons(cons(X, nil), combine(nil, map(levels, Y))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  append(X, nil) >? X 
+  append(nil, X) >? X 
+  append(cons(X, Y), Z) >? cons(X, append(Y, Z)) 
+  zip(nil, X) >? X 
+  zip(X, nil) >? X 
+  zip(cons(X, Y), cons(Z, U)) >? cons(append(X, Z), zip(Y, U)) 
+  combine(X, nil) >? X 
+  combine(X, cons(Y, Z)) >? combine(zip(X, Y), Z) 
+  levels node(X, Y) >? cons(cons(X, nil), combine(nil, map(levels, Y))) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  append = Lam[y0;y1].y0 + y1 
+  combine = Lam[y0;y1].y0 + y1 
+  cons = Lam[y0;y1].1 + y0 + y1 
+  levels = Lam[y0].0 
+  map = Lam[G0;y1].2*y1 + 2*y1*G0(y1) + 2*G0(0) 
+  nil = 0 
+  node = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  zip = Lam[y0;y1].y0 + y1 
+
+Using this interpretation, the requirements translate to:
+
+  [[map(_F0, nil)]] = 2*F0(0) >= 0 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 2 + 2*x1 + 2*x2 + 2*x1*F0(1 + x1 + x2) + 2*x2*F0(1 + x1 + x2) + 2*F0(0) + 2*F0(1 + x1 + x2) > 1 + x1 + 2*x2 + F0(x1) + 2*x2*F0(x2) + 2*F0(0) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+  [[append(_x0, nil)]] = x0 >= x0 = [[_x0]] 
+  [[append(nil, _x0)]] = x0 >= x0 = [[_x0]] 
+  [[append(cons(_x0, _x1), _x2)]] = 1 + x0 + x1 + x2 >= 1 + x0 + x1 + x2 = [[cons(_x0, append(_x1, _x2))]] 
+  [[zip(nil, _x0)]] = x0 >= x0 = [[_x0]] 
+  [[zip(_x0, nil)]] = x0 >= x0 = [[_x0]] 
+  [[zip(cons(_x0, _x1), cons(_x2, _x3))]] = 2 + x0 + x1 + x2 + x3 > 1 + x0 + x1 + x2 + x3 = [[cons(append(_x0, _x2), zip(_x1, _x3))]] 
+  [[combine(_x0, nil)]] = x0 >= x0 = [[_x0]] 
+  [[combine(_x0, cons(_x1, _x2))]] = 1 + x0 + x1 + x2 > x0 + x1 + x2 = [[combine(zip(_x0, _x1), _x2)]] 
+  [[levels node(_x0, _x1)]] = 3 + 3*x0 + 3*x1 > 2 + x0 + 2*x1 = [[cons(cons(_x0, nil), combine(nil, map(levels, _x1)))]] 
+
+We can thus remove the following rules:
+
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  zip(cons(X, Y), cons(Z, U)) => cons(append(X, Z), zip(Y, U)) 
+  combine(X, cons(Y, Z)) => combine(zip(X, Y), Z) 
+  levels node(X, Y) => cons(cons(X, nil), combine(nil, map(levels, Y))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map(F, nil) >? nil 
+  append(X, nil) >? X 
+  append(nil, X) >? X 
+  append(cons(X, Y), Z) >? cons(X, append(Y, Z)) 
+  zip(nil, X) >? X 
+  zip(X, nil) >? X 
+  combine(X, nil) >? X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  append = Lam[y0;y1].3 + y1 + 3*y0 
+  combine = Lam[y0;y1].3 + y0 + y1 
+  cons = Lam[y0;y1].3 + y0 + y1 
+  map = Lam[G0;y1].3 + 3*y1 + G0(0) 
+  nil = 0 
+  zip = Lam[y0;y1].3 + y0 + y1 
+
+Using this interpretation, the requirements translate to:
+
+  [[map(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+  [[append(_x0, nil)]] = 3 + 3*x0 > x0 = [[_x0]] 
+  [[append(nil, _x0)]] = 3 + x0 > x0 = [[_x0]] 
+  [[append(cons(_x0, _x1), _x2)]] = 12 + x2 + 3*x0 + 3*x1 > 6 + x0 + x2 + 3*x1 = [[cons(_x0, append(_x1, _x2))]] 
+  [[zip(nil, _x0)]] = 3 + x0 > x0 = [[_x0]] 
+  [[zip(_x0, nil)]] = 3 + x0 > x0 = [[_x0]] 
+  [[combine(_x0, nil)]] = 3 + x0 > x0 = [[_x0]] 
+
+We can thus remove the following rules:
+
+  map(F, nil) => nil 
+  append(X, nil) => X 
+  append(nil, X) => X 
+  append(cons(X, Y), Z) => cons(X, append(Y, Z)) 
+  zip(nil, X) => X 
+  zip(X, nil) => X 
+  combine(X, nil) => X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

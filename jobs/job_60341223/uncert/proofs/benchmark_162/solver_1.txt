@@ -1,0 +1,289 @@
+YES
+We consider the system U0RVY.
+
+  Alphabet:
+
+    O : [] --> a 
+    cons : [a * c] --> c 
+    false : [] --> b 
+    filter : [a -> b] --> c -> c 
+    filtersub : [b * a -> b * c] --> c 
+    neq : [a] --> a -> b 
+    nil : [] --> c 
+    nonzero : [] --> c -> c 
+    s : [a] --> a 
+    true : [] --> b 
+
+  Rules:
+
+    neq(O) O => false 
+    neq(O) s(X) => true 
+    neq(s(X)) O => true 
+    neq(s(X)) s(Y) => neq(X) Y 
+    filter(F) nil => nil 
+    filter(F) cons(X, Y) => filtersub(F X, F, cons(X, Y)) 
+    filtersub(true, F, cons(X, Y)) => cons(X, filter(F) Y) 
+    filtersub(false, F, cons(X, Y)) => filter(F) Y 
+    nonzero => filter(neq(O)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  neq(O) O >? false 
+  neq(O) s(X) >? true 
+  neq(s(X)) O >? true 
+  neq(s(X)) s(Y) >? neq(X) Y 
+  filter(F) nil >? nil 
+  filter(F) cons(X, Y) >? filtersub(F X, F, cons(X, Y)) 
+  filtersub(true, F, cons(X, Y)) >? cons(X, filter(F) Y) 
+  filtersub(false, F, cons(X, Y)) >? filter(F) Y 
+  nonzero >? filter(neq(O)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[@_{o -> o}(x_1, x_2)]] = @_{o -> o}(x_2, x_1) 
+  [[O]] = _|_ 
+  [[false]] = _|_ 
+  [[filtersub(x_1, x_2, x_3)]] = filtersub(x_3, x_2, x_1) 
+  [[nil]] = _|_ 
+  [[true]] = _|_ 
+
+We choose Lex = {@_{o -> o}, filtersub} and Mul = {cons, filter, neq, nonzero, s}, and the following precedence: nonzero > neq > @_{o -> o} = filtersub > filter > cons > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(neq(_|_), _|_) >= _|_ 
+  @_{o -> o}(neq(_|_), s(X)) >= _|_ 
+  @_{o -> o}(neq(s(X)), _|_) >= _|_ 
+  @_{o -> o}(neq(s(X)), s(Y)) >= @_{o -> o}(neq(X), Y) 
+  @_{o -> o}(filter(F), _|_) >= _|_ 
+  @_{o -> o}(filter(F), cons(X, Y)) >= filtersub(@_{o -> o}(F, X), F, cons(X, Y)) 
+  filtersub(_|_, F, cons(X, Y)) >= cons(X, @_{o -> o}(filter(F), Y)) 
+  filtersub(_|_, F, cons(X, Y)) > @_{o -> o}(filter(F), Y) 
+  nonzero >= filter(neq(_|_)) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(neq(_|_), _|_) >= _|_  by (Bot) 
+
+  2] @_{o -> o}(neq(_|_), s(X)) >= _|_  by (Bot) 
+
+  3] @_{o -> o}(neq(s(X)), _|_) >= _|_  by (Bot) 
+
+  4] @_{o -> o}(neq(s(X)), s(Y)) >= @_{o -> o}(neq(X), Y)  because @_{o -> o} in Lex, [5] and [10], by (Fun) 
+  5] neq(s(X)) >= neq(X)  because [6], by (Star) 
+  6] neq*(s(X)) >= neq(X)  because neq in Mul and [7], by (Stat) 
+  7] s(X) > X  because [8], by definition 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] s(Y) >= Y  because [11], by (Star) 
+  11] s*(Y) >= Y  because [12], by (Select) 
+  12] Y >= Y  by (Meta) 
+
+  13] @_{o -> o}(filter(F), _|_) >= _|_  by (Bot) 
+
+  14] @_{o -> o}(filter(F), cons(X, Y)) >= filtersub(@_{o -> o}(F, X), F, cons(X, Y))  because [15], by (Star) 
+  15] @_{o -> o}*(filter(F), cons(X, Y)) >= filtersub(@_{o -> o}(F, X), F, cons(X, Y))  because @_{o -> o} = filtersub, @_{o -> o} in Lex, [16], [19], [22], [25] and [28], by (Stat) 
+  16] filter(F) > F  because [17], by definition 
+  17] filter*(F) >= F  because [18], by (Select) 
+  18] F >= F  by (Meta) 
+  19] cons(X, Y) >= cons(X, Y)  because cons in Mul, [20] and [21], by (Fun) 
+  20] X >= X  by (Meta) 
+  21] Y >= Y  by (Meta) 
+  22] @_{o -> o}*(filter(F), cons(X, Y)) >= @_{o -> o}(F, X)  because @_{o -> o} in Lex, [16], [23], [25] and [27], by (Stat) 
+  23] cons(X, Y) >= X  because [24], by (Star) 
+  24] cons*(X, Y) >= X  because [20], by (Select) 
+  25] @_{o -> o}*(filter(F), cons(X, Y)) >= F  because [26], by (Select) 
+  26] filter(F) >= F  because [17], by (Star) 
+  27] @_{o -> o}*(filter(F), cons(X, Y)) >= X  because [23], by (Select) 
+  28] @_{o -> o}*(filter(F), cons(X, Y)) >= cons(X, Y)  because [29], by (Select) 
+  29] filter(F) @_{o -> o}*(filter(F), cons(X, Y)) >= cons(X, Y)  because [30] 
+  30] filter*(F, @_{o -> o}*(filter(F), cons(X, Y))) >= cons(X, Y)  because [31], by (Select) 
+  31] @_{o -> o}*(filter(F), cons(X, Y)) >= cons(X, Y)  because [32], by (Select) 
+  32] cons(X, Y) >= cons(X, Y)  because cons in Mul, [20] and [21], by (Fun) 
+
+  33] filtersub(_|_, F, cons(X, Y)) >= cons(X, @_{o -> o}(filter(F), Y))  because [34], by (Star) 
+  34] filtersub*(_|_, F, cons(X, Y)) >= cons(X, @_{o -> o}(filter(F), Y))  because filtersub > cons, [35] and [39], by (Copy) 
+  35] filtersub*(_|_, F, cons(X, Y)) >= X  because [36], by (Select) 
+  36] cons(X, Y) >= X  because [37], by (Star) 
+  37] cons*(X, Y) >= X  because [38], by (Select) 
+  38] X >= X  by (Meta) 
+  39] filtersub*(_|_, F, cons(X, Y)) >= @_{o -> o}(filter(F), Y)  because filtersub = @_{o -> o}, filtersub in Lex, [40], [43] and [46], by (Stat) 
+  40] cons(X, Y) > Y  because [41], by definition 
+  41] cons*(X, Y) >= Y  because [42], by (Select) 
+  42] Y >= Y  by (Meta) 
+  43] filtersub*(_|_, F, cons(X, Y)) >= filter(F)  because filtersub > filter and [44], by (Copy) 
+  44] filtersub*(_|_, F, cons(X, Y)) >= F  because [45], by (Select) 
+  45] F >= F  by (Meta) 
+  46] filtersub*(_|_, F, cons(X, Y)) >= Y  because [47], by (Select) 
+  47] cons(X, Y) >= Y  because [41], by (Star) 
+
+  48] filtersub(_|_, F, cons(X, Y)) > @_{o -> o}(filter(F), Y)  because [49], by definition 
+  49] filtersub*(_|_, F, cons(X, Y)) >= @_{o -> o}(filter(F), Y)  because filtersub = @_{o -> o}, filtersub in Lex, [50], [53] and [56], by (Stat) 
+  50] cons(X, Y) > Y  because [51], by definition 
+  51] cons*(X, Y) >= Y  because [52], by (Select) 
+  52] Y >= Y  by (Meta) 
+  53] filtersub*(_|_, F, cons(X, Y)) >= filter(F)  because filtersub > filter and [54], by (Copy) 
+  54] filtersub*(_|_, F, cons(X, Y)) >= F  because [55], by (Select) 
+  55] F >= F  by (Meta) 
+  56] filtersub*(_|_, F, cons(X, Y)) >= Y  because [57], by (Select) 
+  57] cons(X, Y) >= Y  because [51], by (Star) 
+
+  58] nonzero >= filter(neq(_|_))  because [59], by (Star) 
+  59] nonzero* >= filter(neq(_|_))  because nonzero > filter and [60], by (Copy) 
+  60] nonzero* >= neq(_|_)  because nonzero > neq and [61], by (Copy) 
+  61] nonzero* >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  filtersub(false, F, cons(X, Y)) => filter(F) Y 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  neq(O) O >? false 
+  neq(O) s(X) >? true 
+  neq(s(X)) O >? true 
+  neq(s(X)) s(Y) >? neq(X) Y 
+  filter(F) nil >? nil 
+  filter(F) cons(X, Y) >? filtersub(F X, F, cons(X, Y)) 
+  filtersub(true, F, cons(X, Y)) >? cons(X, filter(F) Y) 
+  nonzero >? filter(neq(O)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[@_{o -> o}(x_1, x_2)]] = @_{o -> o}(x_2, x_1) 
+  [[O]] = _|_ 
+  [[false]] = _|_ 
+  [[filtersub(x_1, x_2, x_3)]] = filtersub(x_3, x_2, x_1) 
+  [[nil]] = _|_ 
+  [[true]] = _|_ 
+
+We choose Lex = {@_{o -> o}, filtersub} and Mul = {cons, filter, neq, nonzero, s}, and the following precedence: @_{o -> o} = filtersub > cons > nonzero > filter > neq > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(neq(_|_), _|_) >= _|_ 
+  @_{o -> o}(neq(_|_), s(X)) >= _|_ 
+  @_{o -> o}(neq(s(X)), _|_) >= _|_ 
+  @_{o -> o}(neq(s(X)), s(Y)) > @_{o -> o}(neq(X), Y) 
+  @_{o -> o}(filter(F), _|_) >= _|_ 
+  @_{o -> o}(filter(F), cons(X, Y)) > filtersub(@_{o -> o}(F, X), F, cons(X, Y)) 
+  filtersub(_|_, F, cons(X, Y)) > cons(X, @_{o -> o}(filter(F), Y)) 
+  nonzero > filter(neq(_|_)) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(neq(_|_), _|_) >= _|_  by (Bot) 
+
+  2] @_{o -> o}(neq(_|_), s(X)) >= _|_  by (Bot) 
+
+  3] @_{o -> o}(neq(s(X)), _|_) >= _|_  by (Bot) 
+
+  4] @_{o -> o}(neq(s(X)), s(Y)) > @_{o -> o}(neq(X), Y)  because [5], by definition 
+  5] @_{o -> o}*(neq(s(X)), s(Y)) >= @_{o -> o}(neq(X), Y)  because @_{o -> o} in Lex, [6], [9] and [15], by (Stat) 
+  6] s(Y) > Y  because [7], by definition 
+  7] s*(Y) >= Y  because [8], by (Select) 
+  8] Y >= Y  by (Meta) 
+  9] @_{o -> o}*(neq(s(X)), s(Y)) >= neq(X)  because [10], by (Select) 
+  10] neq(s(X)) >= neq(X)  because [11], by (Star) 
+  11] neq*(s(X)) >= neq(X)  because neq in Mul and [12], by (Stat) 
+  12] s(X) > X  because [13], by definition 
+  13] s*(X) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+  15] @_{o -> o}*(neq(s(X)), s(Y)) >= Y  because [16], by (Select) 
+  16] s(Y) >= Y  because [7], by (Star) 
+
+  17] @_{o -> o}(filter(F), _|_) >= _|_  by (Bot) 
+
+  18] @_{o -> o}(filter(F), cons(X, Y)) > filtersub(@_{o -> o}(F, X), F, cons(X, Y))  because [19], by definition 
+  19] @_{o -> o}*(filter(F), cons(X, Y)) >= filtersub(@_{o -> o}(F, X), F, cons(X, Y))  because @_{o -> o} = filtersub, @_{o -> o} in Lex, [20], [23], [26], [29] and [32], by (Stat) 
+  20] filter(F) > F  because [21], by definition 
+  21] filter*(F) >= F  because [22], by (Select) 
+  22] F >= F  by (Meta) 
+  23] cons(X, Y) >= cons(X, Y)  because cons in Mul, [24] and [25], by (Fun) 
+  24] X >= X  by (Meta) 
+  25] Y >= Y  by (Meta) 
+  26] @_{o -> o}*(filter(F), cons(X, Y)) >= @_{o -> o}(F, X)  because @_{o -> o} in Lex, [20], [27], [29] and [31], by (Stat) 
+  27] cons(X, Y) >= X  because [28], by (Star) 
+  28] cons*(X, Y) >= X  because [24], by (Select) 
+  29] @_{o -> o}*(filter(F), cons(X, Y)) >= F  because [30], by (Select) 
+  30] filter(F) >= F  because [21], by (Star) 
+  31] @_{o -> o}*(filter(F), cons(X, Y)) >= X  because [27], by (Select) 
+  32] @_{o -> o}*(filter(F), cons(X, Y)) >= cons(X, Y)  because [23], by (Select) 
+
+  33] filtersub(_|_, F, cons(X, Y)) > cons(X, @_{o -> o}(filter(F), Y))  because [34], by definition 
+  34] filtersub*(_|_, F, cons(X, Y)) >= cons(X, @_{o -> o}(filter(F), Y))  because filtersub > cons, [35] and [39], by (Copy) 
+  35] filtersub*(_|_, F, cons(X, Y)) >= X  because [36], by (Select) 
+  36] cons(X, Y) >= X  because [37], by (Star) 
+  37] cons*(X, Y) >= X  because [38], by (Select) 
+  38] X >= X  by (Meta) 
+  39] filtersub*(_|_, F, cons(X, Y)) >= @_{o -> o}(filter(F), Y)  because filtersub = @_{o -> o}, filtersub in Lex, [40], [43] and [46], by (Stat) 
+  40] cons(X, Y) > Y  because [41], by definition 
+  41] cons*(X, Y) >= Y  because [42], by (Select) 
+  42] Y >= Y  by (Meta) 
+  43] filtersub*(_|_, F, cons(X, Y)) >= filter(F)  because filtersub > filter and [44], by (Copy) 
+  44] filtersub*(_|_, F, cons(X, Y)) >= F  because [45], by (Select) 
+  45] F >= F  by (Meta) 
+  46] filtersub*(_|_, F, cons(X, Y)) >= Y  because [47], by (Select) 
+  47] cons(X, Y) >= Y  because [41], by (Star) 
+
+  48] nonzero > filter(neq(_|_))  because [49], by definition 
+  49] nonzero* >= filter(neq(_|_))  because nonzero > filter and [50], by (Copy) 
+  50] nonzero* >= neq(_|_)  because nonzero > neq and [51], by (Copy) 
+  51] nonzero* >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  neq(s(X)) s(Y) => neq(X) Y 
+  filter(F) cons(X, Y) => filtersub(F X, F, cons(X, Y)) 
+  filtersub(true, F, cons(X, Y)) => cons(X, filter(F) Y) 
+  nonzero => filter(neq(O)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  neq(O, O) >? false 
+  neq(O, s(X)) >? true 
+  neq(s(X), O) >? true 
+  filter(F, nil) >? nil 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  false = 0 
+  filter = Lam[G0;y1].3 + 3*y1 + G0(0) 
+  neq = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  nil = 0 
+  s = Lam[y0].3 + y0 
+  true = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[neq(O, O)]] = 21 > 0 = [[false]] 
+  [[neq(O, s(_x0))]] = 21 + 3*x0 > 0 = [[true]] 
+  [[neq(s(_x0), O)]] = 21 + 3*x0 > 0 = [[true]] 
+  [[filter(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+
+We can thus remove the following rules:
+
+  neq(O, O) => false 
+  neq(O, s(X)) => true 
+  neq(s(X), O) => true 
+  filter(F, nil) => nil 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

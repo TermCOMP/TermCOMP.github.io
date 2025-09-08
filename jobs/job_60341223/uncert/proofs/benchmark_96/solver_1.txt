@@ -1,0 +1,183 @@
+YES
+We consider the system PMlD8.
+
+  Alphabet:
+
+    cons : [nat * list] --> list 
+    emap : [nat -> nat * list] --> list 
+    nil : [] --> list 
+    twice : [nat -> nat * nat] --> nat 
+
+  Rules:
+
+    emap(F, nil) => nil 
+    emap(F, cons(X, Y)) => cons(F X, emap(/\x.twice(F, x), Y)) 
+    twice(F, X) => F (F X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  emap(F, nil) >? nil 
+  emap(F, cons(X, Y)) >? cons(F X, emap(/\x.twice(F, x), Y)) 
+  twice(F, X) >? F (F X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[emap(x_1, x_2)]] = emap(x_2, x_1) 
+  [[nil]] = _|_ 
+
+We choose Lex = {emap} and Mul = {@_{o -> o}, cons, twice}, and the following precedence: emap > cons > twice > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  emap(F, _|_) > _|_ 
+  emap(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), emap(/\x.twice(F, x), Y)) 
+  twice(F, X) >= @_{o -> o}(F, @_{o -> o}(F, X)) 
+
+With these choices, we have:
+
+  1] emap(F, _|_) > _|_  because [2], by definition 
+  2] emap*(F, _|_) >= _|_  by (Bot) 
+
+  3] emap(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), emap(/\x.twice(F, x), Y))  because [4], by (Star) 
+  4] emap*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), emap(/\x.twice(F, x), Y))  because emap > cons, [5] and [12], by (Copy) 
+  5] emap*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because emap > @_{o -> o}, [6] and [8], by (Copy) 
+  6] emap*(F, cons(X, Y)) >= F  because [7], by (Select) 
+  7] F >= F  by (Meta) 
+  8] emap*(F, cons(X, Y)) >= X  because [9], by (Select) 
+  9] cons(X, Y) >= X  because [10], by (Star) 
+  10] cons*(X, Y) >= X  because [11], by (Select) 
+  11] X >= X  by (Meta) 
+  12] emap*(F, cons(X, Y)) >= emap(/\x.twice(F, x), Y)  because emap in Lex, [13], [16] and [21], by (Stat) 
+  13] cons(X, Y) > Y  because [14], by definition 
+  14] cons*(X, Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+  16] emap*(F, cons(X, Y)) >= /\y.twice(F, y)  because [17], by (F-Abs) 
+  17] emap*(F, cons(X, Y), x) >= twice(F, x)  because emap > twice, [18] and [19], by (Copy) 
+  18] emap*(F, cons(X, Y), x) >= F  because [7], by (Select) 
+  19] emap*(F, cons(X, Y), x) >= x  because [20], by (Select) 
+  20] x >= x  by (Var) 
+  21] emap*(F, cons(X, Y)) >= Y  because [22], by (Select) 
+  22] cons(X, Y) >= Y  because [14], by (Star) 
+
+  23] twice(F, X) >= @_{o -> o}(F, @_{o -> o}(F, X))  because [24], by (Star) 
+  24] twice*(F, X) >= @_{o -> o}(F, @_{o -> o}(F, X))  because twice > @_{o -> o}, [25] and [27], by (Copy) 
+  25] twice*(F, X) >= F  because [26], by (Select) 
+  26] F >= F  by (Meta) 
+  27] twice*(F, X) >= @_{o -> o}(F, X)  because twice > @_{o -> o}, [25] and [28], by (Copy) 
+  28] twice*(F, X) >= X  because [29], by (Select) 
+  29] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  emap(F, nil) => nil 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  emap(F, cons(X, Y)) >? cons(F X, emap(/\x.twice(F, x), Y)) 
+  twice(F, X) >? F (F X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[emap(x_1, x_2)]] = emap(x_2, x_1) 
+
+We choose Lex = {emap} and Mul = {@_{o -> o}, cons, twice}, and the following precedence: emap > cons > twice > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  emap(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), emap(/\x.twice(F, x), Y)) 
+  twice(F, X) > @_{o -> o}(F, @_{o -> o}(F, X)) 
+
+With these choices, we have:
+
+  1] emap(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), emap(/\x.twice(F, x), Y))  because [2], by (Star) 
+  2] emap*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), emap(/\x.twice(F, x), Y))  because emap > cons, [3] and [10], by (Copy) 
+  3] emap*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because emap > @_{o -> o}, [4] and [6], by (Copy) 
+  4] emap*(F, cons(X, Y)) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] emap*(F, cons(X, Y)) >= X  because [7], by (Select) 
+  7] cons(X, Y) >= X  because [8], by (Star) 
+  8] cons*(X, Y) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] emap*(F, cons(X, Y)) >= emap(/\x.twice(F, x), Y)  because emap in Lex, [11], [14] and [19], by (Stat) 
+  11] cons(X, Y) > Y  because [12], by definition 
+  12] cons*(X, Y) >= Y  because [13], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] emap*(F, cons(X, Y)) >= /\y.twice(F, y)  because [15], by (F-Abs) 
+  15] emap*(F, cons(X, Y), x) >= twice(F, x)  because emap > twice, [16] and [17], by (Copy) 
+  16] emap*(F, cons(X, Y), x) >= F  because [5], by (Select) 
+  17] emap*(F, cons(X, Y), x) >= x  because [18], by (Select) 
+  18] x >= x  by (Var) 
+  19] emap*(F, cons(X, Y)) >= Y  because [20], by (Select) 
+  20] cons(X, Y) >= Y  because [12], by (Star) 
+
+  21] twice(F, X) > @_{o -> o}(F, @_{o -> o}(F, X))  because [22], by definition 
+  22] twice*(F, X) >= @_{o -> o}(F, @_{o -> o}(F, X))  because twice > @_{o -> o}, [23] and [25], by (Copy) 
+  23] twice*(F, X) >= F  because [24], by (Select) 
+  24] F >= F  by (Meta) 
+  25] twice*(F, X) >= @_{o -> o}(F, X)  because twice > @_{o -> o}, [23] and [26], by (Copy) 
+  26] twice*(F, X) >= X  because [27], by (Select) 
+  27] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  twice(F, X) => F (F X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  emap(F, cons(X, Y)) >? cons(F X, emap(/\x.twice(F, x), Y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[emap(x_1, x_2)]] = emap(x_2, x_1) 
+
+We choose Lex = {emap} and Mul = {@_{o -> o}, cons, twice}, and the following precedence: emap > cons > twice > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  emap(F, cons(X, Y)) > cons(@_{o -> o}(F, X), emap(/\x.twice(F, x), Y)) 
+
+With these choices, we have:
+
+  1] emap(F, cons(X, Y)) > cons(@_{o -> o}(F, X), emap(/\x.twice(F, x), Y))  because [2], by definition 
+  2] emap*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), emap(/\x.twice(F, x), Y))  because emap > cons, [3] and [10], by (Copy) 
+  3] emap*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because emap > @_{o -> o}, [4] and [6], by (Copy) 
+  4] emap*(F, cons(X, Y)) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] emap*(F, cons(X, Y)) >= X  because [7], by (Select) 
+  7] cons(X, Y) >= X  because [8], by (Star) 
+  8] cons*(X, Y) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] emap*(F, cons(X, Y)) >= emap(/\x.twice(F, x), Y)  because emap in Lex, [11], [14] and [19], by (Stat) 
+  11] cons(X, Y) > Y  because [12], by definition 
+  12] cons*(X, Y) >= Y  because [13], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] emap*(F, cons(X, Y)) >= /\y.twice(F, y)  because [15], by (F-Abs) 
+  15] emap*(F, cons(X, Y), x) >= twice(F, x)  because emap > twice, [16] and [17], by (Copy) 
+  16] emap*(F, cons(X, Y), x) >= F  because [5], by (Select) 
+  17] emap*(F, cons(X, Y), x) >= x  because [18], by (Select) 
+  18] x >= x  by (Var) 
+  19] emap*(F, cons(X, Y)) >= Y  because [20], by (Select) 
+  20] cons(X, Y) >= Y  because [12], by (Star) 
+
+We can thus remove the following rules:
+
+  emap(F, cons(X, Y)) => cons(F X, emap(/\x.twice(F, x), Y)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

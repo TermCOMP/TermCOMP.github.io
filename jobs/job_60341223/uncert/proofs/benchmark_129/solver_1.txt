@@ -1,0 +1,54 @@
+YES
+We consider the system ydbB1.
+
+  Alphabet:
+
+    O : [] --> ord 
+    lim : [nat -> ord] --> ord 
+    rec : [ord * a * ord -> a -> a * (nat -> ord) -> (nat -> a) -> a] --> a 
+    s : [ord] --> ord 
+
+  Rules:
+
+    rec(O, X, F, G) => X 
+    rec(s(X), Y, F, G) => F X rec(X, Y, F, G) 
+    rec(lim(F), X, G, H) => H F (/\x.rec(F x, X, G, H)) 
+
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] rec#(s(X), Y, F, G) =#> rec#(X, Y, F, G)   
+    1] rec#(lim(F), X, G, H) =#> rec#(F Y, X, G, H)   
+
+  Rules R_0:
+
+    rec(O, X, F, G) => X 
+    rec(s(X), Y, F, G) => F X rec(X, Y, F, G) 
+    rec(lim(F), X, G, H) => H F (/\x.rec(F x, X, G, H)) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We apply the accessible subterm criterion with the following projection function:
+
+  nu(rec#) = 1 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(rec#(s(X), Y, F, G)) = s(X) [>] X = nu(rec#(X, Y, F, G)) 
+  nu(rec#(lim(F), X, G, H)) = lim(F) [>] F Y = nu(rec#(F Y, X, G, H)) 
+
+By [FuhKop19, Thm. 63], we may replace a dependency pair problem (P_0, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

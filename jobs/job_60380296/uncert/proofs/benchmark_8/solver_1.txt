@@ -1,0 +1,469 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/DFvnv.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 474 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 99 ms]
+        (9) QDP
+        (10) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (11) YES
+    (12) JBCTerminationSCC
+        (13) SCCToIRSProof [SOUND, 99 ms]
+        (14) IRSwT
+        (15) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (16) IRSwT
+        (17) IRSwTTerminationDigraphProof [EQUIVALENT, 7 ms]
+        (18) IRSwT
+        (19) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (20) IRSwT
+        (21) TempFilterProof [SOUND, 33 ms]
+        (22) IntTRS
+        (23) RankingReductionPairProof [EQUIVALENT, 19 ms]
+        (24) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package SharingAnalysisRec;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package SharingAnalysisRec;
+
+public class SharingAnalysisRec {
+	int val;
+	SharingAnalysisRec field;
+
+	public static void main(String[] args) {
+		Random.args = args;
+		SharingAnalysisRec t1 = new SharingAnalysisRec();
+		SharingAnalysisRec t2 = t1.appendNewList(1);
+		SharingAnalysisRec t3 = t2.appendNewList(Random.random());
+		t2.field = null;
+		copy(t1, t3);
+	}
+
+	public static void copy(SharingAnalysisRec source, SharingAnalysisRec target) {
+		if (source == null) {
+			return;
+		} else {
+			SharingAnalysisRec newEle = new SharingAnalysisRec();
+			newEle.val = source.val;
+			target.field = newEle;
+			copy(source.field, newEle);
+		}
+	}
+
+	/**
+ 	 * @param i number of elements to append
+ 	 * @return the last list element appended
+ 	 */
+	private SharingAnalysisRec appendNewList(int i) {
+		this.field = new SharingAnalysisRec();
+		this.val = Random.random();
+		if (i <= 1) {
+			return this.field;
+		} else {
+			return this.field.appendNewList(i-1);
+		}
+	}
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package SharingAnalysisRec;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package SharingAnalysisRec;
+
+public class SharingAnalysisRec {
+	int val;
+	SharingAnalysisRec field;
+
+	public static void main(String[] args) {
+		Random.args = args;
+		SharingAnalysisRec t1 = new SharingAnalysisRec();
+		SharingAnalysisRec t2 = t1.appendNewList(1);
+		SharingAnalysisRec t3 = t2.appendNewList(Random.random());
+		t2.field = null;
+		copy(t1, t3);
+	}
+
+	public static void copy(SharingAnalysisRec source, SharingAnalysisRec target) {
+		if (source == null) {
+			return;
+		} else {
+			SharingAnalysisRec newEle = new SharingAnalysisRec();
+			newEle.val = source.val;
+			target.field = newEle;
+			copy(source.field, newEle);
+		}
+	}
+
+	/**
+ 	 * @param i number of elements to append
+ 	 * @return the last list element appended
+ 	 */
+	private SharingAnalysisRec appendNewList(int i) {
+		this.field = new SharingAnalysisRec();
+		this.val = Random.random();
+		if (i <= 1) {
+			return this.field;
+		} else {
+			return this.field.appendNewList(i-1);
+		}
+	}
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+SharingAnalysisRec.SharingAnalysisRec.main([Ljava/lang/String;)V: Graph of 135 nodes with 0 SCCs.
+
+
+
+SharingAnalysisRec.SharingAnalysisRec.appendNewList(I)LSharingAnalysisRec/SharingAnalysisRec;: Graph of 141 nodes with 0 SCCs.
+
+
+
+SharingAnalysisRec.SharingAnalysisRec.copy(LSharingAnalysisRec/SharingAnalysisRec;LSharingAnalysisRec/SharingAnalysisRec;)V: Graph of 32 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: SharingAnalysisRec.SharingAnalysisRec.copy(LSharingAnalysisRec/SharingAnalysisRec;LSharingAnalysisRec/SharingAnalysisRec;)V
+SCC calls the following helper methods: SharingAnalysisRec.SharingAnalysisRec.copy(LSharingAnalysisRec/SharingAnalysisRec;LSharingAnalysisRec/SharingAnalysisRec;)V
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*SharingAnalysisRec.SharingAnalysisRec: [val, field]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 24 rules for P and 31 rules for R.P rules:
+f5603_0_copy_NONNULL(EOS(STATIC_5603), java.lang.Object(o861sub), java.lang.Object(o861sub)) -> f5605_0_copy_NONNULL(EOS(STATIC_5605), java.lang.Object(o861sub), java.lang.Object(o861sub)) :|: TRUE
+f5605_0_copy_NONNULL(EOS(STATIC_5605), java.lang.Object(o861sub), java.lang.Object(o861sub)) -> f5608_0_copy_New(EOS(STATIC_5608), java.lang.Object(o861sub)) :|: TRUE
+f5608_0_copy_New(EOS(STATIC_5608), java.lang.Object(o861sub)) -> f5612_0_copy_Duplicate(EOS(STATIC_5612), java.lang.Object(o861sub)) :|: TRUE
+f5612_0_copy_Duplicate(EOS(STATIC_5612), java.lang.Object(o861sub)) -> f5615_0_copy_InvokeMethod(EOS(STATIC_5615), java.lang.Object(o861sub)) :|: TRUE
+f5615_0_copy_InvokeMethod(EOS(STATIC_5615), java.lang.Object(o861sub)) -> f5617_0__init__Load(EOS(STATIC_5617), java.lang.Object(o861sub)) :|: TRUE
+f5617_0__init__Load(EOS(STATIC_5617), java.lang.Object(o861sub)) -> f5619_0__init__InvokeMethod(EOS(STATIC_5619), java.lang.Object(o861sub)) :|: TRUE
+f5619_0__init__InvokeMethod(EOS(STATIC_5619), java.lang.Object(o861sub)) -> f5620_0__init__Return(EOS(STATIC_5620), java.lang.Object(o861sub)) :|: TRUE
+f5620_0__init__Return(EOS(STATIC_5620), java.lang.Object(o861sub)) -> f5621_0_copy_Store(EOS(STATIC_5621), java.lang.Object(o861sub)) :|: TRUE
+f5621_0_copy_Store(EOS(STATIC_5621), java.lang.Object(o861sub)) -> f5622_0_copy_Load(EOS(STATIC_5622), java.lang.Object(o861sub)) :|: TRUE
+f5622_0_copy_Load(EOS(STATIC_5622), java.lang.Object(o861sub)) -> f5623_0_copy_Load(EOS(STATIC_5623), java.lang.Object(o861sub)) :|: TRUE
+f5623_0_copy_Load(EOS(STATIC_5623), java.lang.Object(o861sub)) -> f5624_0_copy_FieldAccess(EOS(STATIC_5624), java.lang.Object(o861sub), java.lang.Object(o861sub)) :|: TRUE
+f5624_0_copy_FieldAccess(EOS(STATIC_5624), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866)), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5625_0_copy_FieldAccess(EOS(STATIC_5625), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866)), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5625_0_copy_FieldAccess(EOS(STATIC_5625), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866)), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5626_0_copy_FieldAccess(EOS(STATIC_5626), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5626_0_copy_FieldAccess(EOS(STATIC_5626), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5627_0_copy_Load(EOS(STATIC_5627), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5627_0_copy_Load(EOS(STATIC_5627), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5628_0_copy_Load(EOS(STATIC_5628), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5628_0_copy_Load(EOS(STATIC_5628), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5629_0_copy_FieldAccess(EOS(STATIC_5629), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5629_0_copy_FieldAccess(EOS(STATIC_5629), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5630_0_copy_Load(EOS(STATIC_5630), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5630_0_copy_Load(EOS(STATIC_5630), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5631_0_copy_FieldAccess(EOS(STATIC_5631), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5631_0_copy_FieldAccess(EOS(STATIC_5631), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5632_0_copy_Load(EOS(STATIC_5632), o866) :|: TRUE
+f5632_0_copy_Load(EOS(STATIC_5632), o866) -> f5633_0_copy_InvokeMethod(EOS(STATIC_5633), o866) :|: TRUE
+f5633_0_copy_InvokeMethod(EOS(STATIC_5633), o866) -> f5634_1_copy_InvokeMethod(f5634_0_copy_Load(EOS(STATIC_5634), o866)) :|: TRUE
+f5634_0_copy_Load(EOS(STATIC_5634), o866) -> f5635_0_copy_Load(EOS(STATIC_5635), o866) :|: TRUE
+f5635_0_copy_Load(EOS(STATIC_5635), o866) -> f5600_0_copy_Load(EOS(STATIC_5600), o866) :|: TRUE
+f5600_0_copy_Load(EOS(STATIC_5600), o858) -> f5603_0_copy_NONNULL(EOS(STATIC_5603), o858, o858) :|: TRUE
+R rules:
+f5600_0_copy_Load(EOS(STATIC_5600), o858) -> f5603_0_copy_NONNULL(EOS(STATIC_5603), o858, o858) :|: TRUE
+f5603_0_copy_NONNULL(EOS(STATIC_5603), java.lang.Object(o861sub), java.lang.Object(o861sub)) -> f5605_0_copy_NONNULL(EOS(STATIC_5605), java.lang.Object(o861sub), java.lang.Object(o861sub)) :|: TRUE
+f5603_0_copy_NONNULL(EOS(STATIC_5603), NULL, NULL) -> f5606_0_copy_NONNULL(EOS(STATIC_5606), NULL, NULL) :|: TRUE
+f5605_0_copy_NONNULL(EOS(STATIC_5605), java.lang.Object(o861sub), java.lang.Object(o861sub)) -> f5608_0_copy_New(EOS(STATIC_5608), java.lang.Object(o861sub)) :|: TRUE
+f5606_0_copy_NONNULL(EOS(STATIC_5606), NULL, NULL) -> f5610_0_copy_Return(EOS(STATIC_5610)) :|: TRUE
+f5608_0_copy_New(EOS(STATIC_5608), java.lang.Object(o861sub)) -> f5612_0_copy_Duplicate(EOS(STATIC_5612), java.lang.Object(o861sub)) :|: TRUE
+f5612_0_copy_Duplicate(EOS(STATIC_5612), java.lang.Object(o861sub)) -> f5615_0_copy_InvokeMethod(EOS(STATIC_5615), java.lang.Object(o861sub)) :|: TRUE
+f5615_0_copy_InvokeMethod(EOS(STATIC_5615), java.lang.Object(o861sub)) -> f5617_0__init__Load(EOS(STATIC_5617), java.lang.Object(o861sub)) :|: TRUE
+f5617_0__init__Load(EOS(STATIC_5617), java.lang.Object(o861sub)) -> f5619_0__init__InvokeMethod(EOS(STATIC_5619), java.lang.Object(o861sub)) :|: TRUE
+f5619_0__init__InvokeMethod(EOS(STATIC_5619), java.lang.Object(o861sub)) -> f5620_0__init__Return(EOS(STATIC_5620), java.lang.Object(o861sub)) :|: TRUE
+f5620_0__init__Return(EOS(STATIC_5620), java.lang.Object(o861sub)) -> f5621_0_copy_Store(EOS(STATIC_5621), java.lang.Object(o861sub)) :|: TRUE
+f5621_0_copy_Store(EOS(STATIC_5621), java.lang.Object(o861sub)) -> f5622_0_copy_Load(EOS(STATIC_5622), java.lang.Object(o861sub)) :|: TRUE
+f5622_0_copy_Load(EOS(STATIC_5622), java.lang.Object(o861sub)) -> f5623_0_copy_Load(EOS(STATIC_5623), java.lang.Object(o861sub)) :|: TRUE
+f5623_0_copy_Load(EOS(STATIC_5623), java.lang.Object(o861sub)) -> f5624_0_copy_FieldAccess(EOS(STATIC_5624), java.lang.Object(o861sub), java.lang.Object(o861sub)) :|: TRUE
+f5624_0_copy_FieldAccess(EOS(STATIC_5624), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866)), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5625_0_copy_FieldAccess(EOS(STATIC_5625), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866)), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5625_0_copy_FieldAccess(EOS(STATIC_5625), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866)), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5626_0_copy_FieldAccess(EOS(STATIC_5626), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5626_0_copy_FieldAccess(EOS(STATIC_5626), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5627_0_copy_Load(EOS(STATIC_5627), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5627_0_copy_Load(EOS(STATIC_5627), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5628_0_copy_Load(EOS(STATIC_5628), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5628_0_copy_Load(EOS(STATIC_5628), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5629_0_copy_FieldAccess(EOS(STATIC_5629), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5629_0_copy_FieldAccess(EOS(STATIC_5629), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5630_0_copy_Load(EOS(STATIC_5630), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5630_0_copy_Load(EOS(STATIC_5630), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5631_0_copy_FieldAccess(EOS(STATIC_5631), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) :|: TRUE
+f5631_0_copy_FieldAccess(EOS(STATIC_5631), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746, o866))) -> f5632_0_copy_Load(EOS(STATIC_5632), o866) :|: TRUE
+f5632_0_copy_Load(EOS(STATIC_5632), o866) -> f5633_0_copy_InvokeMethod(EOS(STATIC_5633), o866) :|: TRUE
+f5633_0_copy_InvokeMethod(EOS(STATIC_5633), o866) -> f5634_1_copy_InvokeMethod(f5634_0_copy_Load(EOS(STATIC_5634), o866)) :|: TRUE
+f5634_0_copy_Load(EOS(STATIC_5634), o866) -> f5635_0_copy_Load(EOS(STATIC_5635), o866) :|: TRUE
+f6370_0_copy_Return(EOS(STATIC_6370)) -> f6374_0_copy_Return(EOS(STATIC_6374)) :|: TRUE
+f6390_0_copy_Return(EOS(STATIC_6390)) -> f6403_0_copy_Return(EOS(STATIC_6403)) :|: TRUE
+f6403_0_copy_Return(EOS(STATIC_6403)) -> f6374_0_copy_Return(EOS(STATIC_6374)) :|: TRUE
+f5635_0_copy_Load(EOS(STATIC_5635), o866) -> f5600_0_copy_Load(EOS(STATIC_5600), o866) :|: TRUE
+f5634_1_copy_InvokeMethod(f5610_0_copy_Return(EOS(STATIC_5610))) -> f6370_0_copy_Return(EOS(STATIC_6370)) :|: TRUE
+f5634_1_copy_InvokeMethod(f6374_0_copy_Return(EOS(STATIC_6374))) -> f6390_0_copy_Return(EOS(STATIC_6390)) :|: TRUE
+Combined rules. Obtained 1 conditional rules for P and 4 conditional rules for R.P rules:
+f5603_0_copy_NONNULL(EOS(STATIC_5603), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746:0, o866:0)), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746:0, o866:0))) -> f5634_1_copy_InvokeMethod(f5603_0_copy_NONNULL(EOS(STATIC_5603), o866:0, o866:0)) :|: TRUE
+R rules:
+f5634_1_copy_InvokeMethod(f6374_0_copy_Return(EOS(STATIC_6374))) -> f6374_0_copy_Return(EOS(STATIC_6374)) :|: TRUE
+f5603_0_copy_NONNULL(EOS(STATIC_5603), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746:0, o866:0)), java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(EOC, i746:0, o866:0))) -> f5634_1_copy_InvokeMethod(f5603_0_copy_NONNULL(EOS(STATIC_5603), o866:0, o866:0)) :|: TRUE
+f5603_0_copy_NONNULL(EOS(STATIC_5603), NULL, NULL) -> f5610_0_copy_Return(EOS(STATIC_5610)) :|: TRUE
+f5634_1_copy_InvokeMethod(f5610_0_copy_Return(EOS(STATIC_5610))) -> f6374_0_copy_Return(EOS(STATIC_6374)) :|: TRUE
+Filtered ground terms:
+   f5603_0_copy_NONNULL(x1, x2, x3) -> f5603_0_copy_NONNULL(x2, x3)
+   SharingAnalysisRec.SharingAnalysisRec(x1, x2, x3) -> SharingAnalysisRec.SharingAnalysisRec(x2, x3)
+   f6374_0_copy_Return(x1) -> f6374_0_copy_Return
+   f5610_0_copy_Return(x1) -> f5610_0_copy_Return
+Filtered unneeded arguments:
+   SharingAnalysisRec.SharingAnalysisRec(x1, x2) -> SharingAnalysisRec.SharingAnalysisRec(x2)
+Filtered duplicate args:
+   f5603_0_copy_NONNULL(x1, x2) -> f5603_0_copy_NONNULL(x2)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F5603_0_COPY_NONNULL(java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(o866:0:0))) -> F5603_0_COPY_NONNULL(o866:0:0) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F5603_0_COPY_NONNULL(java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(o866:0:0))) -> F5603_0_COPY_NONNULL(o866:0:0)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F5603_0_COPY_NONNULL(java.lang.Object(SharingAnalysisRec.SharingAnalysisRec(o866:0:0))) -> F5603_0_COPY_NONNULL(o866:0:0)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(11)
+YES
+
+----------------------------------------
+
+(12)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: SharingAnalysisRec.SharingAnalysisRec.appendNewList(I)LSharingAnalysisRec/SharingAnalysisRec;
+SCC calls the following helper methods: SharingAnalysisRec.SharingAnalysisRec.appendNewList(I)LSharingAnalysisRec/SharingAnalysisRec;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*SharingAnalysisRec.SharingAnalysisRec: [field]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(13) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 44 IRulesP rules:
+f649_0_appendNewList_New(EOS(STATIC_649(java.lang.Object(o92sub), i77)), i78, i78) -> f658_0_appendNewList_Duplicate(EOS(STATIC_658(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+f658_0_appendNewList_Duplicate(EOS(STATIC_658(java.lang.Object(o92sub), i77)), i78, i78) -> f667_0_appendNewList_InvokeMethod(EOS(STATIC_667(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+f667_0_appendNewList_InvokeMethod(EOS(STATIC_667(java.lang.Object(o92sub), i77)), i78, i78) -> f670_0__init__Load(EOS(STATIC_670(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+f670_0__init__Load(EOS(STATIC_670(java.lang.Object(o92sub), i77)), i78, i78) -> f675_0__init__InvokeMethod(EOS(STATIC_675(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+f675_0__init__InvokeMethod(EOS(STATIC_675(java.lang.Object(o92sub), i77)), i78, i78) -> f679_0__init__Return(EOS(STATIC_679(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+f679_0__init__Return(EOS(STATIC_679(java.lang.Object(o92sub), i77)), i78, i78) -> f685_0_appendNewList_FieldAccess(EOS(STATIC_685(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+f685_0_appendNewList_FieldAccess(EOS(STATIC_685(java.lang.Object(o92sub), i77)), i78, i78) -> f693_0_appendNewList_Load(EOS(STATIC_693(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+f693_0_appendNewList_Load(EOS(STATIC_693(java.lang.Object(o92sub), i77)), i78, i78) -> f697_0_appendNewList_InvokeMethod(EOS(STATIC_697(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+f697_0_appendNewList_InvokeMethod(EOS(STATIC_697(java.lang.Object(o92sub), i77)), i78, i78) -> f701_0_random_FieldAccess(EOS(STATIC_701(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+f701_0_random_FieldAccess(EOS(STATIC_701(java.lang.Object(o92sub), i77)), i78, i78) -> f705_0_random_FieldAccess(EOS(STATIC_705(java.lang.Object(o92sub), i77)), i78, i78, java.lang.Object(o92sub)) :|: TRUE
+f705_0_random_FieldAccess(EOS(STATIC_705(java.lang.Object(o92sub), i77)), i78, i78, java.lang.Object(o92sub)) -> f706_0_random_ArrayAccess(EOS(STATIC_706(java.lang.Object(o92sub), i77)), i78, i78, java.lang.Object(o92sub), i77) :|: TRUE
+f706_0_random_ArrayAccess(EOS(STATIC_706(java.lang.Object(ARRAY(i80)), i77)), i78, i78, java.lang.Object(ARRAY(i80)), i77) -> f707_0_random_ArrayAccess(EOS(STATIC_707(java.lang.Object(ARRAY(i80)), i77)), i78, i78, java.lang.Object(ARRAY(i80)), i77) :|: i80 >= 0
+f707_0_random_ArrayAccess(EOS(STATIC_707(java.lang.Object(ARRAY(i80)), i82)), i78, i78, java.lang.Object(ARRAY(i80)), i82) -> f709_0_random_ArrayAccess(EOS(STATIC_709(java.lang.Object(ARRAY(i80)), i82)), i78, i78, java.lang.Object(ARRAY(i80)), i82) :|: TRUE
+f709_0_random_ArrayAccess(EOS(STATIC_709(java.lang.Object(ARRAY(i80)), i82)), i78, i78, java.lang.Object(ARRAY(i80)), i82) -> f711_0_random_ArrayAccess(EOS(STATIC_711(java.lang.Object(ARRAY(i80)), i82)), i78, i78, java.lang.Object(ARRAY(i80)), i82) :|: TRUE
+f711_0_random_ArrayAccess(EOS(STATIC_711(java.lang.Object(ARRAY(i80)), i82)), i78, i78, java.lang.Object(ARRAY(i80)), i82) -> f714_0_random_Store(EOS(STATIC_714(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102) :|: i82 < i80
+f714_0_random_Store(EOS(STATIC_714(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102) -> f720_0_random_FieldAccess(EOS(STATIC_720(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102) :|: TRUE
+f720_0_random_FieldAccess(EOS(STATIC_720(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102) -> f725_0_random_ConstantStackPush(EOS(STATIC_725(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102, i82) :|: TRUE
+f725_0_random_ConstantStackPush(EOS(STATIC_725(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102, i82) -> f730_0_random_IntArithmetic(EOS(STATIC_730(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102, i82, 1) :|: TRUE
+f730_0_random_IntArithmetic(EOS(STATIC_730(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102, i82, matching1) -> f737_0_random_FieldAccess(EOS(STATIC_737(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102, i82 + 1) :|: i82 >= 0 && matching1 = 1
+f737_0_random_FieldAccess(EOS(STATIC_737(java.lang.Object(ARRAY(i80)), i82)), i78, i78, o102, i83) -> f741_0_random_Load(EOS(STATIC_741(java.lang.Object(ARRAY(i80)), i83)), i78, i78, o102) :|: TRUE
+f741_0_random_Load(EOS(STATIC_741(java.lang.Object(ARRAY(i80)), i83)), i78, i78, o102) -> f743_0_random_InvokeMethod(EOS(STATIC_743(java.lang.Object(ARRAY(i80)), i83)), i78, i78, o102) :|: TRUE
+f743_0_random_InvokeMethod(EOS(STATIC_743(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(o107sub)) -> f746_0_random_InvokeMethod(EOS(STATIC_746(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(o107sub)) :|: TRUE
+f746_0_random_InvokeMethod(EOS(STATIC_746(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(o108sub)) -> f750_0_random_InvokeMethod(EOS(STATIC_750(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(o108sub)) :|: TRUE
+f750_0_random_InvokeMethod(EOS(STATIC_750(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(o108sub)) -> f753_0_length_Load(EOS(STATIC_753(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(o108sub)) :|: TRUE
+f753_0_length_Load(EOS(STATIC_753(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(o108sub)) -> f761_0_length_FieldAccess(EOS(STATIC_761(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(o108sub)) :|: TRUE
+f761_0_length_FieldAccess(EOS(STATIC_761(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(java.lang.String(EOC, i92))) -> f769_0_length_FieldAccess(EOS(STATIC_769(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(java.lang.String(EOC, i92))) :|: TRUE
+f769_0_length_FieldAccess(EOS(STATIC_769(java.lang.Object(ARRAY(i80)), i83)), i78, i78, java.lang.Object(java.lang.String(EOC, i92))) -> f777_0_length_Return(EOS(STATIC_777(java.lang.Object(ARRAY(i80)), i83)), i78, i78) :|: TRUE
+f777_0_length_Return(EOS(STATIC_777(java.lang.Object(ARRAY(i80)), i83)), i78, i78) -> f783_0_random_Return(EOS(STATIC_783(java.lang.Object(ARRAY(i80)), i83)), i78, i78) :|: TRUE
+f783_0_random_Return(EOS(STATIC_783(java.lang.Object(ARRAY(i80)), i83)), i78, i78) -> f805_0_appendNewList_FieldAccess(EOS(STATIC_805(java.lang.Object(ARRAY(i80)), i83)), i78, i78) :|: TRUE
+f805_0_appendNewList_FieldAccess(EOS(STATIC_805(java.lang.Object(ARRAY(i80)), i83)), i78, i78) -> f817_0_appendNewList_Load(EOS(STATIC_817(java.lang.Object(ARRAY(i80)), i83)), i78, i78) :|: TRUE
+f817_0_appendNewList_Load(EOS(STATIC_817(java.lang.Object(ARRAY(i80)), i83)), i78, i78) -> f828_0_appendNewList_ConstantStackPush(EOS(STATIC_828(java.lang.Object(ARRAY(i80)), i83)), i78, i78, i78) :|: TRUE
+f828_0_appendNewList_ConstantStackPush(EOS(STATIC_828(java.lang.Object(ARRAY(i80)), i83)), i78, i78, i78) -> f837_0_appendNewList_GT(EOS(STATIC_837(java.lang.Object(ARRAY(i80)), i83)), i78, i78, i78, 1) :|: TRUE
+f837_0_appendNewList_GT(EOS(STATIC_837(java.lang.Object(ARRAY(i80)), i83)), i97, i97, i97, matching1) -> f861_0_appendNewList_GT(EOS(STATIC_861(java.lang.Object(ARRAY(i80)), i83)), i97, i97, i97, 1) :|: TRUE && matching1 = 1
+f861_0_appendNewList_GT(EOS(STATIC_861(java.lang.Object(ARRAY(i80)), i83)), i97, i97, i97, matching1) -> f895_0_appendNewList_Load(EOS(STATIC_895(java.lang.Object(ARRAY(i80)), i83)), i97, i97) :|: i97 > 1 && matching1 = 1
+f895_0_appendNewList_Load(EOS(STATIC_895(java.lang.Object(ARRAY(i80)), i83)), i97, i97) -> f911_0_appendNewList_FieldAccess(EOS(STATIC_911(java.lang.Object(ARRAY(i80)), i83)), i97, i97) :|: TRUE
+f911_0_appendNewList_FieldAccess(EOS(STATIC_911(java.lang.Object(ARRAY(i80)), i83)), i97, i97) -> f924_0_appendNewList_Load(EOS(STATIC_924(java.lang.Object(ARRAY(i80)), i83)), i97, i97) :|: TRUE
+f924_0_appendNewList_Load(EOS(STATIC_924(java.lang.Object(ARRAY(i80)), i83)), i97, i97) -> f937_0_appendNewList_ConstantStackPush(EOS(STATIC_937(java.lang.Object(ARRAY(i80)), i83)), i97, i97) :|: TRUE
+f937_0_appendNewList_ConstantStackPush(EOS(STATIC_937(java.lang.Object(ARRAY(i80)), i83)), i97, i97) -> f986_0_appendNewList_IntArithmetic(EOS(STATIC_986(java.lang.Object(ARRAY(i80)), i83)), i97, i97, 1) :|: TRUE
+f986_0_appendNewList_IntArithmetic(EOS(STATIC_986(java.lang.Object(ARRAY(i80)), i83)), i97, i97, matching1) -> f999_0_appendNewList_InvokeMethod(EOS(STATIC_999(java.lang.Object(ARRAY(i80)), i83)), i97, i97 - 1) :|: i97 > 0 && matching1 = 1
+f999_0_appendNewList_InvokeMethod(EOS(STATIC_999(java.lang.Object(ARRAY(i80)), i83)), i97, i124) -> f1014_0_appendNewList_Load(EOS(STATIC_1014(java.lang.Object(ARRAY(i80)), i83)), i124, i124) :|: i97 > 1 && i124 >= 1 && i83 >= 1 && i124 < i97
+f999_0_appendNewList_InvokeMethod(EOS(STATIC_999(java.lang.Object(ARRAY(i80)), i83)), i97, i124) -> f1014_1_appendNewList_Load(EOS(STATIC_1014(java.lang.Object(ARRAY(i80)), i83)), i97, i124) :|: i97 > 1 && i124 >= 1 && i83 >= 1 && i124 < i97
+f1014_0_appendNewList_Load(EOS(STATIC_1014(java.lang.Object(ARRAY(i80)), i83)), i124, i124) -> f1020_0_appendNewList_Load(EOS(STATIC_1020(java.lang.Object(ARRAY(i80)), i83)), i124, i124) :|: TRUE
+f1020_0_appendNewList_Load(EOS(STATIC_1020(java.lang.Object(ARRAY(i80)), i83)), i124, i124) -> f629_0_appendNewList_Load(EOS(STATIC_629(java.lang.Object(ARRAY(i80)), i83)), i124, i124) :|: TRUE
+f629_0_appendNewList_Load(EOS(STATIC_629(java.lang.Object(o92sub), i77)), i78, i78) -> f649_0_appendNewList_New(EOS(STATIC_649(java.lang.Object(o92sub), i77)), i78, i78) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f649_0_appendNewList_New(EOS(STATIC_649(java.lang.Object(ARRAY(i80:0)), i77:0)), i78:0, i78:0) -> f649_0_appendNewList_New(EOS(STATIC_649(java.lang.Object(ARRAY(i80:0)), i77:0 + 1)), i78:0 - 1, i78:0 - 1) :|: i78:0 > 1 && i80:0 > -1 && i80:0 > i77:0 && i77:0 > -1 && i78:0 - 1 < i78:0
+Removed following non-SCC rules:
+f649_0_appendNewList_New(EOS(STATIC_649(java.lang.Object(ARRAY(i80:0)), i77:0)), i78:0, i78:0) -> f1014_1_appendNewList_Load(EOS(STATIC_1014(java.lang.Object(ARRAY(i80:0)), i77:0 + 1)), i78:0, i78:0 - 1) :|: i78:0 > 1 && i80:0 > -1 && i80:0 > i77:0 && i77:0 > -1 && i78:0 - 1 < i78:0
+Filtered duplicate arguments:
+   f649_0_appendNewList_New(x1, x2, x3) -> f649_0_appendNewList_New(x1, x3)
+Finished conversion. Obtained 1 rules.P rules:
+f649_0_appendNewList_New(i78:0, i80:0, i77:0) -> f649_0_appendNewList_New(i78:0 - 1, i80:0, i77:0 + 1) :|: i80:0 > -1 && i78:0 > 1 && i80:0 > i77:0 && i78:0 - 1 < i78:0 && i77:0 > -1
+
+----------------------------------------
+
+(14)
+Obligation:
+Rules:
+f649_0_appendNewList_New(i78:0, i80:0, i77:0) -> f649_0_appendNewList_New(i78:0 - 1, i80:0, i77:0 + 1) :|: i80:0 > -1 && i78:0 > 1 && i80:0 > i77:0 && i78:0 - 1 < i78:0 && i77:0 > -1
+
+----------------------------------------
+
+(15) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f649_0_appendNewList_New(i78:0, i80:0, i77:0) -> f649_0_appendNewList_New(arith, i80:0, arith1) :|: i80:0 > -1 && i78:0 > 1 && i80:0 > i77:0 && i78:0 - 1 < i78:0 && i77:0 > -1 && arith = i78:0 - 1 && arith1 = i77:0 + 1
+
+----------------------------------------
+
+(17) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f649_0_appendNewList_New(i78:0, i80:0, i77:0) -> f649_0_appendNewList_New(arith, i80:0, arith1) :|: i80:0 > -1 && i78:0 > 1 && i80:0 > i77:0 && i78:0 - 1 < i78:0 && i77:0 > -1 && arith = i78:0 - 1 && arith1 = i77:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(18)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f649_0_appendNewList_New(i78:0, i80:0, i77:0) -> f649_0_appendNewList_New(arith, i80:0, arith1) :|: i80:0 > -1 && i78:0 > 1 && i80:0 > i77:0 && i78:0 - 1 < i78:0 && i77:0 > -1 && arith = i78:0 - 1 && arith1 = i77:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(19) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(20)
+Obligation:
+Rules:
+f649_0_appendNewList_New(i78:0:0, i80:0:0, i77:0:0) -> f649_0_appendNewList_New(i78:0:0 - 1, i80:0:0, i77:0:0 + 1) :|: i78:0:0 - 1 < i78:0:0 && i77:0:0 > -1 && i80:0:0 > i77:0:0 && i78:0:0 > 1 && i80:0:0 > -1
+
+----------------------------------------
+
+(21) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f649_0_appendNewList_New(INTEGER, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f649_0_appendNewList_New(i78:0:0, i80:0:0, i77:0:0) -> f649_0_appendNewList_New(c, i80:0:0, c1) :|: c1 = i77:0:0 + 1 && c = i78:0:0 - 1 && (i78:0:0 - 1 < i78:0:0 && i77:0:0 > -1 && i80:0:0 > i77:0:0 && i78:0:0 > 1 && i80:0:0 > -1)
+
+----------------------------------------
+
+(23) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f649_0_appendNewList_New ] = f649_0_appendNewList_New_1
+
+The following rules are decreasing:
+f649_0_appendNewList_New(i78:0:0, i80:0:0, i77:0:0) -> f649_0_appendNewList_New(c, i80:0:0, c1) :|: c1 = i77:0:0 + 1 && c = i78:0:0 - 1 && (i78:0:0 - 1 < i78:0:0 && i77:0:0 > -1 && i80:0:0 > i77:0:0 && i78:0:0 > 1 && i80:0:0 > -1)
+
+The following rules are bounded:
+f649_0_appendNewList_New(i78:0:0, i80:0:0, i77:0:0) -> f649_0_appendNewList_New(c, i80:0:0, c1) :|: c1 = i77:0:0 + 1 && c = i78:0:0 - 1 && (i78:0:0 - 1 < i78:0:0 && i77:0:0 > -1 && i80:0:0 > i77:0:0 && i78:0:0 > 1 && i80:0:0 > -1)
+
+
+----------------------------------------
+
+(24)
+YES

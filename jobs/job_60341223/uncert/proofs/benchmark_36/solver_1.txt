@@ -1,0 +1,321 @@
+YES
+We consider the system wLMbQ.
+
+  Alphabet:
+
+    cos : [R] --> R 
+    d : [R -> R * R] --> R 
+    minus : [R] --> R 
+    mul : [R * R] --> R 
+    one : [] --> R 
+    pls : [R * R] --> R 
+    sin : [R] --> R 
+    zero : [] --> R 
+
+  Rules:
+
+    d(/\x.X, Y) => zero 
+    d(/\x.x, X) => one 
+    d(/\x.minus(X[x]), Y) => minus(d(/\y.X[y], Y)) 
+    d(/\x.pls(X[x], Y[x]), Z) => pls(d(/\y.X[y], Z), d(/\z.Y[z], Z)) 
+    d(/\x.mul(X[x], Y[x]), Z) => pls(mul(d(/\y.X[y], Z), Y[Z]), mul(X[Z], d(/\z.Y[z], Z))) 
+    d(/\x.sin(X[x]), Y) => mul(cos(Y), d(/\y.X[y], Y)) 
+    d(/\x.cos(X[x]), Y) => mul(minus(sin(Y)), d(/\y.X[y], Y)) 
+    minus(zero) => zero 
+    mul(zero, X) => zero 
+    mul(X, zero) => zero 
+    pls(zero, X) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  d(/\x.X, Y) >? zero 
+  d(/\x.x, X) >? one 
+  d(/\x.minus(X[x]), Y) >? minus(d(/\y.X[y], Y)) 
+  d(/\x.pls(X[x], Y[x]), Z) >? pls(d(/\y.X[y], Z), d(/\z.Y[z], Z)) 
+  d(/\x.mul(X[x], Y[x]), Z) >? pls(mul(d(/\y.X[y], Z), Y[Z]), mul(X[Z], d(/\z.Y[z], Z))) 
+  d(/\x.sin(X[x]), Y) >? mul(cos(Y), d(/\y.X[y], Y)) 
+  d(/\x.cos(X[x]), Y) >? mul(minus(sin(Y)), d(/\y.X[y], Y)) 
+  minus(zero) >? zero 
+  mul(zero, X) >? zero 
+  mul(X, zero) >? zero 
+  pls(zero, X) >? X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[minus(x_1)]] = x_1 
+  [[one]] = _|_ 
+  [[zero]] = _|_ 
+
+We choose Lex = {} and Mul = {cos, d, mul, pls, sin}, and the following precedence: d > sin > mul > pls > cos
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  d(/\x.X, Y) >= _|_ 
+  d(/\x.x, X) >= _|_ 
+  d(/\x.X[x], Y) >= d(/\x.X[x], Y) 
+  d(/\x.pls(X[x], Y[x]), Z) > pls(d(/\x.X[x], Z), d(/\y.Y[y], Z)) 
+  d(/\x.mul(X[x], Y[x]), Z) >= pls(mul(d(/\x.X[x], Z), Y[Z]), mul(X[Z], d(/\y.Y[y], Z))) 
+  d(/\x.sin(X[x]), Y) >= mul(cos(Y), d(/\x.X[x], Y)) 
+  d(/\x.cos(X[x]), Y) > mul(sin(Y), d(/\x.X[x], Y)) 
+  _|_ >= _|_ 
+  mul(_|_, X) >= _|_ 
+  mul(X, _|_) >= _|_ 
+  pls(_|_, X) >= X 
+
+With these choices, we have:
+
+  1] d(/\x.X, Y) >= _|_  by (Bot) 
+
+  2] d(/\x.x, X) >= _|_  by (Bot) 
+
+  3] d(/\x.X[x], Y) >= d(/\x.X[x], Y)  because d in Mul, [4] and [7], by (Fun) 
+  4] /\y.X[y] >= /\y.X[y]  because [5], by (Abs) 
+  5] X[x] >= X[x]  because [6], by (Meta) 
+  6] x >= x  by (Var) 
+  7] Y >= Y  by (Meta) 
+
+  8] d(/\x.pls(X[x], Y[x]), Z) > pls(d(/\x.X[x], Z), d(/\y.Y[y], Z))  because [9], by definition 
+  9] d*(/\x.pls(X[x], Y[x]), Z) >= pls(d(/\x.X[x], Z), d(/\y.Y[y], Z))  because d > pls, [10] and [17], by (Copy) 
+  10] d*(/\x.pls(X[x], Y[x]), Z) >= d(/\x.X[x], Z)  because d in Mul, [11] and [16], by (Stat) 
+  11] /\x.pls(X[x], Y[x]) > /\x.X[x]  because [12], by definition 
+  12] /\y.pls*(X[y], Y[y]) >= /\y.X[y]  because [13], by (Abs) 
+  13] pls*(X[x], Y[x]) >= X[x]  because [14], by (Select) 
+  14] X[x] >= X[x]  because [15], by (Meta) 
+  15] x >= x  by (Var) 
+  16] Z >= Z  by (Meta) 
+  17] d*(/\y.pls(X[y], Y[y]), Z) >= d(/\y.Y[y], Z)  because d in Mul, [18] and [16], by (Stat) 
+  18] /\y.pls(X[y], Y[y]) > /\y.Y[y]  because [19], by definition 
+  19] /\z.pls*(X[z], Y[z]) >= /\z.Y[z]  because [20], by (Abs) 
+  20] pls*(X[y], Y[y]) >= Y[y]  because [21], by (Select) 
+  21] Y[y] >= Y[y]  because [22], by (Meta) 
+  22] y >= y  by (Var) 
+
+  23] d(/\x.mul(X[x], Y[x]), Z) >= pls(mul(d(/\x.X[x], Z), Y[Z]), mul(X[Z], d(/\y.Y[y], Z)))  because [24], by (Star) 
+  24] d*(/\x.mul(X[x], Y[x]), Z) >= pls(mul(d(/\x.X[x], Z), Y[Z]), mul(X[Z], d(/\y.Y[y], Z)))  because d > pls, [25] and [38], by (Copy) 
+  25] d*(/\x.mul(X[x], Y[x]), Z) >= mul(d(/\x.X[x], Z), Y[Z])  because d > mul, [26] and [33], by (Copy) 
+  26] d*(/\x.mul(X[x], Y[x]), Z) >= d(/\x.X[x], Z)  because d in Mul, [27] and [32], by (Stat) 
+  27] /\x.mul(X[x], Y[x]) > /\x.X[x]  because [28], by definition 
+  28] /\y.mul*(X[y], Y[y]) >= /\y.X[y]  because [29], by (Abs) 
+  29] mul*(X[x], Y[x]) >= X[x]  because [30], by (Select) 
+  30] X[x] >= X[x]  because [31], by (Meta) 
+  31] x >= x  by (Var) 
+  32] Z >= Z  by (Meta) 
+  33] d*(/\y.mul(X[y], Y[y]), Z) >= Y[Z]  because [34], by (Select) 
+  34] mul(X[d*(/\y.mul(X[y], Y[y]), Z)], Y[d*(/\z.mul(X[z], Y[z]), Z)]) >= Y[Z]  because [35], by (Star) 
+  35] mul*(X[d*(/\y.mul(X[y], Y[y]), Z)], Y[d*(/\z.mul(X[z], Y[z]), Z)]) >= Y[Z]  because [36], by (Select) 
+  36] Y[d*(/\y.mul(X[y], Y[y]), Z)] >= Y[Z]  because [37], by (Meta) 
+  37] d*(/\y.mul(X[y], Y[y]), Z) >= Z  because [32], by (Select) 
+  38] d*(/\y.mul(X[y], Y[y]), Z) >= mul(X[Z], d(/\y.Y[y], Z))  because d > mul, [39] and [43], by (Copy) 
+  39] d*(/\y.mul(X[y], Y[y]), Z) >= X[Z]  because [40], by (Select) 
+  40] mul(X[d*(/\y.mul(X[y], Y[y]), Z)], Y[d*(/\z.mul(X[z], Y[z]), Z)]) >= X[Z]  because [41], by (Star) 
+  41] mul*(X[d*(/\y.mul(X[y], Y[y]), Z)], Y[d*(/\z.mul(X[z], Y[z]), Z)]) >= X[Z]  because [42], by (Select) 
+  42] X[d*(/\y.mul(X[y], Y[y]), Z)] >= X[Z]  because [37], by (Meta) 
+  43] d*(/\y.mul(X[y], Y[y]), Z) >= d(/\y.Y[y], Z)  because d in Mul, [44] and [32], by (Stat) 
+  44] /\y.mul(X[y], Y[y]) > /\y.Y[y]  because [45], by definition 
+  45] /\z.mul*(X[z], Y[z]) >= /\z.Y[z]  because [46], by (Abs) 
+  46] mul*(X[y], Y[y]) >= Y[y]  because [47], by (Select) 
+  47] Y[y] >= Y[y]  because [48], by (Meta) 
+  48] y >= y  by (Var) 
+
+  49] d(/\x.sin(X[x]), Y) >= mul(cos(Y), d(/\x.X[x], Y))  because [50], by (Star) 
+  50] d*(/\x.sin(X[x]), Y) >= mul(cos(Y), d(/\x.X[x], Y))  because d > mul, [51] and [54], by (Copy) 
+  51] d*(/\x.sin(X[x]), Y) >= cos(Y)  because d > cos and [52], by (Copy) 
+  52] d*(/\x.sin(X[x]), Y) >= Y  because [53], by (Select) 
+  53] Y >= Y  by (Meta) 
+  54] d*(/\x.sin(X[x]), Y) >= d(/\x.X[x], Y)  because d in Mul, [55] and [60], by (Stat) 
+  55] /\x.sin(X[x]) > /\x.X[x]  because [56], by definition 
+  56] /\y.sin*(X[y]) >= /\y.X[y]  because [57], by (Abs) 
+  57] sin*(X[x]) >= X[x]  because [58], by (Select) 
+  58] X[x] >= X[x]  because [59], by (Meta) 
+  59] x >= x  by (Var) 
+  60] Y >= Y  by (Meta) 
+
+  61] d(/\x.cos(X[x]), Y) > mul(sin(Y), d(/\x.X[x], Y))  because [62], by definition 
+  62] d*(/\x.cos(X[x]), Y) >= mul(sin(Y), d(/\x.X[x], Y))  because d > mul, [63] and [66], by (Copy) 
+  63] d*(/\x.cos(X[x]), Y) >= sin(Y)  because d > sin and [64], by (Copy) 
+  64] d*(/\x.cos(X[x]), Y) >= Y  because [65], by (Select) 
+  65] Y >= Y  by (Meta) 
+  66] d*(/\x.cos(X[x]), Y) >= d(/\x.X[x], Y)  because d in Mul, [67] and [72], by (Stat) 
+  67] /\x.cos(X[x]) > /\x.X[x]  because [68], by definition 
+  68] /\y.cos*(X[y]) >= /\y.X[y]  because [69], by (Abs) 
+  69] cos*(X[x]) >= X[x]  because [70], by (Select) 
+  70] X[x] >= X[x]  because [71], by (Meta) 
+  71] x >= x  by (Var) 
+  72] Y >= Y  by (Meta) 
+
+  73] _|_ >= _|_  by (Bot) 
+
+  74] mul(_|_, X) >= _|_  by (Bot) 
+
+  75] mul(X, _|_) >= _|_  by (Bot) 
+
+  76] pls(_|_, X) >= X  because [77], by (Star) 
+  77] pls*(_|_, X) >= X  because [78], by (Select) 
+  78] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  d(/\x.pls(X[x], Y[x]), Z) => pls(d(/\y.X[y], Z), d(/\z.Y[z], Z)) 
+  d(/\x.cos(X[x]), Y) => mul(minus(sin(Y)), d(/\y.X[y], Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  d(/\x.X, Y) >? zero 
+  d(/\x.x, X) >? one 
+  d(/\x.minus(X[x]), Y) >? minus(d(/\y.X[y], Y)) 
+  d(/\x.mul(X[x], Y[x]), Z) >? pls(mul(d(/\y.X[y], Z), Y[Z]), mul(X[Z], d(/\z.Y[z], Z))) 
+  d(/\x.sin(X[x]), Y) >? mul(cos(Y), d(/\y.X[y], Y)) 
+  minus(zero) >? zero 
+  mul(zero, X) >? zero 
+  mul(X, zero) >? zero 
+  pls(zero, X) >? X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[cos(x_1)]] = x_1 
+  [[one]] = _|_ 
+  [[zero]] = _|_ 
+
+We choose Lex = {} and Mul = {d, minus, mul, pls, sin}, and the following precedence: sin > d > minus > mul > pls
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  d(/\x.X, Y) >= _|_ 
+  d(/\x.x, X) >= _|_ 
+  d(/\x.minus(X[x]), Y) > minus(d(/\x.X[x], Y)) 
+  d(/\x.mul(X[x], Y[x]), Z) > pls(mul(d(/\x.X[x], Z), Y[Z]), mul(X[Z], d(/\y.Y[y], Z))) 
+  d(/\x.sin(X[x]), Y) >= mul(Y, d(/\x.X[x], Y)) 
+  minus(_|_) >= _|_ 
+  mul(_|_, X) >= _|_ 
+  mul(X, _|_) >= _|_ 
+  pls(_|_, X) >= X 
+
+With these choices, we have:
+
+  1] d(/\x.X, Y) >= _|_  by (Bot) 
+
+  2] d(/\x.x, X) >= _|_  by (Bot) 
+
+  3] d(/\x.minus(X[x]), Y) > minus(d(/\x.X[x], Y))  because [4], by definition 
+  4] d*(/\x.minus(X[x]), Y) >= minus(d(/\x.X[x], Y))  because d > minus and [5], by (Copy) 
+  5] d*(/\x.minus(X[x]), Y) >= d(/\x.X[x], Y)  because d in Mul, [6] and [11], by (Stat) 
+  6] /\x.minus(X[x]) > /\x.X[x]  because [7], by definition 
+  7] /\y.minus*(X[y]) >= /\y.X[y]  because [8], by (Abs) 
+  8] minus*(X[x]) >= X[x]  because [9], by (Select) 
+  9] X[x] >= X[x]  because [10], by (Meta) 
+  10] x >= x  by (Var) 
+  11] Y >= Y  by (Meta) 
+
+  12] d(/\x.mul(X[x], Y[x]), Z) > pls(mul(d(/\x.X[x], Z), Y[Z]), mul(X[Z], d(/\y.Y[y], Z)))  because [13], by definition 
+  13] d*(/\x.mul(X[x], Y[x]), Z) >= pls(mul(d(/\x.X[x], Z), Y[Z]), mul(X[Z], d(/\y.Y[y], Z)))  because d > pls, [14] and [27], by (Copy) 
+  14] d*(/\x.mul(X[x], Y[x]), Z) >= mul(d(/\x.X[x], Z), Y[Z])  because d > mul, [15] and [22], by (Copy) 
+  15] d*(/\x.mul(X[x], Y[x]), Z) >= d(/\x.X[x], Z)  because d in Mul, [16] and [21], by (Stat) 
+  16] /\x.mul(X[x], Y[x]) > /\x.X[x]  because [17], by definition 
+  17] /\y.mul*(X[y], Y[y]) >= /\y.X[y]  because [18], by (Abs) 
+  18] mul*(X[x], Y[x]) >= X[x]  because [19], by (Select) 
+  19] X[x] >= X[x]  because [20], by (Meta) 
+  20] x >= x  by (Var) 
+  21] Z >= Z  by (Meta) 
+  22] d*(/\y.mul(X[y], Y[y]), Z) >= Y[Z]  because [23], by (Select) 
+  23] mul(X[d*(/\y.mul(X[y], Y[y]), Z)], Y[d*(/\z.mul(X[z], Y[z]), Z)]) >= Y[Z]  because [24], by (Star) 
+  24] mul*(X[d*(/\y.mul(X[y], Y[y]), Z)], Y[d*(/\z.mul(X[z], Y[z]), Z)]) >= Y[Z]  because [25], by (Select) 
+  25] Y[d*(/\y.mul(X[y], Y[y]), Z)] >= Y[Z]  because [26], by (Meta) 
+  26] d*(/\y.mul(X[y], Y[y]), Z) >= Z  because [21], by (Select) 
+  27] d*(/\y.mul(X[y], Y[y]), Z) >= mul(X[Z], d(/\y.Y[y], Z))  because d > mul, [28] and [32], by (Copy) 
+  28] d*(/\y.mul(X[y], Y[y]), Z) >= X[Z]  because [29], by (Select) 
+  29] mul(X[d*(/\y.mul(X[y], Y[y]), Z)], Y[d*(/\z.mul(X[z], Y[z]), Z)]) >= X[Z]  because [30], by (Star) 
+  30] mul*(X[d*(/\y.mul(X[y], Y[y]), Z)], Y[d*(/\z.mul(X[z], Y[z]), Z)]) >= X[Z]  because [31], by (Select) 
+  31] X[d*(/\y.mul(X[y], Y[y]), Z)] >= X[Z]  because [26], by (Meta) 
+  32] d*(/\y.mul(X[y], Y[y]), Z) >= d(/\y.Y[y], Z)  because d in Mul, [33] and [21], by (Stat) 
+  33] /\y.mul(X[y], Y[y]) > /\y.Y[y]  because [34], by definition 
+  34] /\z.mul*(X[z], Y[z]) >= /\z.Y[z]  because [35], by (Abs) 
+  35] mul*(X[y], Y[y]) >= Y[y]  because [36], by (Select) 
+  36] Y[y] >= Y[y]  because [37], by (Meta) 
+  37] y >= y  by (Var) 
+
+  38] d(/\x.sin(X[x]), Y) >= mul(Y, d(/\x.X[x], Y))  because [39], by (Star) 
+  39] d*(/\x.sin(X[x]), Y) >= mul(Y, d(/\x.X[x], Y))  because d > mul, [40] and [42], by (Copy) 
+  40] d*(/\x.sin(X[x]), Y) >= Y  because [41], by (Select) 
+  41] Y >= Y  by (Meta) 
+  42] d*(/\x.sin(X[x]), Y) >= d(/\x.X[x], Y)  because d in Mul, [43] and [48], by (Stat) 
+  43] /\x.sin(X[x]) > /\x.X[x]  because [44], by definition 
+  44] /\y.sin*(X[y]) >= /\y.X[y]  because [45], by (Abs) 
+  45] sin*(X[x]) >= X[x]  because [46], by (Select) 
+  46] X[x] >= X[x]  because [47], by (Meta) 
+  47] x >= x  by (Var) 
+  48] Y >= Y  by (Meta) 
+
+  49] minus(_|_) >= _|_  by (Bot) 
+
+  50] mul(_|_, X) >= _|_  by (Bot) 
+
+  51] mul(X, _|_) >= _|_  by (Bot) 
+
+  52] pls(_|_, X) >= X  because [53], by (Star) 
+  53] pls*(_|_, X) >= X  because [54], by (Select) 
+  54] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  d(/\x.minus(X[x]), Y) => minus(d(/\y.X[y], Y)) 
+  d(/\x.mul(X[x], Y[x]), Z) => pls(mul(d(/\y.X[y], Z), Y[Z]), mul(X[Z], d(/\z.Y[z], Z))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  d(/\x.X, Y) >? zero 
+  d(/\x.x, X) >? one 
+  d(/\x.sin(X[x]), Y) >? mul(cos(Y), d(/\y.X[y], Y)) 
+  minus(zero) >? zero 
+  mul(zero, X) >? zero 
+  mul(X, zero) >? zero 
+  pls(zero, X) >? X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  cos = Lam[y0].y0 
+  d = Lam[G0;y1].3 + 2*y1 + 3*y1*G0(y1) + 3*G0(0) + 3*G0(y1) 
+  minus = Lam[y0].3 + 3*y0 
+  mul = Lam[y0;y1].2 + y0 + y1 
+  one = 0 
+  pls = Lam[y0;y1].3 + y0 + y1 
+  sin = Lam[y0].3 + 3*y0 
+  zero = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[d(/\x._x0, _x1)]] = 3 + 2*x1 + 3*x0*x1 + 6*x0 > 0 = [[zero]] 
+  [[d(/\x.x, _x0)]] = 3 + 3*x0*x0 + 5*x0 > 0 = [[one]] 
+  [[d(/\x.sin(_x0[x]), _x1)]] = 21 + 11*x1 + 9*x1*F0(x1) + 9*F0(0) + 9*F0(x1) > 5 + 3*x1 + 3*x1*F0(x1) + 3*F0(0) + 3*F0(x1) = [[mul(cos(_x1), d(/\x._x0[x], _x1))]] 
+  [[minus(zero)]] = 3 > 0 = [[zero]] 
+  [[mul(zero, _x0)]] = 2 + x0 > 0 = [[zero]] 
+  [[mul(_x0, zero)]] = 2 + x0 > 0 = [[zero]] 
+  [[pls(zero, _x0)]] = 3 + x0 > x0 = [[_x0]] 
+
+We can thus remove the following rules:
+
+  d(/\x.X, Y) => zero 
+  d(/\x.x, X) => one 
+  d(/\x.sin(X[x]), Y) => mul(cos(Y), d(/\y.X[y], Y)) 
+  minus(zero) => zero 
+  mul(zero, X) => zero 
+  mul(X, zero) => zero 
+  pls(zero, X) => X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

@@ -1,0 +1,83 @@
+YES
+We consider the system XCamL.
+
+  Alphabet:
+
+    O : [] --> nat 
+    bool : [nat] --> boolean 
+    cons : [nat * list] --> list 
+    consif : [boolean * nat * list] --> list 
+    false : [] --> boolean 
+    filter : [nat -> boolean * list] --> list 
+    nil : [] --> list 
+    rand : [nat] --> nat 
+    s : [nat] --> nat 
+    true : [] --> boolean 
+
+  Rules:
+
+    rand(X) => X 
+    rand(s(X)) => rand(X) 
+    bool(O) => false 
+    bool(s(O)) => true 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => consif(F X, X, filter(F, Y)) 
+    consif(true, X, Y) => cons(X, Y) 
+    consif(false, X, Y) => Y 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rand(X) >? X 
+  rand(s(X)) >? rand(X) 
+  bool(O) >? false 
+  bool(s(O)) >? true 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? consif(F X, X, filter(F, Y)) 
+  consif(true, X, Y) >? cons(X, Y) 
+  consif(false, X, Y) >? Y 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  bool = Lam[y0].3 + 3*y0 
+  cons = Lam[y0;y1].2 + 2*y0 + 2*y1 
+  consif = Lam[y0;y1;y2].1 + y0 + 2*y1 + 2*y2 
+  false = 1 
+  filter = Lam[G0;y1].2*y1 + G0(y1) + 2*y1*G0(y1) 
+  nil = 2 
+  rand = Lam[y0].3 + 2*y0 
+  s = Lam[y0].3 + 3*y0 
+  true = 3 
+
+Using this interpretation, the requirements translate to:
+
+  [[rand(_x0)]] = 3 + 2*x0 > x0 = [[_x0]] 
+  [[rand(s(_x0))]] = 9 + 6*x0 > 3 + 2*x0 = [[rand(_x0)]] 
+  [[bool(O)]] = 12 > 1 = [[false]] 
+  [[bool(s(O))]] = 39 > 3 = [[true]] 
+  [[filter(_F0, nil)]] = 4 + 5*F0(2) > 2 = [[nil]] 
+  [[filter(_F0, cons(_x1, _x2))]] = 4 + 4*x1 + 4*x2 + 4*x1*F0(2 + 2*x1 + 2*x2) + 4*x2*F0(2 + 2*x1 + 2*x2) + 5*F0(2 + 2*x1 + 2*x2) > 1 + 3*x1 + 4*x2 + F0(x1) + 2*F0(x2) + 4*x2*F0(x2) = [[consif(_F0 _x1, _x1, filter(_F0, _x2))]] 
+  [[consif(true, _x0, _x1)]] = 4 + 2*x0 + 2*x1 > 2 + 2*x0 + 2*x1 = [[cons(_x0, _x1)]] 
+  [[consif(false, _x0, _x1)]] = 2 + 2*x0 + 2*x1 > x1 = [[_x1]] 
+
+We can thus remove the following rules:
+
+  rand(X) => X 
+  rand(s(X)) => rand(X) 
+  bool(O) => false 
+  bool(s(O)) => true 
+  filter(F, nil) => nil 
+  filter(F, cons(X, Y)) => consif(F X, X, filter(F, Y)) 
+  consif(true, X, Y) => cons(X, Y) 
+  consif(false, X, Y) => Y 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

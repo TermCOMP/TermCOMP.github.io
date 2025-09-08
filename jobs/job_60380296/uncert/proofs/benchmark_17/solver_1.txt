@@ -1,0 +1,882 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/ndMJf.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 499 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 57 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 10 ms]
+        (13) IRSwT
+        (14) TempFilterProof [SOUND, 2 ms]
+        (15) IRSwT
+        (16) IRSwTToQDPProof [SOUND, 0 ms]
+        (17) QDP
+        (18) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (19) YES
+    (20) JBCTerminationSCC
+        (21) SCCToQDPProof [SOUND, 176 ms]
+        (22) QDP
+        (23) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (24) YES
+    (25) JBCTerminationSCC
+        (26) SCCToIRSProof [SOUND, 58 ms]
+        (27) IRSwT
+        (28) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (29) IRSwT
+        (30) IRSwTTerminationDigraphProof [EQUIVALENT, 14 ms]
+        (31) IRSwT
+        (32) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (33) IRSwT
+        (34) TempFilterProof [SOUND, 19 ms]
+        (35) IntTRS
+        (36) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (37) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package BinTreeChanger;
+
+public class BinTreeChanger {
+  public static void main(final String[] args) {
+    Random.args = args;
+
+    final Tree t = Tree.createTree(Random.random());
+
+    t.applyTreeChanger(new AnswerAdder());
+  }
+}
+
+class AnswerAdder implements TreeChanger {
+    public void change(final Tree t) {
+        final Tree newLeft = new Tree(42);
+        final Tree newRight = new Tree(42);
+        newLeft.left = t.left;
+        newRight.right = t.right;
+        t.left = newLeft;
+        t.right = newRight;
+    }
+}
+
+
+package BinTreeChanger;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package BinTreeChanger;
+
+public interface TreeChanger {
+    public void change(Tree t);
+}
+
+
+package BinTreeChanger;
+
+public class Tree {
+    Tree left;
+    Tree right;
+    int value;
+
+    public static Tree createTree(final int numElements) {
+        final Tree t = new Tree(Random.random());
+
+        for (int i = 0; i < numElements; i++) {
+            t.insert(Random.random());
+        }
+
+        return t;
+    }
+
+    public Tree(final int val) {
+        this.value = val;
+    }
+
+    public void insert(final int v) {
+        if (v <= this.value) {
+            if (this.left == null) {
+                this.left = new Tree(v);
+            } else {
+                this.left.insert(v);
+            }
+        } else {
+            if (this.right == null) {
+                this.right = new Tree(v);
+            } else {
+                this.right.insert(v);
+            }
+        }
+    }
+
+    public void applyTreeChanger(final TreeChanger c) {
+        final Tree oldLeft = this.left;
+        final Tree oldRight = this.right;
+        c.change(this);
+        if (oldLeft != null) {
+            oldLeft.applyTreeChanger(c);
+        }
+        if (oldRight != null) {
+            oldRight.applyTreeChanger(c);
+        }
+    }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package BinTreeChanger;
+
+public class BinTreeChanger {
+  public static void main(final String[] args) {
+    Random.args = args;
+
+    final Tree t = Tree.createTree(Random.random());
+
+    t.applyTreeChanger(new AnswerAdder());
+  }
+}
+
+class AnswerAdder implements TreeChanger {
+    public void change(final Tree t) {
+        final Tree newLeft = new Tree(42);
+        final Tree newRight = new Tree(42);
+        newLeft.left = t.left;
+        newRight.right = t.right;
+        t.left = newLeft;
+        t.right = newRight;
+    }
+}
+
+
+package BinTreeChanger;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package BinTreeChanger;
+
+public interface TreeChanger {
+    public void change(Tree t);
+}
+
+
+package BinTreeChanger;
+
+public class Tree {
+    Tree left;
+    Tree right;
+    int value;
+
+    public static Tree createTree(final int numElements) {
+        final Tree t = new Tree(Random.random());
+
+        for (int i = 0; i < numElements; i++) {
+            t.insert(Random.random());
+        }
+
+        return t;
+    }
+
+    public Tree(final int val) {
+        this.value = val;
+    }
+
+    public void insert(final int v) {
+        if (v <= this.value) {
+            if (this.left == null) {
+                this.left = new Tree(v);
+            } else {
+                this.left.insert(v);
+            }
+        } else {
+            if (this.right == null) {
+                this.right = new Tree(v);
+            } else {
+                this.right.insert(v);
+            }
+        }
+    }
+
+    public void applyTreeChanger(final TreeChanger c) {
+        final Tree oldLeft = this.left;
+        final Tree oldRight = this.right;
+        c.change(this);
+        if (oldLeft != null) {
+            oldLeft.applyTreeChanger(c);
+        }
+        if (oldRight != null) {
+            oldRight.applyTreeChanger(c);
+        }
+    }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+BinTreeChanger.BinTreeChanger.main([Ljava/lang/String;)V: Graph of 134 nodes with 0 SCCs.
+
+
+
+BinTreeChanger.Tree.createTree(I)LBinTreeChanger/Tree;: Graph of 194 nodes with 1 SCC.
+
+
+
+BinTreeChanger.Tree.applyTreeChanger(LBinTreeChanger/TreeChanger;)V: Graph of 77 nodes with 0 SCCs.
+
+
+
+BinTreeChanger.Tree.insert(I)V: Graph of 74 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 3 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: BinTreeChanger.Tree.insert(I)V
+SCC calls the following helper methods: BinTreeChanger.Tree.insert(I)V
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*BinTreeChanger.Tree: [value, right, left]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 30 IRulesP rules:
+f7357_0_insert_Load(EOS(STATIC_7357), java.lang.Object(o1051sub), i1108, java.lang.Object(o1051sub), i1108, i1108) -> f7366_0_insert_FieldAccess(EOS(STATIC_7366), java.lang.Object(o1051sub), i1108, java.lang.Object(o1051sub), i1108, i1108, java.lang.Object(o1051sub)) :|: TRUE
+f7366_0_insert_FieldAccess(EOS(STATIC_7366), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061))) -> f7372_0_insert_FieldAccess(EOS(STATIC_7372), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061))) :|: TRUE
+f7372_0_insert_FieldAccess(EOS(STATIC_7372), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061))) -> f7383_0_insert_GT(EOS(STATIC_7383), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, i1138) :|: TRUE
+f7383_0_insert_GT(EOS(STATIC_7383), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, i1138) -> f7394_0_insert_GT(EOS(STATIC_7394), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, i1138) :|: i1108 > i1138
+f7383_0_insert_GT(EOS(STATIC_7383), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, i1138) -> f7395_0_insert_GT(EOS(STATIC_7395), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, i1138) :|: i1108 <= i1138
+f7394_0_insert_GT(EOS(STATIC_7394), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, i1138) -> f7411_0_insert_Load(EOS(STATIC_7411), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108) :|: i1108 > i1138
+f7411_0_insert_Load(EOS(STATIC_7411), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108) -> f7424_0_insert_FieldAccess(EOS(STATIC_7424), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061))) :|: TRUE
+f7424_0_insert_FieldAccess(EOS(STATIC_7424), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061))) -> f7442_0_insert_NONNULL(EOS(STATIC_7442), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, o1062) :|: TRUE
+f7442_0_insert_NONNULL(EOS(STATIC_7442), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(o1083sub)) -> f7473_0_insert_NONNULL(EOS(STATIC_7473), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(o1083sub)) :|: TRUE
+f7473_0_insert_NONNULL(EOS(STATIC_7473), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(o1083sub)) -> f7484_0_insert_Load(EOS(STATIC_7484), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108) :|: TRUE
+f7484_0_insert_Load(EOS(STATIC_7484), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108) -> f7518_0_insert_FieldAccess(EOS(STATIC_7518), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061))) :|: TRUE
+f7518_0_insert_FieldAccess(EOS(STATIC_7518), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061))) -> f7544_0_insert_Load(EOS(STATIC_7544), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, i1108, java.lang.Object(o1083sub)) :|: TRUE
+f7544_0_insert_Load(EOS(STATIC_7544), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, i1108, java.lang.Object(o1083sub)) -> f7557_0_insert_InvokeMethod(EOS(STATIC_7557), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(o1083sub), i1108) :|: TRUE
+f7557_0_insert_InvokeMethod(EOS(STATIC_7557), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(o1083sub), i1108) -> f7589_0_insert_Load(EOS(STATIC_7589), java.lang.Object(o1083sub), i1108, java.lang.Object(o1083sub), i1108) :|: i1107 >= 1 && i1108 > i1138
+f7557_0_insert_InvokeMethod(EOS(STATIC_7557), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(o1083sub), i1108) -> f7589_1_insert_Load(EOS(STATIC_7589), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, java.lang.Object(o1083sub), o1061)), i1108, java.lang.Object(o1083sub), i1108) :|: i1107 >= 1 && i1108 > i1138
+f7589_0_insert_Load(EOS(STATIC_7589), java.lang.Object(o1083sub), i1108, java.lang.Object(o1083sub), i1108) -> f7595_0_insert_Load(EOS(STATIC_7595), java.lang.Object(o1083sub), i1108, java.lang.Object(o1083sub), i1108) :|: TRUE
+f7595_0_insert_Load(EOS(STATIC_7595), java.lang.Object(o1083sub), i1108, java.lang.Object(o1083sub), i1108) -> f7339_0_insert_Load(EOS(STATIC_7339), java.lang.Object(o1083sub), i1108, java.lang.Object(o1083sub), i1108) :|: TRUE
+f7339_0_insert_Load(EOS(STATIC_7339), java.lang.Object(o1051sub), i1108, java.lang.Object(o1051sub), i1108) -> f7357_0_insert_Load(EOS(STATIC_7357), java.lang.Object(o1051sub), i1108, java.lang.Object(o1051sub), i1108, i1108) :|: TRUE
+f7395_0_insert_GT(EOS(STATIC_7395), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, i1108, i1138) -> f7416_0_insert_Load(EOS(STATIC_7416), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108) :|: i1108 <= i1138
+f7416_0_insert_Load(EOS(STATIC_7416), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108) -> f7425_0_insert_FieldAccess(EOS(STATIC_7425), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061))) :|: TRUE
+f7425_0_insert_FieldAccess(EOS(STATIC_7425), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061))) -> f7443_0_insert_NONNULL(EOS(STATIC_7443), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, o1061)), i1108, o1061) :|: TRUE
+f7443_0_insert_NONNULL(EOS(STATIC_7443), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(o1084sub)) -> f7475_0_insert_NONNULL(EOS(STATIC_7475), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(o1084sub)) :|: TRUE
+f7475_0_insert_NONNULL(EOS(STATIC_7475), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(o1084sub)) -> f7486_0_insert_Load(EOS(STATIC_7486), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108) :|: TRUE
+f7486_0_insert_Load(EOS(STATIC_7486), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108) -> f7520_0_insert_FieldAccess(EOS(STATIC_7520), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub)))) :|: TRUE
+f7520_0_insert_FieldAccess(EOS(STATIC_7520), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, i1108, java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub)))) -> f7549_0_insert_Load(EOS(STATIC_7549), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, i1108, java.lang.Object(o1084sub)) :|: TRUE
+f7549_0_insert_Load(EOS(STATIC_7549), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, i1108, java.lang.Object(o1084sub)) -> f7561_0_insert_InvokeMethod(EOS(STATIC_7561), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(o1084sub), i1108) :|: TRUE
+f7561_0_insert_InvokeMethod(EOS(STATIC_7561), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(o1084sub), i1108) -> f7591_0_insert_Load(EOS(STATIC_7591), java.lang.Object(o1084sub), i1108, java.lang.Object(o1084sub), i1108) :|: i1107 >= 1 && i1108 <= i1138
+f7561_0_insert_InvokeMethod(EOS(STATIC_7561), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(o1084sub), i1108) -> f7591_1_insert_Load(EOS(STATIC_7591), java.lang.Object(BinTreeChanger.Tree(EOC, i1138, o1062, java.lang.Object(o1084sub))), i1108, java.lang.Object(o1084sub), i1108) :|: i1107 >= 1 && i1108 <= i1138
+f7591_0_insert_Load(EOS(STATIC_7591), java.lang.Object(o1084sub), i1108, java.lang.Object(o1084sub), i1108) -> f7599_0_insert_Load(EOS(STATIC_7599), java.lang.Object(o1084sub), i1108, java.lang.Object(o1084sub), i1108) :|: TRUE
+f7599_0_insert_Load(EOS(STATIC_7599), java.lang.Object(o1084sub), i1108, java.lang.Object(o1084sub), i1108) -> f7339_0_insert_Load(EOS(STATIC_7339), java.lang.Object(o1084sub), i1108, java.lang.Object(o1084sub), i1108) :|: TRUE
+Combined rules. Obtained 4 IRulesP rules:
+f7357_0_insert_Load(EOS(STATIC_7357), java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0, java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0, i1108:0) -> f7357_0_insert_Load(EOS(STATIC_7357), java.lang.Object(o1083sub:0), i1108:0, java.lang.Object(o1083sub:0), i1108:0, i1108:0) :|: i1138:0 < i1108:0 && i1107:0 > 0
+f7357_0_insert_Load(EOS(STATIC_7357), java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, o1062:0, java.lang.Object(o1084sub:0))), i1108:0, java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, o1062:0, java.lang.Object(o1084sub:0))), i1108:0, i1108:0) -> f7357_0_insert_Load(EOS(STATIC_7357), java.lang.Object(o1084sub:0), i1108:0, java.lang.Object(o1084sub:0), i1108:0, i1108:0) :|: i1138:0 >= i1108:0 && i1107:0 > 0
+Removed following non-SCC rules:
+f7357_0_insert_Load(EOS(STATIC_7357), java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0, java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0, i1108:0) -> f7589_1_insert_Load(EOS(STATIC_7589), java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0, java.lang.Object(o1083sub:0), i1108:0) :|: i1138:0 < i1108:0 && i1107:0 > 0
+f7357_0_insert_Load(EOS(STATIC_7357), java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, o1062:0, java.lang.Object(o1084sub:0))), i1108:0, java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, o1062:0, java.lang.Object(o1084sub:0))), i1108:0, i1108:0) -> f7591_1_insert_Load(EOS(STATIC_7591), java.lang.Object(BinTreeChanger.Tree(EOC, i1138:0, o1062:0, java.lang.Object(o1084sub:0))), i1108:0, java.lang.Object(o1084sub:0), i1108:0) :|: i1138:0 >= i1108:0 && i1107:0 > 0
+Filtered constant ground arguments:
+   f7357_0_insert_Load(x1, x2, x3, x4, x5, x6) -> f7357_0_insert_Load(x2, x3, x4, x5, x6)
+   EOS(x1) -> EOS
+   BinTreeChanger.Tree(x1, x2, x3, x4) -> BinTreeChanger.Tree(x2, x3, x4)
+Filtered duplicate arguments:
+   f7357_0_insert_Load(x1, x2, x3, x4, x5) -> f7357_0_insert_Load(x3, x5)
+Finished conversion. Obtained 2 rules.P rules:
+f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0) -> f7357_0_insert_Load(java.lang.Object(o1083sub:0), i1108:0) :|: i1138:0 < i1108:0 && i1107:0 > 0
+f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(i1138:0, o1062:0, java.lang.Object(o1084sub:0))), i1108:0) -> f7357_0_insert_Load(java.lang.Object(o1084sub:0), i1108:0) :|: i1138:0 >= i1108:0 && i1107:0 > 0
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0) -> f7357_0_insert_Load(java.lang.Object(o1083sub:0), i1108:0) :|: i1138:0 < i1108:0 && i1107:0 > 0
+f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(x, x1, java.lang.Object(x2))), x3) -> f7357_0_insert_Load(java.lang.Object(x2), x3) :|: x >= x3 && x4 > 0
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0) -> f7357_0_insert_Load(java.lang.Object(o1083sub:0), i1108:0) :|: i1138:0 < i1108:0 && i1107:0 > 0
+f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(x, x1, java.lang.Object(x2))), x3) -> f7357_0_insert_Load(java.lang.Object(x2), x3) :|: x >= x3 && x4 > 0
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0) -> f7357_0_insert_Load(java.lang.Object(o1083sub:0), i1108:0) :|: i1138:0 < i1108:0 && i1107:0 > 0
+(2) f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(x, x1, java.lang.Object(x2))), x3) -> f7357_0_insert_Load(java.lang.Object(x2), x3) :|: x >= x3 && x4 > 0
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(i1138:0, java.lang.Object(o1083sub:0), o1061:0)), i1108:0) -> f7357_0_insert_Load(java.lang.Object(o1083sub:0), i1108:0) :|: i1138:0 < i1108:0 && i1107:0 > 0
+(2) f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(x, x1, java.lang.Object(x2))), x3) -> f7357_0_insert_Load(java.lang.Object(x2), x3) :|: x >= x3 && x4 > 0
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(14) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f7357_0_insert_Load(VARIABLE, INTEGER)
+java.lang.Object(VARIABLE)
+BinTreeChanger.Tree(INTEGER, VARIABLE, VARIABLE)
+Removed predefined arithmetic.
+----------------------------------------
+
+(15)
+Obligation:
+Rules:
+f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1083sub:0), o1061:0))) -> f7357_0_insert_Load(java.lang.Object(o1083sub:0))
+f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(x1, java.lang.Object(x2)))) -> f7357_0_insert_Load(java.lang.Object(x2))
+
+----------------------------------------
+
+(16) IRSwTToQDPProof (SOUND)
+Removed the integers and created a QDP-Problem.
+----------------------------------------
+
+(17)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1083sub:0), o1061:0))) -> f7357_0_insert_Load(java.lang.Object(o1083sub:0))
+   f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(x1, java.lang.Object(x2)))) -> f7357_0_insert_Load(java.lang.Object(x2))
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(18) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1083sub:0), o1061:0))) -> f7357_0_insert_Load(java.lang.Object(o1083sub:0))
+The graph contains the following edges 1 > 1
+
+
+*f7357_0_insert_Load(java.lang.Object(BinTreeChanger.Tree(x1, java.lang.Object(x2)))) -> f7357_0_insert_Load(java.lang.Object(x2))
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(19)
+YES
+
+----------------------------------------
+
+(20)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: BinTreeChanger.Tree.applyTreeChanger(LBinTreeChanger/TreeChanger;)V
+SCC calls the following helper methods: BinTreeChanger.Tree.applyTreeChanger(LBinTreeChanger/TreeChanger;)V
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*BinTreeChanger.Tree: [left, right]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(21) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 73 rules for P and 79 rules for R.P rules:
+f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9034_0_applyTreeChanger_FieldAccess(EOS(STATIC_9034), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9034_0_applyTreeChanger_FieldAccess(EOS(STATIC_9034), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9035_0_applyTreeChanger_Store(EOS(STATIC_9035), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444) :|: TRUE
+f9035_0_applyTreeChanger_Store(EOS(STATIC_9035), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444) -> f9036_0_applyTreeChanger_Load(EOS(STATIC_9036), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444) :|: TRUE
+f9036_0_applyTreeChanger_Load(EOS(STATIC_9036), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444) -> f9037_0_applyTreeChanger_FieldAccess(EOS(STATIC_9037), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9037_0_applyTreeChanger_FieldAccess(EOS(STATIC_9037), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9038_0_applyTreeChanger_Store(EOS(STATIC_9038), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) :|: TRUE
+f9038_0_applyTreeChanger_Store(EOS(STATIC_9038), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) -> f9039_0_applyTreeChanger_Load(EOS(STATIC_9039), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) :|: TRUE
+f9039_0_applyTreeChanger_Load(EOS(STATIC_9039), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) -> f9040_0_applyTreeChanger_Load(EOS(STATIC_9040), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) :|: TRUE
+f9040_0_applyTreeChanger_Load(EOS(STATIC_9040), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) -> f9041_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9041), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9041_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9041), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9042_0_change_New(EOS(STATIC_9042), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9042_0_change_New(EOS(STATIC_9042), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9043_0_change_Duplicate(EOS(STATIC_9043), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9043_0_change_Duplicate(EOS(STATIC_9043), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9044_0_change_ConstantStackPush(EOS(STATIC_9044), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9044_0_change_ConstantStackPush(EOS(STATIC_9044), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9045_0_change_InvokeMethod(EOS(STATIC_9045), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE
+f9045_0_change_InvokeMethod(EOS(STATIC_9045), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9046_0__init__Load(EOS(STATIC_9046), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9046_0__init__Load(EOS(STATIC_9046), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9047_0__init__InvokeMethod(EOS(STATIC_9047), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9047_0__init__InvokeMethod(EOS(STATIC_9047), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9048_0__init__Load(EOS(STATIC_9048), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9048_0__init__Load(EOS(STATIC_9048), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9049_0__init__Load(EOS(STATIC_9049), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9049_0__init__Load(EOS(STATIC_9049), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9050_0__init__FieldAccess(EOS(STATIC_9050), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9050_0__init__FieldAccess(EOS(STATIC_9050), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9051_0__init__Return(EOS(STATIC_9051), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9051_0__init__Return(EOS(STATIC_9051), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9052_0_change_Store(EOS(STATIC_9052), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9052_0_change_Store(EOS(STATIC_9052), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9053_0_change_New(EOS(STATIC_9053), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9053_0_change_New(EOS(STATIC_9053), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9054_0_change_Duplicate(EOS(STATIC_9054), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9054_0_change_Duplicate(EOS(STATIC_9054), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9055_0_change_ConstantStackPush(EOS(STATIC_9055), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9055_0_change_ConstantStackPush(EOS(STATIC_9055), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9056_0_change_InvokeMethod(EOS(STATIC_9056), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE
+f9056_0_change_InvokeMethod(EOS(STATIC_9056), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9057_0__init__Load(EOS(STATIC_9057), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9057_0__init__Load(EOS(STATIC_9057), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9058_0__init__InvokeMethod(EOS(STATIC_9058), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9058_0__init__InvokeMethod(EOS(STATIC_9058), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9059_0__init__Load(EOS(STATIC_9059), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9059_0__init__Load(EOS(STATIC_9059), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9060_0__init__Load(EOS(STATIC_9060), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9060_0__init__Load(EOS(STATIC_9060), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9061_0__init__FieldAccess(EOS(STATIC_9061), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9061_0__init__FieldAccess(EOS(STATIC_9061), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9062_0__init__Return(EOS(STATIC_9062), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9062_0__init__Return(EOS(STATIC_9062), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9063_0_change_Store(EOS(STATIC_9063), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9063_0_change_Store(EOS(STATIC_9063), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9064_0_change_Load(EOS(STATIC_9064), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9064_0_change_Load(EOS(STATIC_9064), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9065_0_change_Load(EOS(STATIC_9065), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9065_0_change_Load(EOS(STATIC_9065), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9066_0_change_FieldAccess(EOS(STATIC_9066), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9066_0_change_FieldAccess(EOS(STATIC_9066), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9067_0_change_FieldAccess(EOS(STATIC_9067), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), o1444) :|: TRUE
+f9067_0_change_FieldAccess(EOS(STATIC_9067), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), o1444) -> f9068_0_change_Load(EOS(STATIC_9068), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9068_0_change_Load(EOS(STATIC_9068), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9071_0_change_Load(EOS(STATIC_9071), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9071_0_change_Load(EOS(STATIC_9071), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9072_0_change_FieldAccess(EOS(STATIC_9072), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9072_0_change_FieldAccess(EOS(STATIC_9072), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9074_0_change_FieldAccess(EOS(STATIC_9074), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), o1445) :|: TRUE
+f9074_0_change_FieldAccess(EOS(STATIC_9074), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), o1445) -> f9075_0_change_Load(EOS(STATIC_9075), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) :|: TRUE
+f9075_0_change_Load(EOS(STATIC_9075), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) -> f9076_0_change_Load(EOS(STATIC_9076), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9076_0_change_Load(EOS(STATIC_9076), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9077_0_change_FieldAccess(EOS(STATIC_9077), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL))) :|: TRUE
+f9077_0_change_FieldAccess(EOS(STATIC_9077), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL))) -> f9078_0_change_Load(EOS(STATIC_9078), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) :|: TRUE
+f9078_0_change_Load(EOS(STATIC_9078), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) -> f9079_0_change_Load(EOS(STATIC_9079), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445))) :|: TRUE
+f9079_0_change_Load(EOS(STATIC_9079), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445))) -> f9080_0_change_FieldAccess(EOS(STATIC_9080), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) :|: TRUE
+f9080_0_change_FieldAccess(EOS(STATIC_9080), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) -> f9081_0_change_Return(EOS(STATIC_9081), o1444, o1445) :|: TRUE
+f9081_0_change_Return(EOS(STATIC_9081), o1444, o1445) -> f9082_0_applyTreeChanger_Load(EOS(STATIC_9082), o1444, o1445) :|: TRUE
+f9082_0_applyTreeChanger_Load(EOS(STATIC_9082), o1444, o1445) -> f9084_0_applyTreeChanger_NULL(EOS(STATIC_9084), o1444, o1445, o1444) :|: TRUE
+f9084_0_applyTreeChanger_NULL(EOS(STATIC_9084), java.lang.Object(o1457sub), o1445, java.lang.Object(o1457sub)) -> f9085_0_applyTreeChanger_NULL(EOS(STATIC_9085), java.lang.Object(o1457sub), o1445, java.lang.Object(o1457sub)) :|: TRUE
+f9084_0_applyTreeChanger_NULL(EOS(STATIC_9084), NULL, o1445, NULL) -> f9086_0_applyTreeChanger_NULL(EOS(STATIC_9086), NULL, o1445, NULL) :|: TRUE
+f9085_0_applyTreeChanger_NULL(EOS(STATIC_9085), java.lang.Object(o1457sub), o1445, java.lang.Object(o1457sub)) -> f9087_0_applyTreeChanger_Load(EOS(STATIC_9087), java.lang.Object(o1457sub), o1445) :|: TRUE
+f9087_0_applyTreeChanger_Load(EOS(STATIC_9087), java.lang.Object(o1457sub), o1445) -> f9089_0_applyTreeChanger_Load(EOS(STATIC_9089), o1445, java.lang.Object(o1457sub)) :|: TRUE
+f9089_0_applyTreeChanger_Load(EOS(STATIC_9089), o1445, java.lang.Object(o1457sub)) -> f9091_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9091), o1445, java.lang.Object(o1457sub)) :|: TRUE
+f9091_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9091), o1445, java.lang.Object(o1457sub)) -> f9094_1_applyTreeChanger_InvokeMethod(f9094_0_applyTreeChanger_Load(EOS(STATIC_9094), java.lang.Object(o1457sub)), o1445) :|: TRUE
+f9094_0_applyTreeChanger_Load(EOS(STATIC_9094), java.lang.Object(o1457sub)) -> f9100_0_applyTreeChanger_Load(EOS(STATIC_9100), java.lang.Object(o1457sub)) :|: TRUE
+f9100_0_applyTreeChanger_Load(EOS(STATIC_9100), java.lang.Object(o1457sub)) -> f9122_0_applyTreeChanger_Load(EOS(STATIC_9122), java.lang.Object(o1457sub)) :|: TRUE
+f9122_0_applyTreeChanger_Load(EOS(STATIC_9122), java.lang.Object(o1457sub)) -> f9032_0_applyTreeChanger_Load(EOS(STATIC_9032), java.lang.Object(o1457sub)) :|: TRUE
+f9032_0_applyTreeChanger_Load(EOS(STATIC_9032), java.lang.Object(o1441sub)) -> f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(o1441sub), java.lang.Object(o1441sub)) :|: TRUE
+f9123_0_applyTreeChanger_Return(EOS(STATIC_9123), o1445) -> f9124_0_applyTreeChanger_Load(EOS(STATIC_9124), o1445) :|: TRUE
+f9124_0_applyTreeChanger_Load(EOS(STATIC_9124), o1445) -> f9132_0_applyTreeChanger_NULL(EOS(STATIC_9132), o1445, o1445) :|: TRUE
+f9132_0_applyTreeChanger_NULL(EOS(STATIC_9132), o1445, o1445) -> f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), o1445, o1445) :|: TRUE
+f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), java.lang.Object(o1458sub), java.lang.Object(o1458sub)) -> f9092_0_applyTreeChanger_NULL(EOS(STATIC_9092), java.lang.Object(o1458sub), java.lang.Object(o1458sub)) :|: TRUE
+f9092_0_applyTreeChanger_NULL(EOS(STATIC_9092), java.lang.Object(o1458sub), java.lang.Object(o1458sub)) -> f9095_0_applyTreeChanger_Load(EOS(STATIC_9095), java.lang.Object(o1458sub)) :|: TRUE
+f9095_0_applyTreeChanger_Load(EOS(STATIC_9095), java.lang.Object(o1458sub)) -> f9101_0_applyTreeChanger_Load(EOS(STATIC_9101), java.lang.Object(o1458sub)) :|: TRUE
+f9101_0_applyTreeChanger_Load(EOS(STATIC_9101), java.lang.Object(o1458sub)) -> f9103_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9103), java.lang.Object(o1458sub)) :|: TRUE
+f9103_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9103), java.lang.Object(o1458sub)) -> f9106_1_applyTreeChanger_InvokeMethod(f9106_0_applyTreeChanger_Load(EOS(STATIC_9106), java.lang.Object(o1458sub))) :|: TRUE
+f9106_0_applyTreeChanger_Load(EOS(STATIC_9106), java.lang.Object(o1458sub)) -> f9121_0_applyTreeChanger_Load(EOS(STATIC_9121), java.lang.Object(o1458sub)) :|: TRUE
+f9121_0_applyTreeChanger_Load(EOS(STATIC_9121), java.lang.Object(o1458sub)) -> f9152_0_applyTreeChanger_Load(EOS(STATIC_9152), java.lang.Object(o1458sub)) :|: TRUE
+f9152_0_applyTreeChanger_Load(EOS(STATIC_9152), java.lang.Object(o1458sub)) -> f9032_0_applyTreeChanger_Load(EOS(STATIC_9032), java.lang.Object(o1458sub)) :|: TRUE
+f9186_0_applyTreeChanger_Return(EOS(STATIC_9186), o1445) -> f9123_0_applyTreeChanger_Return(EOS(STATIC_9123), o1445) :|: TRUE
+f9086_0_applyTreeChanger_NULL(EOS(STATIC_9086), NULL, o1445, NULL) -> f9088_0_applyTreeChanger_Load(EOS(STATIC_9088), o1445) :|: TRUE
+f9088_0_applyTreeChanger_Load(EOS(STATIC_9088), o1445) -> f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), o1445, o1445) :|: TRUE
+f9094_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return(EOS(STATIC_9097)), o1445) -> f9123_0_applyTreeChanger_Return(EOS(STATIC_9123), o1445) :|: TRUE
+f9094_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return(EOS(STATIC_9154)), o1445) -> f9186_0_applyTreeChanger_Return(EOS(STATIC_9186), o1445) :|: TRUE
+R rules:
+f9032_0_applyTreeChanger_Load(EOS(STATIC_9032), java.lang.Object(o1441sub)) -> f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(o1441sub), java.lang.Object(o1441sub)) :|: TRUE
+f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9034_0_applyTreeChanger_FieldAccess(EOS(STATIC_9034), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9034_0_applyTreeChanger_FieldAccess(EOS(STATIC_9034), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9035_0_applyTreeChanger_Store(EOS(STATIC_9035), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444) :|: TRUE
+f9035_0_applyTreeChanger_Store(EOS(STATIC_9035), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444) -> f9036_0_applyTreeChanger_Load(EOS(STATIC_9036), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444) :|: TRUE
+f9036_0_applyTreeChanger_Load(EOS(STATIC_9036), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444) -> f9037_0_applyTreeChanger_FieldAccess(EOS(STATIC_9037), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9037_0_applyTreeChanger_FieldAccess(EOS(STATIC_9037), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9038_0_applyTreeChanger_Store(EOS(STATIC_9038), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) :|: TRUE
+f9038_0_applyTreeChanger_Store(EOS(STATIC_9038), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) -> f9039_0_applyTreeChanger_Load(EOS(STATIC_9039), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) :|: TRUE
+f9039_0_applyTreeChanger_Load(EOS(STATIC_9039), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) -> f9040_0_applyTreeChanger_Load(EOS(STATIC_9040), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) :|: TRUE
+f9040_0_applyTreeChanger_Load(EOS(STATIC_9040), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), o1444, o1445) -> f9041_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9041), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9041_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9041), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9042_0_change_New(EOS(STATIC_9042), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9042_0_change_New(EOS(STATIC_9042), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9043_0_change_Duplicate(EOS(STATIC_9043), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9043_0_change_Duplicate(EOS(STATIC_9043), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9044_0_change_ConstantStackPush(EOS(STATIC_9044), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9044_0_change_ConstantStackPush(EOS(STATIC_9044), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9045_0_change_InvokeMethod(EOS(STATIC_9045), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE
+f9045_0_change_InvokeMethod(EOS(STATIC_9045), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9046_0__init__Load(EOS(STATIC_9046), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9046_0__init__Load(EOS(STATIC_9046), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9047_0__init__InvokeMethod(EOS(STATIC_9047), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9047_0__init__InvokeMethod(EOS(STATIC_9047), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9048_0__init__Load(EOS(STATIC_9048), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9048_0__init__Load(EOS(STATIC_9048), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9049_0__init__Load(EOS(STATIC_9049), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9049_0__init__Load(EOS(STATIC_9049), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9050_0__init__FieldAccess(EOS(STATIC_9050), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9050_0__init__FieldAccess(EOS(STATIC_9050), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9051_0__init__Return(EOS(STATIC_9051), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9051_0__init__Return(EOS(STATIC_9051), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9052_0_change_Store(EOS(STATIC_9052), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9052_0_change_Store(EOS(STATIC_9052), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9053_0_change_New(EOS(STATIC_9053), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9053_0_change_New(EOS(STATIC_9053), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9054_0_change_Duplicate(EOS(STATIC_9054), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9054_0_change_Duplicate(EOS(STATIC_9054), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9055_0_change_ConstantStackPush(EOS(STATIC_9055), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9055_0_change_ConstantStackPush(EOS(STATIC_9055), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9056_0_change_InvokeMethod(EOS(STATIC_9056), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE
+f9056_0_change_InvokeMethod(EOS(STATIC_9056), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9057_0__init__Load(EOS(STATIC_9057), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9057_0__init__Load(EOS(STATIC_9057), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9058_0__init__InvokeMethod(EOS(STATIC_9058), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9058_0__init__InvokeMethod(EOS(STATIC_9058), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9059_0__init__Load(EOS(STATIC_9059), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9059_0__init__Load(EOS(STATIC_9059), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9060_0__init__Load(EOS(STATIC_9060), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9060_0__init__Load(EOS(STATIC_9060), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9061_0__init__FieldAccess(EOS(STATIC_9061), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), 42) :|: TRUE && matching1 = 42
+f9061_0__init__FieldAccess(EOS(STATIC_9061), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), matching1) -> f9062_0__init__Return(EOS(STATIC_9062), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE && matching1 = 42
+f9062_0__init__Return(EOS(STATIC_9062), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9063_0_change_Store(EOS(STATIC_9063), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9063_0_change_Store(EOS(STATIC_9063), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9064_0_change_Load(EOS(STATIC_9064), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9064_0_change_Load(EOS(STATIC_9064), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9065_0_change_Load(EOS(STATIC_9065), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9065_0_change_Load(EOS(STATIC_9065), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9066_0_change_FieldAccess(EOS(STATIC_9066), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9066_0_change_FieldAccess(EOS(STATIC_9066), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9067_0_change_FieldAccess(EOS(STATIC_9067), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), o1444) :|: TRUE
+f9067_0_change_FieldAccess(EOS(STATIC_9067), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), o1444) -> f9068_0_change_Load(EOS(STATIC_9068), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9068_0_change_Load(EOS(STATIC_9068), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9071_0_change_Load(EOS(STATIC_9071), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) :|: TRUE
+f9071_0_change_Load(EOS(STATIC_9071), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL))) -> f9072_0_change_FieldAccess(EOS(STATIC_9072), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9072_0_change_FieldAccess(EOS(STATIC_9072), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9074_0_change_FieldAccess(EOS(STATIC_9074), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), o1445) :|: TRUE
+f9074_0_change_FieldAccess(EOS(STATIC_9074), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, NULL)), o1445) -> f9075_0_change_Load(EOS(STATIC_9075), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) :|: TRUE
+f9075_0_change_Load(EOS(STATIC_9075), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) -> f9076_0_change_Load(EOS(STATIC_9076), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) :|: TRUE
+f9076_0_change_Load(EOS(STATIC_9076), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445))) -> f9077_0_change_FieldAccess(EOS(STATIC_9077), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL))) :|: TRUE
+f9077_0_change_FieldAccess(EOS(STATIC_9077), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL))) -> f9078_0_change_Load(EOS(STATIC_9078), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) :|: TRUE
+f9078_0_change_Load(EOS(STATIC_9078), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) -> f9079_0_change_Load(EOS(STATIC_9079), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445))) :|: TRUE
+f9079_0_change_Load(EOS(STATIC_9079), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445))) -> f9080_0_change_FieldAccess(EOS(STATIC_9080), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) :|: TRUE
+f9080_0_change_FieldAccess(EOS(STATIC_9080), o1444, o1445, java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(BinTreeChanger.Tree(EOC, o1444, NULL)), o1445)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445))) -> f9081_0_change_Return(EOS(STATIC_9081), o1444, o1445) :|: TRUE
+f9081_0_change_Return(EOS(STATIC_9081), o1444, o1445) -> f9082_0_applyTreeChanger_Load(EOS(STATIC_9082), o1444, o1445) :|: TRUE
+f9082_0_applyTreeChanger_Load(EOS(STATIC_9082), o1444, o1445) -> f9084_0_applyTreeChanger_NULL(EOS(STATIC_9084), o1444, o1445, o1444) :|: TRUE
+f9084_0_applyTreeChanger_NULL(EOS(STATIC_9084), java.lang.Object(o1457sub), o1445, java.lang.Object(o1457sub)) -> f9085_0_applyTreeChanger_NULL(EOS(STATIC_9085), java.lang.Object(o1457sub), o1445, java.lang.Object(o1457sub)) :|: TRUE
+f9084_0_applyTreeChanger_NULL(EOS(STATIC_9084), NULL, o1445, NULL) -> f9086_0_applyTreeChanger_NULL(EOS(STATIC_9086), NULL, o1445, NULL) :|: TRUE
+f9085_0_applyTreeChanger_NULL(EOS(STATIC_9085), java.lang.Object(o1457sub), o1445, java.lang.Object(o1457sub)) -> f9087_0_applyTreeChanger_Load(EOS(STATIC_9087), java.lang.Object(o1457sub), o1445) :|: TRUE
+f9086_0_applyTreeChanger_NULL(EOS(STATIC_9086), NULL, o1445, NULL) -> f9088_0_applyTreeChanger_Load(EOS(STATIC_9088), o1445) :|: TRUE
+f9087_0_applyTreeChanger_Load(EOS(STATIC_9087), java.lang.Object(o1457sub), o1445) -> f9089_0_applyTreeChanger_Load(EOS(STATIC_9089), o1445, java.lang.Object(o1457sub)) :|: TRUE
+f9088_0_applyTreeChanger_Load(EOS(STATIC_9088), o1445) -> f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), o1445, o1445) :|: TRUE
+f9089_0_applyTreeChanger_Load(EOS(STATIC_9089), o1445, java.lang.Object(o1457sub)) -> f9091_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9091), o1445, java.lang.Object(o1457sub)) :|: TRUE
+f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), java.lang.Object(o1458sub), java.lang.Object(o1458sub)) -> f9092_0_applyTreeChanger_NULL(EOS(STATIC_9092), java.lang.Object(o1458sub), java.lang.Object(o1458sub)) :|: TRUE
+f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), NULL, NULL) -> f9093_0_applyTreeChanger_NULL(EOS(STATIC_9093), NULL, NULL) :|: TRUE
+f9091_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9091), o1445, java.lang.Object(o1457sub)) -> f9094_1_applyTreeChanger_InvokeMethod(f9094_0_applyTreeChanger_Load(EOS(STATIC_9094), java.lang.Object(o1457sub)), o1445) :|: TRUE
+f9092_0_applyTreeChanger_NULL(EOS(STATIC_9092), java.lang.Object(o1458sub), java.lang.Object(o1458sub)) -> f9095_0_applyTreeChanger_Load(EOS(STATIC_9095), java.lang.Object(o1458sub)) :|: TRUE
+f9093_0_applyTreeChanger_NULL(EOS(STATIC_9093), NULL, NULL) -> f9097_0_applyTreeChanger_Return(EOS(STATIC_9097)) :|: TRUE
+f9094_0_applyTreeChanger_Load(EOS(STATIC_9094), java.lang.Object(o1457sub)) -> f9100_0_applyTreeChanger_Load(EOS(STATIC_9100), java.lang.Object(o1457sub)) :|: TRUE
+f9095_0_applyTreeChanger_Load(EOS(STATIC_9095), java.lang.Object(o1458sub)) -> f9101_0_applyTreeChanger_Load(EOS(STATIC_9101), java.lang.Object(o1458sub)) :|: TRUE
+f9100_0_applyTreeChanger_Load(EOS(STATIC_9100), java.lang.Object(o1457sub)) -> f9122_0_applyTreeChanger_Load(EOS(STATIC_9122), java.lang.Object(o1457sub)) :|: TRUE
+f9101_0_applyTreeChanger_Load(EOS(STATIC_9101), java.lang.Object(o1458sub)) -> f9103_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9103), java.lang.Object(o1458sub)) :|: TRUE
+f9103_0_applyTreeChanger_InvokeMethod(EOS(STATIC_9103), java.lang.Object(o1458sub)) -> f9106_1_applyTreeChanger_InvokeMethod(f9106_0_applyTreeChanger_Load(EOS(STATIC_9106), java.lang.Object(o1458sub))) :|: TRUE
+f9106_0_applyTreeChanger_Load(EOS(STATIC_9106), java.lang.Object(o1458sub)) -> f9121_0_applyTreeChanger_Load(EOS(STATIC_9121), java.lang.Object(o1458sub)) :|: TRUE
+f9121_0_applyTreeChanger_Load(EOS(STATIC_9121), java.lang.Object(o1458sub)) -> f9152_0_applyTreeChanger_Load(EOS(STATIC_9152), java.lang.Object(o1458sub)) :|: TRUE
+f9123_0_applyTreeChanger_Return(EOS(STATIC_9123), o1445) -> f9124_0_applyTreeChanger_Load(EOS(STATIC_9124), o1445) :|: TRUE
+f9124_0_applyTreeChanger_Load(EOS(STATIC_9124), o1445) -> f9132_0_applyTreeChanger_NULL(EOS(STATIC_9132), o1445, o1445) :|: TRUE
+f9132_0_applyTreeChanger_NULL(EOS(STATIC_9132), o1445, o1445) -> f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), o1445, o1445) :|: TRUE
+f9153_0_applyTreeChanger_Return(EOS(STATIC_9153)) -> f9154_0_applyTreeChanger_Return(EOS(STATIC_9154)) :|: TRUE
+f9186_0_applyTreeChanger_Return(EOS(STATIC_9186), o1445) -> f9123_0_applyTreeChanger_Return(EOS(STATIC_9123), o1445) :|: TRUE
+f9187_0_applyTreeChanger_Return(EOS(STATIC_9187)) -> f9153_0_applyTreeChanger_Return(EOS(STATIC_9153)) :|: TRUE
+f9122_0_applyTreeChanger_Load(EOS(STATIC_9122), java.lang.Object(o1457sub)) -> f9032_0_applyTreeChanger_Load(EOS(STATIC_9032), java.lang.Object(o1457sub)) :|: TRUE
+f9152_0_applyTreeChanger_Load(EOS(STATIC_9152), java.lang.Object(o1458sub)) -> f9032_0_applyTreeChanger_Load(EOS(STATIC_9032), java.lang.Object(o1458sub)) :|: TRUE
+f9094_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return(EOS(STATIC_9097)), o1445) -> f9123_0_applyTreeChanger_Return(EOS(STATIC_9123), o1445) :|: TRUE
+f9094_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return(EOS(STATIC_9154)), o1445) -> f9186_0_applyTreeChanger_Return(EOS(STATIC_9186), o1445) :|: TRUE
+f9106_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return(EOS(STATIC_9097))) -> f9153_0_applyTreeChanger_Return(EOS(STATIC_9153)) :|: TRUE
+f9106_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return(EOS(STATIC_9154))) -> f9187_0_applyTreeChanger_Return(EOS(STATIC_9187)) :|: TRUE
+Combined rules. Obtained 4 conditional rules for P and 8 conditional rules for R.P rules:
+f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(o1457sub:0), o1445:0)), java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(o1457sub:0), o1445:0))) -> f9094_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(o1457sub:0), java.lang.Object(o1457sub:0)), o1445:0) :|: TRUE
+f9094_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return(EOS(STATIC_9154)), java.lang.Object(o1458sub:0)) -> f9106_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(o1458sub:0), java.lang.Object(o1458sub:0))) :|: TRUE
+f9094_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return(EOS(STATIC_9097)), java.lang.Object(o1458sub:0)) -> f9106_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(o1458sub:0), java.lang.Object(o1458sub:0))) :|: TRUE
+f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, java.lang.Object(o1458sub:0))), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, java.lang.Object(o1458sub:0)))) -> f9106_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(o1458sub:0), java.lang.Object(o1458sub:0))) :|: TRUE
+R rules:
+f9094_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return(EOS(STATIC_9097)), o1445:0) -> f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), o1445:0, o1445:0) :|: TRUE
+f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(o1457sub:0), o1445:0)), java.lang.Object(BinTreeChanger.Tree(EOC, java.lang.Object(o1457sub:0), o1445:0))) -> f9094_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(o1457sub:0), java.lang.Object(o1457sub:0)), o1445:0) :|: TRUE
+f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), java.lang.Object(o1458sub:0), java.lang.Object(o1458sub:0)) -> f9106_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(o1458sub:0), java.lang.Object(o1458sub:0))) :|: TRUE
+f9033_0_applyTreeChanger_FieldAccess(EOS(STATIC_9033), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445:0)), java.lang.Object(BinTreeChanger.Tree(EOC, NULL, o1445:0))) -> f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), o1445:0, o1445:0) :|: TRUE
+f9094_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return(EOS(STATIC_9154)), o1445:0) -> f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), o1445:0, o1445:0) :|: TRUE
+f9106_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return(EOS(STATIC_9097))) -> f9154_0_applyTreeChanger_Return(EOS(STATIC_9154)) :|: TRUE
+f9106_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return(EOS(STATIC_9154))) -> f9154_0_applyTreeChanger_Return(EOS(STATIC_9154)) :|: TRUE
+f9090_0_applyTreeChanger_NULL(EOS(STATIC_9090), NULL, NULL) -> f9097_0_applyTreeChanger_Return(EOS(STATIC_9097)) :|: TRUE
+Filtered ground terms:
+   f9033_0_applyTreeChanger_FieldAccess(x1, x2, x3) -> f9033_0_applyTreeChanger_FieldAccess(x2, x3)
+   f9154_0_applyTreeChanger_Return(x1) -> f9154_0_applyTreeChanger_Return
+   f9097_0_applyTreeChanger_Return(x1) -> f9097_0_applyTreeChanger_Return
+   BinTreeChanger.Tree(x1, x2, x3) -> BinTreeChanger.Tree(x2, x3)
+   f9090_0_applyTreeChanger_NULL(x1, x2, x3) -> f9090_0_applyTreeChanger_NULL(x2, x3)
+Filtered duplicate args:
+   f9033_0_applyTreeChanger_FieldAccess(x1, x2) -> f9033_0_applyTreeChanger_FieldAccess(x2)
+   f9090_0_applyTreeChanger_NULL(x1, x2) -> f9090_0_applyTreeChanger_NULL(x2)
+Combined rules. Obtained 5 conditional rules for P and 8 conditional rules for R.P rules:
+F9094_1_APPLYTREECHANGER_INVOKEMETHOD(f9154_0_applyTreeChanger_Return, java.lang.Object(o1458sub:0:0)) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1458sub:0:0)) :|: TRUE
+F9094_1_APPLYTREECHANGER_INVOKEMETHOD(f9097_0_applyTreeChanger_Return, java.lang.Object(o1458sub:0:0)) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1458sub:0:0)) :|: TRUE
+F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(BinTreeChanger.Tree(NULL, java.lang.Object(o1458sub:0:0)))) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1458sub:0:0)) :|: TRUE
+F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1457sub:0:0), o1445:0:0))) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1457sub:0:0)) :|: TRUE
+F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1457sub:0:0), o1445:0:0))) -> F9094_1_APPLYTREECHANGER_INVOKEMETHOD(f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(o1457sub:0:0)), o1445:0:0) :|: TRUE
+R rules:
+f9094_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return, o1445:0:0) -> f9090_0_applyTreeChanger_NULL(o1445:0:0) :|: TRUE
+f9094_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return, o1445:0:0) -> f9090_0_applyTreeChanger_NULL(o1445:0:0) :|: TRUE
+f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1457sub:0:0), o1445:0:0))) -> f9094_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(o1457sub:0:0)), o1445:0:0) :|: TRUE
+f9106_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return) -> f9154_0_applyTreeChanger_Return :|: TRUE
+f9090_0_applyTreeChanger_NULL(NULL) -> f9097_0_applyTreeChanger_Return :|: TRUE
+f9106_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return) -> f9154_0_applyTreeChanger_Return :|: TRUE
+f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(BinTreeChanger.Tree(NULL, o1445:0:0))) -> f9090_0_applyTreeChanger_NULL(o1445:0:0) :|: TRUE
+f9090_0_applyTreeChanger_NULL(java.lang.Object(o1458sub:0:0)) -> f9106_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(o1458sub:0:0))) :|: TRUE
+
+----------------------------------------
+
+(22)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F9094_1_APPLYTREECHANGER_INVOKEMETHOD(f9154_0_applyTreeChanger_Return, java.lang.Object(o1458sub:0:0)) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1458sub:0:0))
+   F9094_1_APPLYTREECHANGER_INVOKEMETHOD(f9097_0_applyTreeChanger_Return, java.lang.Object(o1458sub:0:0)) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1458sub:0:0))
+   F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(BinTreeChanger.Tree(NULL, java.lang.Object(o1458sub:0:0)))) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1458sub:0:0))
+   F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1457sub:0:0), o1445:0:0))) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1457sub:0:0))
+   F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1457sub:0:0), o1445:0:0))) -> F9094_1_APPLYTREECHANGER_INVOKEMETHOD(f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(o1457sub:0:0)), o1445:0:0)
+
+The TRS R consists of the following rules:
+
+   f9094_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return, o1445:0:0) -> f9090_0_applyTreeChanger_NULL(o1445:0:0)
+   f9094_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return, o1445:0:0) -> f9090_0_applyTreeChanger_NULL(o1445:0:0)
+   f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1457sub:0:0), o1445:0:0))) -> f9094_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(o1457sub:0:0)), o1445:0:0)
+   f9106_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return) -> f9154_0_applyTreeChanger_Return
+   f9090_0_applyTreeChanger_NULL(NULL) -> f9097_0_applyTreeChanger_Return
+   f9106_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return) -> f9154_0_applyTreeChanger_Return
+   f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(BinTreeChanger.Tree(NULL, o1445:0:0))) -> f9090_0_applyTreeChanger_NULL(o1445:0:0)
+   f9090_0_applyTreeChanger_NULL(java.lang.Object(o1458sub:0:0)) -> f9106_1_applyTreeChanger_InvokeMethod(f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(o1458sub:0:0)))
+
+The set Q consists of the following terms:
+
+   f9094_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return, x0)
+   f9094_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return, x0)
+   f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(x0), x1)))
+   f9106_1_applyTreeChanger_InvokeMethod(f9154_0_applyTreeChanger_Return)
+   f9090_0_applyTreeChanger_NULL(NULL)
+   f9106_1_applyTreeChanger_InvokeMethod(f9097_0_applyTreeChanger_Return)
+   f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(BinTreeChanger.Tree(NULL, x0)))
+   f9090_0_applyTreeChanger_NULL(java.lang.Object(x0))
+
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(23) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1457sub:0:0), o1445:0:0))) -> F9094_1_APPLYTREECHANGER_INVOKEMETHOD(f9033_0_applyTreeChanger_FieldAccess(java.lang.Object(o1457sub:0:0)), o1445:0:0)
+The graph contains the following edges 1 > 2
+
+
+*F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(BinTreeChanger.Tree(NULL, java.lang.Object(o1458sub:0:0)))) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1458sub:0:0))
+The graph contains the following edges 1 > 1
+
+
+*F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(BinTreeChanger.Tree(java.lang.Object(o1457sub:0:0), o1445:0:0))) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1457sub:0:0))
+The graph contains the following edges 1 > 1
+
+
+*F9094_1_APPLYTREECHANGER_INVOKEMETHOD(f9154_0_applyTreeChanger_Return, java.lang.Object(o1458sub:0:0)) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1458sub:0:0))
+The graph contains the following edges 2 >= 1
+
+
+*F9094_1_APPLYTREECHANGER_INVOKEMETHOD(f9097_0_applyTreeChanger_Return, java.lang.Object(o1458sub:0:0)) -> F9033_0_APPLYTREECHANGER_FIELDACCESS(java.lang.Object(o1458sub:0:0))
+The graph contains the following edges 2 >= 1
+
+
+----------------------------------------
+
+(24)
+YES
+
+----------------------------------------
+
+(25)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: BinTreeChanger.Tree.createTree(I)LBinTreeChanger/Tree;
+SCC calls the following helper methods: BinTreeChanger.Tree.insert(I)V
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(26) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 40 IRulesP rules:
+f7085_0_createTree_Load(EOS(STATIC_7085(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, i961) -> f7087_0_createTree_GE(EOS(STATIC_7087(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, i961, i959) :|: TRUE
+f7087_0_createTree_GE(EOS(STATIC_7087(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, i961, i959) -> f7092_0_createTree_GE(EOS(STATIC_7092(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, i961, i959) :|: i961 < i959
+f7092_0_createTree_GE(EOS(STATIC_7092(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, i961, i959) -> f7125_0_createTree_Load(EOS(STATIC_7125(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: i961 < i959
+f7125_0_createTree_Load(EOS(STATIC_7125(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) -> f7128_0_createTree_InvokeMethod(EOS(STATIC_7128(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC))) :|: TRUE
+f7128_0_createTree_InvokeMethod(EOS(STATIC_7128(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC))) -> f7131_0_random_FieldAccess(EOS(STATIC_7131(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC))) :|: TRUE
+f7131_0_random_FieldAccess(EOS(STATIC_7131(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC))) -> f7153_0_random_FieldAccess(EOS(STATIC_7153(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(ARRAY(i957))) :|: TRUE
+f7153_0_random_FieldAccess(EOS(STATIC_7153(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(ARRAY(i957))) -> f7163_0_random_ArrayAccess(EOS(STATIC_7163(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(ARRAY(i957)), i958) :|: TRUE
+f7163_0_random_ArrayAccess(EOS(STATIC_7163(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(ARRAY(i957)), i988) -> f7167_0_random_ArrayAccess(EOS(STATIC_7167(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(ARRAY(i957)), i988) :|: TRUE
+f7167_0_random_ArrayAccess(EOS(STATIC_7167(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(ARRAY(i957)), i988) -> f7171_0_random_ArrayAccess(EOS(STATIC_7171(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(ARRAY(i957)), i988) :|: TRUE
+f7171_0_random_ArrayAccess(EOS(STATIC_7171(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(ARRAY(i957)), i988) -> f7177_0_random_Store(EOS(STATIC_7177(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996) :|: i988 < i957
+f7177_0_random_Store(EOS(STATIC_7177(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996) -> f7189_0_random_FieldAccess(EOS(STATIC_7189(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996) :|: TRUE
+f7189_0_random_FieldAccess(EOS(STATIC_7189(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996) -> f7197_0_random_ConstantStackPush(EOS(STATIC_7197(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996, i988) :|: TRUE
+f7197_0_random_ConstantStackPush(EOS(STATIC_7197(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996, i988) -> f7200_0_random_IntArithmetic(EOS(STATIC_7200(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996, i988, 1) :|: TRUE
+f7200_0_random_IntArithmetic(EOS(STATIC_7200(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996, i988, matching1) -> f7206_0_random_FieldAccess(EOS(STATIC_7206(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996, i988 + 1) :|: i988 >= 0 && matching1 = 1
+f7206_0_random_FieldAccess(EOS(STATIC_7206(java.lang.Object(ARRAY(i957)), i988)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996, i1001) -> f7213_0_random_Load(EOS(STATIC_7213(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996) :|: TRUE
+f7213_0_random_Load(EOS(STATIC_7213(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996) -> f7219_0_random_InvokeMethod(EOS(STATIC_7219(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), o996) :|: TRUE
+f7219_0_random_InvokeMethod(EOS(STATIC_7219(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(o1009sub)) -> f7227_0_random_InvokeMethod(EOS(STATIC_7227(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(o1009sub)) :|: TRUE
+f7227_0_random_InvokeMethod(EOS(STATIC_7227(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(o1010sub)) -> f7233_0_random_InvokeMethod(EOS(STATIC_7233(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(o1010sub)) :|: TRUE
+f7233_0_random_InvokeMethod(EOS(STATIC_7233(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(o1010sub)) -> f7249_0_length_Load(EOS(STATIC_7249(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(o1010sub)) :|: TRUE
+f7249_0_length_Load(EOS(STATIC_7249(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(o1010sub)) -> f7272_0_length_FieldAccess(EOS(STATIC_7272(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(o1010sub)) :|: TRUE
+f7272_0_length_FieldAccess(EOS(STATIC_7272(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(java.lang.String(EOC, i1043))) -> f7277_0_length_FieldAccess(EOS(STATIC_7277(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(java.lang.String(EOC, i1043))) :|: i1043 >= 0
+f7277_0_length_FieldAccess(EOS(STATIC_7277(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), java.lang.Object(java.lang.String(EOC, i1043))) -> f7281_0_length_Return(EOS(STATIC_7281(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) :|: TRUE
+f7281_0_length_Return(EOS(STATIC_7281(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) -> f7285_0_random_Return(EOS(STATIC_7285(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) :|: TRUE
+f7285_0_random_Return(EOS(STATIC_7285(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) -> f7290_0_createTree_InvokeMethod(EOS(STATIC_7290(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) :|: TRUE
+f7290_0_createTree_InvokeMethod(EOS(STATIC_7290(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) -> f7294_0_insert_Load(EOS(STATIC_7294(java.lang.Object(ARRAY(i957)), i1001)), java.lang.Object(BinTreeChanger.Tree(EOC)), i1043, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) :|: i959 >= 1 && i1001 >= 1 && i961 < i959 && i1001 > i961
+f7290_0_createTree_InvokeMethod(EOS(STATIC_7290(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) -> f7294_1_insert_Load(EOS(STATIC_7294(java.lang.Object(ARRAY(i957)), i1001)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) :|: i959 >= 1 && i1001 >= 1 && i961 < i959 && i1001 > i961
+f7294_0_insert_Load(EOS(STATIC_7294(java.lang.Object(ARRAY(i957)), i1001)), java.lang.Object(BinTreeChanger.Tree(EOC)), i1043, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) -> f9599_0_insert_Load(EOS(STATIC_9599(java.lang.Object(ARRAY(i957)), i1001)), java.lang.Object(BinTreeChanger.Tree(EOC)), i1043, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) :|: TRUE
+f8126_0_insert_Return(EOS(STATIC_8126(java.lang.Object(ARRAY(i1263)), i1259)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) -> f8164_0_insert_Return(EOS(STATIC_8164(java.lang.Object(ARRAY(i1263)), i1259)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: TRUE
+f8164_0_insert_Return(EOS(STATIC_8164(java.lang.Object(ARRAY(i1316)), i1317)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) -> f8201_0_createTree_Inc(EOS(STATIC_8201(java.lang.Object(ARRAY(i1316)), i1317)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: TRUE
+f8201_0_createTree_Inc(EOS(STATIC_8201(java.lang.Object(ARRAY(i1316)), i1317)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) -> f8216_0_createTree_JMP(EOS(STATIC_8216(java.lang.Object(ARRAY(i1316)), i1317)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961 + 1) :|: TRUE
+f8216_0_createTree_JMP(EOS(STATIC_8216(java.lang.Object(ARRAY(i1316)), i1317)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i1354) -> f8261_0_createTree_Load(EOS(STATIC_8261(java.lang.Object(ARRAY(i1316)), i1317)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i1354) :|: TRUE
+f8261_0_createTree_Load(EOS(STATIC_8261(java.lang.Object(ARRAY(i1316)), i1317)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i1354) -> f7083_0_createTree_Load(EOS(STATIC_7083(java.lang.Object(ARRAY(i1316)), i1317)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i1354) :|: TRUE
+f7083_0_createTree_Load(EOS(STATIC_7083(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) -> f7085_0_createTree_Load(EOS(STATIC_7085(java.lang.Object(ARRAY(i957)), i958)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, i961) :|: TRUE
+f8163_0_insert_Return(EOS(STATIC_8163(java.lang.Object(ARRAY(i1293)), i1289)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) -> f8164_0_insert_Return(EOS(STATIC_8164(java.lang.Object(ARRAY(i1293)), i1289)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: TRUE
+f8412_0_insert_Return(EOS(STATIC_8412(java.lang.Object(ARRAY(i1379)), i1375)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) -> f8164_0_insert_Return(EOS(STATIC_8164(java.lang.Object(ARRAY(i1379)), i1375)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: TRUE
+f8610_0_insert_Return(EOS(STATIC_8610(java.lang.Object(ARRAY(i1423)), i1419)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) -> f8164_0_insert_Return(EOS(STATIC_8164(java.lang.Object(ARRAY(i1423)), i1419)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: TRUE
+f7294_1_insert_Load(EOS(STATIC_7294(java.lang.Object(ARRAY(i1263)), i1259)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1261) -> f8126_0_insert_Return(EOS(STATIC_8126(java.lang.Object(ARRAY(i1263)), i1259)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: TRUE
+f7294_1_insert_Load(EOS(STATIC_7294(java.lang.Object(ARRAY(i1293)), i1289)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1291) -> f8163_0_insert_Return(EOS(STATIC_8163(java.lang.Object(ARRAY(i1293)), i1289)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: TRUE
+f7294_1_insert_Load(EOS(STATIC_7294(java.lang.Object(ARRAY(i1379)), i1375)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) -> f8412_0_insert_Return(EOS(STATIC_8412(java.lang.Object(ARRAY(i1379)), i1375)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: TRUE
+f7294_1_insert_Load(EOS(STATIC_7294(java.lang.Object(ARRAY(i1423)), i1419)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043) -> f8610_0_insert_Return(EOS(STATIC_8610(java.lang.Object(ARRAY(i1423)), i1419)), i959, i959, java.lang.Object(BinTreeChanger.Tree(EOC)), i961) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f7085_0_createTree_Load(EOS(STATIC_7085(java.lang.Object(ARRAY(i957:0)), i958:0)), i959:0, i959:0, java.lang.Object(BinTreeChanger.Tree(EOC)), i961:0, i961:0) -> f7085_0_createTree_Load(EOS(STATIC_7085(java.lang.Object(ARRAY(i957:0)), i958:0 + 1)), i959:0, i959:0, java.lang.Object(BinTreeChanger.Tree(EOC)), i961:0 + 1, i961:0 + 1) :|: i961:0 < i959:0 && i958:0 < i957:0 && i958:0 > -1 && i1043:0 > -1 && i959:0 > 0 && i961:0 < i958:0 + 1
+Removed following non-SCC rules:
+f7085_0_createTree_Load(EOS(STATIC_7085(java.lang.Object(ARRAY(i957:0)), i958:0)), i959:0, i959:0, java.lang.Object(BinTreeChanger.Tree(EOC)), i961:0, i961:0) -> f9599_0_insert_Load(EOS(STATIC_9599(java.lang.Object(ARRAY(i957:0)), i958:0 + 1)), java.lang.Object(BinTreeChanger.Tree(EOC)), i1043:0, java.lang.Object(BinTreeChanger.Tree(EOC)), i1043:0) :|: i961:0 < i959:0 && i958:0 < i957:0 && i958:0 > -1 && i1043:0 > -1 && i959:0 > 0 && i961:0 < i958:0 + 1
+Filtered constant ground arguments:
+   f7085_0_createTree_Load(x1, x2, x3, x4, x5, x6) -> f7085_0_createTree_Load(x1, x2, x3, x5, x6)
+   BinTreeChanger.Tree(x1) -> BinTreeChanger.Tree
+Filtered duplicate arguments:
+   f7085_0_createTree_Load(x1, x2, x3, x4, x5) -> f7085_0_createTree_Load(x1, x3, x5)
+Finished conversion. Obtained 1 rules.P rules:
+f7085_0_createTree_Load(i959:0, i961:0, i957:0, i958:0) -> f7085_0_createTree_Load(i959:0, i961:0 + 1, i957:0, i958:0 + 1) :|: i958:0 < i957:0 && i961:0 < i959:0 && i958:0 > -1 && i1043:0 > -1 && i961:0 < i958:0 + 1 && i959:0 > 0
+
+----------------------------------------
+
+(27)
+Obligation:
+Rules:
+f7085_0_createTree_Load(i959:0, i961:0, i957:0, i958:0) -> f7085_0_createTree_Load(i959:0, i961:0 + 1, i957:0, i958:0 + 1) :|: i958:0 < i957:0 && i961:0 < i959:0 && i958:0 > -1 && i1043:0 > -1 && i961:0 < i958:0 + 1 && i959:0 > 0
+
+----------------------------------------
+
+(28) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(29)
+Obligation:
+Rules:
+f7085_0_createTree_Load(i959:0, i961:0, i957:0, i958:0) -> f7085_0_createTree_Load(i959:0, arith, i957:0, arith1) :|: i958:0 < i957:0 && i961:0 < i959:0 && i958:0 > -1 && i1043:0 > -1 && i961:0 < i958:0 + 1 && i959:0 > 0 && arith = i961:0 + 1 && arith1 = i958:0 + 1
+
+----------------------------------------
+
+(30) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f7085_0_createTree_Load(i959:0, i961:0, i957:0, i958:0) -> f7085_0_createTree_Load(i959:0, arith, i957:0, arith1) :|: i958:0 < i957:0 && i961:0 < i959:0 && i958:0 > -1 && i1043:0 > -1 && i961:0 < i958:0 + 1 && i959:0 > 0 && arith = i961:0 + 1 && arith1 = i958:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(31)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f7085_0_createTree_Load(i959:0, i961:0, i957:0, i958:0) -> f7085_0_createTree_Load(i959:0, arith, i957:0, arith1) :|: i958:0 < i957:0 && i961:0 < i959:0 && i958:0 > -1 && i1043:0 > -1 && i961:0 < i958:0 + 1 && i959:0 > 0 && arith = i961:0 + 1 && arith1 = i958:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(32) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(33)
+Obligation:
+Rules:
+f7085_0_createTree_Load(i959:0:0, i961:0:0, i957:0:0, i958:0:0) -> f7085_0_createTree_Load(i959:0:0, i961:0:0 + 1, i957:0:0, i958:0:0 + 1) :|: i961:0:0 < i958:0:0 + 1 && i959:0:0 > 0 && i1043:0:0 > -1 && i958:0:0 > -1 && i961:0:0 < i959:0:0 && i958:0:0 < i957:0:0
+
+----------------------------------------
+
+(34) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f7085_0_createTree_Load(INTEGER, INTEGER, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(35)
+Obligation:
+Rules:
+f7085_0_createTree_Load(i959:0:0, i961:0:0, i957:0:0, i958:0:0) -> f7085_0_createTree_Load(i959:0:0, c, i957:0:0, c1) :|: c1 = i958:0:0 + 1 && c = i961:0:0 + 1 && (i961:0:0 < i958:0:0 + 1 && i959:0:0 > 0 && i1043:0:0 > -1 && i958:0:0 > -1 && i961:0:0 < i959:0:0 && i958:0:0 < i957:0:0)
+
+----------------------------------------
+
+(36) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f7085_0_createTree_Load(x, x1, x2, x3)] = x2 - x3
+
+The following rules are decreasing:
+f7085_0_createTree_Load(i959:0:0, i961:0:0, i957:0:0, i958:0:0) -> f7085_0_createTree_Load(i959:0:0, c, i957:0:0, c1) :|: c1 = i958:0:0 + 1 && c = i961:0:0 + 1 && (i961:0:0 < i958:0:0 + 1 && i959:0:0 > 0 && i1043:0:0 > -1 && i958:0:0 > -1 && i961:0:0 < i959:0:0 && i958:0:0 < i957:0:0)
+The following rules are bounded:
+f7085_0_createTree_Load(i959:0:0, i961:0:0, i957:0:0, i958:0:0) -> f7085_0_createTree_Load(i959:0:0, c, i957:0:0, c1) :|: c1 = i958:0:0 + 1 && c = i961:0:0 + 1 && (i961:0:0 < i958:0:0 + 1 && i959:0:0 > 0 && i1043:0:0 > -1 && i958:0:0 > -1 && i961:0:0 < i959:0:0 && i958:0:0 < i957:0:0)
+
+----------------------------------------
+
+(37)
+YES

@@ -1,0 +1,245 @@
+YES
+We consider the system j1MO1.
+
+  Alphabet:
+
+    O : [] --> c 
+    add : [] --> a -> c -> c 
+    cons : [a * b] --> b 
+    fold : [a -> c -> c * c] --> b -> c 
+    mul : [] --> a -> c -> c 
+    nil : [] --> b 
+    plus : [c * c] --> c 
+    prod : [] --> b -> c 
+    s : [c] --> c 
+    sum : [] --> b -> c 
+    times : [c * c] --> c 
+
+  Rules:
+
+    fold(F, X) nil => X 
+    fold(F, X) cons(Y, Z) => F Y (fold(F, X) Z) 
+    plus(O, X) => X 
+    plus(s(X), Y) => s(plus(X, Y)) 
+    times(O, X) => O 
+    times(s(X), Y) => plus(times(X, Y), Y) 
+    sum => fold(add, O) 
+    prod => fold(mul, s(O)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  fold(F, X) nil >? X 
+  fold(F, X) cons(Y, Z) >? F Y (fold(F, X) Z) 
+  plus(O, X) >? X 
+  plus(s(X), Y) >? s(plus(X, Y)) 
+  times(O, X) >? O 
+  times(s(X), Y) >? plus(times(X, Y), Y) 
+  sum >? fold(add, O) 
+  prod >? fold(mul, s(O)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[add]] = _|_ 
+  [[mul]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, cons, fold, nil, plus, prod, s, sum, times}, and the following precedence: nil > prod > sum > fold > @_{o -> o} > cons > times > plus > @_{o -> o -> o} > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(fold(F, X), nil) > X 
+  @_{o -> o}(fold(F, X), cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z)) 
+  plus(_|_, X) >= X 
+  plus(s(X), Y) >= s(plus(X, Y)) 
+  times(_|_, X) >= _|_ 
+  times(s(X), Y) > plus(times(X, Y), Y) 
+  sum >= fold(_|_, _|_) 
+  prod >= fold(_|_, s(_|_)) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(fold(F, X), nil) > X  because [2], by definition 
+  2] @_{o -> o}*(fold(F, X), nil) >= X  because [3], by (Select) 
+  3] fold(F, X) @_{o -> o}*(fold(F, X), nil) >= X  because [4] 
+  4] fold*(F, X, @_{o -> o}*(fold(F, X), nil)) >= X  because [5], by (Select) 
+  5] X >= X  by (Meta) 
+
+  6] @_{o -> o}(fold(F, X), cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z))  because [7], by (Star) 
+  7] @_{o -> o}*(fold(F, X), cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z))  because [8], by (Select) 
+  8] fold(F, X) @_{o -> o}*(fold(F, X), cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z))  because [9] 
+  9] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z))  because fold > @_{o -> o}, [10] and [18], by (Copy) 
+  10] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= @_{o -> o -> o}(F, Y)  because fold > @_{o -> o -> o}, [11] and [13], by (Copy) 
+  11] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= F  because [12], by (Select) 
+  12] F >= F  by (Meta) 
+  13] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= Y  because [14], by (Select) 
+  14] @_{o -> o}*(fold(F, X), cons(Y, Z)) >= Y  because [15], by (Select) 
+  15] cons(Y, Z) >= Y  because [16], by (Star) 
+  16] cons*(Y, Z) >= Y  because [17], by (Select) 
+  17] Y >= Y  by (Meta) 
+  18] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= @_{o -> o}(fold(F, X), Z)  because [19], by (Select) 
+  19] @_{o -> o}*(fold(F, X), cons(Y, Z)) >= @_{o -> o}(fold(F, X), Z)  because @_{o -> o} in Mul, [20] and [23], by (Stat) 
+  20] fold(F, X) >= fold(F, X)  because fold in Mul, [21] and [22], by (Fun) 
+  21] F >= F  by (Meta) 
+  22] X >= X  by (Meta) 
+  23] cons(Y, Z) > Z  because [24], by definition 
+  24] cons*(Y, Z) >= Z  because [25], by (Select) 
+  25] Z >= Z  by (Meta) 
+
+  26] plus(_|_, X) >= X  because [27], by (Star) 
+  27] plus*(_|_, X) >= X  because [28], by (Select) 
+  28] X >= X  by (Meta) 
+
+  29] plus(s(X), Y) >= s(plus(X, Y))  because [30], by (Star) 
+  30] plus*(s(X), Y) >= s(plus(X, Y))  because plus > s and [31], by (Copy) 
+  31] plus*(s(X), Y) >= plus(X, Y)  because plus in Mul, [32] and [35], by (Stat) 
+  32] s(X) > X  because [33], by definition 
+  33] s*(X) >= X  because [34], by (Select) 
+  34] X >= X  by (Meta) 
+  35] Y >= Y  by (Meta) 
+
+  36] times(_|_, X) >= _|_  by (Bot) 
+
+  37] times(s(X), Y) > plus(times(X, Y), Y)  because [38], by definition 
+  38] times*(s(X), Y) >= plus(times(X, Y), Y)  because times > plus, [39] and [44], by (Copy) 
+  39] times*(s(X), Y) >= times(X, Y)  because times in Mul, [40] and [43], by (Stat) 
+  40] s(X) > X  because [41], by definition 
+  41] s*(X) >= X  because [42], by (Select) 
+  42] X >= X  by (Meta) 
+  43] Y >= Y  by (Meta) 
+  44] times*(s(X), Y) >= Y  because [43], by (Select) 
+
+  45] sum >= fold(_|_, _|_)  because [46], by (Star) 
+  46] sum* >= fold(_|_, _|_)  because sum > fold, [47] and [48], by (Copy) 
+  47] sum* >= _|_  by (Bot) 
+  48] sum* >= _|_  by (Bot) 
+
+  49] prod >= fold(_|_, s(_|_))  because [50], by (Star) 
+  50] prod* >= fold(_|_, s(_|_))  because prod > fold, [51] and [52], by (Copy) 
+  51] prod* >= _|_  by (Bot) 
+  52] prod* >= s(_|_)  because prod > s and [53], by (Copy) 
+  53] prod* >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  fold(F, X) nil => X 
+  times(s(X), Y) => plus(times(X, Y), Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  fold(F, X) cons(Y, Z) >? F Y (fold(F, X) Z) 
+  plus(O, X) >? X 
+  plus(s(X), Y) >? s(plus(X, Y)) 
+  times(O, X) >? O 
+  sum >? fold(add, O) 
+  prod >? fold(mul, s(O)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[add]] = _|_ 
+  [[mul]] = _|_ 
+  [[s(x_1)]] = x_1 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, cons, fold, plus, prod, sum, times}, and the following precedence: plus > prod > sum > fold > @_{o -> o -> o} > cons > @_{o -> o} > times
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  @_{o -> o}(fold(F, X), cons(Y, Z)) > @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z)) 
+  plus(_|_, X) >= X 
+  plus(X, Y) >= plus(X, Y) 
+  times(_|_, X) >= _|_ 
+  sum > fold(_|_, _|_) 
+  prod > fold(_|_, _|_) 
+
+With these choices, we have:
+
+  1] @_{o -> o}(fold(F, X), cons(Y, Z)) > @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z))  because [2], by definition 
+  2] @_{o -> o}*(fold(F, X), cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z))  because [3], by (Select) 
+  3] fold(F, X) @_{o -> o}*(fold(F, X), cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z))  because [4] 
+  4] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= @_{o -> o}(@_{o -> o -> o}(F, Y), @_{o -> o}(fold(F, X), Z))  because fold > @_{o -> o}, [5] and [13], by (Copy) 
+  5] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= @_{o -> o -> o}(F, Y)  because fold > @_{o -> o -> o}, [6] and [8], by (Copy) 
+  6] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= F  because [7], by (Select) 
+  7] F >= F  by (Meta) 
+  8] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= Y  because [9], by (Select) 
+  9] @_{o -> o}*(fold(F, X), cons(Y, Z)) >= Y  because [10], by (Select) 
+  10] cons(Y, Z) >= Y  because [11], by (Star) 
+  11] cons*(Y, Z) >= Y  because [12], by (Select) 
+  12] Y >= Y  by (Meta) 
+  13] fold*(F, X, @_{o -> o}*(fold(F, X), cons(Y, Z))) >= @_{o -> o}(fold(F, X), Z)  because [14], by (Select) 
+  14] @_{o -> o}*(fold(F, X), cons(Y, Z)) >= @_{o -> o}(fold(F, X), Z)  because @_{o -> o} in Mul, [15] and [18], by (Stat) 
+  15] fold(F, X) >= fold(F, X)  because fold in Mul, [16] and [17], by (Fun) 
+  16] F >= F  by (Meta) 
+  17] X >= X  by (Meta) 
+  18] cons(Y, Z) > Z  because [19], by definition 
+  19] cons*(Y, Z) >= Z  because [20], by (Select) 
+  20] Z >= Z  by (Meta) 
+
+  21] plus(_|_, X) >= X  because [22], by (Star) 
+  22] plus*(_|_, X) >= X  because [23], by (Select) 
+  23] X >= X  by (Meta) 
+
+  24] plus(X, Y) >= plus(X, Y)  because plus in Mul, [25] and [26], by (Fun) 
+  25] X >= X  by (Meta) 
+  26] Y >= Y  by (Meta) 
+
+  27] times(_|_, X) >= _|_  by (Bot) 
+
+  28] sum > fold(_|_, _|_)  because [29], by definition 
+  29] sum* >= fold(_|_, _|_)  because sum > fold, [30] and [31], by (Copy) 
+  30] sum* >= _|_  by (Bot) 
+  31] sum* >= _|_  by (Bot) 
+
+  32] prod > fold(_|_, _|_)  because [33], by definition 
+  33] prod* >= fold(_|_, _|_)  because prod > fold, [34] and [35], by (Copy) 
+  34] prod* >= _|_  by (Bot) 
+  35] prod* >= _|_  by (Bot) 
+
+We can thus remove the following rules:
+
+  fold(F, X) cons(Y, Z) => F Y (fold(F, X) Z) 
+  sum => fold(add, O) 
+  prod => fold(mul, s(O)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O, X) >? X 
+  plus(s(X), Y) >? s(plus(X, Y)) 
+  times(O, X) >? O 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  plus = Lam[y0;y1].3 + y1 + 3*y0 
+  s = Lam[y0].3 + y0 
+  times = Lam[y0;y1].3 + y1 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[plus(O, _x0)]] = 3 + x0 > x0 = [[_x0]] 
+  [[plus(s(_x0), _x1)]] = 12 + x1 + 3*x0 > 6 + x1 + 3*x0 = [[s(plus(_x0, _x1))]] 
+  [[times(O, _x0)]] = 3 + x0 > 0 = [[O]] 
+
+We can thus remove the following rules:
+
+  plus(O, X) => X 
+  plus(s(X), Y) => s(plus(X, Y)) 
+  times(O, X) => O 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

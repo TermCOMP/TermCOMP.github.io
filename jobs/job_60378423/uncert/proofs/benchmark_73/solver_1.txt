@@ -1,0 +1,613 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/qR5aV.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 355 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 63 ms]
+        (9) QDP
+        (10) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (11) YES
+    (12) JBCTerminationSCC
+        (13) SCCToIRSProof [SOUND, 56 ms]
+        (14) IRSwT
+        (15) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (16) IRSwT
+        (17) IRSwTTerminationDigraphProof [EQUIVALENT, 0 ms]
+        (18) IRSwT
+        (19) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (20) IRSwT
+        (21) TempFilterProof [SOUND, 15 ms]
+        (22) IntTRS
+        (23) PolynomialOrderProcessor [EQUIVALENT, 6 ms]
+        (24) YES
+    (25) JBCTerminationSCC
+        (26) SCCToQDPProof [SOUND, 146 ms]
+        (27) QDP
+        (28) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (29) TRUE
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+public class Shuffle{
+
+  // adapted from [Walther, 94]
+  public static void main(String[] args) {
+    Random.args = args;
+    IntList l = IntList.createIntList();
+    IntList res = null;
+
+    while (l != null) {
+
+      res = new IntList(l.value, res);
+      l = l.next;
+      if (l != null) l = l.reverse();
+
+    }
+
+  }
+}
+
+
+class IntList {
+  int value;
+  IntList next;
+
+  public IntList(int value, IntList next) {
+    this.value = value;
+    this.next = next;
+  }
+
+
+  public static IntList createIntList() {
+
+    int i = Random.random();
+    int j;
+
+    IntList l = null;
+
+    while (i > 0) {
+      j = Random.random();
+      l = new IntList(j, l);
+      i--;
+    }
+
+    return l;
+  }
+
+  public IntList reverse() {
+
+    IntList res = null;
+    IntList l = this;
+
+    while (l != null) {
+      res = new IntList(l.value, res);
+      l = l.next;
+
+    }
+
+    return res;
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+public class Shuffle{
+
+  // adapted from [Walther, 94]
+  public static void main(String[] args) {
+    Random.args = args;
+    IntList l = IntList.createIntList();
+    IntList res = null;
+
+    while (l != null) {
+
+      res = new IntList(l.value, res);
+      l = l.next;
+      if (l != null) l = l.reverse();
+
+    }
+
+  }
+}
+
+
+class IntList {
+  int value;
+  IntList next;
+
+  public IntList(int value, IntList next) {
+    this.value = value;
+    this.next = next;
+  }
+
+
+  public static IntList createIntList() {
+
+    int i = Random.random();
+    int j;
+
+    IntList l = null;
+
+    while (i > 0) {
+      j = Random.random();
+      l = new IntList(j, l);
+      i--;
+    }
+
+    return l;
+  }
+
+  public IntList reverse() {
+
+    IntList res = null;
+    IntList l = this;
+
+    while (l != null) {
+      res = new IntList(l.value, res);
+      l = l.next;
+
+    }
+
+    return res;
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+Shuffle.main([Ljava/lang/String;)V: Graph of 113 nodes with 1 SCC.
+
+
+
+IntList.createIntList()LIntList;: Graph of 281 nodes with 1 SCC.
+
+
+
+IntList.reverse()LIntList;: Graph of 58 nodes with 1 SCC.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 3 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: IntList.reverse()LIntList;
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*IntList: [value, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 25 rules for P and 0 rules for R.P rules:
+f4866_0_reverse_NULL(EOS(STATIC_4866), java.lang.Object(o767sub), java.lang.Object(o767sub)) -> f4872_0_reverse_NULL(EOS(STATIC_4872), java.lang.Object(o767sub), java.lang.Object(o767sub)) :|: TRUE
+f4872_0_reverse_NULL(EOS(STATIC_4872), java.lang.Object(o767sub), java.lang.Object(o767sub)) -> f4883_0_reverse_New(EOS(STATIC_4883), java.lang.Object(o767sub)) :|: TRUE
+f4883_0_reverse_New(EOS(STATIC_4883), java.lang.Object(o767sub)) -> f4889_0_reverse_Duplicate(EOS(STATIC_4889), java.lang.Object(o767sub)) :|: TRUE
+f4889_0_reverse_Duplicate(EOS(STATIC_4889), java.lang.Object(o767sub)) -> f4900_0_reverse_Load(EOS(STATIC_4900), java.lang.Object(o767sub)) :|: TRUE
+f4900_0_reverse_Load(EOS(STATIC_4900), java.lang.Object(o767sub)) -> f4918_0_reverse_FieldAccess(EOS(STATIC_4918), java.lang.Object(o767sub), java.lang.Object(o767sub)) :|: TRUE
+f4918_0_reverse_FieldAccess(EOS(STATIC_4918), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, o811))) -> f4932_0_reverse_FieldAccess(EOS(STATIC_4932), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f4932_0_reverse_FieldAccess(EOS(STATIC_4932), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, o811))) -> f4959_0_reverse_Load(EOS(STATIC_4959), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f4959_0_reverse_Load(EOS(STATIC_4959), java.lang.Object(IntList(EOC, i529, o811))) -> f4963_0_reverse_InvokeMethod(EOS(STATIC_4963), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f4963_0_reverse_InvokeMethod(EOS(STATIC_4963), java.lang.Object(IntList(EOC, i529, o811))) -> f4966_0__init__Load(EOS(STATIC_4966), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f4966_0__init__Load(EOS(STATIC_4966), java.lang.Object(IntList(EOC, i529, o811))) -> f4981_0__init__InvokeMethod(EOS(STATIC_4981), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f4981_0__init__InvokeMethod(EOS(STATIC_4981), java.lang.Object(IntList(EOC, i529, o811))) -> f4992_0__init__Load(EOS(STATIC_4992), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f4992_0__init__Load(EOS(STATIC_4992), java.lang.Object(IntList(EOC, i529, o811))) -> f5002_0__init__Load(EOS(STATIC_5002), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5002_0__init__Load(EOS(STATIC_5002), java.lang.Object(IntList(EOC, i529, o811))) -> f5004_0__init__FieldAccess(EOS(STATIC_5004), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5004_0__init__FieldAccess(EOS(STATIC_5004), java.lang.Object(IntList(EOC, i529, o811))) -> f5013_0__init__Load(EOS(STATIC_5013), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5013_0__init__Load(EOS(STATIC_5013), java.lang.Object(IntList(EOC, i529, o811))) -> f5023_0__init__Load(EOS(STATIC_5023), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5023_0__init__Load(EOS(STATIC_5023), java.lang.Object(IntList(EOC, i529, o811))) -> f5033_0__init__FieldAccess(EOS(STATIC_5033), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5033_0__init__FieldAccess(EOS(STATIC_5033), java.lang.Object(IntList(EOC, i529, o811))) -> f5045_0__init__Return(EOS(STATIC_5045), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5045_0__init__Return(EOS(STATIC_5045), java.lang.Object(IntList(EOC, i529, o811))) -> f5051_0_reverse_Store(EOS(STATIC_5051), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5051_0_reverse_Store(EOS(STATIC_5051), java.lang.Object(IntList(EOC, i529, o811))) -> f5062_0_reverse_Load(EOS(STATIC_5062), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5062_0_reverse_Load(EOS(STATIC_5062), java.lang.Object(IntList(EOC, i529, o811))) -> f5073_0_reverse_FieldAccess(EOS(STATIC_5073), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5073_0_reverse_FieldAccess(EOS(STATIC_5073), java.lang.Object(IntList(EOC, i529, o811))) -> f5080_0_reverse_Store(EOS(STATIC_5080), o811) :|: TRUE
+f5080_0_reverse_Store(EOS(STATIC_5080), o811) -> f5085_0_reverse_JMP(EOS(STATIC_5085), o811) :|: TRUE
+f5085_0_reverse_JMP(EOS(STATIC_5085), o811) -> f5109_0_reverse_Load(EOS(STATIC_5109), o811) :|: TRUE
+f5109_0_reverse_Load(EOS(STATIC_5109), o811) -> f4849_0_reverse_Load(EOS(STATIC_4849), o811) :|: TRUE
+f4849_0_reverse_Load(EOS(STATIC_4849), o738) -> f4866_0_reverse_NULL(EOS(STATIC_4866), o738, o738) :|: TRUE
+R rules:
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+f4866_0_reverse_NULL(EOS(STATIC_4866), java.lang.Object(IntList(EOC, i529:0, o811:0)), java.lang.Object(IntList(EOC, i529:0, o811:0))) -> f4866_0_reverse_NULL(EOS(STATIC_4866), o811:0, o811:0) :|: TRUE
+R rules:
+Filtered ground terms:
+   f4866_0_reverse_NULL(x1, x2, x3) -> f4866_0_reverse_NULL(x2, x3)
+   EOS(x1) -> EOS
+   IntList(x1, x2, x3) -> IntList(x2, x3)
+Filtered unneeded arguments:
+   IntList(x1, x2) -> IntList(x2)
+Filtered duplicate args:
+   f4866_0_reverse_NULL(x1, x2) -> f4866_0_reverse_NULL(x2)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F4866_0_REVERSE_NULL(java.lang.Object(IntList(o811:0:0))) -> F4866_0_REVERSE_NULL(o811:0:0) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F4866_0_REVERSE_NULL(java.lang.Object(IntList(o811:0:0))) -> F4866_0_REVERSE_NULL(o811:0:0)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F4866_0_REVERSE_NULL(java.lang.Object(IntList(o811:0:0))) -> F4866_0_REVERSE_NULL(o811:0:0)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(11)
+YES
+
+----------------------------------------
+
+(12)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: IntList.createIntList()LIntList;
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(13) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 41 IRulesP rules:
+f3671_0_createIntList_LE(EOS(STATIC_3671(java.lang.Object(ARRAY(i4)))), i352, i352) -> f3696_0_createIntList_LE(EOS(STATIC_3696(java.lang.Object(ARRAY(i4)))), i352, i352) :|: TRUE
+f3696_0_createIntList_LE(EOS(STATIC_3696(java.lang.Object(ARRAY(i4)))), i352, i352) -> f3703_0_createIntList_InvokeMethod(EOS(STATIC_3703(java.lang.Object(ARRAY(i4)))), i352) :|: i352 > 0
+f3703_0_createIntList_InvokeMethod(EOS(STATIC_3703(java.lang.Object(ARRAY(i4)))), i352) -> f3708_0_random_FieldAccess(EOS(STATIC_3708(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3708_0_random_FieldAccess(EOS(STATIC_3708(java.lang.Object(ARRAY(i4)))), i352) -> f3735_0_random_FieldAccess(EOS(STATIC_3735(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(ARRAY(i4))) :|: TRUE
+f3735_0_random_FieldAccess(EOS(STATIC_3735(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(ARRAY(i4))) -> f3751_0_random_ArrayAccess(EOS(STATIC_3751(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(ARRAY(i4))) :|: TRUE
+f3751_0_random_ArrayAccess(EOS(STATIC_3751(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(ARRAY(i4))) -> f3756_0_random_ArrayAccess(EOS(STATIC_3756(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(ARRAY(i4))) :|: TRUE
+f3756_0_random_ArrayAccess(EOS(STATIC_3756(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(ARRAY(i4))) -> f3765_0_random_Store(EOS(STATIC_3765(java.lang.Object(ARRAY(i4)))), i352, o371) :|: TRUE
+f3765_0_random_Store(EOS(STATIC_3765(java.lang.Object(ARRAY(i4)))), i352, o371) -> f3774_0_random_FieldAccess(EOS(STATIC_3774(java.lang.Object(ARRAY(i4)))), i352, o371) :|: TRUE
+f3774_0_random_FieldAccess(EOS(STATIC_3774(java.lang.Object(ARRAY(i4)))), i352, o371) -> f3778_0_random_ConstantStackPush(EOS(STATIC_3778(java.lang.Object(ARRAY(i4)))), i352, o371) :|: TRUE
+f3778_0_random_ConstantStackPush(EOS(STATIC_3778(java.lang.Object(ARRAY(i4)))), i352, o371) -> f3783_0_random_IntArithmetic(EOS(STATIC_3783(java.lang.Object(ARRAY(i4)))), i352, o371) :|: TRUE
+f3783_0_random_IntArithmetic(EOS(STATIC_3783(java.lang.Object(ARRAY(i4)))), i352, o371) -> f3787_0_random_FieldAccess(EOS(STATIC_3787(java.lang.Object(ARRAY(i4)))), i352, o371) :|: TRUE
+f3787_0_random_FieldAccess(EOS(STATIC_3787(java.lang.Object(ARRAY(i4)))), i352, o371) -> f3792_0_random_Load(EOS(STATIC_3792(java.lang.Object(ARRAY(i4)))), i352, o371) :|: TRUE
+f3792_0_random_Load(EOS(STATIC_3792(java.lang.Object(ARRAY(i4)))), i352, o371) -> f3798_0_random_InvokeMethod(EOS(STATIC_3798(java.lang.Object(ARRAY(i4)))), i352, o371) :|: TRUE
+f3798_0_random_InvokeMethod(EOS(STATIC_3798(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(o376sub)) -> f3806_0_random_InvokeMethod(EOS(STATIC_3806(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(o376sub)) :|: TRUE
+f3806_0_random_InvokeMethod(EOS(STATIC_3806(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(o377sub)) -> f3814_0_random_InvokeMethod(EOS(STATIC_3814(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(o377sub)) :|: TRUE
+f3814_0_random_InvokeMethod(EOS(STATIC_3814(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(o377sub)) -> f3825_0_length_Load(EOS(STATIC_3825(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(o377sub)) :|: TRUE
+f3825_0_length_Load(EOS(STATIC_3825(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(o377sub)) -> f3841_0_length_FieldAccess(EOS(STATIC_3841(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(o377sub)) :|: TRUE
+f3841_0_length_FieldAccess(EOS(STATIC_3841(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(java.lang.String(EOC, i383))) -> f3855_0_length_FieldAccess(EOS(STATIC_3855(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(java.lang.String(EOC, i383))) :|: TRUE
+f3855_0_length_FieldAccess(EOS(STATIC_3855(java.lang.Object(ARRAY(i4)))), i352, java.lang.Object(java.lang.String(EOC, i383))) -> f3865_0_length_Return(EOS(STATIC_3865(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3865_0_length_Return(EOS(STATIC_3865(java.lang.Object(ARRAY(i4)))), i352) -> f3873_0_random_Return(EOS(STATIC_3873(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3873_0_random_Return(EOS(STATIC_3873(java.lang.Object(ARRAY(i4)))), i352) -> f3879_0_createIntList_Store(EOS(STATIC_3879(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3879_0_createIntList_Store(EOS(STATIC_3879(java.lang.Object(ARRAY(i4)))), i352) -> f3882_0_createIntList_New(EOS(STATIC_3882(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3882_0_createIntList_New(EOS(STATIC_3882(java.lang.Object(ARRAY(i4)))), i352) -> f3886_0_createIntList_Duplicate(EOS(STATIC_3886(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3886_0_createIntList_Duplicate(EOS(STATIC_3886(java.lang.Object(ARRAY(i4)))), i352) -> f3890_0_createIntList_Load(EOS(STATIC_3890(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3890_0_createIntList_Load(EOS(STATIC_3890(java.lang.Object(ARRAY(i4)))), i352) -> f3893_0_createIntList_Load(EOS(STATIC_3893(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3893_0_createIntList_Load(EOS(STATIC_3893(java.lang.Object(ARRAY(i4)))), i352) -> f3917_0_createIntList_InvokeMethod(EOS(STATIC_3917(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3917_0_createIntList_InvokeMethod(EOS(STATIC_3917(java.lang.Object(ARRAY(i4)))), i352) -> f3931_0__init__Load(EOS(STATIC_3931(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3931_0__init__Load(EOS(STATIC_3931(java.lang.Object(ARRAY(i4)))), i352) -> f3963_0__init__InvokeMethod(EOS(STATIC_3963(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3963_0__init__InvokeMethod(EOS(STATIC_3963(java.lang.Object(ARRAY(i4)))), i352) -> f3990_0__init__Load(EOS(STATIC_3990(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f3990_0__init__Load(EOS(STATIC_3990(java.lang.Object(ARRAY(i4)))), i352) -> f4007_0__init__Load(EOS(STATIC_4007(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f4007_0__init__Load(EOS(STATIC_4007(java.lang.Object(ARRAY(i4)))), i352) -> f4056_0__init__FieldAccess(EOS(STATIC_4056(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f4056_0__init__FieldAccess(EOS(STATIC_4056(java.lang.Object(ARRAY(i4)))), i352) -> f4068_0__init__Load(EOS(STATIC_4068(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f4068_0__init__Load(EOS(STATIC_4068(java.lang.Object(ARRAY(i4)))), i352) -> f4085_0__init__Load(EOS(STATIC_4085(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f4085_0__init__Load(EOS(STATIC_4085(java.lang.Object(ARRAY(i4)))), i352) -> f4103_0__init__FieldAccess(EOS(STATIC_4103(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f4103_0__init__FieldAccess(EOS(STATIC_4103(java.lang.Object(ARRAY(i4)))), i352) -> f4141_0__init__Return(EOS(STATIC_4141(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f4141_0__init__Return(EOS(STATIC_4141(java.lang.Object(ARRAY(i4)))), i352) -> f4161_0_createIntList_Store(EOS(STATIC_4161(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f4161_0_createIntList_Store(EOS(STATIC_4161(java.lang.Object(ARRAY(i4)))), i352) -> f4173_0_createIntList_Inc(EOS(STATIC_4173(java.lang.Object(ARRAY(i4)))), i352) :|: TRUE
+f4173_0_createIntList_Inc(EOS(STATIC_4173(java.lang.Object(ARRAY(i4)))), i352) -> f4177_0_createIntList_JMP(EOS(STATIC_4177(java.lang.Object(ARRAY(i4)))), i352 + -1) :|: TRUE
+f4177_0_createIntList_JMP(EOS(STATIC_4177(java.lang.Object(ARRAY(i4)))), i426) -> f4180_0_createIntList_Load(EOS(STATIC_4180(java.lang.Object(ARRAY(i4)))), i426) :|: TRUE
+f4180_0_createIntList_Load(EOS(STATIC_4180(java.lang.Object(ARRAY(i4)))), i426) -> f3567_0_createIntList_Load(EOS(STATIC_3567(java.lang.Object(ARRAY(i4)))), i426) :|: TRUE
+f3567_0_createIntList_Load(EOS(STATIC_3567(java.lang.Object(ARRAY(i4)))), i331) -> f3671_0_createIntList_LE(EOS(STATIC_3671(java.lang.Object(ARRAY(i4)))), i331, i331) :|: TRUE
+Combined rules. Obtained 1 IRulesP rules:
+f3671_0_createIntList_LE(EOS(STATIC_3671(java.lang.Object(ARRAY(i4:0)))), i352:0, i352:0) -> f3671_0_createIntList_LE(EOS(STATIC_3671(java.lang.Object(ARRAY(i4:0)))), i352:0 - 1, i352:0 - 1) :|: i352:0 > 0
+Filtered duplicate arguments:
+   f3671_0_createIntList_LE(x1, x2, x3) -> f3671_0_createIntList_LE(x1, x3)
+Filtered unneeded arguments:
+   f3671_0_createIntList_LE(x1, x2) -> f3671_0_createIntList_LE(x2)
+Finished conversion. Obtained 1 rules.P rules:
+f3671_0_createIntList_LE(i352:0) -> f3671_0_createIntList_LE(i352:0 - 1) :|: i352:0 > 0
+
+----------------------------------------
+
+(14)
+Obligation:
+Rules:
+f3671_0_createIntList_LE(i352:0) -> f3671_0_createIntList_LE(i352:0 - 1) :|: i352:0 > 0
+
+----------------------------------------
+
+(15) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f3671_0_createIntList_LE(i352:0) -> f3671_0_createIntList_LE(arith) :|: i352:0 > 0 && arith = i352:0 - 1
+
+----------------------------------------
+
+(17) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f3671_0_createIntList_LE(i352:0) -> f3671_0_createIntList_LE(arith) :|: i352:0 > 0 && arith = i352:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(18)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f3671_0_createIntList_LE(i352:0) -> f3671_0_createIntList_LE(arith) :|: i352:0 > 0 && arith = i352:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(19) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(20)
+Obligation:
+Rules:
+f3671_0_createIntList_LE(i352:0:0) -> f3671_0_createIntList_LE(i352:0:0 - 1) :|: i352:0:0 > 0
+
+----------------------------------------
+
+(21) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f3671_0_createIntList_LE(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f3671_0_createIntList_LE(i352:0:0) -> f3671_0_createIntList_LE(c) :|: c = i352:0:0 - 1 && i352:0:0 > 0
+
+----------------------------------------
+
+(23) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f3671_0_createIntList_LE(x)] = x
+
+The following rules are decreasing:
+f3671_0_createIntList_LE(i352:0:0) -> f3671_0_createIntList_LE(c) :|: c = i352:0:0 - 1 && i352:0:0 > 0
+The following rules are bounded:
+f3671_0_createIntList_LE(i352:0:0) -> f3671_0_createIntList_LE(c) :|: c = i352:0:0 - 1 && i352:0:0 > 0
+
+----------------------------------------
+
+(24)
+YES
+
+----------------------------------------
+
+(25)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Shuffle.main([Ljava/lang/String;)V
+SCC calls the following helper methods: IntList.reverse()LIntList;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*IntList: [value, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(26) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 32 rules for P and 62 rules for R.P rules:
+f10798_0_main_NULL(EOS(STATIC_10798), java.lang.Object(o1452sub), java.lang.Object(o1452sub)) -> f10801_0_main_Load(EOS(STATIC_10801), java.lang.Object(o1452sub)) :|: TRUE
+f10801_0_main_Load(EOS(STATIC_10801), java.lang.Object(o1452sub)) -> f10813_0_main_InvokeMethod(EOS(STATIC_10813), java.lang.Object(o1452sub)) :|: TRUE
+f10813_0_main_InvokeMethod(EOS(STATIC_10813), java.lang.Object(o1452sub)) -> f10824_1_main_InvokeMethod(f10824_0_reverse_ConstantStackPush(EOS(STATIC_10824), java.lang.Object(o1452sub))) :|: TRUE
+f10824_0_reverse_ConstantStackPush(EOS(STATIC_10824), java.lang.Object(o1452sub)) -> f11572_0_reverse_ConstantStackPush(EOS(STATIC_11572), java.lang.Object(o1452sub)) :|: TRUE
+f11267_0_reverse_Return(EOS(STATIC_11267), java.lang.Object(IntList(EOC, i803, o1480))) -> f11273_0_main_Store(EOS(STATIC_11273), java.lang.Object(IntList(EOC, i803, o1480))) :|: TRUE
+f11273_0_main_Store(EOS(STATIC_11273), java.lang.Object(IntList(EOC, i803, o1480))) -> f11277_0_main_JMP(EOS(STATIC_11277), java.lang.Object(IntList(EOC, i803, o1480))) :|: TRUE
+f11277_0_main_JMP(EOS(STATIC_11277), java.lang.Object(IntList(EOC, i803, o1480))) -> f11294_0_main_Load(EOS(STATIC_11294), java.lang.Object(IntList(EOC, i803, o1480))) :|: TRUE
+f11294_0_main_Load(EOS(STATIC_11294), java.lang.Object(IntList(EOC, i803, o1480))) -> f10606_0_main_Load(EOS(STATIC_10606), java.lang.Object(IntList(EOC, i803, o1480))) :|: TRUE
+f10606_0_main_Load(EOS(STATIC_10606), java.lang.Object(IntList(EOC, i749, o1380))) -> f10607_0_main_NULL(EOS(STATIC_10607), java.lang.Object(IntList(EOC, i749, o1380)), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10607_0_main_NULL(EOS(STATIC_10607), java.lang.Object(IntList(EOC, i749, o1380)), java.lang.Object(IntList(EOC, i749, o1380))) -> f10608_0_main_New(EOS(STATIC_10608), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10608_0_main_New(EOS(STATIC_10608), java.lang.Object(IntList(EOC, i749, o1380))) -> f10609_0_main_Duplicate(EOS(STATIC_10609), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10609_0_main_Duplicate(EOS(STATIC_10609), java.lang.Object(IntList(EOC, i749, o1380))) -> f10610_0_main_Load(EOS(STATIC_10610), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10610_0_main_Load(EOS(STATIC_10610), java.lang.Object(IntList(EOC, i749, o1380))) -> f10611_0_main_FieldAccess(EOS(STATIC_10611), java.lang.Object(IntList(EOC, i749, o1380)), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10611_0_main_FieldAccess(EOS(STATIC_10611), java.lang.Object(IntList(EOC, i749, o1380)), java.lang.Object(IntList(EOC, i749, o1380))) -> f10612_0_main_Load(EOS(STATIC_10612), java.lang.Object(IntList(EOC, i749, o1380)), i749) :|: TRUE
+f10612_0_main_Load(EOS(STATIC_10612), java.lang.Object(IntList(EOC, i749, o1380)), i749) -> f10613_0_main_InvokeMethod(EOS(STATIC_10613), java.lang.Object(IntList(EOC, i749, o1380)), i749) :|: TRUE
+f10613_0_main_InvokeMethod(EOS(STATIC_10613), java.lang.Object(IntList(EOC, i749, o1380)), i749) -> f10614_0__init__Load(EOS(STATIC_10614), java.lang.Object(IntList(EOC, i749, o1380)), i749) :|: TRUE
+f10614_0__init__Load(EOS(STATIC_10614), java.lang.Object(IntList(EOC, i749, o1380)), i749) -> f10615_0__init__InvokeMethod(EOS(STATIC_10615), java.lang.Object(IntList(EOC, i749, o1380)), i749) :|: TRUE
+f10615_0__init__InvokeMethod(EOS(STATIC_10615), java.lang.Object(IntList(EOC, i749, o1380)), i749) -> f10616_0__init__Load(EOS(STATIC_10616), java.lang.Object(IntList(EOC, i749, o1380)), i749) :|: TRUE
+f10616_0__init__Load(EOS(STATIC_10616), java.lang.Object(IntList(EOC, i749, o1380)), i749) -> f10681_0__init__Load(EOS(STATIC_10681), java.lang.Object(IntList(EOC, i749, o1380)), i749) :|: TRUE
+f10681_0__init__Load(EOS(STATIC_10681), java.lang.Object(IntList(EOC, i749, o1380)), i749) -> f10705_0__init__FieldAccess(EOS(STATIC_10705), java.lang.Object(IntList(EOC, i749, o1380)), i749) :|: TRUE
+f10705_0__init__FieldAccess(EOS(STATIC_10705), java.lang.Object(IntList(EOC, i749, o1380)), i749) -> f10718_0__init__Load(EOS(STATIC_10718), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10718_0__init__Load(EOS(STATIC_10718), java.lang.Object(IntList(EOC, i749, o1380))) -> f10720_0__init__Load(EOS(STATIC_10720), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10720_0__init__Load(EOS(STATIC_10720), java.lang.Object(IntList(EOC, i749, o1380))) -> f10721_0__init__FieldAccess(EOS(STATIC_10721), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10721_0__init__FieldAccess(EOS(STATIC_10721), java.lang.Object(IntList(EOC, i749, o1380))) -> f10727_0__init__Return(EOS(STATIC_10727), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10727_0__init__Return(EOS(STATIC_10727), java.lang.Object(IntList(EOC, i749, o1380))) -> f10762_0_main_Store(EOS(STATIC_10762), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10762_0_main_Store(EOS(STATIC_10762), java.lang.Object(IntList(EOC, i749, o1380))) -> f10768_0_main_Load(EOS(STATIC_10768), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10768_0_main_Load(EOS(STATIC_10768), java.lang.Object(IntList(EOC, i749, o1380))) -> f10775_0_main_FieldAccess(EOS(STATIC_10775), java.lang.Object(IntList(EOC, i749, o1380))) :|: TRUE
+f10775_0_main_FieldAccess(EOS(STATIC_10775), java.lang.Object(IntList(EOC, i749, o1380))) -> f10783_0_main_Store(EOS(STATIC_10783), o1380) :|: TRUE
+f10783_0_main_Store(EOS(STATIC_10783), o1380) -> f10788_0_main_Load(EOS(STATIC_10788), o1380) :|: TRUE
+f10788_0_main_Load(EOS(STATIC_10788), o1380) -> f10795_0_main_NULL(EOS(STATIC_10795), o1380, o1380) :|: TRUE
+f10795_0_main_NULL(EOS(STATIC_10795), java.lang.Object(o1452sub), java.lang.Object(o1452sub)) -> f10798_0_main_NULL(EOS(STATIC_10798), java.lang.Object(o1452sub), java.lang.Object(o1452sub)) :|: TRUE
+f10824_1_main_InvokeMethod(f4891_0_reverse_Return(EOS(STATIC_4891), java.lang.Object(IntList(EOC, i803, o1480)))) -> f11267_0_reverse_Return(EOS(STATIC_11267), java.lang.Object(IntList(EOC, i803, o1480))) :|: TRUE
+R rules:
+f10824_0_reverse_ConstantStackPush(EOS(STATIC_10824), java.lang.Object(o1452sub)) -> f10836_0_reverse_ConstantStackPush(EOS(STATIC_10836), java.lang.Object(o1452sub)) :|: TRUE
+f10836_0_reverse_ConstantStackPush(EOS(STATIC_10836), java.lang.Object(o1452sub)) -> f10844_0_reverse_ConstantStackPush(EOS(STATIC_10844), java.lang.Object(o1452sub)) :|: TRUE
+f10844_0_reverse_ConstantStackPush(EOS(STATIC_10844), java.lang.Object(o1469sub)) -> f10847_0_reverse_ConstantStackPush(EOS(STATIC_10847), java.lang.Object(o1469sub)) :|: TRUE
+f10847_0_reverse_ConstantStackPush(EOS(STATIC_10847), java.lang.Object(o1469sub)) -> f10852_0_reverse_ConstantStackPush(EOS(STATIC_10852), java.lang.Object(o1469sub)) :|: TRUE
+f10852_0_reverse_ConstantStackPush(EOS(STATIC_10852), java.lang.Object(o1469sub)) -> f3656_0_reverse_ConstantStackPush(EOS(STATIC_3656), java.lang.Object(o1469sub)) :|: TRUE
+f3656_0_reverse_ConstantStackPush(EOS(STATIC_3656), java.lang.Object(o329sub)) -> f3674_0_reverse_Store(EOS(STATIC_3674), java.lang.Object(o329sub), NULL) :|: TRUE
+f3674_0_reverse_Store(EOS(STATIC_3674), java.lang.Object(o329sub), NULL) -> f3697_0_reverse_Load(EOS(STATIC_3697), java.lang.Object(o329sub), NULL) :|: TRUE
+f3697_0_reverse_Load(EOS(STATIC_3697), java.lang.Object(o329sub), NULL) -> f3705_0_reverse_Store(EOS(STATIC_3705), NULL, java.lang.Object(o329sub)) :|: TRUE
+f3705_0_reverse_Store(EOS(STATIC_3705), NULL, java.lang.Object(o329sub)) -> f3710_0_reverse_Load(EOS(STATIC_3710), NULL, java.lang.Object(o329sub)) :|: TRUE
+f3710_0_reverse_Load(EOS(STATIC_3710), NULL, java.lang.Object(o329sub)) -> f3714_0_reverse_NULL(EOS(STATIC_3714), NULL, java.lang.Object(o329sub), java.lang.Object(o329sub)) :|: TRUE
+f3714_0_reverse_NULL(EOS(STATIC_3714), NULL, java.lang.Object(o329sub), java.lang.Object(o329sub)) -> f3737_0_reverse_New(EOS(STATIC_3737), NULL, java.lang.Object(o329sub)) :|: TRUE
+f3737_0_reverse_New(EOS(STATIC_3737), NULL, java.lang.Object(o329sub)) -> f3754_0_reverse_Duplicate(EOS(STATIC_3754), NULL, java.lang.Object(o329sub), java.lang.Object(IntList(EOC, 0, NULL))) :|: TRUE
+f3754_0_reverse_Duplicate(EOS(STATIC_3754), NULL, java.lang.Object(o329sub), java.lang.Object(IntList(EOC, matching1, NULL))) -> f3759_0_reverse_Load(EOS(STATIC_3759), NULL, java.lang.Object(o329sub), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL))) :|: TRUE && matching1 = 0
+f3759_0_reverse_Load(EOS(STATIC_3759), NULL, java.lang.Object(o329sub), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL))) -> f3771_0_reverse_FieldAccess(EOS(STATIC_3771), NULL, java.lang.Object(o329sub), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(o329sub)) :|: TRUE && matching1 = 0 && matching2 = 0
+f3771_0_reverse_FieldAccess(EOS(STATIC_3771), NULL, java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), java.lang.Object(IntList(EOC, i362, o374))) -> f3777_0_reverse_FieldAccess(EOS(STATIC_3777), NULL, java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, i362, o374))) :|: TRUE && matching1 = 0 && matching2 = 0
+f3777_0_reverse_FieldAccess(EOS(STATIC_3777), NULL, java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), java.lang.Object(IntList(EOC, i362, o374))) -> f3781_0_reverse_Load(EOS(STATIC_3781), NULL, java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i362) :|: TRUE && matching1 = 0 && matching2 = 0
+f3781_0_reverse_Load(EOS(STATIC_3781), NULL, java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i362) -> f3786_0_reverse_InvokeMethod(EOS(STATIC_3786), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i362, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f3786_0_reverse_InvokeMethod(EOS(STATIC_3786), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i362, NULL) -> f3789_0__init__Load(EOS(STATIC_3789), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i362, NULL) :|: TRUE && matching1 = 0 && matching2 = 0
+f3789_0__init__Load(EOS(STATIC_3789), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i362, NULL) -> f3803_0__init__InvokeMethod(EOS(STATIC_3803), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i362, NULL, java.lang.Object(IntList(EOC, 0, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f3803_0__init__InvokeMethod(EOS(STATIC_3803), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i362, NULL, java.lang.Object(IntList(EOC, matching3, NULL))) -> f3810_0__init__Load(EOS(STATIC_3810), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i362, NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f3810_0__init__Load(EOS(STATIC_3810), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i362, NULL) -> f3824_0__init__Load(EOS(STATIC_3824), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i362, NULL, java.lang.Object(IntList(EOC, 0, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f3824_0__init__Load(EOS(STATIC_3824), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i362, NULL, java.lang.Object(IntList(EOC, matching3, NULL))) -> f3827_0__init__FieldAccess(EOS(STATIC_3827), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), NULL, java.lang.Object(IntList(EOC, 0, NULL)), i362) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f3827_0__init__FieldAccess(EOS(STATIC_3827), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), NULL, java.lang.Object(IntList(EOC, matching3, NULL)), i362) -> f3833_0__init__Load(EOS(STATIC_3833), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL)), java.lang.Object(IntList(EOC, i362, NULL)), NULL) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f3833_0__init__Load(EOS(STATIC_3833), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL)), java.lang.Object(IntList(EOC, i362, NULL)), NULL) -> f3850_0__init__Load(EOS(STATIC_3850), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL)), NULL, java.lang.Object(IntList(EOC, i362, NULL))) :|: TRUE
+f3850_0__init__Load(EOS(STATIC_3850), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL)), NULL, java.lang.Object(IntList(EOC, i362, NULL))) -> f3860_0__init__FieldAccess(EOS(STATIC_3860), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL)), java.lang.Object(IntList(EOC, i362, NULL)), NULL) :|: TRUE
+f3860_0__init__FieldAccess(EOS(STATIC_3860), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL)), java.lang.Object(IntList(EOC, i362, NULL)), NULL) -> f3870_0__init__Return(EOS(STATIC_3870), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL))) :|: TRUE
+f3870_0__init__Return(EOS(STATIC_3870), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL))) -> f3878_0_reverse_Store(EOS(STATIC_3878), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL))) :|: TRUE
+f3878_0_reverse_Store(EOS(STATIC_3878), java.lang.Object(IntList(EOC, i362, o374)), java.lang.Object(IntList(EOC, i362, NULL))) -> f3881_0_reverse_Load(EOS(STATIC_3881), java.lang.Object(IntList(EOC, i362, NULL)), java.lang.Object(IntList(EOC, i362, o374))) :|: TRUE
+f3881_0_reverse_Load(EOS(STATIC_3881), java.lang.Object(IntList(EOC, i362, NULL)), java.lang.Object(IntList(EOC, i362, o374))) -> f3885_0_reverse_FieldAccess(EOS(STATIC_3885), java.lang.Object(IntList(EOC, i362, NULL)), java.lang.Object(IntList(EOC, i362, o374))) :|: TRUE
+f3885_0_reverse_FieldAccess(EOS(STATIC_3885), java.lang.Object(IntList(EOC, i362, NULL)), java.lang.Object(IntList(EOC, i362, o374))) -> f3889_0_reverse_Store(EOS(STATIC_3889), java.lang.Object(IntList(EOC, i362, NULL)), o374) :|: TRUE
+f3889_0_reverse_Store(EOS(STATIC_3889), java.lang.Object(IntList(EOC, i362, NULL)), o374) -> f3892_0_reverse_JMP(EOS(STATIC_3892), java.lang.Object(IntList(EOC, i362, NULL)), o374) :|: TRUE
+f3892_0_reverse_JMP(EOS(STATIC_3892), java.lang.Object(IntList(EOC, i362, NULL)), o374) -> f3914_0_reverse_Load(EOS(STATIC_3914), java.lang.Object(IntList(EOC, i362, NULL)), o374) :|: TRUE
+f3914_0_reverse_Load(EOS(STATIC_3914), java.lang.Object(IntList(EOC, i362, NULL)), o374) -> f4337_0_reverse_Load(EOS(STATIC_4337), java.lang.Object(IntList(EOC, i362, NULL)), o374) :|: TRUE
+f4337_0_reverse_Load(EOS(STATIC_4337), java.lang.Object(IntList(EOC, i455, o551)), o552) -> f4849_0_reverse_Load(EOS(STATIC_4849), java.lang.Object(IntList(EOC, i455, o551)), o552) :|: TRUE
+f4849_0_reverse_Load(EOS(STATIC_4849), java.lang.Object(IntList(EOC, i511, o737)), o738) -> f4866_0_reverse_NULL(EOS(STATIC_4866), java.lang.Object(IntList(EOC, i511, o737)), o738, o738) :|: TRUE
+f4866_0_reverse_NULL(EOS(STATIC_4866), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub), java.lang.Object(o767sub)) -> f4872_0_reverse_NULL(EOS(STATIC_4872), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub), java.lang.Object(o767sub)) :|: TRUE
+f4866_0_reverse_NULL(EOS(STATIC_4866), java.lang.Object(IntList(EOC, i511, o737)), NULL, NULL) -> f4873_0_reverse_NULL(EOS(STATIC_4873), java.lang.Object(IntList(EOC, i511, o737)), NULL, NULL) :|: TRUE
+f4872_0_reverse_NULL(EOS(STATIC_4872), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub), java.lang.Object(o767sub)) -> f4883_0_reverse_New(EOS(STATIC_4883), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub)) :|: TRUE
+f4873_0_reverse_NULL(EOS(STATIC_4873), java.lang.Object(IntList(EOC, i511, o737)), NULL, NULL) -> f4884_0_reverse_Load(EOS(STATIC_4884), java.lang.Object(IntList(EOC, i511, o737))) :|: TRUE
+f4883_0_reverse_New(EOS(STATIC_4883), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub)) -> f4889_0_reverse_Duplicate(EOS(STATIC_4889), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub), java.lang.Object(IntList(EOC, 0, NULL))) :|: TRUE
+f4884_0_reverse_Load(EOS(STATIC_4884), java.lang.Object(IntList(EOC, i511, o737))) -> f4891_0_reverse_Return(EOS(STATIC_4891), java.lang.Object(IntList(EOC, i511, o737))) :|: TRUE
+f4889_0_reverse_Duplicate(EOS(STATIC_4889), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub), java.lang.Object(IntList(EOC, matching1, NULL))) -> f4900_0_reverse_Load(EOS(STATIC_4900), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL))) :|: TRUE && matching1 = 0
+f4900_0_reverse_Load(EOS(STATIC_4900), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL))) -> f4918_0_reverse_FieldAccess(EOS(STATIC_4918), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(o767sub), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(o767sub)) :|: TRUE && matching1 = 0 && matching2 = 0
+f4918_0_reverse_FieldAccess(EOS(STATIC_4918), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), java.lang.Object(IntList(EOC, i529, o811))) -> f4932_0_reverse_FieldAccess(EOS(STATIC_4932), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE && matching1 = 0 && matching2 = 0
+f4932_0_reverse_FieldAccess(EOS(STATIC_4932), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), java.lang.Object(IntList(EOC, i529, o811))) -> f4959_0_reverse_Load(EOS(STATIC_4959), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i529) :|: TRUE && matching1 = 0 && matching2 = 0
+f4959_0_reverse_Load(EOS(STATIC_4959), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i529) -> f4963_0_reverse_InvokeMethod(EOS(STATIC_4963), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737))) :|: TRUE && matching1 = 0 && matching2 = 0
+f4963_0_reverse_InvokeMethod(EOS(STATIC_4963), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737))) -> f4966_0__init__Load(EOS(STATIC_4966), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737))) :|: TRUE && matching1 = 0 && matching2 = 0
+f4966_0__init__Load(EOS(STATIC_4966), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737))) -> f4981_0__init__InvokeMethod(EOS(STATIC_4981), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, 0, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f4981_0__init__InvokeMethod(EOS(STATIC_4981), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, matching3, NULL))) -> f4992_0__init__Load(EOS(STATIC_4992), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737))) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f4992_0__init__Load(EOS(STATIC_4992), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737))) -> f5002_0__init__Load(EOS(STATIC_5002), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, 0, NULL))) :|: TRUE && matching1 = 0 && matching2 = 0
+f5002_0__init__Load(EOS(STATIC_5002), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), i529, java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, matching3, NULL))) -> f5004_0__init__FieldAccess(EOS(STATIC_5004), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, 0, NULL)), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, 0, NULL)), i529) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f5004_0__init__FieldAccess(EOS(STATIC_5004), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, matching1, NULL)), java.lang.Object(IntList(EOC, matching2, NULL)), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, matching3, NULL)), i529) -> f5013_0__init__Load(EOS(STATIC_5013), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i511, o737))) :|: TRUE && matching1 = 0 && matching2 = 0 && matching3 = 0
+f5013_0__init__Load(EOS(STATIC_5013), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i511, o737))) -> f5023_0__init__Load(EOS(STATIC_5023), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, i529, NULL))) :|: TRUE
+f5023_0__init__Load(EOS(STATIC_5023), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i511, o737)), java.lang.Object(IntList(EOC, i529, NULL))) -> f5033_0__init__FieldAccess(EOS(STATIC_5033), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i511, o737))) :|: TRUE
+f5033_0__init__FieldAccess(EOS(STATIC_5033), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i529, NULL)), java.lang.Object(IntList(EOC, i511, o737))) -> f5045_0__init__Return(EOS(STATIC_5045), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737))))) :|: TRUE
+f5045_0__init__Return(EOS(STATIC_5045), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737))))) -> f5051_0_reverse_Store(EOS(STATIC_5051), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737))))) :|: TRUE
+f5051_0_reverse_Store(EOS(STATIC_5051), java.lang.Object(IntList(EOC, i529, o811)), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737))))) -> f5062_0_reverse_Load(EOS(STATIC_5062), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5062_0_reverse_Load(EOS(STATIC_5062), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), java.lang.Object(IntList(EOC, i529, o811))) -> f5073_0_reverse_FieldAccess(EOS(STATIC_5073), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), java.lang.Object(IntList(EOC, i529, o811))) :|: TRUE
+f5073_0_reverse_FieldAccess(EOS(STATIC_5073), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), java.lang.Object(IntList(EOC, i529, o811))) -> f5080_0_reverse_Store(EOS(STATIC_5080), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), o811) :|: TRUE
+f5080_0_reverse_Store(EOS(STATIC_5080), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), o811) -> f5085_0_reverse_JMP(EOS(STATIC_5085), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), o811) :|: TRUE
+f5085_0_reverse_JMP(EOS(STATIC_5085), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), o811) -> f5109_0_reverse_Load(EOS(STATIC_5109), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), o811) :|: TRUE
+f5109_0_reverse_Load(EOS(STATIC_5109), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), o811) -> f4849_0_reverse_Load(EOS(STATIC_4849), java.lang.Object(IntList(EOC, i529, java.lang.Object(IntList(EOC, i511, o737)))), o811) :|: TRUE
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+f10824_1_main_InvokeMethod(f4891_0_reverse_Return(EOS(STATIC_4891), java.lang.Object(IntList(EOC, i803:0, java.lang.Object(o1452sub:0))))) -> f10824_1_main_InvokeMethod(f11572_0_reverse_ConstantStackPush(EOS(STATIC_11572), java.lang.Object(o1452sub:0))) :|: TRUE
+R rules:
+Filtered ground terms:
+   f4891_0_reverse_Return(x1, x2) -> f4891_0_reverse_Return(x2)
+   f11572_0_reverse_ConstantStackPush(x1, x2) -> f11572_0_reverse_ConstantStackPush(x2)
+   IntList(x1, x2, x3) -> IntList(x2, x3)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F10824_1_MAIN_INVOKEMETHOD(f4891_0_reverse_Return(java.lang.Object(IntList(i803:0:0, java.lang.Object(o1452sub:0:0))))) -> F10824_1_MAIN_INVOKEMETHOD(f11572_0_reverse_ConstantStackPush(java.lang.Object(o1452sub:0:0))) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(27)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F10824_1_MAIN_INVOKEMETHOD(f4891_0_reverse_Return(java.lang.Object(IntList(i803:0:0, java.lang.Object(o1452sub:0:0))))) -> F10824_1_MAIN_INVOKEMETHOD(f11572_0_reverse_ConstantStackPush(java.lang.Object(o1452sub:0:0)))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(28) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 0 SCCs with 1 less node.
+----------------------------------------
+
+(29)
+TRUE

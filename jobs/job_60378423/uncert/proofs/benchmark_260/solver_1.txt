@@ -1,0 +1,1337 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/PwV8t.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 829 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 61 ms]
+        (9) QDP
+        (10) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (11) YES
+    (12) JBCTerminationSCC
+        (13) SCCToIRSProof [SOUND, 236 ms]
+        (14) IRSwT
+        (15) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (16) IRSwT
+        (17) IRSwTTerminationDigraphProof [EQUIVALENT, 131 ms]
+        (18) IRSwT
+        (19) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (20) IRSwT
+        (21) TempFilterProof [SOUND, 1 ms]
+        (22) IRSwT
+        (23) IRSwTToQDPProof [SOUND, 0 ms]
+        (24) QDP
+        (25) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (26) YES
+    (27) JBCTerminationSCC
+        (28) SCCToIRSProof [SOUND, 23 ms]
+        (29) IRSwT
+        (30) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (31) IRSwT
+        (32) IRSwTTerminationDigraphProof [EQUIVALENT, 10 ms]
+        (33) IRSwT
+        (34) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (35) IRSwT
+        (36) TempFilterProof [SOUND, 6 ms]
+        (37) IntTRS
+        (38) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (39) YES
+    (40) JBCTerminationSCC
+        (41) SCCToIRSProof [SOUND, 148 ms]
+        (42) IRSwT
+        (43) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (44) IRSwT
+        (45) IRSwTTerminationDigraphProof [EQUIVALENT, 16 ms]
+        (46) IRSwT
+        (47) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (48) IRSwT
+        (49) TempFilterProof [SOUND, 26 ms]
+        (50) IntTRS
+        (51) RankingReductionPairProof [EQUIVALENT, 0 ms]
+        (52) IntTRS
+        (53) PolynomialOrderProcessor [EQUIVALENT, 3 ms]
+        (54) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+public class Infix2Postfix {
+    public static LinkedList buildExpression(int n) {
+	LinkedList exp = null;
+	for (int i = 1; i <= n; i++) {
+	    if (i <= n-1) exp = new LinkedList(')', exp);
+	    exp = new LinkedList(')', exp);
+	    exp = new LinkedList('b', exp);
+	    exp = new LinkedList('+', exp);
+	    exp = new LinkedList('a', exp);
+	    exp = new LinkedList('(', exp);
+	    if (i <= n-1) exp = new LinkedList('*', exp);
+	}
+
+	for (int i = 1; i < n; i++)
+	    exp = new LinkedList('(', exp);
+
+	return exp;
+    }
+
+    public static LinkedList toPostfix(LinkedList infix) {
+	LinkedList operators = null, operands = null;
+	while (infix != null) {
+	    char c = infix.getFirst();
+	    switch (c) {
+	    case '(': break;
+	    case '+': case '-': case '*': case '/':
+		operators = new LinkedList(c, operators);
+		break;
+	    case ')':
+		operands = new LinkedList(operators.getFirst(), operands);
+		operators = operators.getTail();
+		break;
+	    default:
+		operands = new LinkedList(c, operands);
+	    }
+	    infix = infix.getTail();
+	}
+
+	LinkedList postfix = null;
+	while (operands != null) {
+	    postfix = new LinkedList(operands.getFirst(), postfix);
+	    operands = operands.getTail();
+	}
+
+	return postfix;
+    }
+
+    public static void  main(String args[]) {
+	LinkedList infix = buildExpression(args.length);
+	// System.out.println("infix = " + infix);
+	LinkedList postfix = toPostfix(infix);
+	// System.out.println("postfix = " + postfix);
+    }
+}
+
+
+public class LinkedList {
+    private char head;
+    private LinkedList tail;
+
+    public LinkedList(char head, LinkedList tail) {
+	this.head = head;
+	this.tail = tail;
+    }
+
+    public char getFirst() {
+	return this.head;
+    }
+
+    public LinkedList getTail() {
+	return this.tail;
+    }
+
+    /*
+    public String toString() {
+	return head + (tail == null ? "" : " " + tail.toString());
+    }
+    */
+}
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+public class Infix2Postfix {
+    public static LinkedList buildExpression(int n) {
+	LinkedList exp = null;
+	for (int i = 1; i <= n; i++) {
+	    if (i <= n-1) exp = new LinkedList(')', exp);
+	    exp = new LinkedList(')', exp);
+	    exp = new LinkedList('b', exp);
+	    exp = new LinkedList('+', exp);
+	    exp = new LinkedList('a', exp);
+	    exp = new LinkedList('(', exp);
+	    if (i <= n-1) exp = new LinkedList('*', exp);
+	}
+
+	for (int i = 1; i < n; i++)
+	    exp = new LinkedList('(', exp);
+
+	return exp;
+    }
+
+    public static LinkedList toPostfix(LinkedList infix) {
+	LinkedList operators = null, operands = null;
+	while (infix != null) {
+	    char c = infix.getFirst();
+	    switch (c) {
+	    case '(': break;
+	    case '+': case '-': case '*': case '/':
+		operators = new LinkedList(c, operators);
+		break;
+	    case ')':
+		operands = new LinkedList(operators.getFirst(), operands);
+		operators = operators.getTail();
+		break;
+	    default:
+		operands = new LinkedList(c, operands);
+	    }
+	    infix = infix.getTail();
+	}
+
+	LinkedList postfix = null;
+	while (operands != null) {
+	    postfix = new LinkedList(operands.getFirst(), postfix);
+	    operands = operands.getTail();
+	}
+
+	return postfix;
+    }
+
+    public static void  main(String args[]) {
+	LinkedList infix = buildExpression(args.length);
+	// System.out.println("infix = " + infix);
+	LinkedList postfix = toPostfix(infix);
+	// System.out.println("postfix = " + postfix);
+    }
+}
+
+
+public class LinkedList {
+    private char head;
+    private LinkedList tail;
+
+    public LinkedList(char head, LinkedList tail) {
+	this.head = head;
+	this.tail = tail;
+    }
+
+    public char getFirst() {
+	return this.head;
+    }
+
+    public LinkedList getTail() {
+	return this.tail;
+    }
+
+    /*
+    public String toString() {
+	return head + (tail == null ? "" : " " + tail.toString());
+    }
+    */
+}
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+Infix2Postfix.main([Ljava/lang/String;)V: Graph of 264 nodes with 2 SCCs.
+
+
+
+Infix2Postfix.toPostfix(LLinkedList;)LLinkedList;: Graph of 292 nodes with 2 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 4 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Infix2Postfix.toPostfix(LLinkedList;)LLinkedList;
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*LinkedList: [head, tail]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 31 rules for P and 0 rules for R.P rules:
+f12667_0_toPostfix_NULL(EOS(STATIC_12667), java.lang.Object(o19004sub), java.lang.Object(o19004sub)) -> f12670_0_toPostfix_NULL(EOS(STATIC_12670), java.lang.Object(o19004sub), java.lang.Object(o19004sub)) :|: TRUE
+f12670_0_toPostfix_NULL(EOS(STATIC_12670), java.lang.Object(o19004sub), java.lang.Object(o19004sub)) -> f12674_0_toPostfix_New(EOS(STATIC_12674), java.lang.Object(o19004sub)) :|: TRUE
+f12674_0_toPostfix_New(EOS(STATIC_12674), java.lang.Object(o19004sub)) -> f12678_0_toPostfix_Duplicate(EOS(STATIC_12678), java.lang.Object(o19004sub)) :|: TRUE
+f12678_0_toPostfix_Duplicate(EOS(STATIC_12678), java.lang.Object(o19004sub)) -> f12682_0_toPostfix_Load(EOS(STATIC_12682), java.lang.Object(o19004sub)) :|: TRUE
+f12682_0_toPostfix_Load(EOS(STATIC_12682), java.lang.Object(o19004sub)) -> f12686_0_toPostfix_InvokeMethod(EOS(STATIC_12686), java.lang.Object(o19004sub), java.lang.Object(o19004sub)) :|: TRUE
+f12686_0_toPostfix_InvokeMethod(EOS(STATIC_12686), java.lang.Object(o19004sub), java.lang.Object(o19004sub)) -> f12691_0_getFirst_Load(EOS(STATIC_12691), java.lang.Object(o19004sub), java.lang.Object(o19004sub)) :|: TRUE
+f12691_0_getFirst_Load(EOS(STATIC_12691), java.lang.Object(o19004sub), java.lang.Object(o19004sub)) -> f12700_0_getFirst_FieldAccess(EOS(STATIC_12700), java.lang.Object(o19004sub), java.lang.Object(o19004sub)) :|: TRUE
+f12700_0_getFirst_FieldAccess(EOS(STATIC_12700), java.lang.Object(LinkedList(EOC, i1557, o19018)), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12705_0_getFirst_FieldAccess(EOS(STATIC_12705), java.lang.Object(LinkedList(EOC, i1557, o19018)), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12705_0_getFirst_FieldAccess(EOS(STATIC_12705), java.lang.Object(LinkedList(EOC, i1557, o19018)), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12710_0_getFirst_Return(EOS(STATIC_12710), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12710_0_getFirst_Return(EOS(STATIC_12710), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12715_0_toPostfix_Load(EOS(STATIC_12715), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12715_0_toPostfix_Load(EOS(STATIC_12715), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12720_0_toPostfix_InvokeMethod(EOS(STATIC_12720), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12720_0_toPostfix_InvokeMethod(EOS(STATIC_12720), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12722_0__init__Load(EOS(STATIC_12722), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12722_0__init__Load(EOS(STATIC_12722), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12729_0__init__InvokeMethod(EOS(STATIC_12729), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12729_0__init__InvokeMethod(EOS(STATIC_12729), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12733_0__init__Load(EOS(STATIC_12733), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12733_0__init__Load(EOS(STATIC_12733), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12740_0__init__Load(EOS(STATIC_12740), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12740_0__init__Load(EOS(STATIC_12740), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12746_0__init__FieldAccess(EOS(STATIC_12746), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12746_0__init__FieldAccess(EOS(STATIC_12746), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12752_0__init__Load(EOS(STATIC_12752), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12752_0__init__Load(EOS(STATIC_12752), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12757_0__init__Load(EOS(STATIC_12757), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12757_0__init__Load(EOS(STATIC_12757), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12761_0__init__FieldAccess(EOS(STATIC_12761), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12761_0__init__FieldAccess(EOS(STATIC_12761), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12765_0__init__Return(EOS(STATIC_12765), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12765_0__init__Return(EOS(STATIC_12765), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12769_0_toPostfix_Store(EOS(STATIC_12769), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12769_0_toPostfix_Store(EOS(STATIC_12769), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12773_0_toPostfix_Load(EOS(STATIC_12773), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12773_0_toPostfix_Load(EOS(STATIC_12773), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12778_0_toPostfix_InvokeMethod(EOS(STATIC_12778), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12778_0_toPostfix_InvokeMethod(EOS(STATIC_12778), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12782_0_getTail_Load(EOS(STATIC_12782), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12782_0_getTail_Load(EOS(STATIC_12782), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12790_0_getTail_FieldAccess(EOS(STATIC_12790), java.lang.Object(LinkedList(EOC, i1557, o19018))) :|: TRUE
+f12790_0_getTail_FieldAccess(EOS(STATIC_12790), java.lang.Object(LinkedList(EOC, i1557, o19018))) -> f12793_0_getTail_Return(EOS(STATIC_12793), o19018) :|: TRUE
+f12793_0_getTail_Return(EOS(STATIC_12793), o19018) -> f12798_0_toPostfix_Store(EOS(STATIC_12798), o19018) :|: TRUE
+f12798_0_toPostfix_Store(EOS(STATIC_12798), o19018) -> f12803_0_toPostfix_JMP(EOS(STATIC_12803), o19018) :|: TRUE
+f12803_0_toPostfix_JMP(EOS(STATIC_12803), o19018) -> f12808_0_toPostfix_Load(EOS(STATIC_12808), o19018) :|: TRUE
+f12808_0_toPostfix_Load(EOS(STATIC_12808), o19018) -> f12664_0_toPostfix_Load(EOS(STATIC_12664), o19018) :|: TRUE
+f12664_0_toPostfix_Load(EOS(STATIC_12664), o18989) -> f12667_0_toPostfix_NULL(EOS(STATIC_12667), o18989, o18989) :|: TRUE
+R rules:
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+f12667_0_toPostfix_NULL(EOS(STATIC_12667), java.lang.Object(LinkedList(EOC, i1557:0, o19018:0)), java.lang.Object(LinkedList(EOC, i1557:0, o19018:0))) -> f12667_0_toPostfix_NULL(EOS(STATIC_12667), o19018:0, o19018:0) :|: TRUE
+R rules:
+Filtered ground terms:
+   f12667_0_toPostfix_NULL(x1, x2, x3) -> f12667_0_toPostfix_NULL(x2, x3)
+   EOS(x1) -> EOS
+   LinkedList(x1, x2, x3) -> LinkedList(x2, x3)
+Filtered unneeded arguments:
+   LinkedList(x1, x2) -> LinkedList(x2)
+Filtered duplicate args:
+   f12667_0_toPostfix_NULL(x1, x2) -> f12667_0_toPostfix_NULL(x2)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F12667_0_TOPOSTFIX_NULL(java.lang.Object(LinkedList(o19018:0:0))) -> F12667_0_TOPOSTFIX_NULL(o19018:0:0) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F12667_0_TOPOSTFIX_NULL(java.lang.Object(LinkedList(o19018:0:0))) -> F12667_0_TOPOSTFIX_NULL(o19018:0:0)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F12667_0_TOPOSTFIX_NULL(java.lang.Object(LinkedList(o19018:0:0))) -> F12667_0_TOPOSTFIX_NULL(o19018:0:0)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(11)
+YES
+
+----------------------------------------
+
+(12)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Infix2Postfix.toPostfix(LLinkedList;)LLinkedList;
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*LinkedList: [head, tail]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(13) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 234 IRulesP rules:
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(o16794sub), o16757, java.lang.Object(o16794sub)) -> f11805_0_toPostfix_NULL(EOS(STATIC_11805), java.lang.Object(o16794sub), o16757, java.lang.Object(o16794sub)) :|: TRUE
+f11805_0_toPostfix_NULL(EOS(STATIC_11805), java.lang.Object(o16794sub), o16757, java.lang.Object(o16794sub)) -> f11822_0_toPostfix_Load(EOS(STATIC_11822), java.lang.Object(o16794sub), o16757) :|: TRUE
+f11822_0_toPostfix_Load(EOS(STATIC_11822), java.lang.Object(o16794sub), o16757) -> f11837_0_toPostfix_InvokeMethod(EOS(STATIC_11837), java.lang.Object(o16794sub), o16757, java.lang.Object(o16794sub)) :|: TRUE
+f11837_0_toPostfix_InvokeMethod(EOS(STATIC_11837), java.lang.Object(o16794sub), o16757, java.lang.Object(o16794sub)) -> f11852_0_getFirst_Load(EOS(STATIC_11852), java.lang.Object(o16794sub), o16757, java.lang.Object(o16794sub)) :|: TRUE
+f11852_0_getFirst_Load(EOS(STATIC_11852), java.lang.Object(o16794sub), o16757, java.lang.Object(o16794sub)) -> f11870_0_getFirst_FieldAccess(EOS(STATIC_11870), java.lang.Object(o16794sub), o16757, java.lang.Object(o16794sub)) :|: TRUE
+f11870_0_getFirst_FieldAccess(EOS(STATIC_11870), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, java.lang.Object(LinkedList(EOC, i1355, o16841))) -> f11893_0_getFirst_FieldAccess(EOS(STATIC_11893), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, java.lang.Object(LinkedList(EOC, i1355, o16841))) :|: TRUE
+f11893_0_getFirst_FieldAccess(EOS(STATIC_11893), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, java.lang.Object(LinkedList(EOC, i1355, o16841))) -> f11908_0_getFirst_Return(EOS(STATIC_11908), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f11908_0_getFirst_Return(EOS(STATIC_11908), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f11923_0_toPostfix_Store(EOS(STATIC_11923), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f11923_0_toPostfix_Store(EOS(STATIC_11923), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f11941_0_toPostfix_Load(EOS(STATIC_11941), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f11941_0_toPostfix_Load(EOS(STATIC_11941), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12004_0_toPostfix_TableSwitch(EOS(STATIC_12004), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355, i1355) :|: TRUE
+f12004_0_toPostfix_TableSwitch(EOS(STATIC_12004), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355, i1355) -> f12020_0_toPostfix_TableSwitch(EOS(STATIC_12020), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355, i1355) :|: TRUE
+f12004_0_toPostfix_TableSwitch(EOS(STATIC_12004), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355, i1355) -> f12021_0_toPostfix_TableSwitch(EOS(STATIC_12021), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355, i1355) :|: TRUE
+f12004_0_toPostfix_TableSwitch(EOS(STATIC_12004), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355, i1355) -> f12022_0_toPostfix_TableSwitch(EOS(STATIC_12022), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355, i1355) :|: TRUE
+f12020_0_toPostfix_TableSwitch(EOS(STATIC_12020), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355, i1355) -> f12033_0_toPostfix_New(EOS(STATIC_12033), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: i1355 < 40
+f12033_0_toPostfix_New(EOS(STATIC_12033), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12063_0_toPostfix_Duplicate(EOS(STATIC_12063), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f12063_0_toPostfix_Duplicate(EOS(STATIC_12063), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12088_0_toPostfix_Load(EOS(STATIC_12088), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f12088_0_toPostfix_Load(EOS(STATIC_12088), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12105_0_toPostfix_Load(EOS(STATIC_12105), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f12105_0_toPostfix_Load(EOS(STATIC_12105), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12123_0_toPostfix_InvokeMethod(EOS(STATIC_12123), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f12123_0_toPostfix_InvokeMethod(EOS(STATIC_12123), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12134_0__init__Load(EOS(STATIC_12134), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f12134_0__init__Load(EOS(STATIC_12134), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12179_0__init__InvokeMethod(EOS(STATIC_12179), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f12179_0__init__InvokeMethod(EOS(STATIC_12179), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12190_0__init__Load(EOS(STATIC_12190), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f12190_0__init__Load(EOS(STATIC_12190), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12216_0__init__Load(EOS(STATIC_12216), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f12216_0__init__Load(EOS(STATIC_12216), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12250_0__init__FieldAccess(EOS(STATIC_12250), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+f12250_0__init__FieldAccess(EOS(STATIC_12250), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12276_0__init__Load(EOS(STATIC_12276), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) :|: TRUE
+f12276_0__init__Load(EOS(STATIC_12276), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) -> f12310_0__init__Load(EOS(STATIC_12310), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) :|: TRUE
+f12310_0__init__Load(EOS(STATIC_12310), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) -> f12347_0__init__FieldAccess(EOS(STATIC_12347), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) :|: TRUE
+f12347_0__init__FieldAccess(EOS(STATIC_12347), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) -> f12360_0__init__Return(EOS(STATIC_12360), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) :|: TRUE
+f12360_0__init__Return(EOS(STATIC_12360), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) -> f12373_0_toPostfix_Store(EOS(STATIC_12373), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) :|: TRUE
+f12373_0_toPostfix_Store(EOS(STATIC_12373), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) -> f12387_0_toPostfix_Load(EOS(STATIC_12387), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) :|: TRUE
+f12387_0_toPostfix_Load(EOS(STATIC_12387), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757) -> f12399_0_toPostfix_InvokeMethod(EOS(STATIC_12399), o16757, java.lang.Object(LinkedList(EOC, i1355, o16841))) :|: TRUE
+f12399_0_toPostfix_InvokeMethod(EOS(STATIC_12399), o16757, java.lang.Object(LinkedList(EOC, i1355, o16841))) -> f12412_0_getTail_Load(EOS(STATIC_12412), o16757, java.lang.Object(LinkedList(EOC, i1355, o16841))) :|: TRUE
+f12412_0_getTail_Load(EOS(STATIC_12412), o16757, java.lang.Object(LinkedList(EOC, i1355, o16841))) -> f12436_0_getTail_FieldAccess(EOS(STATIC_12436), o16757, java.lang.Object(LinkedList(EOC, i1355, o16841))) :|: TRUE
+f12436_0_getTail_FieldAccess(EOS(STATIC_12436), o16757, java.lang.Object(LinkedList(EOC, i1355, o16841))) -> f12447_0_getTail_Return(EOS(STATIC_12447), o16757, o16841) :|: TRUE
+f12447_0_getTail_Return(EOS(STATIC_12447), o16757, o16841) -> f12457_0_toPostfix_Store(EOS(STATIC_12457), o16757, o16841) :|: TRUE
+f12457_0_toPostfix_Store(EOS(STATIC_12457), o16757, o16841) -> f12471_0_toPostfix_JMP(EOS(STATIC_12471), o16841, o16757) :|: TRUE
+f12471_0_toPostfix_JMP(EOS(STATIC_12471), o16841, o16757) -> f12485_0_toPostfix_Load(EOS(STATIC_12485), o16841, o16757) :|: TRUE
+f12485_0_toPostfix_Load(EOS(STATIC_12485), o16841, o16757) -> f11669_0_toPostfix_Load(EOS(STATIC_11669), o16841, o16757) :|: TRUE
+f11669_0_toPostfix_Load(EOS(STATIC_11669), o16756, o16757) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16756, o16757, o16756) :|: TRUE
+f12021_0_toPostfix_TableSwitch(EOS(STATIC_12021), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12035_0_toPostfix_TableSwitch(EOS(STATIC_12035), java.lang.Object(LinkedList(EOC, 40, o16841)), o16757, 40, 40) :|: TRUE && matching1 = 40 && matching2 = 40 && matching3 = 40
+f12021_0_toPostfix_TableSwitch(EOS(STATIC_12021), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12036_0_toPostfix_TableSwitch(EOS(STATIC_12036), java.lang.Object(LinkedList(EOC, 41, o16841)), o16757, 41, 41) :|: TRUE && matching1 = 41 && matching2 = 41 && matching3 = 41
+f12021_0_toPostfix_TableSwitch(EOS(STATIC_12021), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12037_0_toPostfix_TableSwitch(EOS(STATIC_12037), java.lang.Object(LinkedList(EOC, 42, o16841)), o16757, 42, 42) :|: TRUE && matching1 = 42 && matching2 = 42 && matching3 = 42
+f12021_0_toPostfix_TableSwitch(EOS(STATIC_12021), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12038_0_toPostfix_TableSwitch(EOS(STATIC_12038), java.lang.Object(LinkedList(EOC, 43, o16841)), o16757, 43, 43) :|: TRUE && matching1 = 43 && matching2 = 43 && matching3 = 43
+f12021_0_toPostfix_TableSwitch(EOS(STATIC_12021), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12039_0_toPostfix_TableSwitch(EOS(STATIC_12039), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44, 44) :|: TRUE && matching1 = 44 && matching2 = 44 && matching3 = 44
+f12021_0_toPostfix_TableSwitch(EOS(STATIC_12021), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12040_0_toPostfix_TableSwitch(EOS(STATIC_12040), java.lang.Object(LinkedList(EOC, 45, o16841)), o16757, 45, 45) :|: TRUE && matching1 = 45 && matching2 = 45 && matching3 = 45
+f12021_0_toPostfix_TableSwitch(EOS(STATIC_12021), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12041_0_toPostfix_TableSwitch(EOS(STATIC_12041), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46, 46) :|: TRUE && matching1 = 46 && matching2 = 46 && matching3 = 46
+f12021_0_toPostfix_TableSwitch(EOS(STATIC_12021), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12042_0_toPostfix_TableSwitch(EOS(STATIC_12042), java.lang.Object(LinkedList(EOC, 47, o16841)), o16757, 47, 47) :|: TRUE && matching1 = 47 && matching2 = 47 && matching3 = 47
+f12035_0_toPostfix_TableSwitch(EOS(STATIC_12035), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12065_0_toPostfix_JMP(EOS(STATIC_12065), java.lang.Object(LinkedList(EOC, 40, o16841)), o16757) :|: TRUE && matching1 = 40 && matching2 = 40 && matching3 = 40
+f12065_0_toPostfix_JMP(EOS(STATIC_12065), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12090_0_toPostfix_Load(EOS(STATIC_12090), java.lang.Object(LinkedList(EOC, 40, o16841)), o16757) :|: TRUE && matching1 = 40
+f12090_0_toPostfix_Load(EOS(STATIC_12090), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12106_0_toPostfix_InvokeMethod(EOS(STATIC_12106), o16757, java.lang.Object(LinkedList(EOC, 40, o16841))) :|: TRUE && matching1 = 40
+f12106_0_toPostfix_InvokeMethod(EOS(STATIC_12106), o16757, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12124_0_getTail_Load(EOS(STATIC_12124), o16757, java.lang.Object(LinkedList(EOC, 40, o16841))) :|: TRUE && matching1 = 40
+f12124_0_getTail_Load(EOS(STATIC_12124), o16757, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12151_0_getTail_FieldAccess(EOS(STATIC_12151), o16757, java.lang.Object(LinkedList(EOC, 40, o16841))) :|: TRUE && matching1 = 40
+f12151_0_getTail_FieldAccess(EOS(STATIC_12151), o16757, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12181_0_getTail_Return(EOS(STATIC_12181), o16757, o16841) :|: TRUE && matching1 = 40
+f12181_0_getTail_Return(EOS(STATIC_12181), o16757, o16841) -> f12191_0_toPostfix_Store(EOS(STATIC_12191), o16757, o16841) :|: TRUE
+f12191_0_toPostfix_Store(EOS(STATIC_12191), o16757, o16841) -> f12217_0_toPostfix_JMP(EOS(STATIC_12217), o16841, o16757) :|: TRUE
+f12217_0_toPostfix_JMP(EOS(STATIC_12217), o16841, o16757) -> f12260_0_toPostfix_Load(EOS(STATIC_12260), o16841, o16757) :|: TRUE
+f12260_0_toPostfix_Load(EOS(STATIC_12260), o16841, o16757) -> f11669_0_toPostfix_Load(EOS(STATIC_11669), o16841, o16757) :|: TRUE
+f12036_0_toPostfix_TableSwitch(EOS(STATIC_12036), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12066_0_toPostfix_New(EOS(STATIC_12066), java.lang.Object(LinkedList(EOC, 41, o16841)), o16757) :|: TRUE && matching1 = 41 && matching2 = 41 && matching3 = 41
+f12066_0_toPostfix_New(EOS(STATIC_12066), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12093_0_toPostfix_Duplicate(EOS(STATIC_12093), java.lang.Object(LinkedList(EOC, 41, o16841)), o16757) :|: TRUE && matching1 = 41
+f12093_0_toPostfix_Duplicate(EOS(STATIC_12093), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12108_0_toPostfix_Load(EOS(STATIC_12108), java.lang.Object(LinkedList(EOC, 41, o16841)), o16757) :|: TRUE && matching1 = 41
+f12108_0_toPostfix_Load(EOS(STATIC_12108), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12125_0_toPostfix_InvokeMethod(EOS(STATIC_12125), java.lang.Object(LinkedList(EOC, 41, o16841)), o16757, o16757) :|: TRUE && matching1 = 41
+f12125_0_toPostfix_InvokeMethod(EOS(STATIC_12125), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(o17011sub), java.lang.Object(o17011sub)) -> f12135_0_toPostfix_InvokeMethod(EOS(STATIC_12135), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(o17011sub), java.lang.Object(o17011sub)) :|: TRUE && matching1 = 41
+f12135_0_toPostfix_InvokeMethod(EOS(STATIC_12135), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(o17011sub), java.lang.Object(o17011sub)) -> f12152_0_getFirst_Load(EOS(STATIC_12152), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(o17011sub), java.lang.Object(o17011sub)) :|: TRUE && matching1 = 41
+f12152_0_getFirst_Load(EOS(STATIC_12152), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(o17011sub), java.lang.Object(o17011sub)) -> f12193_0_getFirst_FieldAccess(EOS(STATIC_12193), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(o17011sub), java.lang.Object(o17011sub)) :|: TRUE && matching1 = 41
+f12193_0_getFirst_FieldAccess(EOS(STATIC_12193), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12221_0_getFirst_FieldAccess(EOS(STATIC_12221), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12221_0_getFirst_FieldAccess(EOS(STATIC_12221), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12262_0_getFirst_Return(EOS(STATIC_12262), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) :|: TRUE && matching1 = 41
+f12262_0_getFirst_Return(EOS(STATIC_12262), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) -> f12278_0_toPostfix_Load(EOS(STATIC_12278), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) :|: TRUE && matching1 = 41
+f12278_0_toPostfix_Load(EOS(STATIC_12278), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) -> f12312_0_toPostfix_InvokeMethod(EOS(STATIC_12312), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) :|: TRUE && matching1 = 41
+f12312_0_toPostfix_InvokeMethod(EOS(STATIC_12312), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) -> f12348_0__init__Load(EOS(STATIC_12348), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) :|: TRUE && matching1 = 41
+f12348_0__init__Load(EOS(STATIC_12348), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) -> f12374_0__init__InvokeMethod(EOS(STATIC_12374), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) :|: TRUE && matching1 = 41
+f12374_0__init__InvokeMethod(EOS(STATIC_12374), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) -> f12388_0__init__Load(EOS(STATIC_12388), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) :|: TRUE && matching1 = 41
+f12388_0__init__Load(EOS(STATIC_12388), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) -> f12400_0__init__Load(EOS(STATIC_12400), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) :|: TRUE && matching1 = 41
+f12400_0__init__Load(EOS(STATIC_12400), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) -> f12413_0__init__FieldAccess(EOS(STATIC_12413), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) :|: TRUE && matching1 = 41
+f12413_0__init__FieldAccess(EOS(STATIC_12413), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133)), i1390) -> f12425_0__init__Load(EOS(STATIC_12425), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12425_0__init__Load(EOS(STATIC_12425), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12437_0__init__Load(EOS(STATIC_12437), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12437_0__init__Load(EOS(STATIC_12437), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12448_0__init__FieldAccess(EOS(STATIC_12448), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12448_0__init__FieldAccess(EOS(STATIC_12448), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12458_0__init__Return(EOS(STATIC_12458), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12458_0__init__Return(EOS(STATIC_12458), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12472_0_toPostfix_Store(EOS(STATIC_12472), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12472_0_toPostfix_Store(EOS(STATIC_12472), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12486_0_toPostfix_Load(EOS(STATIC_12486), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12486_0_toPostfix_Load(EOS(STATIC_12486), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12498_0_toPostfix_InvokeMethod(EOS(STATIC_12498), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12498_0_toPostfix_InvokeMethod(EOS(STATIC_12498), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12510_0_getTail_Load(EOS(STATIC_12510), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12510_0_getTail_Load(EOS(STATIC_12510), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12527_0_getTail_FieldAccess(EOS(STATIC_12527), java.lang.Object(LinkedList(EOC, 41, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) :|: TRUE && matching1 = 41
+f12527_0_getTail_FieldAccess(EOS(STATIC_12527), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, i1390, o17133))) -> f12535_0_getTail_Return(EOS(STATIC_12535), java.lang.Object(LinkedList(EOC, 41, o16841)), o17133) :|: TRUE && matching1 = 41
+f12535_0_getTail_Return(EOS(STATIC_12535), java.lang.Object(LinkedList(EOC, matching1, o16841)), o17133) -> f12542_0_toPostfix_Store(EOS(STATIC_12542), java.lang.Object(LinkedList(EOC, 41, o16841)), o17133) :|: TRUE && matching1 = 41
+f12542_0_toPostfix_Store(EOS(STATIC_12542), java.lang.Object(LinkedList(EOC, matching1, o16841)), o17133) -> f12547_0_toPostfix_JMP(EOS(STATIC_12547), java.lang.Object(LinkedList(EOC, 41, o16841)), o17133) :|: TRUE && matching1 = 41
+f12547_0_toPostfix_JMP(EOS(STATIC_12547), java.lang.Object(LinkedList(EOC, matching1, o16841)), o17133) -> f12553_0_toPostfix_Load(EOS(STATIC_12553), java.lang.Object(LinkedList(EOC, 41, o16841)), o17133) :|: TRUE && matching1 = 41
+f12553_0_toPostfix_Load(EOS(STATIC_12553), java.lang.Object(LinkedList(EOC, matching1, o16841)), o17133) -> f12558_0_toPostfix_InvokeMethod(EOS(STATIC_12558), o17133, java.lang.Object(LinkedList(EOC, 41, o16841))) :|: TRUE && matching1 = 41
+f12558_0_toPostfix_InvokeMethod(EOS(STATIC_12558), o17133, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12564_0_getTail_Load(EOS(STATIC_12564), o17133, java.lang.Object(LinkedList(EOC, 41, o16841))) :|: TRUE && matching1 = 41
+f12564_0_getTail_Load(EOS(STATIC_12564), o17133, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12575_0_getTail_FieldAccess(EOS(STATIC_12575), o17133, java.lang.Object(LinkedList(EOC, 41, o16841))) :|: TRUE && matching1 = 41
+f12575_0_getTail_FieldAccess(EOS(STATIC_12575), o17133, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12579_0_getTail_Return(EOS(STATIC_12579), o17133, o16841) :|: TRUE && matching1 = 41
+f12579_0_getTail_Return(EOS(STATIC_12579), o17133, o16841) -> f12447_0_getTail_Return(EOS(STATIC_12447), o17133, o16841) :|: TRUE
+f12037_0_toPostfix_TableSwitch(EOS(STATIC_12037), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12068_0_toPostfix_New(EOS(STATIC_12068), java.lang.Object(LinkedList(EOC, 42, o16841)), o16757, 42) :|: TRUE && matching1 = 42 && matching2 = 42 && matching3 = 42
+f12068_0_toPostfix_New(EOS(STATIC_12068), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12095_0_toPostfix_Duplicate(EOS(STATIC_12095), java.lang.Object(LinkedList(EOC, 42, o16841)), o16757, 42, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 42 && matching2 = 42
+f12095_0_toPostfix_Duplicate(EOS(STATIC_12095), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, java.lang.Object(LinkedList(EOC, matching3, NULL))) -> f12109_0_toPostfix_Load(EOS(STATIC_12109), java.lang.Object(LinkedList(EOC, 42, o16841)), o16757, 42, java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 42 && matching2 = 42 && matching3 = 0
+f12109_0_toPostfix_Load(EOS(STATIC_12109), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, java.lang.Object(LinkedList(EOC, matching3, NULL)), java.lang.Object(LinkedList(EOC, matching4, NULL))) -> f12126_0_toPostfix_Load(EOS(STATIC_12126), java.lang.Object(LinkedList(EOC, 42, o16841)), o16757, java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 42) :|: TRUE && matching1 = 42 && matching2 = 42 && matching3 = 0 && matching4 = 0
+f12126_0_toPostfix_Load(EOS(STATIC_12126), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4) -> f12138_0_toPostfix_InvokeMethod(EOS(STATIC_12138), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 42, o16757) :|: TRUE && matching1 = 42 && matching2 = 0 && matching3 = 0 && matching4 = 42
+f12138_0_toPostfix_InvokeMethod(EOS(STATIC_12138), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12154_0__init__Load(EOS(STATIC_12154), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 42, o16757) :|: TRUE && matching1 = 42 && matching2 = 0 && matching3 = 0 && matching4 = 42
+f12154_0__init__Load(EOS(STATIC_12154), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12197_0__init__InvokeMethod(EOS(STATIC_12197), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 42, o16757, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 42 && matching2 = 0 && matching3 = 0 && matching4 = 42
+f12197_0__init__InvokeMethod(EOS(STATIC_12197), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757, java.lang.Object(LinkedList(EOC, matching5, NULL))) -> f12224_0__init__Load(EOS(STATIC_12224), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 42, o16757) :|: TRUE && matching1 = 42 && matching2 = 0 && matching3 = 0 && matching4 = 42 && matching5 = 0
+f12224_0__init__Load(EOS(STATIC_12224), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12264_0__init__Load(EOS(STATIC_12264), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 42, o16757, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 42 && matching2 = 0 && matching3 = 0 && matching4 = 42
+f12264_0__init__Load(EOS(STATIC_12264), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757, java.lang.Object(LinkedList(EOC, matching5, NULL))) -> f12282_0__init__FieldAccess(EOS(STATIC_12282), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), o16757, java.lang.Object(LinkedList(EOC, 0, NULL)), 42) :|: TRUE && matching1 = 42 && matching2 = 0 && matching3 = 0 && matching4 = 42 && matching5 = 0
+f12282_0__init__FieldAccess(EOS(STATIC_12282), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757, java.lang.Object(LinkedList(EOC, matching4, NULL)), matching5) -> f12317_0__init__Load(EOS(STATIC_12317), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 42, NULL)), java.lang.Object(LinkedList(EOC, 42, NULL)), o16757) :|: TRUE && matching1 = 42 && matching2 = 0 && matching3 = 0 && matching4 = 0 && matching5 = 42
+f12317_0__init__Load(EOS(STATIC_12317), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757) -> f12349_0__init__Load(EOS(STATIC_12349), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 42, NULL)), o16757, java.lang.Object(LinkedList(EOC, 42, NULL))) :|: TRUE && matching1 = 42 && matching2 = 42 && matching3 = 42
+f12349_0__init__Load(EOS(STATIC_12349), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), o16757, java.lang.Object(LinkedList(EOC, matching3, NULL))) -> f12362_0__init__FieldAccess(EOS(STATIC_12362), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 42, NULL)), java.lang.Object(LinkedList(EOC, 42, NULL)), o16757) :|: TRUE && matching1 = 42 && matching2 = 42 && matching3 = 42
+f12362_0__init__FieldAccess(EOS(STATIC_12362), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757) -> f12376_0__init__Return(EOS(STATIC_12376), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 42, o16757))) :|: TRUE && matching1 = 42 && matching2 = 42 && matching3 = 42
+f12376_0__init__Return(EOS(STATIC_12376), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12389_0_toPostfix_Store(EOS(STATIC_12389), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 42, o16757))) :|: TRUE && matching1 = 42 && matching2 = 42
+f12389_0_toPostfix_Store(EOS(STATIC_12389), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12402_0_toPostfix_JMP(EOS(STATIC_12402), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 42, o16757))) :|: TRUE && matching1 = 42 && matching2 = 42
+f12402_0_toPostfix_JMP(EOS(STATIC_12402), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12415_0_toPostfix_Load(EOS(STATIC_12415), java.lang.Object(LinkedList(EOC, 42, o16841)), java.lang.Object(LinkedList(EOC, 42, o16757))) :|: TRUE && matching1 = 42 && matching2 = 42
+f12415_0_toPostfix_Load(EOS(STATIC_12415), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12427_0_toPostfix_InvokeMethod(EOS(STATIC_12427), java.lang.Object(LinkedList(EOC, 42, o16757)), java.lang.Object(LinkedList(EOC, 42, o16841))) :|: TRUE && matching1 = 42 && matching2 = 42
+f12427_0_toPostfix_InvokeMethod(EOS(STATIC_12427), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12439_0_getTail_Load(EOS(STATIC_12439), java.lang.Object(LinkedList(EOC, 42, o16757)), java.lang.Object(LinkedList(EOC, 42, o16841))) :|: TRUE && matching1 = 42 && matching2 = 42
+f12439_0_getTail_Load(EOS(STATIC_12439), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12460_0_getTail_FieldAccess(EOS(STATIC_12460), java.lang.Object(LinkedList(EOC, 42, o16757)), java.lang.Object(LinkedList(EOC, 42, o16841))) :|: TRUE && matching1 = 42 && matching2 = 42
+f12460_0_getTail_FieldAccess(EOS(STATIC_12460), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12474_0_getTail_Return(EOS(STATIC_12474), java.lang.Object(LinkedList(EOC, 42, o16757)), o16841) :|: TRUE && matching1 = 42 && matching2 = 42
+f12474_0_getTail_Return(EOS(STATIC_12474), java.lang.Object(LinkedList(EOC, matching1, o16757)), o16841) -> f12488_0_toPostfix_Store(EOS(STATIC_12488), java.lang.Object(LinkedList(EOC, 42, o16757)), o16841) :|: TRUE && matching1 = 42
+f12488_0_toPostfix_Store(EOS(STATIC_12488), java.lang.Object(LinkedList(EOC, matching1, o16757)), o16841) -> f12500_0_toPostfix_JMP(EOS(STATIC_12500), o16841, java.lang.Object(LinkedList(EOC, 42, o16757))) :|: TRUE && matching1 = 42
+f12500_0_toPostfix_JMP(EOS(STATIC_12500), o16841, java.lang.Object(LinkedList(EOC, matching1, o16757))) -> f12512_0_toPostfix_Load(EOS(STATIC_12512), o16841, java.lang.Object(LinkedList(EOC, 42, o16757))) :|: TRUE && matching1 = 42
+f12512_0_toPostfix_Load(EOS(STATIC_12512), o16841, java.lang.Object(LinkedList(EOC, matching1, o16757))) -> f11669_0_toPostfix_Load(EOS(STATIC_11669), o16841, java.lang.Object(LinkedList(EOC, 42, o16757))) :|: TRUE && matching1 = 42
+f12038_0_toPostfix_TableSwitch(EOS(STATIC_12038), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12070_0_toPostfix_New(EOS(STATIC_12070), java.lang.Object(LinkedList(EOC, 43, o16841)), o16757, 43) :|: TRUE && matching1 = 43 && matching2 = 43 && matching3 = 43
+f12070_0_toPostfix_New(EOS(STATIC_12070), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12096_0_toPostfix_Duplicate(EOS(STATIC_12096), java.lang.Object(LinkedList(EOC, 43, o16841)), o16757, 43, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 43 && matching2 = 43
+f12096_0_toPostfix_Duplicate(EOS(STATIC_12096), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, java.lang.Object(LinkedList(EOC, matching3, NULL))) -> f12111_0_toPostfix_Load(EOS(STATIC_12111), java.lang.Object(LinkedList(EOC, 43, o16841)), o16757, 43, java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 43 && matching2 = 43 && matching3 = 0
+f12111_0_toPostfix_Load(EOS(STATIC_12111), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, java.lang.Object(LinkedList(EOC, matching3, NULL)), java.lang.Object(LinkedList(EOC, matching4, NULL))) -> f12127_0_toPostfix_Load(EOS(STATIC_12127), java.lang.Object(LinkedList(EOC, 43, o16841)), o16757, java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 43) :|: TRUE && matching1 = 43 && matching2 = 43 && matching3 = 0 && matching4 = 0
+f12127_0_toPostfix_Load(EOS(STATIC_12127), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4) -> f12139_0_toPostfix_InvokeMethod(EOS(STATIC_12139), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 43, o16757) :|: TRUE && matching1 = 43 && matching2 = 0 && matching3 = 0 && matching4 = 43
+f12139_0_toPostfix_InvokeMethod(EOS(STATIC_12139), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12155_0__init__Load(EOS(STATIC_12155), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 43, o16757) :|: TRUE && matching1 = 43 && matching2 = 0 && matching3 = 0 && matching4 = 43
+f12155_0__init__Load(EOS(STATIC_12155), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12200_0__init__InvokeMethod(EOS(STATIC_12200), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 43, o16757, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 43 && matching2 = 0 && matching3 = 0 && matching4 = 43
+f12200_0__init__InvokeMethod(EOS(STATIC_12200), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757, java.lang.Object(LinkedList(EOC, matching5, NULL))) -> f12225_0__init__Load(EOS(STATIC_12225), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 43, o16757) :|: TRUE && matching1 = 43 && matching2 = 0 && matching3 = 0 && matching4 = 43 && matching5 = 0
+f12225_0__init__Load(EOS(STATIC_12225), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12265_0__init__Load(EOS(STATIC_12265), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 43, o16757, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 43 && matching2 = 0 && matching3 = 0 && matching4 = 43
+f12265_0__init__Load(EOS(STATIC_12265), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757, java.lang.Object(LinkedList(EOC, matching5, NULL))) -> f12284_0__init__FieldAccess(EOS(STATIC_12284), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), o16757, java.lang.Object(LinkedList(EOC, 0, NULL)), 43) :|: TRUE && matching1 = 43 && matching2 = 0 && matching3 = 0 && matching4 = 43 && matching5 = 0
+f12284_0__init__FieldAccess(EOS(STATIC_12284), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757, java.lang.Object(LinkedList(EOC, matching4, NULL)), matching5) -> f12320_0__init__Load(EOS(STATIC_12320), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 43, NULL)), java.lang.Object(LinkedList(EOC, 43, NULL)), o16757) :|: TRUE && matching1 = 43 && matching2 = 0 && matching3 = 0 && matching4 = 0 && matching5 = 43
+f12320_0__init__Load(EOS(STATIC_12320), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757) -> f12350_0__init__Load(EOS(STATIC_12350), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 43, NULL)), o16757, java.lang.Object(LinkedList(EOC, 43, NULL))) :|: TRUE && matching1 = 43 && matching2 = 43 && matching3 = 43
+f12350_0__init__Load(EOS(STATIC_12350), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), o16757, java.lang.Object(LinkedList(EOC, matching3, NULL))) -> f12363_0__init__FieldAccess(EOS(STATIC_12363), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 43, NULL)), java.lang.Object(LinkedList(EOC, 43, NULL)), o16757) :|: TRUE && matching1 = 43 && matching2 = 43 && matching3 = 43
+f12363_0__init__FieldAccess(EOS(STATIC_12363), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757) -> f12377_0__init__Return(EOS(STATIC_12377), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 43, o16757))) :|: TRUE && matching1 = 43 && matching2 = 43 && matching3 = 43
+f12377_0__init__Return(EOS(STATIC_12377), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12390_0_toPostfix_Store(EOS(STATIC_12390), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 43, o16757))) :|: TRUE && matching1 = 43 && matching2 = 43
+f12390_0_toPostfix_Store(EOS(STATIC_12390), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12403_0_toPostfix_JMP(EOS(STATIC_12403), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 43, o16757))) :|: TRUE && matching1 = 43 && matching2 = 43
+f12403_0_toPostfix_JMP(EOS(STATIC_12403), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12416_0_toPostfix_Load(EOS(STATIC_12416), java.lang.Object(LinkedList(EOC, 43, o16841)), java.lang.Object(LinkedList(EOC, 43, o16757))) :|: TRUE && matching1 = 43 && matching2 = 43
+f12416_0_toPostfix_Load(EOS(STATIC_12416), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12428_0_toPostfix_InvokeMethod(EOS(STATIC_12428), java.lang.Object(LinkedList(EOC, 43, o16757)), java.lang.Object(LinkedList(EOC, 43, o16841))) :|: TRUE && matching1 = 43 && matching2 = 43
+f12428_0_toPostfix_InvokeMethod(EOS(STATIC_12428), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12440_0_getTail_Load(EOS(STATIC_12440), java.lang.Object(LinkedList(EOC, 43, o16757)), java.lang.Object(LinkedList(EOC, 43, o16841))) :|: TRUE && matching1 = 43 && matching2 = 43
+f12440_0_getTail_Load(EOS(STATIC_12440), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12461_0_getTail_FieldAccess(EOS(STATIC_12461), java.lang.Object(LinkedList(EOC, 43, o16757)), java.lang.Object(LinkedList(EOC, 43, o16841))) :|: TRUE && matching1 = 43 && matching2 = 43
+f12461_0_getTail_FieldAccess(EOS(STATIC_12461), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12475_0_getTail_Return(EOS(STATIC_12475), java.lang.Object(LinkedList(EOC, 43, o16757)), o16841) :|: TRUE && matching1 = 43 && matching2 = 43
+f12475_0_getTail_Return(EOS(STATIC_12475), java.lang.Object(LinkedList(EOC, matching1, o16757)), o16841) -> f12489_0_toPostfix_Store(EOS(STATIC_12489), java.lang.Object(LinkedList(EOC, 43, o16757)), o16841) :|: TRUE && matching1 = 43
+f12489_0_toPostfix_Store(EOS(STATIC_12489), java.lang.Object(LinkedList(EOC, matching1, o16757)), o16841) -> f12501_0_toPostfix_JMP(EOS(STATIC_12501), o16841, java.lang.Object(LinkedList(EOC, 43, o16757))) :|: TRUE && matching1 = 43
+f12501_0_toPostfix_JMP(EOS(STATIC_12501), o16841, java.lang.Object(LinkedList(EOC, matching1, o16757))) -> f12513_0_toPostfix_Load(EOS(STATIC_12513), o16841, java.lang.Object(LinkedList(EOC, 43, o16757))) :|: TRUE && matching1 = 43
+f12513_0_toPostfix_Load(EOS(STATIC_12513), o16841, java.lang.Object(LinkedList(EOC, matching1, o16757))) -> f11669_0_toPostfix_Load(EOS(STATIC_11669), o16841, java.lang.Object(LinkedList(EOC, 43, o16757))) :|: TRUE && matching1 = 43
+f12039_0_toPostfix_TableSwitch(EOS(STATIC_12039), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12072_0_toPostfix_New(EOS(STATIC_12072), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44 && matching3 = 44
+f12072_0_toPostfix_New(EOS(STATIC_12072), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12097_0_toPostfix_Duplicate(EOS(STATIC_12097), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44
+f12097_0_toPostfix_Duplicate(EOS(STATIC_12097), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12113_0_toPostfix_Load(EOS(STATIC_12113), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44
+f12113_0_toPostfix_Load(EOS(STATIC_12113), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12128_0_toPostfix_Load(EOS(STATIC_12128), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44
+f12128_0_toPostfix_Load(EOS(STATIC_12128), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12141_0_toPostfix_InvokeMethod(EOS(STATIC_12141), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44
+f12141_0_toPostfix_InvokeMethod(EOS(STATIC_12141), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12157_0__init__Load(EOS(STATIC_12157), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44
+f12157_0__init__Load(EOS(STATIC_12157), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12203_0__init__InvokeMethod(EOS(STATIC_12203), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44
+f12203_0__init__InvokeMethod(EOS(STATIC_12203), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12226_0__init__Load(EOS(STATIC_12226), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44
+f12226_0__init__Load(EOS(STATIC_12226), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12266_0__init__Load(EOS(STATIC_12266), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44
+f12266_0__init__Load(EOS(STATIC_12266), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12288_0__init__FieldAccess(EOS(STATIC_12288), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757, 44) :|: TRUE && matching1 = 44 && matching2 = 44
+f12288_0__init__FieldAccess(EOS(STATIC_12288), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12323_0__init__Load(EOS(STATIC_12323), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757) :|: TRUE && matching1 = 44 && matching2 = 44
+f12323_0__init__Load(EOS(STATIC_12323), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12351_0__init__Load(EOS(STATIC_12351), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757) :|: TRUE && matching1 = 44
+f12351_0__init__Load(EOS(STATIC_12351), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12364_0__init__FieldAccess(EOS(STATIC_12364), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757) :|: TRUE && matching1 = 44
+f12364_0__init__FieldAccess(EOS(STATIC_12364), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12378_0__init__Return(EOS(STATIC_12378), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757) :|: TRUE && matching1 = 44
+f12378_0__init__Return(EOS(STATIC_12378), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12391_0_toPostfix_Store(EOS(STATIC_12391), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757) :|: TRUE && matching1 = 44
+f12391_0_toPostfix_Store(EOS(STATIC_12391), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12404_0_toPostfix_Load(EOS(STATIC_12404), java.lang.Object(LinkedList(EOC, 44, o16841)), o16757) :|: TRUE && matching1 = 44
+f12404_0_toPostfix_Load(EOS(STATIC_12404), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12417_0_toPostfix_InvokeMethod(EOS(STATIC_12417), o16757, java.lang.Object(LinkedList(EOC, 44, o16841))) :|: TRUE && matching1 = 44
+f12417_0_toPostfix_InvokeMethod(EOS(STATIC_12417), o16757, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12429_0_getTail_Load(EOS(STATIC_12429), o16757, java.lang.Object(LinkedList(EOC, 44, o16841))) :|: TRUE && matching1 = 44
+f12429_0_getTail_Load(EOS(STATIC_12429), o16757, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12450_0_getTail_FieldAccess(EOS(STATIC_12450), o16757, java.lang.Object(LinkedList(EOC, 44, o16841))) :|: TRUE && matching1 = 44
+f12450_0_getTail_FieldAccess(EOS(STATIC_12450), o16757, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12462_0_getTail_Return(EOS(STATIC_12462), o16757, o16841) :|: TRUE && matching1 = 44
+f12462_0_getTail_Return(EOS(STATIC_12462), o16757, o16841) -> f12579_0_getTail_Return(EOS(STATIC_12579), o16757, o16841) :|: TRUE
+f12040_0_toPostfix_TableSwitch(EOS(STATIC_12040), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12075_0_toPostfix_New(EOS(STATIC_12075), java.lang.Object(LinkedList(EOC, 45, o16841)), o16757, 45) :|: TRUE && matching1 = 45 && matching2 = 45 && matching3 = 45
+f12075_0_toPostfix_New(EOS(STATIC_12075), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12098_0_toPostfix_Duplicate(EOS(STATIC_12098), java.lang.Object(LinkedList(EOC, 45, o16841)), o16757, 45, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 45 && matching2 = 45
+f12098_0_toPostfix_Duplicate(EOS(STATIC_12098), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, java.lang.Object(LinkedList(EOC, matching3, NULL))) -> f12115_0_toPostfix_Load(EOS(STATIC_12115), java.lang.Object(LinkedList(EOC, 45, o16841)), o16757, 45, java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 45 && matching2 = 45 && matching3 = 0
+f12115_0_toPostfix_Load(EOS(STATIC_12115), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, java.lang.Object(LinkedList(EOC, matching3, NULL)), java.lang.Object(LinkedList(EOC, matching4, NULL))) -> f12129_0_toPostfix_Load(EOS(STATIC_12129), java.lang.Object(LinkedList(EOC, 45, o16841)), o16757, java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 45) :|: TRUE && matching1 = 45 && matching2 = 45 && matching3 = 0 && matching4 = 0
+f12129_0_toPostfix_Load(EOS(STATIC_12129), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4) -> f12142_0_toPostfix_InvokeMethod(EOS(STATIC_12142), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 45, o16757) :|: TRUE && matching1 = 45 && matching2 = 0 && matching3 = 0 && matching4 = 45
+f12142_0_toPostfix_InvokeMethod(EOS(STATIC_12142), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12158_0__init__Load(EOS(STATIC_12158), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 45, o16757) :|: TRUE && matching1 = 45 && matching2 = 0 && matching3 = 0 && matching4 = 45
+f12158_0__init__Load(EOS(STATIC_12158), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12205_0__init__InvokeMethod(EOS(STATIC_12205), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 45, o16757, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 45 && matching2 = 0 && matching3 = 0 && matching4 = 45
+f12205_0__init__InvokeMethod(EOS(STATIC_12205), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757, java.lang.Object(LinkedList(EOC, matching5, NULL))) -> f12227_0__init__Load(EOS(STATIC_12227), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 45, o16757) :|: TRUE && matching1 = 45 && matching2 = 0 && matching3 = 0 && matching4 = 45 && matching5 = 0
+f12227_0__init__Load(EOS(STATIC_12227), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12267_0__init__Load(EOS(STATIC_12267), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 45, o16757, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 45 && matching2 = 0 && matching3 = 0 && matching4 = 45
+f12267_0__init__Load(EOS(STATIC_12267), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757, java.lang.Object(LinkedList(EOC, matching5, NULL))) -> f12291_0__init__FieldAccess(EOS(STATIC_12291), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), o16757, java.lang.Object(LinkedList(EOC, 0, NULL)), 45) :|: TRUE && matching1 = 45 && matching2 = 0 && matching3 = 0 && matching4 = 45 && matching5 = 0
+f12291_0__init__FieldAccess(EOS(STATIC_12291), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757, java.lang.Object(LinkedList(EOC, matching4, NULL)), matching5) -> f12326_0__init__Load(EOS(STATIC_12326), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 45, NULL)), java.lang.Object(LinkedList(EOC, 45, NULL)), o16757) :|: TRUE && matching1 = 45 && matching2 = 0 && matching3 = 0 && matching4 = 0 && matching5 = 45
+f12326_0__init__Load(EOS(STATIC_12326), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757) -> f12352_0__init__Load(EOS(STATIC_12352), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 45, NULL)), o16757, java.lang.Object(LinkedList(EOC, 45, NULL))) :|: TRUE && matching1 = 45 && matching2 = 45 && matching3 = 45
+f12352_0__init__Load(EOS(STATIC_12352), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), o16757, java.lang.Object(LinkedList(EOC, matching3, NULL))) -> f12365_0__init__FieldAccess(EOS(STATIC_12365), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 45, NULL)), java.lang.Object(LinkedList(EOC, 45, NULL)), o16757) :|: TRUE && matching1 = 45 && matching2 = 45 && matching3 = 45
+f12365_0__init__FieldAccess(EOS(STATIC_12365), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757) -> f12379_0__init__Return(EOS(STATIC_12379), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 45, o16757))) :|: TRUE && matching1 = 45 && matching2 = 45 && matching3 = 45
+f12379_0__init__Return(EOS(STATIC_12379), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12392_0_toPostfix_Store(EOS(STATIC_12392), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 45, o16757))) :|: TRUE && matching1 = 45 && matching2 = 45
+f12392_0_toPostfix_Store(EOS(STATIC_12392), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12405_0_toPostfix_JMP(EOS(STATIC_12405), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 45, o16757))) :|: TRUE && matching1 = 45 && matching2 = 45
+f12405_0_toPostfix_JMP(EOS(STATIC_12405), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12418_0_toPostfix_Load(EOS(STATIC_12418), java.lang.Object(LinkedList(EOC, 45, o16841)), java.lang.Object(LinkedList(EOC, 45, o16757))) :|: TRUE && matching1 = 45 && matching2 = 45
+f12418_0_toPostfix_Load(EOS(STATIC_12418), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12430_0_toPostfix_InvokeMethod(EOS(STATIC_12430), java.lang.Object(LinkedList(EOC, 45, o16757)), java.lang.Object(LinkedList(EOC, 45, o16841))) :|: TRUE && matching1 = 45 && matching2 = 45
+f12430_0_toPostfix_InvokeMethod(EOS(STATIC_12430), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12441_0_getTail_Load(EOS(STATIC_12441), java.lang.Object(LinkedList(EOC, 45, o16757)), java.lang.Object(LinkedList(EOC, 45, o16841))) :|: TRUE && matching1 = 45 && matching2 = 45
+f12441_0_getTail_Load(EOS(STATIC_12441), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12463_0_getTail_FieldAccess(EOS(STATIC_12463), java.lang.Object(LinkedList(EOC, 45, o16757)), java.lang.Object(LinkedList(EOC, 45, o16841))) :|: TRUE && matching1 = 45 && matching2 = 45
+f12463_0_getTail_FieldAccess(EOS(STATIC_12463), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12477_0_getTail_Return(EOS(STATIC_12477), java.lang.Object(LinkedList(EOC, 45, o16757)), o16841) :|: TRUE && matching1 = 45 && matching2 = 45
+f12477_0_getTail_Return(EOS(STATIC_12477), java.lang.Object(LinkedList(EOC, matching1, o16757)), o16841) -> f12491_0_toPostfix_Store(EOS(STATIC_12491), java.lang.Object(LinkedList(EOC, 45, o16757)), o16841) :|: TRUE && matching1 = 45
+f12491_0_toPostfix_Store(EOS(STATIC_12491), java.lang.Object(LinkedList(EOC, matching1, o16757)), o16841) -> f12503_0_toPostfix_JMP(EOS(STATIC_12503), o16841, java.lang.Object(LinkedList(EOC, 45, o16757))) :|: TRUE && matching1 = 45
+f12503_0_toPostfix_JMP(EOS(STATIC_12503), o16841, java.lang.Object(LinkedList(EOC, matching1, o16757))) -> f12514_0_toPostfix_Load(EOS(STATIC_12514), o16841, java.lang.Object(LinkedList(EOC, 45, o16757))) :|: TRUE && matching1 = 45
+f12514_0_toPostfix_Load(EOS(STATIC_12514), o16841, java.lang.Object(LinkedList(EOC, matching1, o16757))) -> f11669_0_toPostfix_Load(EOS(STATIC_11669), o16841, java.lang.Object(LinkedList(EOC, 45, o16757))) :|: TRUE && matching1 = 45
+f12041_0_toPostfix_TableSwitch(EOS(STATIC_12041), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12078_0_toPostfix_New(EOS(STATIC_12078), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46 && matching3 = 46
+f12078_0_toPostfix_New(EOS(STATIC_12078), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12099_0_toPostfix_Duplicate(EOS(STATIC_12099), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46
+f12099_0_toPostfix_Duplicate(EOS(STATIC_12099), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12117_0_toPostfix_Load(EOS(STATIC_12117), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46
+f12117_0_toPostfix_Load(EOS(STATIC_12117), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12130_0_toPostfix_Load(EOS(STATIC_12130), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46
+f12130_0_toPostfix_Load(EOS(STATIC_12130), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12144_0_toPostfix_InvokeMethod(EOS(STATIC_12144), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46
+f12144_0_toPostfix_InvokeMethod(EOS(STATIC_12144), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12159_0__init__Load(EOS(STATIC_12159), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46
+f12159_0__init__Load(EOS(STATIC_12159), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12209_0__init__InvokeMethod(EOS(STATIC_12209), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46
+f12209_0__init__InvokeMethod(EOS(STATIC_12209), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12229_0__init__Load(EOS(STATIC_12229), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46
+f12229_0__init__Load(EOS(STATIC_12229), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12268_0__init__Load(EOS(STATIC_12268), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46
+f12268_0__init__Load(EOS(STATIC_12268), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12294_0__init__FieldAccess(EOS(STATIC_12294), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757, 46) :|: TRUE && matching1 = 46 && matching2 = 46
+f12294_0__init__FieldAccess(EOS(STATIC_12294), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12330_0__init__Load(EOS(STATIC_12330), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757) :|: TRUE && matching1 = 46 && matching2 = 46
+f12330_0__init__Load(EOS(STATIC_12330), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12353_0__init__Load(EOS(STATIC_12353), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757) :|: TRUE && matching1 = 46
+f12353_0__init__Load(EOS(STATIC_12353), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12366_0__init__FieldAccess(EOS(STATIC_12366), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757) :|: TRUE && matching1 = 46
+f12366_0__init__FieldAccess(EOS(STATIC_12366), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12380_0__init__Return(EOS(STATIC_12380), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757) :|: TRUE && matching1 = 46
+f12380_0__init__Return(EOS(STATIC_12380), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12393_0_toPostfix_Store(EOS(STATIC_12393), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757) :|: TRUE && matching1 = 46
+f12393_0_toPostfix_Store(EOS(STATIC_12393), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12406_0_toPostfix_Load(EOS(STATIC_12406), java.lang.Object(LinkedList(EOC, 46, o16841)), o16757) :|: TRUE && matching1 = 46
+f12406_0_toPostfix_Load(EOS(STATIC_12406), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757) -> f12419_0_toPostfix_InvokeMethod(EOS(STATIC_12419), o16757, java.lang.Object(LinkedList(EOC, 46, o16841))) :|: TRUE && matching1 = 46
+f12419_0_toPostfix_InvokeMethod(EOS(STATIC_12419), o16757, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12431_0_getTail_Load(EOS(STATIC_12431), o16757, java.lang.Object(LinkedList(EOC, 46, o16841))) :|: TRUE && matching1 = 46
+f12431_0_getTail_Load(EOS(STATIC_12431), o16757, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12451_0_getTail_FieldAccess(EOS(STATIC_12451), o16757, java.lang.Object(LinkedList(EOC, 46, o16841))) :|: TRUE && matching1 = 46
+f12451_0_getTail_FieldAccess(EOS(STATIC_12451), o16757, java.lang.Object(LinkedList(EOC, matching1, o16841))) -> f12464_0_getTail_Return(EOS(STATIC_12464), o16757, o16841) :|: TRUE && matching1 = 46
+f12464_0_getTail_Return(EOS(STATIC_12464), o16757, o16841) -> f12579_0_getTail_Return(EOS(STATIC_12579), o16757, o16841) :|: TRUE
+f12042_0_toPostfix_TableSwitch(EOS(STATIC_12042), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, matching3) -> f12080_0_toPostfix_New(EOS(STATIC_12080), java.lang.Object(LinkedList(EOC, 47, o16841)), o16757, 47) :|: TRUE && matching1 = 47 && matching2 = 47 && matching3 = 47
+f12080_0_toPostfix_New(EOS(STATIC_12080), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2) -> f12100_0_toPostfix_Duplicate(EOS(STATIC_12100), java.lang.Object(LinkedList(EOC, 47, o16841)), o16757, 47, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 47 && matching2 = 47
+f12100_0_toPostfix_Duplicate(EOS(STATIC_12100), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, java.lang.Object(LinkedList(EOC, matching3, NULL))) -> f12118_0_toPostfix_Load(EOS(STATIC_12118), java.lang.Object(LinkedList(EOC, 47, o16841)), o16757, 47, java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 47 && matching2 = 47 && matching3 = 0
+f12118_0_toPostfix_Load(EOS(STATIC_12118), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, matching2, java.lang.Object(LinkedList(EOC, matching3, NULL)), java.lang.Object(LinkedList(EOC, matching4, NULL))) -> f12131_0_toPostfix_Load(EOS(STATIC_12131), java.lang.Object(LinkedList(EOC, 47, o16841)), o16757, java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 47) :|: TRUE && matching1 = 47 && matching2 = 47 && matching3 = 0 && matching4 = 0
+f12131_0_toPostfix_Load(EOS(STATIC_12131), java.lang.Object(LinkedList(EOC, matching1, o16841)), o16757, java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4) -> f12146_0_toPostfix_InvokeMethod(EOS(STATIC_12146), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 47, o16757) :|: TRUE && matching1 = 47 && matching2 = 0 && matching3 = 0 && matching4 = 47
+f12146_0_toPostfix_InvokeMethod(EOS(STATIC_12146), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12161_0__init__Load(EOS(STATIC_12161), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 47, o16757) :|: TRUE && matching1 = 47 && matching2 = 0 && matching3 = 0 && matching4 = 47
+f12161_0__init__Load(EOS(STATIC_12161), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12211_0__init__InvokeMethod(EOS(STATIC_12211), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 47, o16757, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 47 && matching2 = 0 && matching3 = 0 && matching4 = 47
+f12211_0__init__InvokeMethod(EOS(STATIC_12211), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757, java.lang.Object(LinkedList(EOC, matching5, NULL))) -> f12233_0__init__Load(EOS(STATIC_12233), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 47, o16757) :|: TRUE && matching1 = 47 && matching2 = 0 && matching3 = 0 && matching4 = 47 && matching5 = 0
+f12233_0__init__Load(EOS(STATIC_12233), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757) -> f12269_0__init__Load(EOS(STATIC_12269), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), 47, o16757, java.lang.Object(LinkedList(EOC, 0, NULL))) :|: TRUE && matching1 = 47 && matching2 = 0 && matching3 = 0 && matching4 = 47
+f12269_0__init__Load(EOS(STATIC_12269), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), matching4, o16757, java.lang.Object(LinkedList(EOC, matching5, NULL))) -> f12297_0__init__FieldAccess(EOS(STATIC_12297), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 0, NULL)), java.lang.Object(LinkedList(EOC, 0, NULL)), o16757, java.lang.Object(LinkedList(EOC, 0, NULL)), 47) :|: TRUE && matching1 = 47 && matching2 = 0 && matching3 = 0 && matching4 = 47 && matching5 = 0
+f12297_0__init__FieldAccess(EOS(STATIC_12297), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757, java.lang.Object(LinkedList(EOC, matching4, NULL)), matching5) -> f12331_0__init__Load(EOS(STATIC_12331), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 47, NULL)), java.lang.Object(LinkedList(EOC, 47, NULL)), o16757) :|: TRUE && matching1 = 47 && matching2 = 0 && matching3 = 0 && matching4 = 0 && matching5 = 47
+f12331_0__init__Load(EOS(STATIC_12331), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757) -> f12354_0__init__Load(EOS(STATIC_12354), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 47, NULL)), o16757, java.lang.Object(LinkedList(EOC, 47, NULL))) :|: TRUE && matching1 = 47 && matching2 = 47 && matching3 = 47
+f12354_0__init__Load(EOS(STATIC_12354), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), o16757, java.lang.Object(LinkedList(EOC, matching3, NULL))) -> f12367_0__init__FieldAccess(EOS(STATIC_12367), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 47, NULL)), java.lang.Object(LinkedList(EOC, 47, NULL)), o16757) :|: TRUE && matching1 = 47 && matching2 = 47 && matching3 = 47
+f12367_0__init__FieldAccess(EOS(STATIC_12367), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, NULL)), java.lang.Object(LinkedList(EOC, matching3, NULL)), o16757) -> f12381_0__init__Return(EOS(STATIC_12381), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 47, o16757))) :|: TRUE && matching1 = 47 && matching2 = 47 && matching3 = 47
+f12381_0__init__Return(EOS(STATIC_12381), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12394_0_toPostfix_Store(EOS(STATIC_12394), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 47, o16757))) :|: TRUE && matching1 = 47 && matching2 = 47
+f12394_0_toPostfix_Store(EOS(STATIC_12394), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12407_0_toPostfix_JMP(EOS(STATIC_12407), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 47, o16757))) :|: TRUE && matching1 = 47 && matching2 = 47
+f12407_0_toPostfix_JMP(EOS(STATIC_12407), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12420_0_toPostfix_Load(EOS(STATIC_12420), java.lang.Object(LinkedList(EOC, 47, o16841)), java.lang.Object(LinkedList(EOC, 47, o16757))) :|: TRUE && matching1 = 47 && matching2 = 47
+f12420_0_toPostfix_Load(EOS(STATIC_12420), java.lang.Object(LinkedList(EOC, matching1, o16841)), java.lang.Object(LinkedList(EOC, matching2, o16757))) -> f12432_0_toPostfix_InvokeMethod(EOS(STATIC_12432), java.lang.Object(LinkedList(EOC, 47, o16757)), java.lang.Object(LinkedList(EOC, 47, o16841))) :|: TRUE && matching1 = 47 && matching2 = 47
+f12432_0_toPostfix_InvokeMethod(EOS(STATIC_12432), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12442_0_getTail_Load(EOS(STATIC_12442), java.lang.Object(LinkedList(EOC, 47, o16757)), java.lang.Object(LinkedList(EOC, 47, o16841))) :|: TRUE && matching1 = 47 && matching2 = 47
+f12442_0_getTail_Load(EOS(STATIC_12442), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12465_0_getTail_FieldAccess(EOS(STATIC_12465), java.lang.Object(LinkedList(EOC, 47, o16757)), java.lang.Object(LinkedList(EOC, 47, o16841))) :|: TRUE && matching1 = 47 && matching2 = 47
+f12465_0_getTail_FieldAccess(EOS(STATIC_12465), java.lang.Object(LinkedList(EOC, matching1, o16757)), java.lang.Object(LinkedList(EOC, matching2, o16841))) -> f12479_0_getTail_Return(EOS(STATIC_12479), java.lang.Object(LinkedList(EOC, 47, o16757)), o16841) :|: TRUE && matching1 = 47 && matching2 = 47
+f12479_0_getTail_Return(EOS(STATIC_12479), java.lang.Object(LinkedList(EOC, matching1, o16757)), o16841) -> f12493_0_toPostfix_Store(EOS(STATIC_12493), java.lang.Object(LinkedList(EOC, 47, o16757)), o16841) :|: TRUE && matching1 = 47
+f12493_0_toPostfix_Store(EOS(STATIC_12493), java.lang.Object(LinkedList(EOC, matching1, o16757)), o16841) -> f12505_0_toPostfix_JMP(EOS(STATIC_12505), o16841, java.lang.Object(LinkedList(EOC, 47, o16757))) :|: TRUE && matching1 = 47
+f12505_0_toPostfix_JMP(EOS(STATIC_12505), o16841, java.lang.Object(LinkedList(EOC, matching1, o16757))) -> f12515_0_toPostfix_Load(EOS(STATIC_12515), o16841, java.lang.Object(LinkedList(EOC, 47, o16757))) :|: TRUE && matching1 = 47
+f12515_0_toPostfix_Load(EOS(STATIC_12515), o16841, java.lang.Object(LinkedList(EOC, matching1, o16757))) -> f11669_0_toPostfix_Load(EOS(STATIC_11669), o16841, java.lang.Object(LinkedList(EOC, 47, o16757))) :|: TRUE && matching1 = 47
+f12022_0_toPostfix_TableSwitch(EOS(STATIC_12022), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355, i1355) -> f12045_0_toPostfix_New(EOS(STATIC_12045), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: i1355 > 47
+f12045_0_toPostfix_New(EOS(STATIC_12045), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) -> f12033_0_toPostfix_New(EOS(STATIC_12033), java.lang.Object(LinkedList(EOC, i1355, o16841)), o16757, i1355) :|: TRUE
+Combined rules. Obtained 10 IRulesP rules:
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, 41, o16841:0)), java.lang.Object(LinkedList(EOC, i1390:0, o17133:0)), java.lang.Object(LinkedList(EOC, 41, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, o17133:0, o16841:0) :|: TRUE
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, i1355:0, o16841:0)), o16757:0, java.lang.Object(LinkedList(EOC, i1355:0, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, o16757:0, o16841:0) :|: i1355:0 < 40
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, i1355:0, o16841:0)), o16757:0, java.lang.Object(LinkedList(EOC, i1355:0, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, o16757:0, o16841:0) :|: i1355:0 > 47
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, 46, o16841:0)), o16757:0, java.lang.Object(LinkedList(EOC, 46, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, o16757:0, o16841:0) :|: TRUE
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, 40, o16841:0)), o16757:0, java.lang.Object(LinkedList(EOC, 40, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, o16757:0, o16841:0) :|: TRUE
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, 42, o16841:0)), o16757:0, java.lang.Object(LinkedList(EOC, 42, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, java.lang.Object(LinkedList(EOC, 42, o16757:0)), o16841:0) :|: TRUE
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, 44, o16841:0)), o16757:0, java.lang.Object(LinkedList(EOC, 44, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, o16757:0, o16841:0) :|: TRUE
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, 43, o16841:0)), o16757:0, java.lang.Object(LinkedList(EOC, 43, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, java.lang.Object(LinkedList(EOC, 43, o16757:0)), o16841:0) :|: TRUE
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, 45, o16841:0)), o16757:0, java.lang.Object(LinkedList(EOC, 45, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, java.lang.Object(LinkedList(EOC, 45, o16757:0)), o16841:0) :|: TRUE
+f11786_0_toPostfix_NULL(EOS(STATIC_11786), java.lang.Object(LinkedList(EOC, 47, o16841:0)), o16757:0, java.lang.Object(LinkedList(EOC, 47, o16841:0))) -> f11786_0_toPostfix_NULL(EOS(STATIC_11786), o16841:0, java.lang.Object(LinkedList(EOC, 47, o16757:0)), o16841:0) :|: TRUE
+Filtered constant ground arguments:
+   f11786_0_toPostfix_NULL(x1, x2, x3, x4) -> f11786_0_toPostfix_NULL(x2, x3, x4)
+   EOS(x1) -> EOS
+   LinkedList(x1, x2, x3) -> LinkedList(x2, x3)
+Filtered duplicate arguments:
+   f11786_0_toPostfix_NULL(x1, x2, x3) -> f11786_0_toPostfix_NULL(x2, x3)
+Finished conversion. Obtained 10 rules.P rules:
+f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(i1390:0, o17133:0)), java.lang.Object(LinkedList(cons_41, o16841:0))) -> f11786_0_toPostfix_NULL(o17133:0, o16841:0) :|: TRUE && cons_41 = 41
+f11786_0_toPostfix_NULL(o16757:0, java.lang.Object(LinkedList(i1355:0, o16841:0))) -> f11786_0_toPostfix_NULL(o16757:0, o16841:0) :|: i1355:0 < 40
+f11786_0_toPostfix_NULL(o16757:0, java.lang.Object(LinkedList(i1355:0, o16841:0))) -> f11786_0_toPostfix_NULL(o16757:0, o16841:0) :|: i1355:0 > 47
+f11786_0_toPostfix_NULL(o16757:0, java.lang.Object(LinkedList(cons_46, o16841:0))) -> f11786_0_toPostfix_NULL(o16757:0, o16841:0) :|: TRUE && cons_46 = 46
+f11786_0_toPostfix_NULL(o16757:0, java.lang.Object(LinkedList(cons_40, o16841:0))) -> f11786_0_toPostfix_NULL(o16757:0, o16841:0) :|: TRUE && cons_40 = 40
+f11786_0_toPostfix_NULL(o16757:0, java.lang.Object(LinkedList(cons_42, o16841:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(42, o16757:0)), o16841:0) :|: TRUE && cons_42 = 42
+f11786_0_toPostfix_NULL(o16757:0, java.lang.Object(LinkedList(cons_44, o16841:0))) -> f11786_0_toPostfix_NULL(o16757:0, o16841:0) :|: TRUE && cons_44 = 44
+f11786_0_toPostfix_NULL(o16757:0, java.lang.Object(LinkedList(cons_43, o16841:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(43, o16757:0)), o16841:0) :|: TRUE && cons_43 = 43
+f11786_0_toPostfix_NULL(o16757:0, java.lang.Object(LinkedList(cons_45, o16841:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(45, o16757:0)), o16841:0) :|: TRUE && cons_45 = 45
+f11786_0_toPostfix_NULL(o16757:0, java.lang.Object(LinkedList(cons_47, o16841:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(47, o16757:0)), o16841:0) :|: TRUE && cons_47 = 47
+
+----------------------------------------
+
+(14)
+Obligation:
+Rules:
+f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(i1390:0, o17133:0)), java.lang.Object(LinkedList(cons_41, o16841:0))) -> f11786_0_toPostfix_NULL(o17133:0, o16841:0) :|: TRUE && cons_41 = 41
+f11786_0_toPostfix_NULL(x, java.lang.Object(LinkedList(x1, x2))) -> f11786_0_toPostfix_NULL(x, x2) :|: x1 < 40
+f11786_0_toPostfix_NULL(x3, java.lang.Object(LinkedList(x4, x5))) -> f11786_0_toPostfix_NULL(x3, x5) :|: x4 > 47
+f11786_0_toPostfix_NULL(x6, java.lang.Object(LinkedList(x7, x8))) -> f11786_0_toPostfix_NULL(x6, x8) :|: TRUE && x7 = 46
+f11786_0_toPostfix_NULL(x9, java.lang.Object(LinkedList(x10, x11))) -> f11786_0_toPostfix_NULL(x9, x11) :|: TRUE && x10 = 40
+f11786_0_toPostfix_NULL(x12, java.lang.Object(LinkedList(x13, x14))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(42, x12)), x14) :|: TRUE && x13 = 42
+f11786_0_toPostfix_NULL(x15, java.lang.Object(LinkedList(x16, x17))) -> f11786_0_toPostfix_NULL(x15, x17) :|: TRUE && x16 = 44
+f11786_0_toPostfix_NULL(x18, java.lang.Object(LinkedList(x19, x20))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(43, x18)), x20) :|: TRUE && x19 = 43
+f11786_0_toPostfix_NULL(x21, java.lang.Object(LinkedList(x22, x23))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(45, x21)), x23) :|: TRUE && x22 = 45
+f11786_0_toPostfix_NULL(x24, java.lang.Object(LinkedList(x25, x26))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(47, x24)), x26) :|: TRUE && x25 = 47
+
+----------------------------------------
+
+(15) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(i1390:0, o17133:0)), java.lang.Object(LinkedList(cons_41, o16841:0))) -> f11786_0_toPostfix_NULL(o17133:0, o16841:0) :|: TRUE && cons_41 = 41
+f11786_0_toPostfix_NULL(x, java.lang.Object(LinkedList(x1, x2))) -> f11786_0_toPostfix_NULL(x, x2) :|: x1 < 40
+f11786_0_toPostfix_NULL(x3, java.lang.Object(LinkedList(x4, x5))) -> f11786_0_toPostfix_NULL(x3, x5) :|: x4 > 47
+f11786_0_toPostfix_NULL(x6, java.lang.Object(LinkedList(x7, x8))) -> f11786_0_toPostfix_NULL(x6, x8) :|: TRUE && x7 = 46
+f11786_0_toPostfix_NULL(x9, java.lang.Object(LinkedList(x10, x11))) -> f11786_0_toPostfix_NULL(x9, x11) :|: TRUE && x10 = 40
+f11786_0_toPostfix_NULL(x12, java.lang.Object(LinkedList(x13, x14))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(42, x12)), x14) :|: TRUE && x13 = 42
+f11786_0_toPostfix_NULL(x15, java.lang.Object(LinkedList(x16, x17))) -> f11786_0_toPostfix_NULL(x15, x17) :|: TRUE && x16 = 44
+f11786_0_toPostfix_NULL(x18, java.lang.Object(LinkedList(x19, x20))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(43, x18)), x20) :|: TRUE && x19 = 43
+f11786_0_toPostfix_NULL(x21, java.lang.Object(LinkedList(x22, x23))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(45, x21)), x23) :|: TRUE && x22 = 45
+f11786_0_toPostfix_NULL(x24, java.lang.Object(LinkedList(x25, x26))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(47, x24)), x26) :|: TRUE && x25 = 47
+
+----------------------------------------
+
+(17) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(i1390:0, o17133:0)), java.lang.Object(LinkedList(cons_41, o16841:0))) -> f11786_0_toPostfix_NULL(o17133:0, o16841:0) :|: TRUE && cons_41 = 41
+(2) f11786_0_toPostfix_NULL(x, java.lang.Object(LinkedList(x1, x2))) -> f11786_0_toPostfix_NULL(x, x2) :|: x1 < 40
+(3) f11786_0_toPostfix_NULL(x3, java.lang.Object(LinkedList(x4, x5))) -> f11786_0_toPostfix_NULL(x3, x5) :|: x4 > 47
+(4) f11786_0_toPostfix_NULL(x6, java.lang.Object(LinkedList(x7, x8))) -> f11786_0_toPostfix_NULL(x6, x8) :|: TRUE && x7 = 46
+(5) f11786_0_toPostfix_NULL(x9, java.lang.Object(LinkedList(x10, x11))) -> f11786_0_toPostfix_NULL(x9, x11) :|: TRUE && x10 = 40
+(6) f11786_0_toPostfix_NULL(x12, java.lang.Object(LinkedList(x13, x14))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(42, x12)), x14) :|: TRUE && x13 = 42
+(7) f11786_0_toPostfix_NULL(x15, java.lang.Object(LinkedList(x16, x17))) -> f11786_0_toPostfix_NULL(x15, x17) :|: TRUE && x16 = 44
+(8) f11786_0_toPostfix_NULL(x18, java.lang.Object(LinkedList(x19, x20))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(43, x18)), x20) :|: TRUE && x19 = 43
+(9) f11786_0_toPostfix_NULL(x21, java.lang.Object(LinkedList(x22, x23))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(45, x21)), x23) :|: TRUE && x22 = 45
+(10) f11786_0_toPostfix_NULL(x24, java.lang.Object(LinkedList(x25, x26))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(47, x24)), x26) :|: TRUE && x25 = 47
+
+Arcs:
+(1) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(2) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(3) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(4) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(5) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(6) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(7) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(8) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(9) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(10) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(18)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(i1390:0, o17133:0)), java.lang.Object(LinkedList(cons_41, o16841:0))) -> f11786_0_toPostfix_NULL(o17133:0, o16841:0) :|: TRUE && cons_41 = 41
+(2) f11786_0_toPostfix_NULL(x, java.lang.Object(LinkedList(x1, x2))) -> f11786_0_toPostfix_NULL(x, x2) :|: x1 < 40
+(3) f11786_0_toPostfix_NULL(x3, java.lang.Object(LinkedList(x4, x5))) -> f11786_0_toPostfix_NULL(x3, x5) :|: x4 > 47
+(4) f11786_0_toPostfix_NULL(x6, java.lang.Object(LinkedList(x7, x8))) -> f11786_0_toPostfix_NULL(x6, x8) :|: TRUE && x7 = 46
+(5) f11786_0_toPostfix_NULL(x9, java.lang.Object(LinkedList(x10, x11))) -> f11786_0_toPostfix_NULL(x9, x11) :|: TRUE && x10 = 40
+(6) f11786_0_toPostfix_NULL(x12, java.lang.Object(LinkedList(x13, x14))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(42, x12)), x14) :|: TRUE && x13 = 42
+(7) f11786_0_toPostfix_NULL(x15, java.lang.Object(LinkedList(x16, x17))) -> f11786_0_toPostfix_NULL(x15, x17) :|: TRUE && x16 = 44
+(8) f11786_0_toPostfix_NULL(x18, java.lang.Object(LinkedList(x19, x20))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(43, x18)), x20) :|: TRUE && x19 = 43
+(9) f11786_0_toPostfix_NULL(x21, java.lang.Object(LinkedList(x22, x23))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(45, x21)), x23) :|: TRUE && x22 = 45
+(10) f11786_0_toPostfix_NULL(x24, java.lang.Object(LinkedList(x25, x26))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(47, x24)), x26) :|: TRUE && x25 = 47
+
+Arcs:
+(1) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(2) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(3) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(4) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(5) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(6) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(7) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(8) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(9) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+(10) -> (1), (2), (3), (4), (5), (6), (7), (8), (9), (10)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(19) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(20)
+Obligation:
+Rules:
+f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(i1390:0:0, o17133:0:0)), java.lang.Object(LinkedList(cons_41, o16841:0:0))) -> f11786_0_toPostfix_NULL(o17133:0:0, o16841:0:0) :|: TRUE && cons_41 = 41
+f11786_0_toPostfix_NULL(x15:0, java.lang.Object(LinkedList(cons_44, x17:0))) -> f11786_0_toPostfix_NULL(x15:0, x17:0) :|: TRUE && cons_44 = 44
+f11786_0_toPostfix_NULL(x12:0, java.lang.Object(LinkedList(cons_42, x14:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(42, x12:0)), x14:0) :|: TRUE && cons_42 = 42
+f11786_0_toPostfix_NULL(x18:0, java.lang.Object(LinkedList(cons_43, x20:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(43, x18:0)), x20:0) :|: TRUE && cons_43 = 43
+f11786_0_toPostfix_NULL(x21:0, java.lang.Object(LinkedList(cons_45, x23:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(45, x21:0)), x23:0) :|: TRUE && cons_45 = 45
+f11786_0_toPostfix_NULL(x24:0, java.lang.Object(LinkedList(cons_47, x26:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(47, x24:0)), x26:0) :|: TRUE && cons_47 = 47
+f11786_0_toPostfix_NULL(x:0, java.lang.Object(LinkedList(x1:0, x2:0))) -> f11786_0_toPostfix_NULL(x:0, x2:0) :|: x1:0 < 40
+f11786_0_toPostfix_NULL(x3:0, java.lang.Object(LinkedList(x4:0, x5:0))) -> f11786_0_toPostfix_NULL(x3:0, x5:0) :|: x4:0 > 47
+f11786_0_toPostfix_NULL(x6:0, java.lang.Object(LinkedList(cons_46, x8:0))) -> f11786_0_toPostfix_NULL(x6:0, x8:0) :|: TRUE && cons_46 = 46
+f11786_0_toPostfix_NULL(x9:0, java.lang.Object(LinkedList(cons_40, x11:0))) -> f11786_0_toPostfix_NULL(x9:0, x11:0) :|: TRUE && cons_40 = 40
+
+----------------------------------------
+
+(21) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f11786_0_toPostfix_NULL(VARIABLE, VARIABLE)
+java.lang.Object(VARIABLE)
+LinkedList(VARIABLE, VARIABLE)
+Removed predefined arithmetic.
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(i1390:0:0, o17133:0:0)), java.lang.Object(LinkedList(predef, o16841:0:0))) -> f11786_0_toPostfix_NULL(o17133:0:0, o16841:0:0)
+f11786_0_toPostfix_NULL(x15:0, java.lang.Object(LinkedList(predef, x17:0))) -> f11786_0_toPostfix_NULL(x15:0, x17:0)
+f11786_0_toPostfix_NULL(x12:0, java.lang.Object(LinkedList(predef, x14:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(predef, x12:0)), x14:0)
+f11786_0_toPostfix_NULL(x:0, java.lang.Object(LinkedList(x1:0, x2:0))) -> f11786_0_toPostfix_NULL(x:0, x2:0)
+
+----------------------------------------
+
+(23) IRSwTToQDPProof (SOUND)
+Removed the integers and created a QDP-Problem.
+----------------------------------------
+
+(24)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(i1390:0:0, o17133:0:0)), java.lang.Object(LinkedList(predef, o16841:0:0))) -> f11786_0_toPostfix_NULL(o17133:0:0, o16841:0:0)
+   f11786_0_toPostfix_NULL(x15:0, java.lang.Object(LinkedList(predef, x17:0))) -> f11786_0_toPostfix_NULL(x15:0, x17:0)
+   f11786_0_toPostfix_NULL(x12:0, java.lang.Object(LinkedList(predef, x14:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(predef, x12:0)), x14:0)
+   f11786_0_toPostfix_NULL(x:0, java.lang.Object(LinkedList(x1:0, x2:0))) -> f11786_0_toPostfix_NULL(x:0, x2:0)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(25) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(i1390:0:0, o17133:0:0)), java.lang.Object(LinkedList(predef, o16841:0:0))) -> f11786_0_toPostfix_NULL(o17133:0:0, o16841:0:0)
+The graph contains the following edges 1 > 1, 2 > 2
+
+
+*f11786_0_toPostfix_NULL(x15:0, java.lang.Object(LinkedList(predef, x17:0))) -> f11786_0_toPostfix_NULL(x15:0, x17:0)
+The graph contains the following edges 1 >= 1, 2 > 2
+
+
+*f11786_0_toPostfix_NULL(x12:0, java.lang.Object(LinkedList(predef, x14:0))) -> f11786_0_toPostfix_NULL(java.lang.Object(LinkedList(predef, x12:0)), x14:0)
+The graph contains the following edges 2 > 2
+
+
+*f11786_0_toPostfix_NULL(x:0, java.lang.Object(LinkedList(x1:0, x2:0))) -> f11786_0_toPostfix_NULL(x:0, x2:0)
+The graph contains the following edges 1 >= 1, 2 > 2
+
+
+----------------------------------------
+
+(26)
+YES
+
+----------------------------------------
+
+(27)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Infix2Postfix.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(28) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 22 IRulesP rules:
+f12943_0_buildExpression_Load(EOS(STATIC_12943), java.lang.Object(ARRAY(i1644)), i1644, i1645, i1645) -> f12946_0_buildExpression_GE(EOS(STATIC_12946), java.lang.Object(ARRAY(i1644)), i1644, i1645, i1645, i1644) :|: TRUE
+f12946_0_buildExpression_GE(EOS(STATIC_12946), java.lang.Object(ARRAY(i1644)), i1644, i1645, i1645, i1644) -> f12950_0_buildExpression_GE(EOS(STATIC_12950), java.lang.Object(ARRAY(i1644)), i1644, i1645, i1645, i1644) :|: i1645 < i1644
+f12950_0_buildExpression_GE(EOS(STATIC_12950), java.lang.Object(ARRAY(i1644)), i1644, i1645, i1645, i1644) -> f12954_0_buildExpression_New(EOS(STATIC_12954), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: i1645 < i1644
+f12954_0_buildExpression_New(EOS(STATIC_12954), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12958_0_buildExpression_Duplicate(EOS(STATIC_12958), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12958_0_buildExpression_Duplicate(EOS(STATIC_12958), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12962_0_buildExpression_ConstantStackPush(EOS(STATIC_12962), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12962_0_buildExpression_ConstantStackPush(EOS(STATIC_12962), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12966_0_buildExpression_Load(EOS(STATIC_12966), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12966_0_buildExpression_Load(EOS(STATIC_12966), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12970_0_buildExpression_InvokeMethod(EOS(STATIC_12970), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12970_0_buildExpression_InvokeMethod(EOS(STATIC_12970), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12972_0__init__Load(EOS(STATIC_12972), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12972_0__init__Load(EOS(STATIC_12972), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12978_0__init__InvokeMethod(EOS(STATIC_12978), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12978_0__init__InvokeMethod(EOS(STATIC_12978), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12981_0__init__Load(EOS(STATIC_12981), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12981_0__init__Load(EOS(STATIC_12981), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12984_0__init__Load(EOS(STATIC_12984), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12984_0__init__Load(EOS(STATIC_12984), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12990_0__init__FieldAccess(EOS(STATIC_12990), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12990_0__init__FieldAccess(EOS(STATIC_12990), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12995_0__init__Load(EOS(STATIC_12995), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f12995_0__init__Load(EOS(STATIC_12995), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f13000_0__init__Load(EOS(STATIC_13000), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f13000_0__init__Load(EOS(STATIC_13000), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f13004_0__init__FieldAccess(EOS(STATIC_13004), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f13004_0__init__FieldAccess(EOS(STATIC_13004), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f13007_0__init__Return(EOS(STATIC_13007), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f13007_0__init__Return(EOS(STATIC_13007), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f13010_0_buildExpression_Store(EOS(STATIC_13010), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f13010_0_buildExpression_Store(EOS(STATIC_13010), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f13013_0_buildExpression_Inc(EOS(STATIC_13013), java.lang.Object(ARRAY(i1644)), i1644, i1645) :|: TRUE
+f13013_0_buildExpression_Inc(EOS(STATIC_13013), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f13016_0_buildExpression_JMP(EOS(STATIC_13016), java.lang.Object(ARRAY(i1644)), i1644, i1645 + 1) :|: TRUE
+f13016_0_buildExpression_JMP(EOS(STATIC_13016), java.lang.Object(ARRAY(i1644)), i1644, i1650) -> f13019_0_buildExpression_Load(EOS(STATIC_13019), java.lang.Object(ARRAY(i1644)), i1644, i1650) :|: TRUE
+f13019_0_buildExpression_Load(EOS(STATIC_13019), java.lang.Object(ARRAY(i1644)), i1644, i1650) -> f12940_0_buildExpression_Load(EOS(STATIC_12940), java.lang.Object(ARRAY(i1644)), i1644, i1650) :|: TRUE
+f12940_0_buildExpression_Load(EOS(STATIC_12940), java.lang.Object(ARRAY(i1644)), i1644, i1645) -> f12943_0_buildExpression_Load(EOS(STATIC_12943), java.lang.Object(ARRAY(i1644)), i1644, i1645, i1645) :|: TRUE
+Combined rules. Obtained 1 IRulesP rules:
+f12943_0_buildExpression_Load(EOS(STATIC_12943), java.lang.Object(ARRAY(i1644:0)), i1644:0, i1645:0, i1645:0) -> f12943_0_buildExpression_Load(EOS(STATIC_12943), java.lang.Object(ARRAY(i1644:0)), i1644:0, i1645:0 + 1, i1645:0 + 1) :|: i1645:0 < i1644:0
+Filtered constant ground arguments:
+   f12943_0_buildExpression_Load(x1, x2, x3, x4, x5) -> f12943_0_buildExpression_Load(x2, x3, x4, x5)
+   EOS(x1) -> EOS
+Filtered duplicate arguments:
+   f12943_0_buildExpression_Load(x1, x2, x3, x4) -> f12943_0_buildExpression_Load(x1, x2, x4)
+Finished conversion. Obtained 1 rules.P rules:
+f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, i1645:0, i1644:0) -> f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, i1645:0 + 1, i1644:0) :|: i1645:0 < i1644:0
+
+----------------------------------------
+
+(29)
+Obligation:
+Rules:
+f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, i1645:0, i1644:0) -> f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, i1645:0 + 1, i1644:0) :|: i1645:0 < i1644:0
+
+----------------------------------------
+
+(30) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(31)
+Obligation:
+Rules:
+f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, i1645:0, i1644:0) -> f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, arith, i1644:0) :|: i1645:0 < i1644:0 && arith = i1645:0 + 1
+
+----------------------------------------
+
+(32) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, i1645:0, i1644:0) -> f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, arith, i1644:0) :|: i1645:0 < i1644:0 && arith = i1645:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(33)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, i1645:0, i1644:0) -> f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0)), i1644:0, arith, i1644:0) :|: i1645:0 < i1644:0 && arith = i1645:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(34) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(35)
+Obligation:
+Rules:
+f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0:0)), i1644:0:0, i1645:0:0, i1644:0:0) -> f12943_0_buildExpression_Load(java.lang.Object(ARRAY(i1644:0:0)), i1644:0:0, i1645:0:0 + 1, i1644:0:0) :|: i1645:0:0 < i1644:0:0
+
+----------------------------------------
+
+(36) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f12943_0_buildExpression_Load(VARIABLE, INTEGER, INTEGER, INTEGER)
+java.lang.Object(VARIABLE)
+ARRAY(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(37)
+Obligation:
+Rules:
+f12943_0_buildExpression_Load(c, i1644:0:0, i1645:0:0, i1644:0:0) -> f12943_0_buildExpression_Load(c1, i1644:0:0, c2, i1644:0:0) :|: c2 = i1645:0:0 + 1 && (c1 = 0 && c = 0) && i1645:0:0 < i1644:0:0
+
+----------------------------------------
+
+(38) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f12943_0_buildExpression_Load(x, x1, x2, x3)] = c*x - x2 + x3
+
+The following rules are decreasing:
+f12943_0_buildExpression_Load(c, i1644:0:0, i1645:0:0, i1644:0:0) -> f12943_0_buildExpression_Load(c1, i1644:0:0, c2, i1644:0:0) :|: c2 = i1645:0:0 + 1 && (c1 = 0 && c = 0) && i1645:0:0 < i1644:0:0
+The following rules are bounded:
+f12943_0_buildExpression_Load(c, i1644:0:0, i1645:0:0, i1644:0:0) -> f12943_0_buildExpression_Load(c1, i1644:0:0, c2, i1644:0:0) :|: c2 = i1645:0:0 + 1 && (c1 = 0 && c = 0) && i1645:0:0 < i1644:0:0
+
+----------------------------------------
+
+(39)
+YES
+
+----------------------------------------
+
+(40)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Infix2Postfix.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(41) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 211 IRulesP rules:
+f12660_0_buildExpression_Load(EOS(STATIC_12660), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545) -> f12662_0_buildExpression_GT(EOS(STATIC_12662), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) :|: TRUE
+f12662_0_buildExpression_GT(EOS(STATIC_12662), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) -> f12666_0_buildExpression_GT(EOS(STATIC_12666), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) :|: i1545 <= i1544
+f12666_0_buildExpression_GT(EOS(STATIC_12666), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) -> f12669_0_buildExpression_Load(EOS(STATIC_12669), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: i1545 <= i1544
+f12669_0_buildExpression_Load(EOS(STATIC_12669), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12673_0_buildExpression_Load(EOS(STATIC_12673), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545) :|: TRUE
+f12673_0_buildExpression_Load(EOS(STATIC_12673), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545) -> f12677_0_buildExpression_ConstantStackPush(EOS(STATIC_12677), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) :|: TRUE
+f12677_0_buildExpression_ConstantStackPush(EOS(STATIC_12677), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) -> f12681_0_buildExpression_IntArithmetic(EOS(STATIC_12681), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544, 1) :|: TRUE
+f12681_0_buildExpression_IntArithmetic(EOS(STATIC_12681), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544, matching1) -> f12685_0_buildExpression_GT(EOS(STATIC_12685), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544 - 1) :|: i1544 > 0 && matching1 = 1
+f12685_0_buildExpression_GT(EOS(STATIC_12685), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1553) -> f12689_0_buildExpression_GT(EOS(STATIC_12689), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1553) :|: i1545 > i1553
+f12685_0_buildExpression_GT(EOS(STATIC_12685), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1553) -> f12690_0_buildExpression_GT(EOS(STATIC_12690), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1553) :|: i1545 <= i1553
+f12689_0_buildExpression_GT(EOS(STATIC_12689), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1553) -> f12694_0_buildExpression_New(EOS(STATIC_12694), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: i1545 > i1553
+f12694_0_buildExpression_New(EOS(STATIC_12694), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12698_0_buildExpression_Duplicate(EOS(STATIC_12698), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12698_0_buildExpression_Duplicate(EOS(STATIC_12698), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12703_0_buildExpression_ConstantStackPush(EOS(STATIC_12703), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12703_0_buildExpression_ConstantStackPush(EOS(STATIC_12703), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12708_0_buildExpression_Load(EOS(STATIC_12708), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12708_0_buildExpression_Load(EOS(STATIC_12708), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12713_0_buildExpression_InvokeMethod(EOS(STATIC_12713), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12713_0_buildExpression_InvokeMethod(EOS(STATIC_12713), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12718_0__init__Load(EOS(STATIC_12718), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12718_0__init__Load(EOS(STATIC_12718), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12724_0__init__InvokeMethod(EOS(STATIC_12724), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12724_0__init__InvokeMethod(EOS(STATIC_12724), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12727_0__init__Load(EOS(STATIC_12727), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12727_0__init__Load(EOS(STATIC_12727), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12731_0__init__Load(EOS(STATIC_12731), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12731_0__init__Load(EOS(STATIC_12731), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12738_0__init__FieldAccess(EOS(STATIC_12738), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12738_0__init__FieldAccess(EOS(STATIC_12738), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12744_0__init__Load(EOS(STATIC_12744), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12744_0__init__Load(EOS(STATIC_12744), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12750_0__init__Load(EOS(STATIC_12750), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12750_0__init__Load(EOS(STATIC_12750), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12755_0__init__FieldAccess(EOS(STATIC_12755), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12755_0__init__FieldAccess(EOS(STATIC_12755), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12759_0__init__Return(EOS(STATIC_12759), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12759_0__init__Return(EOS(STATIC_12759), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12763_0_buildExpression_Store(EOS(STATIC_12763), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12763_0_buildExpression_Store(EOS(STATIC_12763), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12767_0_buildExpression_New(EOS(STATIC_12767), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12767_0_buildExpression_New(EOS(STATIC_12767), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12771_0_buildExpression_Duplicate(EOS(STATIC_12771), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12771_0_buildExpression_Duplicate(EOS(STATIC_12771), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12776_0_buildExpression_ConstantStackPush(EOS(STATIC_12776), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12776_0_buildExpression_ConstantStackPush(EOS(STATIC_12776), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12780_0_buildExpression_Load(EOS(STATIC_12780), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12780_0_buildExpression_Load(EOS(STATIC_12780), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12784_0_buildExpression_InvokeMethod(EOS(STATIC_12784), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12784_0_buildExpression_InvokeMethod(EOS(STATIC_12784), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12788_0__init__Load(EOS(STATIC_12788), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12788_0__init__Load(EOS(STATIC_12788), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12796_0__init__InvokeMethod(EOS(STATIC_12796), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12796_0__init__InvokeMethod(EOS(STATIC_12796), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12801_0__init__Load(EOS(STATIC_12801), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12801_0__init__Load(EOS(STATIC_12801), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12806_0__init__Load(EOS(STATIC_12806), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12806_0__init__Load(EOS(STATIC_12806), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12811_0__init__FieldAccess(EOS(STATIC_12811), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12811_0__init__FieldAccess(EOS(STATIC_12811), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12815_0__init__Load(EOS(STATIC_12815), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12815_0__init__Load(EOS(STATIC_12815), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12818_0__init__Load(EOS(STATIC_12818), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12818_0__init__Load(EOS(STATIC_12818), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12821_0__init__FieldAccess(EOS(STATIC_12821), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12821_0__init__FieldAccess(EOS(STATIC_12821), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12824_0__init__Return(EOS(STATIC_12824), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12824_0__init__Return(EOS(STATIC_12824), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12827_0_buildExpression_Store(EOS(STATIC_12827), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12827_0_buildExpression_Store(EOS(STATIC_12827), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12833_0_buildExpression_New(EOS(STATIC_12833), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12833_0_buildExpression_New(EOS(STATIC_12833), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12838_0_buildExpression_Duplicate(EOS(STATIC_12838), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12838_0_buildExpression_Duplicate(EOS(STATIC_12838), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12843_0_buildExpression_ConstantStackPush(EOS(STATIC_12843), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12843_0_buildExpression_ConstantStackPush(EOS(STATIC_12843), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12847_0_buildExpression_Load(EOS(STATIC_12847), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12847_0_buildExpression_Load(EOS(STATIC_12847), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12850_0_buildExpression_InvokeMethod(EOS(STATIC_12850), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12850_0_buildExpression_InvokeMethod(EOS(STATIC_12850), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12853_0__init__Load(EOS(STATIC_12853), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12853_0__init__Load(EOS(STATIC_12853), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12857_0__init__InvokeMethod(EOS(STATIC_12857), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12857_0__init__InvokeMethod(EOS(STATIC_12857), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12861_0__init__Load(EOS(STATIC_12861), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12861_0__init__Load(EOS(STATIC_12861), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12864_0__init__Load(EOS(STATIC_12864), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12864_0__init__Load(EOS(STATIC_12864), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12867_0__init__FieldAccess(EOS(STATIC_12867), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12867_0__init__FieldAccess(EOS(STATIC_12867), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12871_0__init__Load(EOS(STATIC_12871), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12871_0__init__Load(EOS(STATIC_12871), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12875_0__init__Load(EOS(STATIC_12875), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12875_0__init__Load(EOS(STATIC_12875), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12879_0__init__FieldAccess(EOS(STATIC_12879), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12879_0__init__FieldAccess(EOS(STATIC_12879), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12883_0__init__Return(EOS(STATIC_12883), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12883_0__init__Return(EOS(STATIC_12883), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12887_0_buildExpression_Store(EOS(STATIC_12887), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12887_0_buildExpression_Store(EOS(STATIC_12887), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12891_0_buildExpression_New(EOS(STATIC_12891), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12891_0_buildExpression_New(EOS(STATIC_12891), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12895_0_buildExpression_Duplicate(EOS(STATIC_12895), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12895_0_buildExpression_Duplicate(EOS(STATIC_12895), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12898_0_buildExpression_ConstantStackPush(EOS(STATIC_12898), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12898_0_buildExpression_ConstantStackPush(EOS(STATIC_12898), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12901_0_buildExpression_Load(EOS(STATIC_12901), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12901_0_buildExpression_Load(EOS(STATIC_12901), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12904_0_buildExpression_InvokeMethod(EOS(STATIC_12904), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12904_0_buildExpression_InvokeMethod(EOS(STATIC_12904), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12907_0__init__Load(EOS(STATIC_12907), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12907_0__init__Load(EOS(STATIC_12907), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12916_0__init__InvokeMethod(EOS(STATIC_12916), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12916_0__init__InvokeMethod(EOS(STATIC_12916), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12921_0__init__Load(EOS(STATIC_12921), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12921_0__init__Load(EOS(STATIC_12921), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12925_0__init__Load(EOS(STATIC_12925), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12925_0__init__Load(EOS(STATIC_12925), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12928_0__init__FieldAccess(EOS(STATIC_12928), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12928_0__init__FieldAccess(EOS(STATIC_12928), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12931_0__init__Load(EOS(STATIC_12931), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12931_0__init__Load(EOS(STATIC_12931), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12934_0__init__Load(EOS(STATIC_12934), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12934_0__init__Load(EOS(STATIC_12934), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12937_0__init__FieldAccess(EOS(STATIC_12937), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12937_0__init__FieldAccess(EOS(STATIC_12937), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12941_0__init__Return(EOS(STATIC_12941), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12941_0__init__Return(EOS(STATIC_12941), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12944_0_buildExpression_Store(EOS(STATIC_12944), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12944_0_buildExpression_Store(EOS(STATIC_12944), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12947_0_buildExpression_New(EOS(STATIC_12947), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12947_0_buildExpression_New(EOS(STATIC_12947), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12951_0_buildExpression_Duplicate(EOS(STATIC_12951), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12951_0_buildExpression_Duplicate(EOS(STATIC_12951), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12955_0_buildExpression_ConstantStackPush(EOS(STATIC_12955), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12955_0_buildExpression_ConstantStackPush(EOS(STATIC_12955), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12959_0_buildExpression_Load(EOS(STATIC_12959), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12959_0_buildExpression_Load(EOS(STATIC_12959), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12963_0_buildExpression_InvokeMethod(EOS(STATIC_12963), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12963_0_buildExpression_InvokeMethod(EOS(STATIC_12963), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12967_0__init__Load(EOS(STATIC_12967), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12967_0__init__Load(EOS(STATIC_12967), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12973_0__init__InvokeMethod(EOS(STATIC_12973), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12973_0__init__InvokeMethod(EOS(STATIC_12973), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12976_0__init__Load(EOS(STATIC_12976), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12976_0__init__Load(EOS(STATIC_12976), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12979_0__init__Load(EOS(STATIC_12979), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12979_0__init__Load(EOS(STATIC_12979), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12982_0__init__FieldAccess(EOS(STATIC_12982), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12982_0__init__FieldAccess(EOS(STATIC_12982), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12985_0__init__Load(EOS(STATIC_12985), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12985_0__init__Load(EOS(STATIC_12985), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12991_0__init__Load(EOS(STATIC_12991), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12991_0__init__Load(EOS(STATIC_12991), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12996_0__init__FieldAccess(EOS(STATIC_12996), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12996_0__init__FieldAccess(EOS(STATIC_12996), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13001_0__init__Return(EOS(STATIC_13001), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13001_0__init__Return(EOS(STATIC_13001), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13005_0_buildExpression_Store(EOS(STATIC_13005), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13005_0_buildExpression_Store(EOS(STATIC_13005), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13008_0_buildExpression_Load(EOS(STATIC_13008), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13008_0_buildExpression_Load(EOS(STATIC_13008), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13011_0_buildExpression_Load(EOS(STATIC_13011), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545) :|: TRUE
+f13011_0_buildExpression_Load(EOS(STATIC_13011), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545) -> f13014_0_buildExpression_ConstantStackPush(EOS(STATIC_13014), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) :|: TRUE
+f13014_0_buildExpression_ConstantStackPush(EOS(STATIC_13014), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) -> f13017_0_buildExpression_IntArithmetic(EOS(STATIC_13017), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544, 1) :|: TRUE
+f13017_0_buildExpression_IntArithmetic(EOS(STATIC_13017), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544, matching1) -> f13020_0_buildExpression_GT(EOS(STATIC_13020), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544 - 1) :|: i1544 > 0 && matching1 = 1
+f13020_0_buildExpression_GT(EOS(STATIC_13020), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1653) -> f13022_0_buildExpression_GT(EOS(STATIC_13022), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1653) :|: i1545 > i1653
+f13020_0_buildExpression_GT(EOS(STATIC_13020), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1653) -> f13023_0_buildExpression_GT(EOS(STATIC_13023), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1653) :|: i1545 <= i1653
+f13022_0_buildExpression_GT(EOS(STATIC_13022), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1653) -> f13025_0_buildExpression_Inc(EOS(STATIC_13025), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: i1545 > i1653
+f13025_0_buildExpression_Inc(EOS(STATIC_13025), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13027_0_buildExpression_JMP(EOS(STATIC_13027), java.lang.Object(ARRAY(i1544)), i1544, i1545 + 1) :|: TRUE
+f13027_0_buildExpression_JMP(EOS(STATIC_13027), java.lang.Object(ARRAY(i1544)), i1544, i1654) -> f13030_0_buildExpression_Load(EOS(STATIC_13030), java.lang.Object(ARRAY(i1544)), i1544, i1654) :|: TRUE
+f13030_0_buildExpression_Load(EOS(STATIC_13030), java.lang.Object(ARRAY(i1544)), i1544, i1654) -> f12658_0_buildExpression_Load(EOS(STATIC_12658), java.lang.Object(ARRAY(i1544)), i1544, i1654) :|: TRUE
+f12658_0_buildExpression_Load(EOS(STATIC_12658), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12660_0_buildExpression_Load(EOS(STATIC_12660), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545) :|: TRUE
+f13023_0_buildExpression_GT(EOS(STATIC_13023), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1653) -> f13026_0_buildExpression_New(EOS(STATIC_13026), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: i1545 <= i1653
+f13026_0_buildExpression_New(EOS(STATIC_13026), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13028_0_buildExpression_Duplicate(EOS(STATIC_13028), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13028_0_buildExpression_Duplicate(EOS(STATIC_13028), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13031_0_buildExpression_ConstantStackPush(EOS(STATIC_13031), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13031_0_buildExpression_ConstantStackPush(EOS(STATIC_13031), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13033_0_buildExpression_Load(EOS(STATIC_13033), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13033_0_buildExpression_Load(EOS(STATIC_13033), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13035_0_buildExpression_InvokeMethod(EOS(STATIC_13035), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13035_0_buildExpression_InvokeMethod(EOS(STATIC_13035), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13037_0__init__Load(EOS(STATIC_13037), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13037_0__init__Load(EOS(STATIC_13037), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13040_0__init__InvokeMethod(EOS(STATIC_13040), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13040_0__init__InvokeMethod(EOS(STATIC_13040), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13042_0__init__Load(EOS(STATIC_13042), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13042_0__init__Load(EOS(STATIC_13042), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13044_0__init__Load(EOS(STATIC_13044), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13044_0__init__Load(EOS(STATIC_13044), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13046_0__init__FieldAccess(EOS(STATIC_13046), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13046_0__init__FieldAccess(EOS(STATIC_13046), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13048_0__init__Load(EOS(STATIC_13048), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13048_0__init__Load(EOS(STATIC_13048), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13050_0__init__Load(EOS(STATIC_13050), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13050_0__init__Load(EOS(STATIC_13050), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13052_0__init__FieldAccess(EOS(STATIC_13052), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13052_0__init__FieldAccess(EOS(STATIC_13052), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13054_0__init__Return(EOS(STATIC_13054), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13054_0__init__Return(EOS(STATIC_13054), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13056_0_buildExpression_Store(EOS(STATIC_13056), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13056_0_buildExpression_Store(EOS(STATIC_13056), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13057_0_buildExpression_Inc(EOS(STATIC_13057), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13057_0_buildExpression_Inc(EOS(STATIC_13057), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13058_0_buildExpression_JMP(EOS(STATIC_13058), java.lang.Object(ARRAY(i1544)), i1544, i1545 + 1) :|: TRUE
+f13058_0_buildExpression_JMP(EOS(STATIC_13058), java.lang.Object(ARRAY(i1544)), i1544, i1659) -> f13059_0_buildExpression_Load(EOS(STATIC_13059), java.lang.Object(ARRAY(i1544)), i1544, i1659) :|: TRUE
+f13059_0_buildExpression_Load(EOS(STATIC_13059), java.lang.Object(ARRAY(i1544)), i1544, i1659) -> f12658_0_buildExpression_Load(EOS(STATIC_12658), java.lang.Object(ARRAY(i1544)), i1544, i1659) :|: TRUE
+f12690_0_buildExpression_GT(EOS(STATIC_12690), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1553) -> f12695_0_buildExpression_New(EOS(STATIC_12695), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: i1545 <= i1553
+f12695_0_buildExpression_New(EOS(STATIC_12695), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12699_0_buildExpression_Duplicate(EOS(STATIC_12699), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12699_0_buildExpression_Duplicate(EOS(STATIC_12699), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12704_0_buildExpression_ConstantStackPush(EOS(STATIC_12704), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12704_0_buildExpression_ConstantStackPush(EOS(STATIC_12704), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12709_0_buildExpression_Load(EOS(STATIC_12709), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12709_0_buildExpression_Load(EOS(STATIC_12709), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12714_0_buildExpression_InvokeMethod(EOS(STATIC_12714), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12714_0_buildExpression_InvokeMethod(EOS(STATIC_12714), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12719_0__init__Load(EOS(STATIC_12719), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12719_0__init__Load(EOS(STATIC_12719), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12725_0__init__InvokeMethod(EOS(STATIC_12725), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12725_0__init__InvokeMethod(EOS(STATIC_12725), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12728_0__init__Load(EOS(STATIC_12728), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12728_0__init__Load(EOS(STATIC_12728), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12732_0__init__Load(EOS(STATIC_12732), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12732_0__init__Load(EOS(STATIC_12732), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12739_0__init__FieldAccess(EOS(STATIC_12739), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12739_0__init__FieldAccess(EOS(STATIC_12739), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12745_0__init__Load(EOS(STATIC_12745), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12745_0__init__Load(EOS(STATIC_12745), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12751_0__init__Load(EOS(STATIC_12751), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12751_0__init__Load(EOS(STATIC_12751), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12756_0__init__FieldAccess(EOS(STATIC_12756), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12756_0__init__FieldAccess(EOS(STATIC_12756), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12760_0__init__Return(EOS(STATIC_12760), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12760_0__init__Return(EOS(STATIC_12760), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12764_0_buildExpression_Store(EOS(STATIC_12764), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12764_0_buildExpression_Store(EOS(STATIC_12764), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12768_0_buildExpression_New(EOS(STATIC_12768), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12768_0_buildExpression_New(EOS(STATIC_12768), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12772_0_buildExpression_Duplicate(EOS(STATIC_12772), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12772_0_buildExpression_Duplicate(EOS(STATIC_12772), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12777_0_buildExpression_ConstantStackPush(EOS(STATIC_12777), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12777_0_buildExpression_ConstantStackPush(EOS(STATIC_12777), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12781_0_buildExpression_Load(EOS(STATIC_12781), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12781_0_buildExpression_Load(EOS(STATIC_12781), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12785_0_buildExpression_InvokeMethod(EOS(STATIC_12785), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12785_0_buildExpression_InvokeMethod(EOS(STATIC_12785), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12789_0__init__Load(EOS(STATIC_12789), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12789_0__init__Load(EOS(STATIC_12789), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12797_0__init__InvokeMethod(EOS(STATIC_12797), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12797_0__init__InvokeMethod(EOS(STATIC_12797), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12802_0__init__Load(EOS(STATIC_12802), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12802_0__init__Load(EOS(STATIC_12802), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12807_0__init__Load(EOS(STATIC_12807), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12807_0__init__Load(EOS(STATIC_12807), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12812_0__init__FieldAccess(EOS(STATIC_12812), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12812_0__init__FieldAccess(EOS(STATIC_12812), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12816_0__init__Load(EOS(STATIC_12816), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12816_0__init__Load(EOS(STATIC_12816), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12819_0__init__Load(EOS(STATIC_12819), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12819_0__init__Load(EOS(STATIC_12819), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12822_0__init__FieldAccess(EOS(STATIC_12822), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12822_0__init__FieldAccess(EOS(STATIC_12822), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12825_0__init__Return(EOS(STATIC_12825), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12825_0__init__Return(EOS(STATIC_12825), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12828_0_buildExpression_Store(EOS(STATIC_12828), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12828_0_buildExpression_Store(EOS(STATIC_12828), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12834_0_buildExpression_New(EOS(STATIC_12834), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12834_0_buildExpression_New(EOS(STATIC_12834), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12839_0_buildExpression_Duplicate(EOS(STATIC_12839), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12839_0_buildExpression_Duplicate(EOS(STATIC_12839), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12844_0_buildExpression_ConstantStackPush(EOS(STATIC_12844), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12844_0_buildExpression_ConstantStackPush(EOS(STATIC_12844), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12848_0_buildExpression_Load(EOS(STATIC_12848), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12848_0_buildExpression_Load(EOS(STATIC_12848), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12851_0_buildExpression_InvokeMethod(EOS(STATIC_12851), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12851_0_buildExpression_InvokeMethod(EOS(STATIC_12851), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12854_0__init__Load(EOS(STATIC_12854), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12854_0__init__Load(EOS(STATIC_12854), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12858_0__init__InvokeMethod(EOS(STATIC_12858), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12858_0__init__InvokeMethod(EOS(STATIC_12858), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12862_0__init__Load(EOS(STATIC_12862), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12862_0__init__Load(EOS(STATIC_12862), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12865_0__init__Load(EOS(STATIC_12865), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12865_0__init__Load(EOS(STATIC_12865), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12868_0__init__FieldAccess(EOS(STATIC_12868), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12868_0__init__FieldAccess(EOS(STATIC_12868), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12872_0__init__Load(EOS(STATIC_12872), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12872_0__init__Load(EOS(STATIC_12872), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12876_0__init__Load(EOS(STATIC_12876), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12876_0__init__Load(EOS(STATIC_12876), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12880_0__init__FieldAccess(EOS(STATIC_12880), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12880_0__init__FieldAccess(EOS(STATIC_12880), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12884_0__init__Return(EOS(STATIC_12884), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12884_0__init__Return(EOS(STATIC_12884), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12888_0_buildExpression_Store(EOS(STATIC_12888), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12888_0_buildExpression_Store(EOS(STATIC_12888), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12892_0_buildExpression_New(EOS(STATIC_12892), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12892_0_buildExpression_New(EOS(STATIC_12892), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12896_0_buildExpression_Duplicate(EOS(STATIC_12896), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12896_0_buildExpression_Duplicate(EOS(STATIC_12896), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12899_0_buildExpression_ConstantStackPush(EOS(STATIC_12899), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12899_0_buildExpression_ConstantStackPush(EOS(STATIC_12899), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12902_0_buildExpression_Load(EOS(STATIC_12902), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12902_0_buildExpression_Load(EOS(STATIC_12902), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12905_0_buildExpression_InvokeMethod(EOS(STATIC_12905), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12905_0_buildExpression_InvokeMethod(EOS(STATIC_12905), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12908_0__init__Load(EOS(STATIC_12908), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12908_0__init__Load(EOS(STATIC_12908), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12917_0__init__InvokeMethod(EOS(STATIC_12917), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12917_0__init__InvokeMethod(EOS(STATIC_12917), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12922_0__init__Load(EOS(STATIC_12922), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12922_0__init__Load(EOS(STATIC_12922), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12926_0__init__Load(EOS(STATIC_12926), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12926_0__init__Load(EOS(STATIC_12926), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12929_0__init__FieldAccess(EOS(STATIC_12929), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12929_0__init__FieldAccess(EOS(STATIC_12929), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12932_0__init__Load(EOS(STATIC_12932), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12932_0__init__Load(EOS(STATIC_12932), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12935_0__init__Load(EOS(STATIC_12935), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12935_0__init__Load(EOS(STATIC_12935), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12938_0__init__FieldAccess(EOS(STATIC_12938), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12938_0__init__FieldAccess(EOS(STATIC_12938), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12942_0__init__Return(EOS(STATIC_12942), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12942_0__init__Return(EOS(STATIC_12942), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12945_0_buildExpression_Store(EOS(STATIC_12945), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12945_0_buildExpression_Store(EOS(STATIC_12945), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12948_0_buildExpression_New(EOS(STATIC_12948), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12948_0_buildExpression_New(EOS(STATIC_12948), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12952_0_buildExpression_Duplicate(EOS(STATIC_12952), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12952_0_buildExpression_Duplicate(EOS(STATIC_12952), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12956_0_buildExpression_ConstantStackPush(EOS(STATIC_12956), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12956_0_buildExpression_ConstantStackPush(EOS(STATIC_12956), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12960_0_buildExpression_Load(EOS(STATIC_12960), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12960_0_buildExpression_Load(EOS(STATIC_12960), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12964_0_buildExpression_InvokeMethod(EOS(STATIC_12964), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12964_0_buildExpression_InvokeMethod(EOS(STATIC_12964), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12968_0__init__Load(EOS(STATIC_12968), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12968_0__init__Load(EOS(STATIC_12968), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12974_0__init__InvokeMethod(EOS(STATIC_12974), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12974_0__init__InvokeMethod(EOS(STATIC_12974), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12977_0__init__Load(EOS(STATIC_12977), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12977_0__init__Load(EOS(STATIC_12977), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12980_0__init__Load(EOS(STATIC_12980), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12980_0__init__Load(EOS(STATIC_12980), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12983_0__init__FieldAccess(EOS(STATIC_12983), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12983_0__init__FieldAccess(EOS(STATIC_12983), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12986_0__init__Load(EOS(STATIC_12986), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12986_0__init__Load(EOS(STATIC_12986), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12992_0__init__Load(EOS(STATIC_12992), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12992_0__init__Load(EOS(STATIC_12992), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f12997_0__init__FieldAccess(EOS(STATIC_12997), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f12997_0__init__FieldAccess(EOS(STATIC_12997), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13002_0__init__Return(EOS(STATIC_13002), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13002_0__init__Return(EOS(STATIC_13002), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13006_0_buildExpression_Store(EOS(STATIC_13006), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13006_0_buildExpression_Store(EOS(STATIC_13006), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13009_0_buildExpression_New(EOS(STATIC_13009), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13009_0_buildExpression_New(EOS(STATIC_13009), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13012_0_buildExpression_Duplicate(EOS(STATIC_13012), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13012_0_buildExpression_Duplicate(EOS(STATIC_13012), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13015_0_buildExpression_ConstantStackPush(EOS(STATIC_13015), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13015_0_buildExpression_ConstantStackPush(EOS(STATIC_13015), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13018_0_buildExpression_Load(EOS(STATIC_13018), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13018_0_buildExpression_Load(EOS(STATIC_13018), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13021_0_buildExpression_InvokeMethod(EOS(STATIC_13021), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13021_0_buildExpression_InvokeMethod(EOS(STATIC_13021), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13024_0__init__Load(EOS(STATIC_13024), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13024_0__init__Load(EOS(STATIC_13024), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13029_0__init__InvokeMethod(EOS(STATIC_13029), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13029_0__init__InvokeMethod(EOS(STATIC_13029), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13032_0__init__Load(EOS(STATIC_13032), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13032_0__init__Load(EOS(STATIC_13032), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13034_0__init__Load(EOS(STATIC_13034), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13034_0__init__Load(EOS(STATIC_13034), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13036_0__init__FieldAccess(EOS(STATIC_13036), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13036_0__init__FieldAccess(EOS(STATIC_13036), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13038_0__init__Load(EOS(STATIC_13038), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13038_0__init__Load(EOS(STATIC_13038), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13039_0__init__Load(EOS(STATIC_13039), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13039_0__init__Load(EOS(STATIC_13039), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13041_0__init__FieldAccess(EOS(STATIC_13041), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13041_0__init__FieldAccess(EOS(STATIC_13041), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13043_0__init__Return(EOS(STATIC_13043), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13043_0__init__Return(EOS(STATIC_13043), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13045_0_buildExpression_Store(EOS(STATIC_13045), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13045_0_buildExpression_Store(EOS(STATIC_13045), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13047_0_buildExpression_Load(EOS(STATIC_13047), java.lang.Object(ARRAY(i1544)), i1544, i1545) :|: TRUE
+f13047_0_buildExpression_Load(EOS(STATIC_13047), java.lang.Object(ARRAY(i1544)), i1544, i1545) -> f13049_0_buildExpression_Load(EOS(STATIC_13049), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545) :|: TRUE
+f13049_0_buildExpression_Load(EOS(STATIC_13049), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545) -> f13051_0_buildExpression_ConstantStackPush(EOS(STATIC_13051), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) :|: TRUE
+f13051_0_buildExpression_ConstantStackPush(EOS(STATIC_13051), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544) -> f13053_0_buildExpression_IntArithmetic(EOS(STATIC_13053), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544, 1) :|: TRUE
+f13053_0_buildExpression_IntArithmetic(EOS(STATIC_13053), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544, matching1) -> f13055_0_buildExpression_GT(EOS(STATIC_13055), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1544 - 1) :|: i1544 > 0 && matching1 = 1
+f13055_0_buildExpression_GT(EOS(STATIC_13055), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1657) -> f13020_0_buildExpression_GT(EOS(STATIC_13020), java.lang.Object(ARRAY(i1544)), i1544, i1545, i1545, i1657) :|: TRUE
+Combined rules. Obtained 4 IRulesP rules:
+f12660_0_buildExpression_Load(EOS(STATIC_12660), java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1545:0) -> f13020_0_buildExpression_GT(EOS(STATIC_13020), java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1545:0, i1544:0 - 1) :|: i1545:0 <= i1544:0 && i1544:0 > 0 && i1545:0 > i1544:0 - 1
+f13020_0_buildExpression_GT(EOS(STATIC_13020), java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1545:0, i1653:0) -> f12660_0_buildExpression_Load(EOS(STATIC_12660), java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0 + 1, i1545:0 + 1) :|: i1653:0 < i1545:0
+f13020_0_buildExpression_GT(EOS(STATIC_13020), java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1545:0, i1653:0) -> f12660_0_buildExpression_Load(EOS(STATIC_12660), java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0 + 1, i1545:0 + 1) :|: i1653:0 >= i1545:0
+f12660_0_buildExpression_Load(EOS(STATIC_12660), java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1545:0) -> f13020_0_buildExpression_GT(EOS(STATIC_13020), java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1545:0, i1544:0 - 1) :|: i1545:0 <= i1544:0 && i1544:0 > 0 && i1545:0 <= i1544:0 - 1
+Filtered constant ground arguments:
+   f12660_0_buildExpression_Load(x1, x2, x3, x4, x5) -> f12660_0_buildExpression_Load(x2, x3, x4, x5)
+   f13020_0_buildExpression_GT(x1, x2, x3, x4, x5, x6) -> f13020_0_buildExpression_GT(x2, x3, x4, x5, x6)
+Filtered duplicate arguments:
+   f12660_0_buildExpression_Load(x1, x2, x3, x4) -> f12660_0_buildExpression_Load(x1, x2, x4)
+   f13020_0_buildExpression_GT(x1, x2, x3, x4, x5) -> f13020_0_buildExpression_GT(x1, x2, x4, x5)
+Finished conversion. Obtained 4 rules.P rules:
+f12660_0_buildExpression_Load(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1544:0) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1544:0 - 1, i1544:0) :|: i1544:0 > 0 && i1545:0 > i1544:0 - 1 && i1545:0 <= i1544:0
+f13020_0_buildExpression_GT(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1653:0, i1544:0) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0 + 1, i1544:0) :|: i1653:0 < i1545:0
+f13020_0_buildExpression_GT(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1653:0, i1544:0) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0 + 1, i1544:0) :|: i1653:0 >= i1545:0
+f12660_0_buildExpression_Load(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1544:0) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1544:0 - 1, i1544:0) :|: i1544:0 > 0 && i1545:0 <= i1544:0 - 1 && i1545:0 <= i1544:0
+
+----------------------------------------
+
+(42)
+Obligation:
+Rules:
+f12660_0_buildExpression_Load(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1544:0) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1544:0 - 1, i1544:0) :|: i1544:0 > 0 && i1545:0 > i1544:0 - 1 && i1545:0 <= i1544:0
+f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x)), x, x1, x2, x) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x)), x, x1 + 1, x) :|: x2 < x1
+f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x3)), x3, x4, x5, x3) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x3)), x3, x4 + 1, x3) :|: x5 >= x4
+f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x6)), x6, x7, x6) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x6)), x6, x7, x6 - 1, x6) :|: x6 > 0 && x7 <= x6 - 1 && x7 <= x6
+
+----------------------------------------
+
+(43) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(44)
+Obligation:
+Rules:
+f12660_0_buildExpression_Load(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1544:0) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, arith, i1544:0) :|: i1544:0 > 0 && i1545:0 > i1544:0 - 1 && i1545:0 <= i1544:0 && arith = i1544:0 - 1
+f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x8)), x8, x9, x10, x8) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x8)), x8, x11, x8) :|: x10 < x9 && x11 = x9 + 1
+f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x12)), x12, x13, x14, x12) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x12)), x12, x15, x12) :|: x14 >= x13 && x15 = x13 + 1
+f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x16)), x16, x17, x16) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x16)), x16, x17, x18, x16) :|: x16 > 0 && x17 <= x16 - 1 && x17 <= x16 && x18 = x16 - 1
+
+----------------------------------------
+
+(45) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f12660_0_buildExpression_Load(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1544:0) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, arith, i1544:0) :|: i1544:0 > 0 && i1545:0 > i1544:0 - 1 && i1545:0 <= i1544:0 && arith = i1544:0 - 1
+(2) f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x8)), x8, x9, x10, x8) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x8)), x8, x11, x8) :|: x10 < x9 && x11 = x9 + 1
+(3) f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x12)), x12, x13, x14, x12) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x12)), x12, x15, x12) :|: x14 >= x13 && x15 = x13 + 1
+(4) f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x16)), x16, x17, x16) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x16)), x16, x17, x18, x16) :|: x16 > 0 && x17 <= x16 - 1 && x17 <= x16 && x18 = x16 - 1
+
+Arcs:
+(1) -> (2)
+(2) -> (1), (4)
+(3) -> (1), (4)
+(4) -> (3)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(46)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f12660_0_buildExpression_Load(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, i1544:0) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(i1544:0)), i1544:0, i1545:0, arith, i1544:0) :|: i1544:0 > 0 && i1545:0 > i1544:0 - 1 && i1545:0 <= i1544:0 && arith = i1544:0 - 1
+(2) f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x12)), x12, x13, x14, x12) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x12)), x12, x15, x12) :|: x14 >= x13 && x15 = x13 + 1
+(3) f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x16)), x16, x17, x16) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x16)), x16, x17, x18, x16) :|: x16 > 0 && x17 <= x16 - 1 && x17 <= x16 && x18 = x16 - 1
+(4) f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x8)), x8, x9, x10, x8) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x8)), x8, x11, x8) :|: x10 < x9 && x11 = x9 + 1
+
+Arcs:
+(1) -> (4)
+(2) -> (1), (3)
+(3) -> (2)
+(4) -> (1), (3)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(47) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(48)
+Obligation:
+Rules:
+f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x8:0)), x8:0, x9:0, x10:0, x8:0) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x8:0)), x8:0, x9:0 + 1, x8:0) :|: x9:0 > x10:0
+f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x16:0)), x16:0, x17:0, x16:0) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x16:0)), x16:0, x17:0, x16:0 - 1, x16:0) :|: x16:0 > 0 && x17:0 <= x16:0 - 1 && x17:0 <= x16:0
+f12660_0_buildExpression_Load(java.lang.Object(ARRAY(i1544:0:0)), i1544:0:0, i1545:0:0, i1544:0:0) -> f13020_0_buildExpression_GT(java.lang.Object(ARRAY(i1544:0:0)), i1544:0:0, i1545:0:0, i1544:0:0 - 1, i1544:0:0) :|: i1544:0:0 > 0 && i1545:0:0 > i1544:0:0 - 1 && i1545:0:0 <= i1544:0:0
+f13020_0_buildExpression_GT(java.lang.Object(ARRAY(x12:0)), x12:0, x13:0, x14:0, x12:0) -> f12660_0_buildExpression_Load(java.lang.Object(ARRAY(x12:0)), x12:0, x13:0 + 1, x12:0) :|: x14:0 >= x13:0
+
+----------------------------------------
+
+(49) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f13020_0_buildExpression_GT(VARIABLE, VARIABLE, INTEGER, INTEGER, VARIABLE)
+java.lang.Object(VARIABLE)
+ARRAY(VARIABLE)
+f12660_0_buildExpression_Load(VARIABLE, VARIABLE, INTEGER, VARIABLE)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(50)
+Obligation:
+Rules:
+f13020_0_buildExpression_GT(c, x8:0, x9:0, x10:0, x8:0) -> f12660_0_buildExpression_Load(c1, x8:0, c2, x8:0) :|: c2 = x9:0 + 1 && (c1 = 0 && c = 0) && x9:0 > x10:0
+f12660_0_buildExpression_Load(c3, x16:0, x17:0, x16:0) -> f13020_0_buildExpression_GT(c4, x16:0, x17:0, c5, x16:0) :|: c5 = x16:0 - 1 && (c4 = 0 && c3 = 0) && (x16:0 > 0 && x17:0 <= x16:0 - 1 && x17:0 <= x16:0)
+f12660_0_buildExpression_Load(c6, i1544:0:0, i1545:0:0, i1544:0:0) -> f13020_0_buildExpression_GT(c7, i1544:0:0, i1545:0:0, c8, i1544:0:0) :|: c8 = i1544:0:0 - 1 && (c7 = 0 && c6 = 0) && (i1544:0:0 > 0 && i1545:0:0 > i1544:0:0 - 1 && i1545:0:0 <= i1544:0:0)
+f13020_0_buildExpression_GT(c9, x12:0, x13:0, x14:0, x12:0) -> f12660_0_buildExpression_Load(c10, x12:0, c11, x12:0) :|: c11 = x13:0 + 1 && (c10 = 0 && c9 = 0) && x14:0 >= x13:0
+
+----------------------------------------
+
+(51) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f13020_0_buildExpression_GT ] = -2*f13020_0_buildExpression_GT_3 + 3*f13020_0_buildExpression_GT_5 + -1
+[ f12660_0_buildExpression_Load ] = 3*f12660_0_buildExpression_Load_4 + -2*f12660_0_buildExpression_Load_3
+
+The following rules are decreasing:
+f13020_0_buildExpression_GT(c, x8:0, x9:0, x10:0, x8:0) -> f12660_0_buildExpression_Load(c1, x8:0, c2, x8:0) :|: c2 = x9:0 + 1 && (c1 = 0 && c = 0) && x9:0 > x10:0
+f12660_0_buildExpression_Load(c3, x16:0, x17:0, x16:0) -> f13020_0_buildExpression_GT(c4, x16:0, x17:0, c5, x16:0) :|: c5 = x16:0 - 1 && (c4 = 0 && c3 = 0) && (x16:0 > 0 && x17:0 <= x16:0 - 1 && x17:0 <= x16:0)
+f12660_0_buildExpression_Load(c6, i1544:0:0, i1545:0:0, i1544:0:0) -> f13020_0_buildExpression_GT(c7, i1544:0:0, i1545:0:0, c8, i1544:0:0) :|: c8 = i1544:0:0 - 1 && (c7 = 0 && c6 = 0) && (i1544:0:0 > 0 && i1545:0:0 > i1544:0:0 - 1 && i1545:0:0 <= i1544:0:0)
+f13020_0_buildExpression_GT(c9, x12:0, x13:0, x14:0, x12:0) -> f12660_0_buildExpression_Load(c10, x12:0, c11, x12:0) :|: c11 = x13:0 + 1 && (c10 = 0 && c9 = 0) && x14:0 >= x13:0
+
+The following rules are bounded:
+f12660_0_buildExpression_Load(c3, x16:0, x17:0, x16:0) -> f13020_0_buildExpression_GT(c4, x16:0, x17:0, c5, x16:0) :|: c5 = x16:0 - 1 && (c4 = 0 && c3 = 0) && (x16:0 > 0 && x17:0 <= x16:0 - 1 && x17:0 <= x16:0)
+f12660_0_buildExpression_Load(c6, i1544:0:0, i1545:0:0, i1544:0:0) -> f13020_0_buildExpression_GT(c7, i1544:0:0, i1545:0:0, c8, i1544:0:0) :|: c8 = i1544:0:0 - 1 && (c7 = 0 && c6 = 0) && (i1544:0:0 > 0 && i1545:0:0 > i1544:0:0 - 1 && i1545:0:0 <= i1544:0:0)
+
+
+----------------------------------------
+
+(52)
+Obligation:
+Rules:
+f13020_0_buildExpression_GT(c, x8:0, x9:0, x10:0, x8:0) -> f12660_0_buildExpression_Load(c1, x8:0, c2, x8:0) :|: c2 = x9:0 + 1 && (c1 = 0 && c = 0) && x9:0 > x10:0
+f13020_0_buildExpression_GT(c9, x12:0, x13:0, x14:0, x12:0) -> f12660_0_buildExpression_Load(c10, x12:0, c11, x12:0) :|: c11 = x13:0 + 1 && (c10 = 0 && c9 = 0) && x14:0 >= x13:0
+
+----------------------------------------
+
+(53) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f13020_0_buildExpression_GT(x, x1, x2, x3, x4)] = c*x
+[f12660_0_buildExpression_Load(x5, x6, x7, x8)] = -1 + c5*x5
+
+The following rules are decreasing:
+f13020_0_buildExpression_GT(c, x8:0, x9:0, x10:0, x8:0) -> f12660_0_buildExpression_Load(c1, x8:0, c2, x8:0) :|: c2 = x9:0 + 1 && (c1 = 0 && c = 0) && x9:0 > x10:0
+f13020_0_buildExpression_GT(c9, x12:0, x13:0, x14:0, x12:0) -> f12660_0_buildExpression_Load(c10, x12:0, c11, x12:0) :|: c11 = x13:0 + 1 && (c10 = 0 && c9 = 0) && x14:0 >= x13:0
+The following rules are bounded:
+f13020_0_buildExpression_GT(c, x8:0, x9:0, x10:0, x8:0) -> f12660_0_buildExpression_Load(c1, x8:0, c2, x8:0) :|: c2 = x9:0 + 1 && (c1 = 0 && c = 0) && x9:0 > x10:0
+f13020_0_buildExpression_GT(c9, x12:0, x13:0, x14:0, x12:0) -> f12660_0_buildExpression_Load(c10, x12:0, c11, x12:0) :|: c11 = x13:0 + 1 && (c10 = 0 && c9 = 0) && x14:0 >= x13:0
+
+----------------------------------------
+
+(54)
+YES

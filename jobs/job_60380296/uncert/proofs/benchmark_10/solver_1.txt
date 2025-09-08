@@ -1,0 +1,1034 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/DT7tR.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 1174 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 723 ms]
+        (9) QDP
+        (10) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (11) QDP
+        (12) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (13) YES
+    (14) JBCTerminationSCC
+        (15) SCCToIRSProof [SOUND, 228 ms]
+        (16) IRSwT
+        (17) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (18) IRSwT
+        (19) IRSwTTerminationDigraphProof [EQUIVALENT, 41 ms]
+        (20) IRSwT
+        (21) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (22) IRSwT
+        (23) TempFilterProof [SOUND, 37 ms]
+        (24) IntTRS
+        (25) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (26) IntTRS
+        (27) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (28) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package Terms;
+
+public final class FunctionApplication extends Term {
+	FunctionSymbol fs;
+	List<Term> args;
+	
+	public FunctionApplication(FunctionSymbol f, List<Term> a) {
+		this.fs = f;
+		this.args = a;
+	}
+
+	public void collectVariables(List<Variable> vars) {
+		List<Term> cur = this.args;
+		while (cur != null) {
+			cur.value.collectVariables(vars);
+			cur = cur.next;
+		}
+	}
+
+	public Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that) {
+		if (that instanceof Variable) {
+			return null;
+		}
+		FunctionApplication fThat = (FunctionApplication) that;
+		if (this.fs.equals(fThat.fs)) {
+			List<Term> curThisArg = this.args; 
+			List<Term> curThatArg = fThat.args; 
+			while (curThisArg != null && curThatArg != null) {
+				sigma = curThisArg.value.extendMatchingSubstitution(sigma, curThatArg.value);
+				if (sigma == null) {
+					return null;
+				}
+				curThisArg = curThisArg.next;
+				curThatArg = curThatArg.next;
+			}
+			return sigma;
+		} else {
+			return null;
+		}
+	}
+
+
+	public int getDepth(){
+		int currentMaximum=0;
+		List<Term> cur = this.args;
+		while (cur != null) {
+			int currentDepth = cur.value.getDepth()+1;
+			if (currentDepth > currentMaximum) currentMaximum=currentDepth;
+			cur = cur.next;
+		}
+		return currentMaximum;
+	}
+	
+	public boolean equals(Object o) {
+		if (o instanceof FunctionApplication) {
+			FunctionApplication oFA = (FunctionApplication) o;
+			return (this.fs.equals(oFA.fs) && this.args.equals(oFA.args));
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return args.hashCode() * fs.hashCode();
+	}
+}
+
+
+package Terms;
+
+public final class FunctionSymbol {
+	int number;
+
+	public FunctionSymbol(int id) {
+		this.number = id;
+	}
+
+	public int getArity() {
+		return this.number;
+	}
+
+	public boolean equals(Object o) {
+		if (o instanceof FunctionSymbol) {
+			return this.number == ((FunctionSymbol) o).number;
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return this.number;
+	}
+}
+
+
+package Terms;
+
+public final class List<T> {
+	public T value;
+	public List<T> next;
+
+	public void add(T v) {
+		List<T> newEle = new List<T>();
+		newEle.value = this.value;
+		newEle.next = this.next;
+		this.next = newEle;
+		this.value = v;
+	}
+}
+
+
+
+package Terms;
+
+public final class Map<K, V> {
+	private K key;
+	private V value;
+	private Map<K, V> next;
+
+	public void put(K k, V v) {
+		Map<K, V> newEntry = new Map<K, V>();
+		newEntry.key = this.key;
+		newEntry.value = this.value;
+		newEntry.next = this.next;
+		this.next = newEntry;
+		this.key = k;
+		this.value = v;
+	}
+
+	public V get(K k) {
+		if (this.key.equals(k)) {
+			return this.value;
+		}
+		if (this.next != null) {
+			return this.next.get(k);
+		}
+		return null;
+	}
+}
+
+
+
+package Terms;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package Terms;
+
+public abstract class Term {
+	/**
+	 * @param n maximal depth of the return term
+	 * @return some term of maximal depth n
+	 */
+	public static Term create(int n) {
+		if (n <= 1) {
+			return new Variable(Random.random());
+		} else {
+			int arity = Random.random();
+			List<Term> args = new List<Term>();
+			for (int i = 0; i < arity; i++) {
+				args.add(Term.create(n-1));
+			}
+			return new FunctionApplication(new FunctionSymbol(arity), args);
+		}
+	}
+
+	public final boolean matches(final Term that) {
+		Map<Variable, Term> sigma = new Map<Variable, Term>();
+		sigma = this.extendMatchingSubstitution(sigma, that);
+		return sigma != null;
+	}
+
+	public abstract Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that);
+
+	public abstract void collectVariables(List<Variable> vars);
+
+	public final List<Variable> getVariables() {
+		final List<Variable> vars = new List<Variable>();
+		this.collectVariables(vars);
+		return vars;
+	}
+
+	public abstract int getDepth();
+}
+
+
+package Terms;
+
+public class TermsCreateMatch {
+	public static void main(String[] args) {
+		Random.args = args;
+		Term t1 = Term.create(Random.random());
+		Term t2 = Term.create(Random.random());
+		t1.matches(t2);
+	}
+}
+
+
+package Terms;
+
+public final class Variable extends Term {
+	int number;
+
+	public Variable(int id) {
+		this.number = id;
+	}
+
+
+	public void collectVariables(List<Variable> vars) {
+		vars.add(this);
+	}
+	
+	public Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that) {
+		Term thisSigma = sigma.get(this);
+		if (thisSigma == null) {
+			sigma.put(this, that);
+			return sigma;
+		} else {
+			if (thisSigma.equals(that)) {
+				return sigma;
+			} else {
+				return null;
+			}
+		}
+	}
+
+
+	public int getDepth(){
+		return 0;
+	}
+
+	public boolean equals(Object o) {
+		if (o instanceof Variable) {
+			return this.number == ((Variable) o).number;
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return number;
+	}
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package Terms;
+
+public final class FunctionApplication extends Term {
+	FunctionSymbol fs;
+	List<Term> args;
+	
+	public FunctionApplication(FunctionSymbol f, List<Term> a) {
+		this.fs = f;
+		this.args = a;
+	}
+
+	public void collectVariables(List<Variable> vars) {
+		List<Term> cur = this.args;
+		while (cur != null) {
+			cur.value.collectVariables(vars);
+			cur = cur.next;
+		}
+	}
+
+	public Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that) {
+		if (that instanceof Variable) {
+			return null;
+		}
+		FunctionApplication fThat = (FunctionApplication) that;
+		if (this.fs.equals(fThat.fs)) {
+			List<Term> curThisArg = this.args; 
+			List<Term> curThatArg = fThat.args; 
+			while (curThisArg != null && curThatArg != null) {
+				sigma = curThisArg.value.extendMatchingSubstitution(sigma, curThatArg.value);
+				if (sigma == null) {
+					return null;
+				}
+				curThisArg = curThisArg.next;
+				curThatArg = curThatArg.next;
+			}
+			return sigma;
+		} else {
+			return null;
+		}
+	}
+
+
+	public int getDepth(){
+		int currentMaximum=0;
+		List<Term> cur = this.args;
+		while (cur != null) {
+			int currentDepth = cur.value.getDepth()+1;
+			if (currentDepth > currentMaximum) currentMaximum=currentDepth;
+			cur = cur.next;
+		}
+		return currentMaximum;
+	}
+	
+	public boolean equals(Object o) {
+		if (o instanceof FunctionApplication) {
+			FunctionApplication oFA = (FunctionApplication) o;
+			return (this.fs.equals(oFA.fs) && this.args.equals(oFA.args));
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return args.hashCode() * fs.hashCode();
+	}
+}
+
+
+package Terms;
+
+public final class FunctionSymbol {
+	int number;
+
+	public FunctionSymbol(int id) {
+		this.number = id;
+	}
+
+	public int getArity() {
+		return this.number;
+	}
+
+	public boolean equals(Object o) {
+		if (o instanceof FunctionSymbol) {
+			return this.number == ((FunctionSymbol) o).number;
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return this.number;
+	}
+}
+
+
+package Terms;
+
+public final class List<T> {
+	public T value;
+	public List<T> next;
+
+	public void add(T v) {
+		List<T> newEle = new List<T>();
+		newEle.value = this.value;
+		newEle.next = this.next;
+		this.next = newEle;
+		this.value = v;
+	}
+}
+
+
+
+package Terms;
+
+public final class Map<K, V> {
+	private K key;
+	private V value;
+	private Map<K, V> next;
+
+	public void put(K k, V v) {
+		Map<K, V> newEntry = new Map<K, V>();
+		newEntry.key = this.key;
+		newEntry.value = this.value;
+		newEntry.next = this.next;
+		this.next = newEntry;
+		this.key = k;
+		this.value = v;
+	}
+
+	public V get(K k) {
+		if (this.key.equals(k)) {
+			return this.value;
+		}
+		if (this.next != null) {
+			return this.next.get(k);
+		}
+		return null;
+	}
+}
+
+
+
+package Terms;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package Terms;
+
+public abstract class Term {
+	/**
+	 * @param n maximal depth of the return term
+	 * @return some term of maximal depth n
+	 */
+	public static Term create(int n) {
+		if (n <= 1) {
+			return new Variable(Random.random());
+		} else {
+			int arity = Random.random();
+			List<Term> args = new List<Term>();
+			for (int i = 0; i < arity; i++) {
+				args.add(Term.create(n-1));
+			}
+			return new FunctionApplication(new FunctionSymbol(arity), args);
+		}
+	}
+
+	public final boolean matches(final Term that) {
+		Map<Variable, Term> sigma = new Map<Variable, Term>();
+		sigma = this.extendMatchingSubstitution(sigma, that);
+		return sigma != null;
+	}
+
+	public abstract Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that);
+
+	public abstract void collectVariables(List<Variable> vars);
+
+	public final List<Variable> getVariables() {
+		final List<Variable> vars = new List<Variable>();
+		this.collectVariables(vars);
+		return vars;
+	}
+
+	public abstract int getDepth();
+}
+
+
+package Terms;
+
+public class TermsCreateMatch {
+	public static void main(String[] args) {
+		Random.args = args;
+		Term t1 = Term.create(Random.random());
+		Term t2 = Term.create(Random.random());
+		t1.matches(t2);
+	}
+}
+
+
+package Terms;
+
+public final class Variable extends Term {
+	int number;
+
+	public Variable(int id) {
+		this.number = id;
+	}
+
+
+	public void collectVariables(List<Variable> vars) {
+		vars.add(this);
+	}
+	
+	public Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that) {
+		Term thisSigma = sigma.get(this);
+		if (thisSigma == null) {
+			sigma.put(this, that);
+			return sigma;
+		} else {
+			if (thisSigma.equals(that)) {
+				return sigma;
+			} else {
+				return null;
+			}
+		}
+	}
+
+
+	public int getDepth(){
+		return 0;
+	}
+
+	public boolean equals(Object o) {
+		if (o instanceof Variable) {
+			return this.number == ((Variable) o).number;
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return number;
+	}
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+Terms.TermsCreateMatch.main([Ljava/lang/String;)V: Graph of 483 nodes with 0 SCCs.
+
+
+
+Terms.Term.create(I)LTerms/Term;: Graph of 274 nodes with 1 SCC.
+
+
+
+Terms.Map.get(Ljava/lang/Object;)Ljava/lang/Object;: Graph of 24 nodes with 0 SCCs.
+
+
+
+Terms.FunctionApplication.extendMatchingSubstitution(LTerms/Map;LTerms/Term;)LTerms/Map;: Graph of 374 nodes with 1 SCC.
+
+
+
+Terms.FunctionSymbol.equals(Ljava/lang/Object;)Z: Graph of 26 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Terms.FunctionApplication.extendMatchingSubstitution(LTerms/Map;LTerms/Term;)LTerms/Map;
+SCC calls the following helper methods: Terms.FunctionApplication.extendMatchingSubstitution(LTerms/Map;LTerms/Term;)LTerms/Map;, Terms.FunctionSymbol.equals(Ljava/lang/Object;)Z, Terms.Map.get(Ljava/lang/Object;)Ljava/lang/Object;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*Terms.FunctionApplication: [fs, args]
+*Terms.List: [value, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated rules. Obtained 91 IRulesP rules:
+f14825_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14825), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL) -> f14830_0_extendMatchingSubstitution_Load(EOS(STATIC_14830), java.lang.Object(o9901sub), NULL, o9553, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL) :|: i7326 > 1
+f14825_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14825), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL) -> f14830_1_extendMatchingSubstitution_Load(EOS(STATIC_14830), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL) :|: i7326 > 1
+f14830_0_extendMatchingSubstitution_Load(EOS(STATIC_14830), java.lang.Object(o9901sub), NULL, o9553, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL) -> f14839_0_extendMatchingSubstitution_Load(EOS(STATIC_14839), java.lang.Object(o9901sub), NULL, o9553, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL) :|: TRUE
+f14839_0_extendMatchingSubstitution_Load(EOS(STATIC_14839), java.lang.Object(o9901sub), NULL, o9553, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL) -> f14847_0_extendMatchingSubstitution_Load(EOS(STATIC_14847), java.lang.Object(o9901sub), NULL, o9553, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL, o9608[List.value]o9901) :|: o9608[List.value]o9901 = 1
+f14847_0_extendMatchingSubstitution_Load(EOS(STATIC_14847), java.lang.Object(o9977sub), NULL, o9979, o9982, java.lang.Object(o9977sub), java.lang.Object(Terms.Map(EOC)), NULL, o9982[List.value]o9977) -> f14865_0_extendMatchingSubstitution_Load(EOS(STATIC_14865), java.lang.Object(o9977sub), NULL, java.lang.Object(o9977sub), java.lang.Object(Terms.Map(EOC)), NULL) :|: TRUE
+f14865_0_extendMatchingSubstitution_Load(EOS(STATIC_14865), java.lang.Object(o9977sub), NULL, java.lang.Object(o9977sub), java.lang.Object(Terms.Map(EOC)), NULL) -> f14403_0_extendMatchingSubstitution_Load(EOS(STATIC_14403), java.lang.Object(o9977sub), NULL, java.lang.Object(o9977sub), java.lang.Object(Terms.Map(EOC)), NULL) :|: TRUE
+f14403_0_extendMatchingSubstitution_Load(EOS(STATIC_14403), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), o7042) -> f14404_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14404), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), o7042, o7042) :|: TRUE
+f14404_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14404), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7043sub), java.lang.Object(o7043sub)) -> f14405_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14405), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7043sub), java.lang.Object(o7043sub)) :|: TRUE
+f14405_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14405), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), java.lang.Object(o7045sub)) -> f14408_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14408), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), java.lang.Object(o7045sub)) :|: TRUE
+f14408_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14408), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), java.lang.Object(o7045sub)) -> f14411_0_extendMatchingSubstitution_EQ(EOS(STATIC_14411), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), 0) :|: TRUE
+f14411_0_extendMatchingSubstitution_EQ(EOS(STATIC_14411), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), matching1) -> f14414_0_extendMatchingSubstitution_Load(EOS(STATIC_14414), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub)) :|: TRUE && matching1 = 0
+f14414_0_extendMatchingSubstitution_Load(EOS(STATIC_14414), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub)) -> f14417_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14417), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub)) :|: TRUE
+f14417_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14417), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub)) -> f14420_0_extendMatchingSubstitution_Store(EOS(STATIC_14420), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub)) :|: TRUE
+f14420_0_extendMatchingSubstitution_Store(EOS(STATIC_14420), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub)) -> f14422_0_extendMatchingSubstitution_Load(EOS(STATIC_14422), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub)) :|: TRUE
+f14422_0_extendMatchingSubstitution_Load(EOS(STATIC_14422), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub)) -> f14426_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14426), o7033, o7034, java.lang.Object(o7040sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), java.lang.Object(o7040sub)) :|: TRUE
+f14426_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14426), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171)))) -> f14428_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14428), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171)))) :|: TRUE
+f14428_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14428), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171)))) -> f14430_0_extendMatchingSubstitution_Load(EOS(STATIC_14430), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), o7170) :|: TRUE
+f14430_0_extendMatchingSubstitution_Load(EOS(STATIC_14430), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), o7170) -> f14432_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14432), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o7045sub), o7170, java.lang.Object(o7045sub)) :|: TRUE
+f14432_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14432), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), o7170, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230)))) -> f14434_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14434), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), o7170, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230)))) :|: TRUE
+f14434_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14434), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), o7170, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230)))) -> f14435_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14435), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7170, o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), o7170, o7229) :|: TRUE
+f14435_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14435), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), java.lang.Object(o7231sub), o7229) -> f14437_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14437), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), java.lang.Object(o7231sub), o7229) :|: TRUE
+f14437_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14437), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), java.lang.Object(o7231sub), o7229) -> f14440_0_equals_Load(EOS(STATIC_14440), java.lang.Object(o7231sub), o7229, o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub), o7171))), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), java.lang.Object(o7231sub), o7229) :|: i7008 > 1
+f14437_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14437), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), java.lang.Object(o7231sub), o7229) -> f14440_1_equals_Load(EOS(STATIC_14440), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), java.lang.Object(o7231sub), o7229) :|: i7008 > 1
+f14440_0_equals_Load(EOS(STATIC_14440), java.lang.Object(o7231sub), o7229, o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub), o7171))), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), java.lang.Object(o7231sub), o7229) -> f15163_0_equals_Load(EOS(STATIC_15163), java.lang.Object(o7231sub), o7229, o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub), o7171))), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229, o7230))), java.lang.Object(o7231sub), o7229) :|: TRUE
+f14511_0_equals_Return(EOS(STATIC_14511), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7230))), matching1) -> f14517_0_equals_Return(EOS(STATIC_14517), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7230))), 0) :|: TRUE && matching1 = 0
+f14517_0_equals_Return(EOS(STATIC_14517), o7437, o7438, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7445))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), i7053) -> f14519_0_extendMatchingSubstitution_EQ(EOS(STATIC_14519), o7437, o7438, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7445))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), i7053) :|: TRUE
+f14519_0_extendMatchingSubstitution_EQ(EOS(STATIC_14519), o7437, o7438, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7445))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), matching1) -> f14521_0_extendMatchingSubstitution_EQ(EOS(STATIC_14521), o7437, o7438, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7445))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), 1) :|: TRUE && matching1 = 1
+f14521_0_extendMatchingSubstitution_EQ(EOS(STATIC_14521), o7437, o7438, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7445))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), matching1) -> f14523_0_extendMatchingSubstitution_Load(EOS(STATIC_14523), o7437, o7438, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7445))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449)))) :|: 1 > 0 && matching1 = 1
+f14523_0_extendMatchingSubstitution_Load(EOS(STATIC_14523), o7437, o7438, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7445))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449)))) -> f14527_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14527), o7437, o7438, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7445)))) :|: TRUE
+f14527_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14527), o7437, o7438, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7445)))) -> f14528_0_extendMatchingSubstitution_Store(EOS(STATIC_14528), o7437, o7438, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), o7445) :|: TRUE
+f14528_0_extendMatchingSubstitution_Store(EOS(STATIC_14528), o7437, o7438, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), o7445) -> f14529_0_extendMatchingSubstitution_Load(EOS(STATIC_14529), o7437, o7438, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), o7445) :|: TRUE
+f14529_0_extendMatchingSubstitution_Load(EOS(STATIC_14529), o7437, o7438, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449))), o7445) -> f14530_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14530), o7437, o7438, java.lang.Object(Terms.Map(EOC)), o7445, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449)))) :|: TRUE
+f14530_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14530), o7437, o7438, java.lang.Object(Terms.Map(EOC)), o7445, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7449)))) -> f14531_0_extendMatchingSubstitution_Store(EOS(STATIC_14531), o7437, o7438, java.lang.Object(Terms.Map(EOC)), o7445, o7449) :|: TRUE
+f14531_0_extendMatchingSubstitution_Store(EOS(STATIC_14531), o7437, o7438, java.lang.Object(Terms.Map(EOC)), o7445, o7449) -> f14532_0_extendMatchingSubstitution_Load(EOS(STATIC_14532), o7437, o7438, java.lang.Object(Terms.Map(EOC)), o7445, o7449) :|: TRUE
+f14532_0_extendMatchingSubstitution_Load(EOS(STATIC_14532), o7437, o7438, java.lang.Object(Terms.Map(EOC)), o7445, o7449) -> f14755_0_extendMatchingSubstitution_Load(EOS(STATIC_14755), o7437, o7438, java.lang.Object(Terms.Map(EOC)), o7445, o7449) :|: TRUE
+f14755_0_extendMatchingSubstitution_Load(EOS(STATIC_14755), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9561, o9562) -> f14757_0_extendMatchingSubstitution_NULL(EOS(STATIC_14757), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9561, o9562, o9561) :|: TRUE
+f14757_0_extendMatchingSubstitution_NULL(EOS(STATIC_14757), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), o9562, java.lang.Object(o9585sub)) -> f14759_0_extendMatchingSubstitution_NULL(EOS(STATIC_14759), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), o9562, java.lang.Object(o9585sub)) :|: TRUE
+f14759_0_extendMatchingSubstitution_NULL(EOS(STATIC_14759), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), o9562, java.lang.Object(o9585sub)) -> f14761_0_extendMatchingSubstitution_Load(EOS(STATIC_14761), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), o9562) :|: TRUE
+f14761_0_extendMatchingSubstitution_Load(EOS(STATIC_14761), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), o9562) -> f14764_0_extendMatchingSubstitution_NULL(EOS(STATIC_14764), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), o9562, o9562) :|: TRUE
+f14764_0_extendMatchingSubstitution_NULL(EOS(STATIC_14764), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), java.lang.Object(o9586sub), java.lang.Object(o9586sub)) -> f14767_0_extendMatchingSubstitution_NULL(EOS(STATIC_14767), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), java.lang.Object(o9586sub), java.lang.Object(o9586sub)) :|: TRUE
+f14767_0_extendMatchingSubstitution_NULL(EOS(STATIC_14767), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), java.lang.Object(o9586sub), java.lang.Object(o9586sub)) -> f14770_0_extendMatchingSubstitution_Load(EOS(STATIC_14770), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), java.lang.Object(o9586sub)) :|: TRUE
+f14770_0_extendMatchingSubstitution_Load(EOS(STATIC_14770), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), java.lang.Object(o9586sub)) -> f14773_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14773), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9585sub), java.lang.Object(o9586sub), java.lang.Object(o9585sub)) :|: TRUE
+f14773_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14773), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, o9609, o9610)), java.lang.Object(o9586sub), java.lang.Object(Terms.List(EOC, o9609, o9610))) -> f14777_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14777), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, o9609, o9610)), java.lang.Object(o9586sub), java.lang.Object(Terms.List(EOC, o9609, o9610))) :|: TRUE
+f14777_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14777), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, o9609, o9610)), java.lang.Object(o9586sub), java.lang.Object(Terms.List(EOC, o9609, o9610))) -> f14779_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14779), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, o9609, o9610)), java.lang.Object(o9586sub), o9609) :|: TRUE
+f14779_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14779), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9611sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9611sub)) -> f14781_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14781), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9611sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9611sub)) :|: TRUE
+f14781_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14781), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9612sub)) -> f14784_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14784), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9612sub)) :|: TRUE
+f14784_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14784), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9612sub)) -> f14788_0_extendMatchingSubstitution_Load(EOS(STATIC_14788), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9612sub)) :|: TRUE
+f14788_0_extendMatchingSubstitution_Load(EOS(STATIC_14788), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9612sub)) -> f14792_0_extendMatchingSubstitution_Load(EOS(STATIC_14792), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC))) :|: TRUE
+f14792_0_extendMatchingSubstitution_Load(EOS(STATIC_14792), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC))) -> f14795_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14795), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(o9586sub), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9586sub)) :|: TRUE
+f14795_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14795), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, o9680, o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, o9680, o9681))) -> f14799_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14799), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, o9680, o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, o9680, o9681))) :|: TRUE
+f14799_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14799), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, o9680, o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, o9680, o9681))) -> f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, o9680, o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), o9680) :|: TRUE
+f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9717sub), o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9717sub)) -> f14807_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14807), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9717sub), o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9717sub)) :|: TRUE
+f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), NULL) -> f14808_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14808), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), NULL) :|: TRUE
+f14807_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14807), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) -> f14814_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14814), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) :|: TRUE
+f14814_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14814), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) -> f14822_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14822), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) :|: TRUE
+f14822_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14822), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) -> f14828_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14828), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) :|: TRUE
+f14828_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14828), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) -> f14837_0_extendMatchingSubstitution_Load(EOS(STATIC_14837), java.lang.Object(o9922sub), java.lang.Object(o9722sub), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) :|: i7326 > 1
+f14828_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14828), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) -> f14837_1_extendMatchingSubstitution_Load(EOS(STATIC_14837), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) :|: i7326 > 1
+f14837_0_extendMatchingSubstitution_Load(EOS(STATIC_14837), java.lang.Object(o9922sub), java.lang.Object(o9722sub), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) -> f14844_0_extendMatchingSubstitution_Load(EOS(STATIC_14844), java.lang.Object(o9922sub), java.lang.Object(o9722sub), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) :|: TRUE
+f14844_0_extendMatchingSubstitution_Load(EOS(STATIC_14844), java.lang.Object(o9922sub), java.lang.Object(o9722sub), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub)) -> f14850_0_extendMatchingSubstitution_Load(EOS(STATIC_14850), java.lang.Object(o9922sub), java.lang.Object(o9722sub), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9922sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9722sub), o9681)), java.lang.Object(o9922sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9722sub), o9608[List.value]o9922, o9679[List.value]o9722) :|: o9608[List.value]o9922 = 1 && o9679[List.value]o9722 = 1
+f14850_0_extendMatchingSubstitution_Load(EOS(STATIC_14850), java.lang.Object(o9991sub), java.lang.Object(o9992sub), o9994, o9997, o10000, o10001, java.lang.Object(o9991sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9992sub), o10000[List.value]o9991, o10001[List.value]o9992) -> f14874_0_extendMatchingSubstitution_Load(EOS(STATIC_14874), java.lang.Object(o9991sub), java.lang.Object(o9992sub), java.lang.Object(o9991sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9992sub)) :|: TRUE
+f14874_0_extendMatchingSubstitution_Load(EOS(STATIC_14874), java.lang.Object(o9991sub), java.lang.Object(o9992sub), java.lang.Object(o9991sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9992sub)) -> f14403_0_extendMatchingSubstitution_Load(EOS(STATIC_14403), java.lang.Object(o9991sub), java.lang.Object(o9992sub), java.lang.Object(o9991sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9992sub)) :|: TRUE
+f14879_0_extendMatchingSubstitution_Return(EOS(STATIC_14879), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), java.lang.Object(Terms.Map(EOC))) -> f14894_0_extendMatchingSubstitution_Store(EOS(STATIC_14894), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), java.lang.Object(Terms.Map(EOC))) :|: TRUE
+f14894_0_extendMatchingSubstitution_Store(EOS(STATIC_14894), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), java.lang.Object(Terms.Map(EOC))) -> f14905_0_extendMatchingSubstitution_Load(EOS(STATIC_14905), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681))) :|: TRUE
+f14905_0_extendMatchingSubstitution_Load(EOS(STATIC_14905), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681))) -> f14912_0_extendMatchingSubstitution_NONNULL(EOS(STATIC_14912), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), java.lang.Object(Terms.Map(EOC))) :|: TRUE
+f14912_0_extendMatchingSubstitution_NONNULL(EOS(STATIC_14912), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), java.lang.Object(Terms.Map(EOC))) -> f14933_0_extendMatchingSubstitution_Load(EOS(STATIC_14933), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681))) :|: TRUE
+f14933_0_extendMatchingSubstitution_Load(EOS(STATIC_14933), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681))) -> f14945_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14945), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610))) :|: TRUE
+f14945_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14945), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610))) -> f14955_0_extendMatchingSubstitution_Store(EOS(STATIC_14955), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), o9610) :|: TRUE
+f14955_0_extendMatchingSubstitution_Store(EOS(STATIC_14955), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), o9610) -> f14964_0_extendMatchingSubstitution_Load(EOS(STATIC_14964), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681))) :|: TRUE
+f14964_0_extendMatchingSubstitution_Load(EOS(STATIC_14964), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681))) -> f14976_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14976), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681))) :|: TRUE
+f14976_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14976), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681))) -> f14998_0_extendMatchingSubstitution_Store(EOS(STATIC_14998), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) :|: TRUE
+f14998_0_extendMatchingSubstitution_Store(EOS(STATIC_14998), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) -> f14988_0_extendMatchingSubstitution_Store(EOS(STATIC_14988), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) :|: TRUE
+f14988_0_extendMatchingSubstitution_Store(EOS(STATIC_14988), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) -> f15002_0_extendMatchingSubstitution_JMP(EOS(STATIC_15002), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) :|: TRUE
+f15002_0_extendMatchingSubstitution_JMP(EOS(STATIC_15002), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) -> f15009_0_extendMatchingSubstitution_Load(EOS(STATIC_15009), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) :|: TRUE
+f15009_0_extendMatchingSubstitution_Load(EOS(STATIC_15009), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) -> f14755_0_extendMatchingSubstitution_Load(EOS(STATIC_14755), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) :|: TRUE
+f14808_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14808), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), NULL) -> f14816_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14816), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o9612sub), java.lang.Object(Terms.Map(EOC)), NULL) :|: TRUE
+f14816_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14816), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL) -> f14825_0_extendMatchingSubstitution_InvokeMethod(EOS(STATIC_14825), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o9901sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o9901sub), java.lang.Object(Terms.Map(EOC)), NULL) :|: TRUE
+f14516_0_equals_Return(EOS(STATIC_14516), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7230))), matching1) -> f14517_0_equals_Return(EOS(STATIC_14517), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7230))), 1) :|: TRUE && matching1 = 1
+f14870_0_extendMatchingSubstitution_Return(EOS(STATIC_14870), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(Terms.Map(EOC))) -> f14885_0_extendMatchingSubstitution_Store(EOS(STATIC_14885), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(Terms.Map(EOC))) :|: TRUE
+f14885_0_extendMatchingSubstitution_Store(EOS(STATIC_14885), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(Terms.Map(EOC))) -> f14898_0_extendMatchingSubstitution_Load(EOS(STATIC_14898), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681))) :|: TRUE
+f14898_0_extendMatchingSubstitution_Load(EOS(STATIC_14898), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681))) -> f14908_0_extendMatchingSubstitution_NONNULL(EOS(STATIC_14908), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(Terms.Map(EOC))) :|: TRUE
+f14908_0_extendMatchingSubstitution_NONNULL(EOS(STATIC_14908), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(Terms.Map(EOC))) -> f14920_0_extendMatchingSubstitution_Load(EOS(STATIC_14920), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681))) :|: TRUE
+f14920_0_extendMatchingSubstitution_Load(EOS(STATIC_14920), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681))) -> f14937_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14937), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610))) :|: TRUE
+f14937_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14937), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610))) -> f14949_0_extendMatchingSubstitution_Store(EOS(STATIC_14949), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, NULL, o9681)), o9610) :|: TRUE
+f14949_0_extendMatchingSubstitution_Store(EOS(STATIC_14949), o9553, o9554, java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.List(EOC, NULL, o9681)), o9610) -> f14958_0_extendMatchingSubstitution_Load(EOS(STATIC_14958), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, java.lang.Object(Terms.List(EOC, NULL, o9681))) :|: TRUE
+f14958_0_extendMatchingSubstitution_Load(EOS(STATIC_14958), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, java.lang.Object(Terms.List(EOC, NULL, o9681))) -> f14971_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14971), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, java.lang.Object(Terms.List(EOC, NULL, o9681))) :|: TRUE
+f14971_0_extendMatchingSubstitution_FieldAccess(EOS(STATIC_14971), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, java.lang.Object(Terms.List(EOC, NULL, o9681))) -> f14988_0_extendMatchingSubstitution_Store(EOS(STATIC_14988), o9553, o9554, java.lang.Object(Terms.Map(EOC)), o9610, o9681) :|: TRUE
+f14830_1_extendMatchingSubstitution_Load(EOS(STATIC_14830), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(o10134sub), java.lang.Object(Terms.Map(EOC)), NULL) -> f14870_0_extendMatchingSubstitution_Return(EOS(STATIC_14870), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10134sub), o9610)), java.lang.Object(Terms.List(EOC, NULL, o9681)), java.lang.Object(Terms.Map(EOC))) :|: TRUE
+f14440_1_equals_Load(EOS(STATIC_14440), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7230))), java.lang.Object(Terms.FunctionSymbol(EOC)), java.lang.Object(Terms.FunctionSymbol(EOC))) -> f14511_0_equals_Return(EOS(STATIC_14511), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7230))), 0) :|: TRUE
+f14440_1_equals_Load(EOS(STATIC_14440), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7230))), java.lang.Object(Terms.FunctionSymbol(EOC)), java.lang.Object(Terms.FunctionSymbol(EOC))) -> f14516_0_equals_Return(EOS(STATIC_14516), o7033, o7034, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7171))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), o7230))), 1) :|: TRUE
+f14837_1_extendMatchingSubstitution_Load(EOS(STATIC_14837), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), java.lang.Object(o10285sub), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o10283sub)) -> f14879_0_extendMatchingSubstitution_Return(EOS(STATIC_14879), o9553, o9554, java.lang.Object(Terms.List(EOC, java.lang.Object(o10285sub), o9610)), java.lang.Object(Terms.List(EOC, java.lang.Object(o10283sub), o9681)), java.lang.Object(Terms.Map(EOC))) :|: TRUE
+Combined rules. Obtained 6 IRulesP rules:
+f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o9553:0, o9554:0, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub:0), java.lang.Object(Terms.List(EOC, java.lang.Object(o9611sub:0), o9610:0)))), java.lang.Object(Terms.List(EOC, NULL, java.lang.Object(Terms.List(EOC, o9680:0, o9681:0)))), java.lang.Object(o9612sub:0), java.lang.Object(Terms.Map(EOC)), NULL) -> f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o9553:0, o9554:0, java.lang.Object(Terms.List(EOC, java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(EOC, o9680:0, o9681:0)), java.lang.Object(o9611sub:0), java.lang.Object(Terms.Map(EOC)), o9680:0) :|: TRUE
+f14404_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14404), o7033:0, o7034:0, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9611sub:0), o9610:0))))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), java.lang.Object(Terms.List(EOC, o9680:0, o9681:0))))), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.FunctionSymbol(EOC)), java.lang.Object(Terms.List(EOC, o9680:0, o9681:0)))))) -> f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o7033:0, o7034:0, java.lang.Object(Terms.List(EOC, java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(EOC, o9680:0, o9681:0)), java.lang.Object(o9611sub:0), java.lang.Object(Terms.Map(EOC)), o9680:0) :|: TRUE
+f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o9553:0, o9554:0, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub:0), java.lang.Object(Terms.List(EOC, java.lang.Object(o9611sub:0), o9610:0)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o9717sub:0), java.lang.Object(Terms.List(EOC, o9680:0, o9681:0)))), java.lang.Object(o9612sub:0), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9717sub:0)) -> f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o9553:0, o9554:0, java.lang.Object(Terms.List(EOC, java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(EOC, o9680:0, o9681:0)), java.lang.Object(o9611sub:0), java.lang.Object(Terms.Map(EOC)), o9680:0) :|: TRUE
+f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o9553:0, o9554:0, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub:0), o9610:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o9717sub:0), o9681:0)), java.lang.Object(o9612sub:0), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9717sub:0)) -> f14404_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14404), java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0), java.lang.Object(o9612sub:0), java.lang.Object(Terms.Map(EOC)), java.lang.Object(o9717sub:0), java.lang.Object(o9717sub:0)) :|: TRUE
+f14803_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14803), o9553:0, o9554:0, java.lang.Object(Terms.List(EOC, java.lang.Object(o9612sub:0), o9610:0)), java.lang.Object(Terms.List(EOC, NULL, o9681:0)), java.lang.Object(o9612sub:0), java.lang.Object(Terms.Map(EOC)), NULL) -> f14404_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14404), java.lang.Object(o9612sub:0), NULL, java.lang.Object(o9612sub:0), java.lang.Object(Terms.Map(EOC)), NULL, NULL) :|: TRUE
+Removed following non-SCC rules:
+f14404_0_extendMatchingSubstitution_CheckCast(EOS(STATIC_14404), o7033:0, o7034:0, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub:0), o7171:0))), java.lang.Object(Terms.Map(EOC)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229:0, o7230:0))), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229:0, o7230:0)))) -> f15163_0_equals_Load(EOS(STATIC_15163), java.lang.Object(o7231sub:0), o7229:0, o7033:0, o7034:0, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(o7231sub:0), o7171:0))), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o7229:0, o7230:0))), java.lang.Object(o7231sub:0), o7229:0) :|: TRUE
+Filtered constant ground arguments:
+   f14803_0_extendMatchingSubstitution_CheckCast(x1, x2, x3, x4, x5, x6, x7, x8) -> f14803_0_extendMatchingSubstitution_CheckCast(x2, x3, x4, x5, x6, x8)
+   f14404_0_extendMatchingSubstitution_CheckCast(x1, x2, x3, x4, x5, x6, x7) -> f14404_0_extendMatchingSubstitution_CheckCast(x2, x3, x4, x6, x7)
+   Terms.List(x1, x2, x3) -> Terms.List(x2, x3)
+   Terms.Map(x1) -> Terms.Map
+   Terms.FunctionApplication(x1, x2, x3) -> Terms.FunctionApplication(x3)
+   Terms.FunctionSymbol(x1) -> Terms.FunctionSymbol
+Filtered duplicate arguments:
+   f14404_0_extendMatchingSubstitution_CheckCast(x1, x2, x3, x4, x5) -> f14404_0_extendMatchingSubstitution_CheckCast(x1, x2, x3, x5)
+Filtered unneeded arguments:
+   f14803_0_extendMatchingSubstitution_CheckCast(x1, x2, x3, x4, x5, x6) -> f14803_0_extendMatchingSubstitution_CheckCast(x3, x4, x5, x6)
+   f14404_0_extendMatchingSubstitution_CheckCast(x1, x2, x3, x4) -> f14404_0_extendMatchingSubstitution_CheckCast(x3, x4)
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)))), java.lang.Object(Terms.List(NULL, java.lang.Object(Terms.List(o9680:0, o9681:0)))), java.lang.Object(o9612sub:0), NULL) -> f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(o9680:0, o9681:0)), java.lang.Object(o9611sub:0), o9680:0)
+   f14404_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0))))), java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(o9680:0, o9681:0)))))) -> f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(o9680:0, o9681:0)), java.lang.Object(o9611sub:0), o9680:0)
+   f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)))), java.lang.Object(Terms.List(java.lang.Object(o9717sub:0), java.lang.Object(Terms.List(o9680:0, o9681:0)))), java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0)) -> f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(o9680:0, o9681:0)), java.lang.Object(o9611sub:0), o9680:0)
+   f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), o9610:0)), java.lang.Object(Terms.List(java.lang.Object(o9717sub:0), o9681:0)), java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0)) -> f14404_0_extendMatchingSubstitution_CheckCast(java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0))
+   f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), o9610:0)), java.lang.Object(Terms.List(NULL, o9681:0)), java.lang.Object(o9612sub:0), NULL) -> f14404_0_extendMatchingSubstitution_CheckCast(java.lang.Object(o9612sub:0), NULL)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 1 SCC with 1 less node.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)))), java.lang.Object(Terms.List(java.lang.Object(o9717sub:0), java.lang.Object(Terms.List(o9680:0, o9681:0)))), java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0)) -> f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(o9680:0, o9681:0)), java.lang.Object(o9611sub:0), o9680:0)
+   f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)))), java.lang.Object(Terms.List(NULL, java.lang.Object(Terms.List(o9680:0, o9681:0)))), java.lang.Object(o9612sub:0), NULL) -> f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(o9680:0, o9681:0)), java.lang.Object(o9611sub:0), o9680:0)
+   f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), o9610:0)), java.lang.Object(Terms.List(java.lang.Object(o9717sub:0), o9681:0)), java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0)) -> f14404_0_extendMatchingSubstitution_CheckCast(java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0))
+   f14404_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0))))), java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(o9680:0, o9681:0)))))) -> f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(o9680:0, o9681:0)), java.lang.Object(o9611sub:0), o9680:0)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(12) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), o9610:0)), java.lang.Object(Terms.List(java.lang.Object(o9717sub:0), o9681:0)), java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0)) -> f14404_0_extendMatchingSubstitution_CheckCast(java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0))
+The graph contains the following edges 1 > 1, 3 >= 1, 2 > 2, 4 >= 2
+
+
+*f14404_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0))))), java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(o9680:0, o9681:0)))))) -> f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(o9680:0, o9681:0)), java.lang.Object(o9611sub:0), o9680:0)
+The graph contains the following edges 1 > 1, 2 > 2, 1 > 3, 2 > 4
+
+
+*f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)))), java.lang.Object(Terms.List(java.lang.Object(o9717sub:0), java.lang.Object(Terms.List(o9680:0, o9681:0)))), java.lang.Object(o9612sub:0), java.lang.Object(o9717sub:0)) -> f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(o9680:0, o9681:0)), java.lang.Object(o9611sub:0), o9680:0)
+The graph contains the following edges 1 > 1, 2 > 2, 1 > 3, 2 > 4
+
+
+*f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9612sub:0), java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)))), java.lang.Object(Terms.List(NULL, java.lang.Object(Terms.List(o9680:0, o9681:0)))), java.lang.Object(o9612sub:0), NULL) -> f14803_0_extendMatchingSubstitution_CheckCast(java.lang.Object(Terms.List(java.lang.Object(o9611sub:0), o9610:0)), java.lang.Object(Terms.List(o9680:0, o9681:0)), java.lang.Object(o9611sub:0), o9680:0)
+The graph contains the following edges 1 > 1, 2 > 2, 1 > 3, 2 > 4
+
+
+----------------------------------------
+
+(13)
+YES
+
+----------------------------------------
+
+(14)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Terms.Term.create(I)LTerms/Term;
+SCC calls the following helper methods: Terms.Term.create(I)LTerms/Term;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Terms.List: [value, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(15) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 108 IRulesP rules:
+f3851_0_create_ConstantStackPush(EOS(STATIC_3851(java.lang.Object(o483sub), i617)), i618, i618, i618) -> f3859_0_create_GT(EOS(STATIC_3859(java.lang.Object(o483sub), i617)), i618, i618, i618, 1) :|: TRUE
+f3859_0_create_GT(EOS(STATIC_3859(java.lang.Object(o483sub), i617)), i640, i640, i640, matching1) -> f3871_0_create_GT(EOS(STATIC_3871(java.lang.Object(o483sub), i617)), i640, i640, i640, 1) :|: TRUE && matching1 = 1
+f3871_0_create_GT(EOS(STATIC_3871(java.lang.Object(o483sub), i617)), i640, i640, i640, matching1) -> f3899_0_create_InvokeMethod(EOS(STATIC_3899(java.lang.Object(o483sub), i617)), i640, i640) :|: i640 > 1 && matching1 = 1
+f3899_0_create_InvokeMethod(EOS(STATIC_3899(java.lang.Object(o483sub), i617)), i640, i640) -> f3922_0_random_FieldAccess(EOS(STATIC_3922(java.lang.Object(o483sub), i617)), i640, i640) :|: TRUE
+f3922_0_random_FieldAccess(EOS(STATIC_3922(java.lang.Object(o483sub), i617)), i640, i640) -> f3934_0_random_FieldAccess(EOS(STATIC_3934(java.lang.Object(o483sub), i617)), i640, i640, java.lang.Object(o483sub)) :|: TRUE
+f3934_0_random_FieldAccess(EOS(STATIC_3934(java.lang.Object(o483sub), i617)), i640, i640, java.lang.Object(o483sub)) -> f3937_0_random_ArrayAccess(EOS(STATIC_3937(java.lang.Object(o483sub), i617)), i640, i640, java.lang.Object(o483sub), i617) :|: TRUE
+f3937_0_random_ArrayAccess(EOS(STATIC_3937(java.lang.Object(ARRAY(i671)), i617)), i640, i640, java.lang.Object(ARRAY(i671)), i617) -> f3941_0_random_ArrayAccess(EOS(STATIC_3941(java.lang.Object(ARRAY(i671)), i617)), i640, i640, java.lang.Object(ARRAY(i671)), i617) :|: i671 >= 0
+f3941_0_random_ArrayAccess(EOS(STATIC_3941(java.lang.Object(ARRAY(i671)), i617)), i640, i640, java.lang.Object(ARRAY(i671)), i617) -> f3951_0_random_ArrayAccess(EOS(STATIC_3951(java.lang.Object(ARRAY(i671)), i617)), i640, i640, java.lang.Object(ARRAY(i671)), i617) :|: TRUE
+f3951_0_random_ArrayAccess(EOS(STATIC_3951(java.lang.Object(ARRAY(i671)), i617)), i640, i640, java.lang.Object(ARRAY(i671)), i617) -> f3955_0_random_Store(EOS(STATIC_3955(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492) :|: i617 < i671
+f3955_0_random_Store(EOS(STATIC_3955(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492) -> f3964_0_random_FieldAccess(EOS(STATIC_3964(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492) :|: TRUE
+f3964_0_random_FieldAccess(EOS(STATIC_3964(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492) -> f3972_0_random_ConstantStackPush(EOS(STATIC_3972(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492, i617) :|: TRUE
+f3972_0_random_ConstantStackPush(EOS(STATIC_3972(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492, i617) -> f3979_0_random_IntArithmetic(EOS(STATIC_3979(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492, i617, 1) :|: TRUE
+f3979_0_random_IntArithmetic(EOS(STATIC_3979(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492, i617, matching1) -> f3990_0_random_FieldAccess(EOS(STATIC_3990(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492, i617 + 1) :|: i617 > 0 && matching1 = 1
+f3990_0_random_FieldAccess(EOS(STATIC_3990(java.lang.Object(ARRAY(i671)), i617)), i640, i640, o492, i681) -> f3993_0_random_Load(EOS(STATIC_3993(java.lang.Object(ARRAY(i671)), i681)), i640, i640, o492) :|: TRUE
+f3993_0_random_Load(EOS(STATIC_3993(java.lang.Object(ARRAY(i671)), i681)), i640, i640, o492) -> f4046_0_random_InvokeMethod(EOS(STATIC_4046(java.lang.Object(ARRAY(i671)), i681)), i640, i640, o492) :|: TRUE
+f4046_0_random_InvokeMethod(EOS(STATIC_4046(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(o509sub)) -> f4057_0_random_InvokeMethod(EOS(STATIC_4057(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(o509sub)) :|: TRUE
+f4057_0_random_InvokeMethod(EOS(STATIC_4057(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(o514sub)) -> f4068_0_random_InvokeMethod(EOS(STATIC_4068(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(o514sub)) :|: TRUE
+f4068_0_random_InvokeMethod(EOS(STATIC_4068(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(o514sub)) -> f4076_0_length_Load(EOS(STATIC_4076(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(o514sub)) :|: TRUE
+f4076_0_length_Load(EOS(STATIC_4076(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(o514sub)) -> f4084_0_length_FieldAccess(EOS(STATIC_4084(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(o514sub)) :|: TRUE
+f4084_0_length_FieldAccess(EOS(STATIC_4084(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(java.lang.String(EOC, i703))) -> f4092_0_length_FieldAccess(EOS(STATIC_4092(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(java.lang.String(EOC, i703))) :|: i703 >= 0
+f4092_0_length_FieldAccess(EOS(STATIC_4092(java.lang.Object(ARRAY(i671)), i681)), i640, i640, java.lang.Object(java.lang.String(EOC, i703))) -> f4113_0_length_Return(EOS(STATIC_4113(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4113_0_length_Return(EOS(STATIC_4113(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4122_0_random_Return(EOS(STATIC_4122(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4122_0_random_Return(EOS(STATIC_4122(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4136_0_create_Store(EOS(STATIC_4136(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4136_0_create_Store(EOS(STATIC_4136(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4145_0_create_New(EOS(STATIC_4145(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4145_0_create_New(EOS(STATIC_4145(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4150_0_create_Duplicate(EOS(STATIC_4150(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4150_0_create_Duplicate(EOS(STATIC_4150(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4156_0_create_InvokeMethod(EOS(STATIC_4156(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4156_0_create_InvokeMethod(EOS(STATIC_4156(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4164_0__init__Load(EOS(STATIC_4164(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4164_0__init__Load(EOS(STATIC_4164(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4186_0__init__InvokeMethod(EOS(STATIC_4186(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4186_0__init__InvokeMethod(EOS(STATIC_4186(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4198_0__init__Return(EOS(STATIC_4198(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4198_0__init__Return(EOS(STATIC_4198(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4206_0_create_Store(EOS(STATIC_4206(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4206_0_create_Store(EOS(STATIC_4206(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4212_0_create_ConstantStackPush(EOS(STATIC_4212(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) :|: TRUE
+f4212_0_create_ConstantStackPush(EOS(STATIC_4212(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703) -> f4325_0_create_Store(EOS(STATIC_4325(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703, 0) :|: TRUE
+f4325_0_create_Store(EOS(STATIC_4325(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703, matching1) -> f4371_0_create_Load(EOS(STATIC_4371(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703, 0) :|: TRUE && matching1 = 0
+f4371_0_create_Load(EOS(STATIC_4371(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703, matching1) -> f6623_0_create_Load(EOS(STATIC_6623(java.lang.Object(ARRAY(i671)), i681)), i640, i640, i703, 0) :|: TRUE && matching1 = 0
+f6623_0_create_Load(EOS(STATIC_6623(java.lang.Object(ARRAY(i1374)), i1375)), i640, i640, i1376, i1377) -> f9639_0_create_Load(EOS(STATIC_9639(java.lang.Object(ARRAY(i1374)), i1375)), i640, i640, i1376, i1377) :|: TRUE
+f9639_0_create_Load(EOS(STATIC_9639(java.lang.Object(ARRAY(i2193)), i2194)), i640, i640, i2195, i2196) -> f11003_0_create_Load(EOS(STATIC_11003(java.lang.Object(ARRAY(i2193)), i2194)), i640, i640, i2195, i2196) :|: TRUE
+f11003_0_create_Load(EOS(STATIC_11003(java.lang.Object(ARRAY(i2973)), i2974)), i640, i640, i2975, i2976) -> f12728_0_create_Load(EOS(STATIC_12728(java.lang.Object(ARRAY(i2973)), i2974)), i640, i640, i2975, i2976) :|: TRUE
+f12728_0_create_Load(EOS(STATIC_12728(java.lang.Object(ARRAY(i4003)), i4004)), i640, i640, i4005, i4006) -> f12943_0_create_Load(EOS(STATIC_12943(java.lang.Object(ARRAY(i4003)), i4004)), i640, i640, i4005, i4006) :|: TRUE
+f12943_0_create_Load(EOS(STATIC_12943(java.lang.Object(ARRAY(i4564)), i4565)), i640, i640, i4566, i4567) -> f13427_0_create_Load(EOS(STATIC_13427(java.lang.Object(ARRAY(i4564)), i4565)), i640, i640, i4566, i4567) :|: TRUE
+f13427_0_create_Load(EOS(STATIC_13427(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565) -> f13441_0_create_Load(EOS(STATIC_13441(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i5565) :|: TRUE
+f13441_0_create_Load(EOS(STATIC_13441(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i5565) -> f13450_0_create_GE(EOS(STATIC_13450(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i5565, i5564) :|: TRUE
+f13450_0_create_GE(EOS(STATIC_13450(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i5565, i5564) -> f13458_0_create_GE(EOS(STATIC_13458(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i5565, i5564) :|: i5565 < i5564
+f13458_0_create_GE(EOS(STATIC_13458(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i5565, i5564) -> f13465_0_create_Load(EOS(STATIC_13465(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565) :|: i5565 < i5564
+f13465_0_create_Load(EOS(STATIC_13465(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565) -> f13472_0_create_Load(EOS(STATIC_13472(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565) :|: TRUE
+f13472_0_create_Load(EOS(STATIC_13472(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565) -> f13479_0_create_ConstantStackPush(EOS(STATIC_13479(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i640) :|: TRUE
+f13479_0_create_ConstantStackPush(EOS(STATIC_13479(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i640) -> f13484_0_create_IntArithmetic(EOS(STATIC_13484(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i640, 1) :|: TRUE
+f13484_0_create_IntArithmetic(EOS(STATIC_13484(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i640, matching1) -> f13491_0_create_InvokeMethod(EOS(STATIC_13491(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i640 - 1) :|: i640 > 0 && matching1 = 1
+f13491_0_create_InvokeMethod(EOS(STATIC_13491(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i5736) -> f13497_0_create_Load(EOS(STATIC_13497(java.lang.Object(ARRAY(i5562)), i5563)), i5736, i5736) :|: i640 > 1 && i5736 >= 1 && i5564 >= 1 && i5563 > 1 && i5565 < i5564 && i5736 < i640
+f13491_0_create_InvokeMethod(EOS(STATIC_13491(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i5736) -> f13497_1_create_Load(EOS(STATIC_13497(java.lang.Object(ARRAY(i5562)), i5563)), i640, i640, i5564, i5565, i5736) :|: i640 > 1 && i5736 >= 1 && i5564 >= 1 && i5563 > 1 && i5565 < i5564 && i5736 < i640
+f13497_0_create_Load(EOS(STATIC_13497(java.lang.Object(ARRAY(i5562)), i5563)), i5736, i5736) -> f13503_0_create_Load(EOS(STATIC_13503(java.lang.Object(ARRAY(i5562)), i5563)), i5736, i5736) :|: TRUE
+f13503_0_create_Load(EOS(STATIC_13503(java.lang.Object(ARRAY(i5562)), i5563)), i5736, i5736) -> f3813_0_create_Load(EOS(STATIC_3813(java.lang.Object(ARRAY(i5562)), i5563)), i5736, i5736) :|: TRUE
+f3813_0_create_Load(EOS(STATIC_3813(java.lang.Object(o483sub), i617)), i618, i618) -> f3851_0_create_ConstantStackPush(EOS(STATIC_3851(java.lang.Object(o483sub), i617)), i618, i618, i618) :|: TRUE
+f13526_0_create_Return(EOS(STATIC_13526(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13539_0_create_InvokeMethod(EOS(STATIC_13539(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13539_0_create_InvokeMethod(EOS(STATIC_13539(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13548_0_add_New(EOS(STATIC_13548(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13548_0_add_New(EOS(STATIC_13548(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13557_0_add_Duplicate(EOS(STATIC_13557(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13557_0_add_Duplicate(EOS(STATIC_13557(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13568_0_add_InvokeMethod(EOS(STATIC_13568(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13568_0_add_InvokeMethod(EOS(STATIC_13568(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13575_0__init__Load(EOS(STATIC_13575(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13575_0__init__Load(EOS(STATIC_13575(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13583_0__init__InvokeMethod(EOS(STATIC_13583(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13583_0__init__InvokeMethod(EOS(STATIC_13583(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13586_0__init__Return(EOS(STATIC_13586(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13586_0__init__Return(EOS(STATIC_13586(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13591_0_add_Store(EOS(STATIC_13591(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13591_0_add_Store(EOS(STATIC_13591(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13595_0_add_Load(EOS(STATIC_13595(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13595_0_add_Load(EOS(STATIC_13595(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13599_0_add_Load(EOS(STATIC_13599(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13599_0_add_Load(EOS(STATIC_13599(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13603_0_add_FieldAccess(EOS(STATIC_13603(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13603_0_add_FieldAccess(EOS(STATIC_13603(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13607_0_add_FieldAccess(EOS(STATIC_13607(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13607_0_add_FieldAccess(EOS(STATIC_13607(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13611_0_add_Load(EOS(STATIC_13611(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13611_0_add_Load(EOS(STATIC_13611(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13614_0_add_Load(EOS(STATIC_13614(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13614_0_add_Load(EOS(STATIC_13614(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13619_0_add_FieldAccess(EOS(STATIC_13619(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13619_0_add_FieldAccess(EOS(STATIC_13619(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13624_0_add_FieldAccess(EOS(STATIC_13624(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13624_0_add_FieldAccess(EOS(STATIC_13624(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13628_0_add_Load(EOS(STATIC_13628(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13628_0_add_Load(EOS(STATIC_13628(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13632_0_add_Load(EOS(STATIC_13632(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13632_0_add_Load(EOS(STATIC_13632(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13635_0_add_FieldAccess(EOS(STATIC_13635(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13635_0_add_FieldAccess(EOS(STATIC_13635(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13643_0_add_Load(EOS(STATIC_13643(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13643_0_add_Load(EOS(STATIC_13643(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13648_0_add_Load(EOS(STATIC_13648(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13648_0_add_Load(EOS(STATIC_13648(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13652_0_add_FieldAccess(EOS(STATIC_13652(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13652_0_add_FieldAccess(EOS(STATIC_13652(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13655_0_add_Return(EOS(STATIC_13655(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13655_0_add_Return(EOS(STATIC_13655(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13659_0_create_Inc(EOS(STATIC_13659(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13659_0_create_Inc(EOS(STATIC_13659(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) -> f13664_0_create_JMP(EOS(STATIC_13664(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565 + 1) :|: TRUE
+f13664_0_create_JMP(EOS(STATIC_13664(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i6158) -> f13669_0_create_Load(EOS(STATIC_13669(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i6158) :|: TRUE
+f13669_0_create_Load(EOS(STATIC_13669(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i6158) -> f13427_0_create_Load(EOS(STATIC_13427(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i6158) :|: TRUE
+f13642_0_create_Return(EOS(STATIC_13642(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13647_0_create_InvokeMethod(EOS(STATIC_13647(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13647_0_create_InvokeMethod(EOS(STATIC_13647(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13651_0_add_New(EOS(STATIC_13651(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13651_0_add_New(EOS(STATIC_13651(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13658_0_add_Duplicate(EOS(STATIC_13658(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13658_0_add_Duplicate(EOS(STATIC_13658(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13663_0_add_InvokeMethod(EOS(STATIC_13663(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13663_0_add_InvokeMethod(EOS(STATIC_13663(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13668_0__init__Load(EOS(STATIC_13668(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13668_0__init__Load(EOS(STATIC_13668(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13680_0__init__InvokeMethod(EOS(STATIC_13680(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13680_0__init__InvokeMethod(EOS(STATIC_13680(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13685_0__init__Return(EOS(STATIC_13685(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13685_0__init__Return(EOS(STATIC_13685(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13690_0_add_Store(EOS(STATIC_13690(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13690_0_add_Store(EOS(STATIC_13690(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13695_0_add_Load(EOS(STATIC_13695(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13695_0_add_Load(EOS(STATIC_13695(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13700_0_add_Load(EOS(STATIC_13700(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13700_0_add_Load(EOS(STATIC_13700(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13706_0_add_FieldAccess(EOS(STATIC_13706(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13706_0_add_FieldAccess(EOS(STATIC_13706(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13712_0_add_FieldAccess(EOS(STATIC_13712(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13712_0_add_FieldAccess(EOS(STATIC_13712(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13719_0_add_Load(EOS(STATIC_13719(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13719_0_add_Load(EOS(STATIC_13719(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13727_0_add_Load(EOS(STATIC_13727(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13727_0_add_Load(EOS(STATIC_13727(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13733_0_add_FieldAccess(EOS(STATIC_13733(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13733_0_add_FieldAccess(EOS(STATIC_13733(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13738_0_add_FieldAccess(EOS(STATIC_13738(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13738_0_add_FieldAccess(EOS(STATIC_13738(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13743_0_add_Load(EOS(STATIC_13743(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13743_0_add_Load(EOS(STATIC_13743(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13748_0_add_Load(EOS(STATIC_13748(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13748_0_add_Load(EOS(STATIC_13748(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13755_0_add_FieldAccess(EOS(STATIC_13755(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13755_0_add_FieldAccess(EOS(STATIC_13755(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13761_0_add_Load(EOS(STATIC_13761(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13761_0_add_Load(EOS(STATIC_13761(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13767_0_add_Load(EOS(STATIC_13767(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13767_0_add_Load(EOS(STATIC_13767(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13774_0_add_FieldAccess(EOS(STATIC_13774(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13774_0_add_FieldAccess(EOS(STATIC_13774(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13780_0_add_Return(EOS(STATIC_13780(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13780_0_add_Return(EOS(STATIC_13780(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13784_0_create_Inc(EOS(STATIC_13784(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+f13784_0_create_Inc(EOS(STATIC_13784(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) -> f13791_0_create_JMP(EOS(STATIC_13791(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565 + 1) :|: TRUE
+f13791_0_create_JMP(EOS(STATIC_13791(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i6422) -> f13796_0_create_Load(EOS(STATIC_13796(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i6422) :|: TRUE
+f13796_0_create_Load(EOS(STATIC_13796(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i6422) -> f13427_0_create_Load(EOS(STATIC_13427(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i6422) :|: TRUE
+f13497_1_create_Load(EOS(STATIC_13497(java.lang.Object(ARRAY(i5812)), i5563)), i640, i640, i5564, i5565, i5736) -> f13526_0_create_Return(EOS(STATIC_13526(java.lang.Object(ARRAY(i5812)), i5808)), i640, i640, i5564, i5565) :|: TRUE
+f13497_1_create_Load(EOS(STATIC_13497(java.lang.Object(ARRAY(i6101)), i5563)), i640, i640, i5564, i5565, i5736) -> f13642_0_create_Return(EOS(STATIC_13642(java.lang.Object(ARRAY(i6101)), i6097)), i640, i640, i5564, i5565) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f13491_0_create_InvokeMethod(EOS(STATIC_13491(java.lang.Object(ARRAY(i5562:0)), i5563:0)), i640:0, i640:0, i5564:0, i5565:0, i5736:0) -> f13491_0_create_InvokeMethod(EOS(STATIC_13491(java.lang.Object(ARRAY(i5562:0)), i5563:0 + 1)), i5736:0, i5736:0, i703:0, 0, i5736:0 - 1) :|: i5736:0 > 1 && i703:0 > 0 && i5563:0 > 1 && i5562:0 > -1 && i5563:0 < i5562:0 && i640:0 > 1 && i5564:0 > 0 && i640:0 > i5736:0 && i5565:0 < i5564:0
+f13491_0_create_InvokeMethod(EOS(STATIC_13491(java.lang.Object(ARRAY(i5562:0)), i5563:0)), i640:0, i640:0, i5564:0, i5565:0, i5736:0) -> f13491_0_create_InvokeMethod(EOS(STATIC_13491(java.lang.Object(ARRAY(i5562:0)), i5808:0)), i640:0, i640:0, i5564:0, i5565:0 + 1, i640:0 - 1) :|: i640:0 > 1 && i5565:0 + 1 < i5564:0 && i5736:0 > 0 && i5564:0 > 0 && i640:0 > i5736:0 && i5563:0 > 1
+Filtered duplicate arguments:
+   f13491_0_create_InvokeMethod(x1, x2, x3, x4, x5, x6) -> f13491_0_create_InvokeMethod(x1, x3, x4, x5, x6)
+Finished conversion. Obtained 2 rules.P rules:
+f13491_0_create_InvokeMethod(i640:0, i5564:0, i5565:0, i5736:0, i5562:0, i5563:0) -> f13491_0_create_InvokeMethod(i5736:0, i703:0, 0, i5736:0 - 1, i5562:0, i5563:0 + 1) :|: i703:0 > 0 && i5736:0 > 1 && i5563:0 > 1 && i5562:0 > -1 && i5563:0 < i5562:0 && i640:0 > 1 && i5564:0 > 0 && i5565:0 < i5564:0 && i640:0 > i5736:0
+f13491_0_create_InvokeMethod(i640:0, i5564:0, i5565:0, i5736:0, i5562:0, i5563:0) -> f13491_0_create_InvokeMethod(i640:0, i5564:0, i5565:0 + 1, i640:0 - 1, i5562:0, i5808:0) :|: i5565:0 + 1 < i5564:0 && i640:0 > 1 && i5736:0 > 0 && i5564:0 > 0 && i5563:0 > 1 && i640:0 > i5736:0
+
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f13491_0_create_InvokeMethod(i640:0, i5564:0, i5565:0, i5736:0, i5562:0, i5563:0) -> f13491_0_create_InvokeMethod(i5736:0, i703:0, 0, i5736:0 - 1, i5562:0, i5563:0 + 1) :|: i703:0 > 0 && i5736:0 > 1 && i5563:0 > 1 && i5562:0 > -1 && i5563:0 < i5562:0 && i640:0 > 1 && i5564:0 > 0 && i5565:0 < i5564:0 && i640:0 > i5736:0
+f13491_0_create_InvokeMethod(x, x1, x2, x3, x4, x5) -> f13491_0_create_InvokeMethod(x, x1, x2 + 1, x - 1, x4, x6) :|: x2 + 1 < x1 && x > 1 && x3 > 0 && x1 > 0 && x5 > 1 && x > x3
+
+----------------------------------------
+
+(17) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(18)
+Obligation:
+Rules:
+f13491_0_create_InvokeMethod(i640:0, i5564:0, i5565:0, i5736:0, i5562:0, i5563:0) -> f13491_0_create_InvokeMethod(i5736:0, i703:0, 0, arith, i5562:0, arith1) :|: i703:0 > 0 && i5736:0 > 1 && i5563:0 > 1 && i5562:0 > -1 && i5563:0 < i5562:0 && i640:0 > 1 && i5564:0 > 0 && i5565:0 < i5564:0 && i640:0 > i5736:0 && arith = i5736:0 - 1 && arith1 = i5563:0 + 1
+f13491_0_create_InvokeMethod(x7, x8, x9, x10, x11, x12) -> f13491_0_create_InvokeMethod(x7, x8, x13, x14, x11, x15) :|: x9 + 1 < x8 && x7 > 1 && x10 > 0 && x8 > 0 && x12 > 1 && x7 > x10 && x13 = x9 + 1 && x14 = x7 - 1
+
+----------------------------------------
+
+(19) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f13491_0_create_InvokeMethod(i640:0, i5564:0, i5565:0, i5736:0, i5562:0, i5563:0) -> f13491_0_create_InvokeMethod(i5736:0, i703:0, 0, arith, i5562:0, arith1) :|: i703:0 > 0 && i5736:0 > 1 && i5563:0 > 1 && i5562:0 > -1 && i5563:0 < i5562:0 && i640:0 > 1 && i5564:0 > 0 && i5565:0 < i5564:0 && i640:0 > i5736:0 && arith = i5736:0 - 1 && arith1 = i5563:0 + 1
+(2) f13491_0_create_InvokeMethod(x7, x8, x9, x10, x11, x12) -> f13491_0_create_InvokeMethod(x7, x8, x13, x14, x11, x15) :|: x9 + 1 < x8 && x7 > 1 && x10 > 0 && x8 > 0 && x12 > 1 && x7 > x10 && x13 = x9 + 1 && x14 = x7 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(20)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f13491_0_create_InvokeMethod(i640:0, i5564:0, i5565:0, i5736:0, i5562:0, i5563:0) -> f13491_0_create_InvokeMethod(i5736:0, i703:0, 0, arith, i5562:0, arith1) :|: i703:0 > 0 && i5736:0 > 1 && i5563:0 > 1 && i5562:0 > -1 && i5563:0 < i5562:0 && i640:0 > 1 && i5564:0 > 0 && i5565:0 < i5564:0 && i640:0 > i5736:0 && arith = i5736:0 - 1 && arith1 = i5563:0 + 1
+(2) f13491_0_create_InvokeMethod(x7, x8, x9, x10, x11, x12) -> f13491_0_create_InvokeMethod(x7, x8, x13, x14, x11, x15) :|: x9 + 1 < x8 && x7 > 1 && x10 > 0 && x8 > 0 && x12 > 1 && x7 > x10 && x13 = x9 + 1 && x14 = x7 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(21) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f13491_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f13491_0_create_InvokeMethod(x7:0, x8:0, x9:0 + 1, x7:0 - 1, x11:0, x15:0) :|: x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0
+f13491_0_create_InvokeMethod(i640:0:0, i5564:0:0, i5565:0:0, i5736:0:0, i5562:0:0, i5563:0:0) -> f13491_0_create_InvokeMethod(i5736:0:0, i703:0:0, 0, i5736:0:0 - 1, i5562:0:0, i5563:0:0 + 1) :|: i5565:0:0 < i5564:0:0 && i640:0:0 > i5736:0:0 && i5564:0:0 > 0 && i640:0:0 > 1 && i5563:0:0 < i5562:0:0 && i5562:0:0 > -1 && i5563:0:0 > 1 && i5736:0:0 > 1 && i703:0:0 > 0
+
+----------------------------------------
+
+(23) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f13491_0_create_InvokeMethod(INTEGER, INTEGER, VARIABLE, INTEGER, VARIABLE, VARIABLE)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(24)
+Obligation:
+Rules:
+f13491_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f13491_0_create_InvokeMethod(x7:0, x8:0, c, c1, x11:0, x15:0) :|: c1 = x7:0 - 1 && c = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+f13491_0_create_InvokeMethod(i640:0:0, i5564:0:0, i5565:0:0, i5736:0:0, i5562:0:0, i5563:0:0) -> f13491_0_create_InvokeMethod(i5736:0:0, i703:0:0, c2, c3, i5562:0:0, c4) :|: c4 = i5563:0:0 + 1 && (c3 = i5736:0:0 - 1 && c2 = 0) && (i5565:0:0 < i5564:0:0 && i640:0:0 > i5736:0:0 && i5564:0:0 > 0 && i640:0:0 > 1 && i5563:0:0 < i5562:0:0 && i5562:0:0 > -1 && i5563:0:0 > 1 && i5736:0:0 > 1 && i703:0:0 > 0)
+
+----------------------------------------
+
+(25) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f13491_0_create_InvokeMethod(x, x1, x2, x3, x4, x5)] = x
+
+The following rules are decreasing:
+f13491_0_create_InvokeMethod(i640:0:0, i5564:0:0, i5565:0:0, i5736:0:0, i5562:0:0, i5563:0:0) -> f13491_0_create_InvokeMethod(i5736:0:0, i703:0:0, c2, c3, i5562:0:0, c4) :|: c4 = i5563:0:0 + 1 && (c3 = i5736:0:0 - 1 && c2 = 0) && (i5565:0:0 < i5564:0:0 && i640:0:0 > i5736:0:0 && i5564:0:0 > 0 && i640:0:0 > 1 && i5563:0:0 < i5562:0:0 && i5562:0:0 > -1 && i5563:0:0 > 1 && i5736:0:0 > 1 && i703:0:0 > 0)
+The following rules are bounded:
+f13491_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f13491_0_create_InvokeMethod(x7:0, x8:0, c, c1, x11:0, x15:0) :|: c1 = x7:0 - 1 && c = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+f13491_0_create_InvokeMethod(i640:0:0, i5564:0:0, i5565:0:0, i5736:0:0, i5562:0:0, i5563:0:0) -> f13491_0_create_InvokeMethod(i5736:0:0, i703:0:0, c2, c3, i5562:0:0, c4) :|: c4 = i5563:0:0 + 1 && (c3 = i5736:0:0 - 1 && c2 = 0) && (i5565:0:0 < i5564:0:0 && i640:0:0 > i5736:0:0 && i5564:0:0 > 0 && i640:0:0 > 1 && i5563:0:0 < i5562:0:0 && i5562:0:0 > -1 && i5563:0:0 > 1 && i5736:0:0 > 1 && i703:0:0 > 0)
+
+----------------------------------------
+
+(26)
+Obligation:
+Rules:
+f13491_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f13491_0_create_InvokeMethod(x7:0, x8:0, c, c1, x11:0, x15:0) :|: c1 = x7:0 - 1 && c = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+
+----------------------------------------
+
+(27) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f13491_0_create_InvokeMethod(x, x1, x2, x3, x4, x5)] = x1 - x2
+
+The following rules are decreasing:
+f13491_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f13491_0_create_InvokeMethod(x7:0, x8:0, c, c1, x11:0, x15:0) :|: c1 = x7:0 - 1 && c = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+The following rules are bounded:
+f13491_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f13491_0_create_InvokeMethod(x7:0, x8:0, c, c1, x11:0, x15:0) :|: c1 = x7:0 - 1 && c = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+
+----------------------------------------
+
+(28)
+YES

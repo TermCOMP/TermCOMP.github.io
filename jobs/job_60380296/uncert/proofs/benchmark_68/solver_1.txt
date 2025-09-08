@@ -1,0 +1,179 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/EXTgQ.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 82 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) TRUE
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+/**
+ * A set of functions over objects.
+ *
+ * All calls terminate.
+ *
+ * Julia + BinTerm prove that all calls terminate
+ *
+ * Note that cyclicity is introduced by the statement
+ * <tt>l2.tail.tail = l2</tt>. However, this is not enough to induce
+ * non-termination in the program. If you instead uncomment the line
+ * <tt>l1.tail.tail = l1</tt>, most of the calls cannot be proved to terminate
+ * anymore.
+ *
+ * @author <A HREF="mailto:fausto.spoto@univr.it">Fausto Spoto</A>
+ */
+
+public class List {
+    private Object head;
+    private List tail;
+
+    public static void main(String[] args) {
+	List l1 = new List(new Object(),new List(new Object(),null));
+	List l2 = new List(new Object(),new List(new Object(),null));
+	l1.alternate(l2);
+	l2.tail.tail = l2;
+	//l1.tail.tail = l1;
+	l1.append(l2);
+	l1.iter();
+	l1.reverseAcc(null);
+	l1.reverse();
+    }
+
+    public List(Object head, List tail) {
+	this.head = head;
+	this.tail = tail;
+    }
+
+    private void iter() {
+	if (tail != null) tail.iter();
+    }
+
+    private List append(List other) {
+	if (tail == null) return new List(head,other);
+	else return new List(head,tail.append(other));
+    }
+
+    private List reverseAcc(List acc) {
+	if (tail == null) return new List(head,acc);
+	else return tail.reverseAcc(new List(head,acc));
+    }
+
+    private List reverse() {
+	if (tail == null) return this;
+	else return tail.reverse().append(new List(head,null));
+    }
+
+    private List alternate(List other) {
+	if (other == null) return this;
+	else return new List(head,other.alternate(tail));
+    }
+}
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+/**
+ * A set of functions over objects.
+ *
+ * All calls terminate.
+ *
+ * Julia + BinTerm prove that all calls terminate
+ *
+ * Note that cyclicity is introduced by the statement
+ * <tt>l2.tail.tail = l2</tt>. However, this is not enough to induce
+ * non-termination in the program. If you instead uncomment the line
+ * <tt>l1.tail.tail = l1</tt>, most of the calls cannot be proved to terminate
+ * anymore.
+ *
+ * @author <A HREF="mailto:fausto.spoto@univr.it">Fausto Spoto</A>
+ */
+
+public class List {
+    private Object head;
+    private List tail;
+
+    public static void main(String[] args) {
+	List l1 = new List(new Object(),new List(new Object(),null));
+	List l2 = new List(new Object(),new List(new Object(),null));
+	l1.alternate(l2);
+	l2.tail.tail = l2;
+	//l1.tail.tail = l1;
+	l1.append(l2);
+	l1.iter();
+	l1.reverseAcc(null);
+	l1.reverse();
+    }
+
+    public List(Object head, List tail) {
+	this.head = head;
+	this.tail = tail;
+    }
+
+    private void iter() {
+	if (tail != null) tail.iter();
+    }
+
+    private List append(List other) {
+	if (tail == null) return new List(head,other);
+	else return new List(head,tail.append(other));
+    }
+
+    private List reverseAcc(List acc) {
+	if (tail == null) return new List(head,acc);
+	else return tail.reverseAcc(new List(head,acc));
+    }
+
+    private List reverse() {
+	if (tail == null) return this;
+	else return tail.reverse().append(new List(head,null));
+    }
+
+    private List alternate(List other) {
+	if (other == null) return this;
+	else return new List(head,other.alternate(tail));
+    }
+}
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+List.main([Ljava/lang/String;)V: Graph of 294 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Proven termination by absence of SCCs
+----------------------------------------
+
+(6)
+TRUE

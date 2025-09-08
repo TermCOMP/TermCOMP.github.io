@@ -1,0 +1,43 @@
+MAYBE
+We consider the system w0raO.
+
+  Alphabet:
+
+    app : [ArrNArrNN * N] --> ArrNN 
+    bang : [Uc] --> c 
+    case : [Suma1a2 * a1 -> c * a2 -> c] --> c 
+    cpair : [c1 * c2] --> CPairc1c2 
+    get : [N -> ArrNN] --> ArrNN 
+    handler : [N -> ArrNN * ArrNArrNN -> ArrNN * N -> ArrNN -> ArrNN * ArrNN] --> ArrNN 
+    inj1 : [a1] --> Suma1a2 
+    inj2 : [a2] --> Suma1a2 
+    lam : [N -> ArrNN] --> ArrNArrNN 
+    let : [ArrNN * N -> c] --> c 
+    prj1 : [CPairc1c2] --> c1 
+    prj2 : [CPairc1c2] --> c2 
+    put : [N * ArrNN] --> ArrNN 
+    return : [N] --> ArrNN 
+    sub : [N -> ArrNN * N] --> ArrNN 
+    thunk : [c] --> Uc 
+
+  Rules:
+
+    get(/\x.put(x, X)) => X 
+    get(/\x.get(/\y.X[y, x])) => get(/\z.X[z, z]) 
+    put(X, put(Y, Z)) => put(Y, Z) 
+    put(X, get(F)) => put(X, sub(F, X)) 
+    sub(/\x.return(x), X) => return(X) 
+    sub(/\x.X, Y) => X 
+    sub(/\x.get(/\y.X[y, x]), Y) => get(/\z.sub(/\u.X[z, u], Y)) 
+    sub(/\x.put(X, Y[x]), Z) => put(X, sub(/\y.Y[y], Z)) 
+    app(lam(F), X) => F X 
+    bang(thunk(X)) => X 
+    prj1(cpair(X, Y)) => X 
+    prj2(cpair(X, Y)) => Y 
+    case(inj1(X), F, G) => F X 
+    case(inj2(X), F, G) => G X 
+    let(return(X), F) => F X 
+    handler(F, G, H, get(I)) => G lam(/\x.handler(F, G, H, I x)) 
+    handler(F, G, H, return(X)) => F X 
+    handler(F, G, H, put(X, Y)) => H X handler(F, G, H, Y) 
+

@@ -1,0 +1,73 @@
+YES
+We consider the system YuNG8.
+
+  Alphabet:
+
+    cons : [b * c] --> c 
+    false : [] --> a 
+    filter : [b -> a * c] --> c 
+    filtersub : [a * b -> a * c] --> c 
+    nil : [] --> c 
+    true : [] --> a 
+
+  Rules:
+
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filtersub(F X, F, cons(X, Y)) 
+    filtersub(true, F, cons(X, Y)) => cons(X, filter(F, Y)) 
+    filtersub(false, F, cons(X, Y)) => filter(F, Y) 
+
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] filter#(F, cons(X, Y)) =#> filtersub#(F X, F, cons(X, Y))   
+    1] filtersub#(true, F, cons(X, Y)) =#> filter#(F, Y)   
+    2] filtersub#(false, F, cons(X, Y)) =#> filter#(F, Y)   
+
+  Rules R_0:
+
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filtersub(F X, F, cons(X, Y)) 
+    filtersub(true, F, cons(X, Y)) => cons(X, filter(F, Y)) 
+    filtersub(false, F, cons(X, Y)) => filter(F, Y) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(filter#) = 2 
+  nu(filtersub#) = 3 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(filter#(F, cons(X, Y))) = cons(X, Y) = cons(X, Y) = nu(filtersub#(F X, F, cons(X, Y))) 
+  nu(filtersub#(true, F, cons(X, Y))) = cons(X, Y) |> Y = nu(filter#(F, Y)) 
+  nu(filtersub#(false, F, cons(X, Y))) = cons(X, Y) |> Y = nu(filter#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_0, R_0, computable, f) by (P_1, R_0, computable, f), where P_1 contains:
+
+  filter#(F, cons(X, Y)) =#> filtersub#(F X, F, cons(X, Y))   
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+
+This graph has no strongly connected components.  By [Kop12, Thm. 7.31], this implies finiteness of the dependency pair problem.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

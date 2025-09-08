@@ -1,0 +1,415 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/kIEjP.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 393 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 61 ms]
+        (9) QDP
+        (10) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (11) YES
+    (12) JBCTerminationSCC
+        (13) SCCToIRSProof [SOUND, 30 ms]
+        (14) IRSwT
+        (15) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (16) IRSwT
+        (17) IRSwTTerminationDigraphProof [EQUIVALENT, 8 ms]
+        (18) IRSwT
+        (19) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (20) IRSwT
+        (21) TempFilterProof [SOUND, 8 ms]
+        (22) IntTRS
+        (23) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (24) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package CyclicAnalysisRec;
+
+public class CyclicAnalysisRec {
+	CyclicAnalysisRec field;
+
+	public static void main(String[] args) {
+		Random.args = args;
+		CyclicAnalysisRec t = new CyclicAnalysisRec();
+		t.field = new CyclicAnalysisRec();
+		t.field.appendNewCyclicList(Random.random());
+		t.appendNewList(Random.random());
+		t.length();
+	}
+
+	public int length() {
+		if (this.field == null) return 1;
+		else return 1 + this.field.length();
+	}
+
+	public void appendNewCyclicList(int i) {
+		CyclicAnalysisRec last = this.appendNewList(i);
+		last.field = this;
+	}
+
+	/**
+ 	 * @param i number of elements to append
+ 	 * @return the last list element appended
+ 	 */
+	private CyclicAnalysisRec appendNewList(int i) {
+		this.field = new CyclicAnalysisRec();
+		if (i <= 1) {
+			return this.field;
+		} else {
+			return this.field.appendNewList(i-1);
+		}
+	}
+}
+
+
+package CyclicAnalysisRec;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package CyclicAnalysisRec;
+
+public class CyclicAnalysisRec {
+	CyclicAnalysisRec field;
+
+	public static void main(String[] args) {
+		Random.args = args;
+		CyclicAnalysisRec t = new CyclicAnalysisRec();
+		t.field = new CyclicAnalysisRec();
+		t.field.appendNewCyclicList(Random.random());
+		t.appendNewList(Random.random());
+		t.length();
+	}
+
+	public int length() {
+		if (this.field == null) return 1;
+		else return 1 + this.field.length();
+	}
+
+	public void appendNewCyclicList(int i) {
+		CyclicAnalysisRec last = this.appendNewList(i);
+		last.field = this;
+	}
+
+	/**
+ 	 * @param i number of elements to append
+ 	 * @return the last list element appended
+ 	 */
+	private CyclicAnalysisRec appendNewList(int i) {
+		this.field = new CyclicAnalysisRec();
+		if (i <= 1) {
+			return this.field;
+		} else {
+			return this.field.appendNewList(i-1);
+		}
+	}
+}
+
+
+package CyclicAnalysisRec;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+CyclicAnalysisRec.CyclicAnalysisRec.main([Ljava/lang/String;)V: Graph of 336 nodes with 0 SCCs.
+
+
+
+CyclicAnalysisRec.CyclicAnalysisRec.appendNewList(I)LCyclicAnalysisRec/CyclicAnalysisRec;: Graph of 34 nodes with 0 SCCs.
+
+
+
+CyclicAnalysisRec.CyclicAnalysisRec.length()I: Graph of 22 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: CyclicAnalysisRec.CyclicAnalysisRec.length()I
+SCC calls the following helper methods: CyclicAnalysisRec.CyclicAnalysisRec.length()I
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*CyclicAnalysisRec.CyclicAnalysisRec: [field]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 11 rules for P and 21 rules for R.P rules:
+f10511_0_length_FieldAccess(EOS(STATIC_10511), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248)), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248))) -> f10526_0_length_FieldAccess(EOS(STATIC_10526), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248)), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248))) :|: TRUE
+f10526_0_length_FieldAccess(EOS(STATIC_10526), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248)), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248))) -> f10541_0_length_NONNULL(EOS(STATIC_10541), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248)), o1248) :|: TRUE
+f10541_0_length_NONNULL(EOS(STATIC_10541), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub))), java.lang.Object(o1261sub)) -> f10552_0_length_NONNULL(EOS(STATIC_10552), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub))), java.lang.Object(o1261sub)) :|: TRUE
+f10552_0_length_NONNULL(EOS(STATIC_10552), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub))), java.lang.Object(o1261sub)) -> f10588_0_length_ConstantStackPush(EOS(STATIC_10588), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) :|: TRUE
+f10588_0_length_ConstantStackPush(EOS(STATIC_10588), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) -> f10611_0_length_Load(EOS(STATIC_10611), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) :|: TRUE
+f10611_0_length_Load(EOS(STATIC_10611), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) -> f10622_0_length_FieldAccess(EOS(STATIC_10622), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) :|: TRUE
+f10622_0_length_FieldAccess(EOS(STATIC_10622), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) -> f10653_0_length_InvokeMethod(EOS(STATIC_10653), java.lang.Object(o1261sub)) :|: TRUE
+f10653_0_length_InvokeMethod(EOS(STATIC_10653), java.lang.Object(o1261sub)) -> f11017_1_length_InvokeMethod(f11017_0_length_Load(EOS(STATIC_11017), java.lang.Object(o1261sub))) :|: TRUE
+f11017_0_length_Load(EOS(STATIC_11017), java.lang.Object(o1261sub)) -> f11080_0_length_Load(EOS(STATIC_11080), java.lang.Object(o1261sub)) :|: TRUE
+f11080_0_length_Load(EOS(STATIC_11080), java.lang.Object(o1261sub)) -> f10484_0_length_Load(EOS(STATIC_10484), java.lang.Object(o1261sub)) :|: TRUE
+f10484_0_length_Load(EOS(STATIC_10484), java.lang.Object(o1234sub)) -> f10511_0_length_FieldAccess(EOS(STATIC_10511), java.lang.Object(o1234sub), java.lang.Object(o1234sub)) :|: TRUE
+R rules:
+f10484_0_length_Load(EOS(STATIC_10484), java.lang.Object(o1234sub)) -> f10511_0_length_FieldAccess(EOS(STATIC_10511), java.lang.Object(o1234sub), java.lang.Object(o1234sub)) :|: TRUE
+f10511_0_length_FieldAccess(EOS(STATIC_10511), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248)), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248))) -> f10526_0_length_FieldAccess(EOS(STATIC_10526), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248)), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248))) :|: TRUE
+f10526_0_length_FieldAccess(EOS(STATIC_10526), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248)), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248))) -> f10541_0_length_NONNULL(EOS(STATIC_10541), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, o1248)), o1248) :|: TRUE
+f10541_0_length_NONNULL(EOS(STATIC_10541), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub))), java.lang.Object(o1261sub)) -> f10552_0_length_NONNULL(EOS(STATIC_10552), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub))), java.lang.Object(o1261sub)) :|: TRUE
+f10541_0_length_NONNULL(EOS(STATIC_10541), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, NULL)), NULL) -> f10553_0_length_NONNULL(EOS(STATIC_10553), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, NULL)), NULL) :|: TRUE
+f10552_0_length_NONNULL(EOS(STATIC_10552), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub))), java.lang.Object(o1261sub)) -> f10588_0_length_ConstantStackPush(EOS(STATIC_10588), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) :|: TRUE
+f10553_0_length_NONNULL(EOS(STATIC_10553), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, NULL)), NULL) -> f10590_0_length_ConstantStackPush(EOS(STATIC_10590)) :|: TRUE
+f10588_0_length_ConstantStackPush(EOS(STATIC_10588), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) -> f10611_0_length_Load(EOS(STATIC_10611), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) :|: TRUE
+f10590_0_length_ConstantStackPush(EOS(STATIC_10590)) -> f10612_0_length_Return(EOS(STATIC_10612)) :|: TRUE
+f10611_0_length_Load(EOS(STATIC_10611), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) -> f10622_0_length_FieldAccess(EOS(STATIC_10622), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) :|: TRUE
+f10622_0_length_FieldAccess(EOS(STATIC_10622), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub)))) -> f10653_0_length_InvokeMethod(EOS(STATIC_10653), java.lang.Object(o1261sub)) :|: TRUE
+f10653_0_length_InvokeMethod(EOS(STATIC_10653), java.lang.Object(o1261sub)) -> f11017_1_length_InvokeMethod(f11017_0_length_Load(EOS(STATIC_11017), java.lang.Object(o1261sub))) :|: TRUE
+f11017_0_length_Load(EOS(STATIC_11017), java.lang.Object(o1261sub)) -> f11080_0_length_Load(EOS(STATIC_11080), java.lang.Object(o1261sub)) :|: TRUE
+f11095_0_length_Return(EOS(STATIC_11095)) -> f11096_0_length_IntArithmetic(EOS(STATIC_11096)) :|: TRUE
+f11096_0_length_IntArithmetic(EOS(STATIC_11096)) -> f11612_0_length_IntArithmetic(EOS(STATIC_11612)) :|: TRUE
+f11567_0_length_Return(EOS(STATIC_11567)) -> f11612_0_length_IntArithmetic(EOS(STATIC_11612)) :|: TRUE
+f11612_0_length_IntArithmetic(EOS(STATIC_11612)) -> f11614_0_length_Return(EOS(STATIC_11614)) :|: TRUE
+f11664_0_length_Return(EOS(STATIC_11664)) -> f11567_0_length_Return(EOS(STATIC_11567)) :|: TRUE
+f11080_0_length_Load(EOS(STATIC_11080), java.lang.Object(o1261sub)) -> f10484_0_length_Load(EOS(STATIC_10484), java.lang.Object(o1261sub)) :|: TRUE
+f11017_1_length_InvokeMethod(f10612_0_length_Return(EOS(STATIC_10612))) -> f11095_0_length_Return(EOS(STATIC_11095)) :|: TRUE
+f11017_1_length_InvokeMethod(f11614_0_length_Return(EOS(STATIC_11614))) -> f11664_0_length_Return(EOS(STATIC_11664)) :|: TRUE
+Combined rules. Obtained 1 conditional rules for P and 4 conditional rules for R.P rules:
+f10511_0_length_FieldAccess(EOS(STATIC_10511), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub:0))), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub:0)))) -> f11017_1_length_InvokeMethod(f10511_0_length_FieldAccess(EOS(STATIC_10511), java.lang.Object(o1261sub:0), java.lang.Object(o1261sub:0))) :|: TRUE
+R rules:
+f11017_1_length_InvokeMethod(f10612_0_length_Return(EOS(STATIC_10612))) -> f11614_0_length_Return(EOS(STATIC_11614)) :|: TRUE
+f11017_1_length_InvokeMethod(f11614_0_length_Return(EOS(STATIC_11614))) -> f11614_0_length_Return(EOS(STATIC_11614)) :|: TRUE
+f10511_0_length_FieldAccess(EOS(STATIC_10511), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, NULL)), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, NULL))) -> f10612_0_length_Return(EOS(STATIC_10612)) :|: TRUE
+f10511_0_length_FieldAccess(EOS(STATIC_10511), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub:0))), java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(EOC, java.lang.Object(o1261sub:0)))) -> f11017_1_length_InvokeMethod(f10511_0_length_FieldAccess(EOS(STATIC_10511), java.lang.Object(o1261sub:0), java.lang.Object(o1261sub:0))) :|: TRUE
+Filtered ground terms:
+   f10511_0_length_FieldAccess(x1, x2, x3) -> f10511_0_length_FieldAccess(x2, x3)
+   CyclicAnalysisRec.CyclicAnalysisRec(x1, x2) -> CyclicAnalysisRec.CyclicAnalysisRec(x2)
+   f11614_0_length_Return(x1) -> f11614_0_length_Return
+   f10612_0_length_Return(x1) -> f10612_0_length_Return
+Filtered duplicate args:
+   f10511_0_length_FieldAccess(x1, x2) -> f10511_0_length_FieldAccess(x2)
+Combined rules. Obtained 1 conditional rules for P and 0 conditional rules for R.P rules:
+F10511_0_LENGTH_FIELDACCESS(java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(java.lang.Object(o1261sub:0:0)))) -> F10511_0_LENGTH_FIELDACCESS(java.lang.Object(o1261sub:0:0)) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F10511_0_LENGTH_FIELDACCESS(java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(java.lang.Object(o1261sub:0:0)))) -> F10511_0_LENGTH_FIELDACCESS(java.lang.Object(o1261sub:0:0))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F10511_0_LENGTH_FIELDACCESS(java.lang.Object(CyclicAnalysisRec.CyclicAnalysisRec(java.lang.Object(o1261sub:0:0)))) -> F10511_0_LENGTH_FIELDACCESS(java.lang.Object(o1261sub:0:0))
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(11)
+YES
+
+----------------------------------------
+
+(12)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: CyclicAnalysisRec.CyclicAnalysisRec.appendNewList(I)LCyclicAnalysisRec/CyclicAnalysisRec;
+SCC calls the following helper methods: CyclicAnalysisRec.CyclicAnalysisRec.appendNewList(I)LCyclicAnalysisRec/CyclicAnalysisRec;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*CyclicAnalysisRec.CyclicAnalysisRec: [field]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(13) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 21 IRulesP rules:
+f4953_0_appendNewList_New(EOS(STATIC_4953), i390, i390) -> f4965_0_appendNewList_Duplicate(EOS(STATIC_4965), i390, i390) :|: TRUE
+f4965_0_appendNewList_Duplicate(EOS(STATIC_4965), i390, i390) -> f4986_0_appendNewList_InvokeMethod(EOS(STATIC_4986), i390, i390) :|: TRUE
+f4986_0_appendNewList_InvokeMethod(EOS(STATIC_4986), i390, i390) -> f5071_0__init__Load(EOS(STATIC_5071), i390, i390) :|: TRUE
+f5071_0__init__Load(EOS(STATIC_5071), i390, i390) -> f5145_0__init__InvokeMethod(EOS(STATIC_5145), i390, i390) :|: TRUE
+f5145_0__init__InvokeMethod(EOS(STATIC_5145), i390, i390) -> f5277_0__init__Return(EOS(STATIC_5277), i390, i390) :|: TRUE
+f5277_0__init__Return(EOS(STATIC_5277), i390, i390) -> f5311_0_appendNewList_FieldAccess(EOS(STATIC_5311), i390, i390) :|: TRUE
+f5311_0_appendNewList_FieldAccess(EOS(STATIC_5311), i390, i390) -> f5370_0_appendNewList_Load(EOS(STATIC_5370), i390, i390) :|: TRUE
+f5370_0_appendNewList_Load(EOS(STATIC_5370), i390, i390) -> f5441_0_appendNewList_ConstantStackPush(EOS(STATIC_5441), i390, i390, i390) :|: TRUE
+f5441_0_appendNewList_ConstantStackPush(EOS(STATIC_5441), i390, i390, i390) -> f5483_0_appendNewList_GT(EOS(STATIC_5483), i390, i390, i390, 1) :|: TRUE
+f5483_0_appendNewList_GT(EOS(STATIC_5483), i461, i461, i461, matching1) -> f5509_0_appendNewList_GT(EOS(STATIC_5509), i461, i461, i461, 1) :|: TRUE && matching1 = 1
+f5509_0_appendNewList_GT(EOS(STATIC_5509), i461, i461, i461, matching1) -> f5544_0_appendNewList_Load(EOS(STATIC_5544), i461, i461) :|: i461 > 1 && matching1 = 1
+f5544_0_appendNewList_Load(EOS(STATIC_5544), i461, i461) -> f5570_0_appendNewList_FieldAccess(EOS(STATIC_5570), i461, i461) :|: TRUE
+f5570_0_appendNewList_FieldAccess(EOS(STATIC_5570), i461, i461) -> f5599_0_appendNewList_Load(EOS(STATIC_5599), i461, i461) :|: TRUE
+f5599_0_appendNewList_Load(EOS(STATIC_5599), i461, i461) -> f5640_0_appendNewList_ConstantStackPush(EOS(STATIC_5640), i461, i461) :|: TRUE
+f5640_0_appendNewList_ConstantStackPush(EOS(STATIC_5640), i461, i461) -> f6920_0_appendNewList_IntArithmetic(EOS(STATIC_6920), i461, i461, 1) :|: TRUE
+f6920_0_appendNewList_IntArithmetic(EOS(STATIC_6920), i461, i461, matching1) -> f6965_0_appendNewList_InvokeMethod(EOS(STATIC_6965), i461, i461 - 1) :|: i461 > 0 && matching1 = 1
+f6965_0_appendNewList_InvokeMethod(EOS(STATIC_6965), i461, i556) -> f6979_0_appendNewList_Load(EOS(STATIC_6979), i556, i556) :|: i461 > 1 && i556 >= 1 && i389 >= 1 && i556 < i461
+f6965_0_appendNewList_InvokeMethod(EOS(STATIC_6965), i461, i556) -> f6979_1_appendNewList_Load(EOS(STATIC_6979), i461, i556) :|: i461 > 1 && i556 >= 1 && i389 >= 1 && i556 < i461
+f6979_0_appendNewList_Load(EOS(STATIC_6979), i556, i556) -> f6987_0_appendNewList_Load(EOS(STATIC_6987), i556, i556) :|: TRUE
+f6987_0_appendNewList_Load(EOS(STATIC_6987), i556, i556) -> f4904_0_appendNewList_Load(EOS(STATIC_4904), i556, i556) :|: TRUE
+f4904_0_appendNewList_Load(EOS(STATIC_4904), i390, i390) -> f4953_0_appendNewList_New(EOS(STATIC_4953), i390, i390) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f4953_0_appendNewList_New(EOS(STATIC_4953), i390:0, i390:0) -> f4953_0_appendNewList_New(EOS(STATIC_4953), i390:0 - 1, i390:0 - 1) :|: i390:0 > 1 && i390:0 - 1 < i390:0 && i389:0 > 0
+Removed following non-SCC rules:
+f4953_0_appendNewList_New(EOS(STATIC_4953), i390:0, i390:0) -> f6979_1_appendNewList_Load(EOS(STATIC_6979), i390:0, i390:0 - 1) :|: i390:0 > 1 && i390:0 - 1 < i390:0 && i389:0 > 0
+Filtered constant ground arguments:
+   f4953_0_appendNewList_New(x1, x2, x3) -> f4953_0_appendNewList_New(x2, x3)
+   EOS(x1) -> EOS
+Filtered duplicate arguments:
+   f4953_0_appendNewList_New(x1, x2) -> f4953_0_appendNewList_New(x2)
+Finished conversion. Obtained 1 rules.P rules:
+f4953_0_appendNewList_New(i390:0) -> f4953_0_appendNewList_New(i390:0 - 1) :|: i390:0 - 1 < i390:0 && i389:0 > 0 && i390:0 > 1
+
+----------------------------------------
+
+(14)
+Obligation:
+Rules:
+f4953_0_appendNewList_New(i390:0) -> f4953_0_appendNewList_New(i390:0 - 1) :|: i390:0 - 1 < i390:0 && i389:0 > 0 && i390:0 > 1
+
+----------------------------------------
+
+(15) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f4953_0_appendNewList_New(i390:0) -> f4953_0_appendNewList_New(arith) :|: i390:0 - 1 < i390:0 && i389:0 > 0 && i390:0 > 1 && arith = i390:0 - 1
+
+----------------------------------------
+
+(17) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f4953_0_appendNewList_New(i390:0) -> f4953_0_appendNewList_New(arith) :|: i390:0 - 1 < i390:0 && i389:0 > 0 && i390:0 > 1 && arith = i390:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(18)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f4953_0_appendNewList_New(i390:0) -> f4953_0_appendNewList_New(arith) :|: i390:0 - 1 < i390:0 && i389:0 > 0 && i390:0 > 1 && arith = i390:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(19) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(20)
+Obligation:
+Rules:
+f4953_0_appendNewList_New(i390:0:0) -> f4953_0_appendNewList_New(i390:0:0 - 1) :|: i390:0:0 - 1 < i390:0:0 && i389:0:0 > 0 && i390:0:0 > 1
+
+----------------------------------------
+
+(21) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f4953_0_appendNewList_New(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f4953_0_appendNewList_New(i390:0:0) -> f4953_0_appendNewList_New(c) :|: c = i390:0:0 - 1 && (i390:0:0 - 1 < i390:0:0 && i389:0:0 > 0 && i390:0:0 > 1)
+
+----------------------------------------
+
+(23) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f4953_0_appendNewList_New(x)] = x
+
+The following rules are decreasing:
+f4953_0_appendNewList_New(i390:0:0) -> f4953_0_appendNewList_New(c) :|: c = i390:0:0 - 1 && (i390:0:0 - 1 < i390:0:0 && i389:0:0 > 0 && i390:0:0 > 1)
+The following rules are bounded:
+f4953_0_appendNewList_New(i390:0:0) -> f4953_0_appendNewList_New(c) :|: c = i390:0:0 - 1 && (i390:0:0 - 1 < i390:0:0 && i389:0:0 > 0 && i390:0:0 > 1)
+
+----------------------------------------
+
+(24)
+YES

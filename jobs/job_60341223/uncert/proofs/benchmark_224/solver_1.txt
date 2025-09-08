@@ -1,0 +1,532 @@
+YES
+We consider the system u7rpV.
+
+  Alphabet:
+
+    !minus : [a * a] --> a 
+    !plus : [a * a] --> a 
+    !times : [a * a] --> a 
+    D : [a] --> a 
+    cons : [c * d] --> d 
+    constant : [] --> a 
+    div : [a * a] --> a 
+    false : [] --> b 
+    filter : [c -> b * d] --> d 
+    filter2 : [b * c -> b * c * d] --> d 
+    ln : [a] --> a 
+    map : [c -> c * d] --> d 
+    minus : [a] --> a 
+    nil : [] --> d 
+    one : [] --> a 
+    pow : [a * a] --> a 
+    t : [] --> a 
+    true : [] --> b 
+    two : [] --> a 
+    zero : [] --> a 
+
+  Rules:
+
+    D(t) => one 
+    D(constant) => zero 
+    D(!plus(X, Y)) => !plus(D(X), D(Y)) 
+    D(!times(X, Y)) => !plus(!times(Y, D(X)), !times(X, D(Y))) 
+    D(!minus(X, Y)) => !minus(D(X), D(Y)) 
+    D(minus(X)) => minus(D(X)) 
+    D(div(X, Y)) => !minus(div(D(X), Y), div(!times(X, D(Y)), pow(Y, two))) 
+    D(ln(X)) => div(D(X), X) 
+    D(pow(X, Y)) => !plus(!times(!times(Y, pow(X, !minus(Y, one))), D(X)), !times(!times(pow(X, Y), ln(X)), D(Y))) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  D(t) >? one 
+  D(constant) >? zero 
+  D(!plus(X, Y)) >? !plus(D(X), D(Y)) 
+  D(!times(X, Y)) >? !plus(!times(Y, D(X)), !times(X, D(Y))) 
+  D(!minus(X, Y)) >? !minus(D(X), D(Y)) 
+  D(minus(X)) >? minus(D(X)) 
+  D(div(X, Y)) >? !minus(div(D(X), Y), div(!times(X, D(Y)), pow(Y, two))) 
+  D(ln(X)) >? div(D(X), X) 
+  D(pow(X, Y)) >? !plus(!times(!times(Y, pow(X, !minus(Y, one))), D(X)), !times(!times(pow(X, Y), ln(X)), D(Y))) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >? filter(F, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[filter(x_1, x_2)]] = filter(x_2, x_1) 
+  [[filter2(x_1, x_2, x_3, x_4)]] = filter2(x_4, x_2, x_1, x_3) 
+  [[nil]] = _|_ 
+  [[one]] = _|_ 
+  [[two]] = _|_ 
+  [[zero]] = _|_ 
+
+We choose Lex = {filter, filter2} and Mul = {!minus, !plus, !times, @_{o -> o}, D, cons, constant, div, false, ln, map, minus, pow, t, true}, and the following precedence: constant > false > filter = filter2 > map > @_{o -> o} > cons > D = minus > !minus > div > ln > pow > !plus > !times > t > true
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  D(t) >= _|_ 
+  D(constant) >= _|_ 
+  D(!plus(X, Y)) > !plus(D(X), D(Y)) 
+  D(!times(X, Y)) >= !plus(!times(Y, D(X)), !times(X, D(Y))) 
+  D(!minus(X, Y)) >= !minus(D(X), D(Y)) 
+  D(minus(X)) >= minus(D(X)) 
+  D(div(X, Y)) > !minus(div(D(X), Y), div(!times(X, D(Y)), pow(Y, _|_))) 
+  D(ln(X)) >= div(D(X), X) 
+  D(pow(X, Y)) > !plus(!times(!times(Y, pow(X, !minus(Y, _|_))), D(X)), !times(!times(pow(X, Y), ln(X)), D(Y))) 
+  map(F, _|_) >= _|_ 
+  map(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map(F, Y)) 
+  filter(F, _|_) >= _|_ 
+  filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y) 
+  filter2(true, F, X, Y) >= cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >= filter(F, Y) 
+
+With these choices, we have:
+
+  1] D(t) >= _|_  by (Bot) 
+
+  2] D(constant) >= _|_  by (Bot) 
+
+  3] D(!plus(X, Y)) > !plus(D(X), D(Y))  because [4], by definition 
+  4] D*(!plus(X, Y)) >= !plus(D(X), D(Y))  because D > !plus, [5] and [9], by (Copy) 
+  5] D*(!plus(X, Y)) >= D(X)  because D in Mul and [6], by (Stat) 
+  6] !plus(X, Y) > X  because [7], by definition 
+  7] !plus*(X, Y) >= X  because [8], by (Select) 
+  8] X >= X  by (Meta) 
+  9] D*(!plus(X, Y)) >= D(Y)  because D in Mul and [10], by (Stat) 
+  10] !plus(X, Y) > Y  because [11], by definition 
+  11] !plus*(X, Y) >= Y  because [12], by (Select) 
+  12] Y >= Y  by (Meta) 
+
+  13] D(!times(X, Y)) >= !plus(!times(Y, D(X)), !times(X, D(Y)))  because [14], by (Star) 
+  14] D*(!times(X, Y)) >= !plus(!times(Y, D(X)), !times(X, D(Y)))  because D > !plus, [15] and [24], by (Copy) 
+  15] D*(!times(X, Y)) >= !times(Y, D(X))  because D > !times, [16] and [20], by (Copy) 
+  16] D*(!times(X, Y)) >= Y  because [17], by (Select) 
+  17] !times(X, Y) >= Y  because [18], by (Star) 
+  18] !times*(X, Y) >= Y  because [19], by (Select) 
+  19] Y >= Y  by (Meta) 
+  20] D*(!times(X, Y)) >= D(X)  because D in Mul and [21], by (Stat) 
+  21] !times(X, Y) > X  because [22], by definition 
+  22] !times*(X, Y) >= X  because [23], by (Select) 
+  23] X >= X  by (Meta) 
+  24] D*(!times(X, Y)) >= !times(X, D(Y))  because D > !times, [25] and [27], by (Copy) 
+  25] D*(!times(X, Y)) >= X  because [26], by (Select) 
+  26] !times(X, Y) >= X  because [22], by (Star) 
+  27] D*(!times(X, Y)) >= D(Y)  because D in Mul and [28], by (Stat) 
+  28] !times(X, Y) > Y  because [29], by definition 
+  29] !times*(X, Y) >= Y  because [19], by (Select) 
+
+  30] D(!minus(X, Y)) >= !minus(D(X), D(Y))  because [31], by (Star) 
+  31] D*(!minus(X, Y)) >= !minus(D(X), D(Y))  because D > !minus, [32] and [36], by (Copy) 
+  32] D*(!minus(X, Y)) >= D(X)  because D in Mul and [33], by (Stat) 
+  33] !minus(X, Y) > X  because [34], by definition 
+  34] !minus*(X, Y) >= X  because [35], by (Select) 
+  35] X >= X  by (Meta) 
+  36] D*(!minus(X, Y)) >= D(Y)  because D in Mul and [37], by (Stat) 
+  37] !minus(X, Y) > Y  because [38], by definition 
+  38] !minus*(X, Y) >= Y  because [39], by (Select) 
+  39] Y >= Y  by (Meta) 
+
+  40] D(minus(X)) >= minus(D(X))  because D = minus, D in Mul and [41], by (Fun) 
+  41] minus(X) >= D(X)  because minus = D, minus in Mul and [42], by (Fun) 
+  42] X >= X  by (Meta) 
+
+  43] D(div(X, Y)) > !minus(div(D(X), Y), div(!times(X, D(Y)), pow(Y, _|_)))  because [44], by definition 
+  44] D*(div(X, Y)) >= !minus(div(D(X), Y), div(!times(X, D(Y)), pow(Y, _|_)))  because D > !minus, [45] and [54], by (Copy) 
+  45] D*(div(X, Y)) >= div(D(X), Y)  because D > div, [46] and [50], by (Copy) 
+  46] D*(div(X, Y)) >= D(X)  because D in Mul and [47], by (Stat) 
+  47] div(X, Y) > X  because [48], by definition 
+  48] div*(X, Y) >= X  because [49], by (Select) 
+  49] X >= X  by (Meta) 
+  50] D*(div(X, Y)) >= Y  because [51], by (Select) 
+  51] div(X, Y) >= Y  because [52], by (Star) 
+  52] div*(X, Y) >= Y  because [53], by (Select) 
+  53] Y >= Y  by (Meta) 
+  54] D*(div(X, Y)) >= div(!times(X, D(Y)), pow(Y, _|_))  because D > div, [55] and [61], by (Copy) 
+  55] D*(div(X, Y)) >= !times(X, D(Y))  because D > !times, [56] and [58], by (Copy) 
+  56] D*(div(X, Y)) >= X  because [57], by (Select) 
+  57] div(X, Y) >= X  because [48], by (Star) 
+  58] D*(div(X, Y)) >= D(Y)  because D in Mul and [59], by (Stat) 
+  59] div(X, Y) > Y  because [60], by definition 
+  60] div*(X, Y) >= Y  because [53], by (Select) 
+  61] D*(div(X, Y)) >= pow(Y, _|_)  because [62], by (Select) 
+  62] div(X, Y) >= pow(Y, _|_)  because [63], by (Star) 
+  63] div*(X, Y) >= pow(Y, _|_)  because div > pow, [60] and [64], by (Copy) 
+  64] div*(X, Y) >= _|_  by (Bot) 
+
+  65] D(ln(X)) >= div(D(X), X)  because [66], by (Star) 
+  66] D*(ln(X)) >= div(D(X), X)  because D > div, [67] and [71], by (Copy) 
+  67] D*(ln(X)) >= D(X)  because D in Mul and [68], by (Stat) 
+  68] ln(X) > X  because [69], by definition 
+  69] ln*(X) >= X  because [70], by (Select) 
+  70] X >= X  by (Meta) 
+  71] D*(ln(X)) >= X  because [72], by (Select) 
+  72] ln(X) >= X  because [69], by (Star) 
+
+  73] D(pow(X, Y)) > !plus(!times(!times(Y, pow(X, !minus(Y, _|_))), D(X)), !times(!times(pow(X, Y), ln(X)), D(Y)))  because [74], by definition 
+  74] D*(pow(X, Y)) >= !plus(!times(!times(Y, pow(X, !minus(Y, _|_))), D(X)), !times(!times(pow(X, Y), ln(X)), D(Y)))  because D > !plus, [75] and [91], by (Copy) 
+  75] D*(pow(X, Y)) >= !times(!times(Y, pow(X, !minus(Y, _|_))), D(X))  because D > !times, [76] and [88], by (Copy) 
+  76] D*(pow(X, Y)) >= !times(Y, pow(X, !minus(Y, _|_)))  because D > !times, [77] and [81], by (Copy) 
+  77] D*(pow(X, Y)) >= Y  because [78], by (Select) 
+  78] pow(X, Y) >= Y  because [79], by (Star) 
+  79] pow*(X, Y) >= Y  because [80], by (Select) 
+  80] Y >= Y  by (Meta) 
+  81] D*(pow(X, Y)) >= pow(X, !minus(Y, _|_))  because D > pow, [82] and [86], by (Copy) 
+  82] D*(pow(X, Y)) >= X  because [83], by (Select) 
+  83] pow(X, Y) >= X  because [84], by (Star) 
+  84] pow*(X, Y) >= X  because [85], by (Select) 
+  85] X >= X  by (Meta) 
+  86] D*(pow(X, Y)) >= !minus(Y, _|_)  because D > !minus, [77] and [87], by (Copy) 
+  87] D*(pow(X, Y)) >= _|_  by (Bot) 
+  88] D*(pow(X, Y)) >= D(X)  because D in Mul and [89], by (Stat) 
+  89] pow(X, Y) > X  because [90], by definition 
+  90] pow*(X, Y) >= X  because [85], by (Select) 
+  91] D*(pow(X, Y)) >= !times(!times(pow(X, Y), ln(X)), D(Y))  because D > !times, [92] and [95], by (Copy) 
+  92] D*(pow(X, Y)) >= !times(pow(X, Y), ln(X))  because D > !times, [93] and [94], by (Copy) 
+  93] D*(pow(X, Y)) >= pow(X, Y)  because D > pow, [82] and [77], by (Copy) 
+  94] D*(pow(X, Y)) >= ln(X)  because D > ln and [82], by (Copy) 
+  95] D*(pow(X, Y)) >= D(Y)  because D in Mul and [96], by (Stat) 
+  96] pow(X, Y) > Y  because [97], by definition 
+  97] pow*(X, Y) >= Y  because [80], by (Select) 
+
+  98] map(F, _|_) >= _|_  by (Bot) 
+
+  99] map(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map(F, Y))  because [100], by definition 
+  100] map*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because map > cons, [101] and [108], by (Copy) 
+  101] map*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because map > @_{o -> o}, [102] and [104], by (Copy) 
+  102] map*(F, cons(X, Y)) >= F  because [103], by (Select) 
+  103] F >= F  by (Meta) 
+  104] map*(F, cons(X, Y)) >= X  because [105], by (Select) 
+  105] cons(X, Y) >= X  because [106], by (Star) 
+  106] cons*(X, Y) >= X  because [107], by (Select) 
+  107] X >= X  by (Meta) 
+  108] map*(F, cons(X, Y)) >= map(F, Y)  because map in Mul, [109] and [110], by (Stat) 
+  109] F >= F  by (Meta) 
+  110] cons(X, Y) > Y  because [111], by definition 
+  111] cons*(X, Y) >= Y  because [112], by (Select) 
+  112] Y >= Y  by (Meta) 
+
+  113] filter(F, _|_) >= _|_  by (Bot) 
+
+  114] filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because [115], by (Star) 
+  115] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter = filter2, filter in Lex, [116], [119], [120], [122] and [126], by (Stat) 
+  116] cons(X, Y) > Y  because [117], by definition 
+  117] cons*(X, Y) >= Y  because [118], by (Select) 
+  118] Y >= Y  by (Meta) 
+  119] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [120] and [122], by (Copy) 
+  120] filter*(F, cons(X, Y)) >= F  because [121], by (Select) 
+  121] F >= F  by (Meta) 
+  122] filter*(F, cons(X, Y)) >= X  because [123], by (Select) 
+  123] cons(X, Y) >= X  because [124], by (Star) 
+  124] cons*(X, Y) >= X  because [125], by (Select) 
+  125] X >= X  by (Meta) 
+  126] filter*(F, cons(X, Y)) >= Y  because [127], by (Select) 
+  127] cons(X, Y) >= Y  because [117], by (Star) 
+
+  128] filter2(true, F, X, Y) >= cons(X, filter(F, Y))  because [129], by (Star) 
+  129] filter2*(true, F, X, Y) >= cons(X, filter(F, Y))  because filter2 > cons, [130] and [132], by (Copy) 
+  130] filter2*(true, F, X, Y) >= X  because [131], by (Select) 
+  131] X >= X  by (Meta) 
+  132] filter2*(true, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [133], [134], [135] and [136], by (Stat) 
+  133] F >= F  by (Meta) 
+  134] Y >= Y  by (Meta) 
+  135] filter2*(true, F, X, Y) >= F  because [133], by (Select) 
+  136] filter2*(true, F, X, Y) >= Y  because [134], by (Select) 
+
+  137] filter2(false, F, X, Y) >= filter(F, Y)  because [138], by (Star) 
+  138] filter2*(false, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [139], [140], [141] and [142], by (Stat) 
+  139] F >= F  by (Meta) 
+  140] Y >= Y  by (Meta) 
+  141] filter2*(false, F, X, Y) >= F  because [139], by (Select) 
+  142] filter2*(false, F, X, Y) >= Y  because [140], by (Select) 
+
+We can thus remove the following rules:
+
+  D(!plus(X, Y)) => !plus(D(X), D(Y)) 
+  D(div(X, Y)) => !minus(div(D(X), Y), div(!times(X, D(Y)), pow(Y, two))) 
+  D(pow(X, Y)) => !plus(!times(!times(Y, pow(X, !minus(Y, one))), D(X)), !times(!times(pow(X, Y), ln(X)), D(Y))) 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  D(t) >? one 
+  D(constant) >? zero 
+  D(!times(X, Y)) >? !plus(!times(Y, D(X)), !times(X, D(Y))) 
+  D(!minus(X, Y)) >? !minus(D(X), D(Y)) 
+  D(minus(X)) >? minus(D(X)) 
+  D(ln(X)) >? div(D(X), X) 
+  map(F, nil) >? nil 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >? filter(F, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[filter2(x_1, x_2, x_3, x_4)]] = filter2(x_2, x_4, x_3, x_1) 
+  [[nil]] = _|_ 
+  [[one]] = _|_ 
+  [[zero]] = _|_ 
+
+We choose Lex = {filter, filter2} and Mul = {!minus, !plus, !times, @_{o -> o}, D, cons, constant, div, false, ln, map, minus, t, true}, and the following precedence: filter = filter2 > @_{o -> o} > cons > constant > ln > !minus = D > !plus > !times > div > map > minus > t > false > true
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  D(t) >= _|_ 
+  D(constant) >= _|_ 
+  D(!times(X, Y)) >= !plus(!times(Y, D(X)), !times(X, D(Y))) 
+  D(!minus(X, Y)) >= !minus(D(X), D(Y)) 
+  D(minus(X)) > minus(D(X)) 
+  D(ln(X)) > div(D(X), X) 
+  map(F, _|_) >= _|_ 
+  filter(F, _|_) >= _|_ 
+  filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y) 
+  filter2(true, F, X, Y) > cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) > filter(F, Y) 
+
+With these choices, we have:
+
+  1] D(t) >= _|_  by (Bot) 
+
+  2] D(constant) >= _|_  by (Bot) 
+
+  3] D(!times(X, Y)) >= !plus(!times(Y, D(X)), !times(X, D(Y)))  because [4], by (Star) 
+  4] D*(!times(X, Y)) >= !plus(!times(Y, D(X)), !times(X, D(Y)))  because D > !plus, [5] and [14], by (Copy) 
+  5] D*(!times(X, Y)) >= !times(Y, D(X))  because D > !times, [6] and [10], by (Copy) 
+  6] D*(!times(X, Y)) >= Y  because [7], by (Select) 
+  7] !times(X, Y) >= Y  because [8], by (Star) 
+  8] !times*(X, Y) >= Y  because [9], by (Select) 
+  9] Y >= Y  by (Meta) 
+  10] D*(!times(X, Y)) >= D(X)  because D in Mul and [11], by (Stat) 
+  11] !times(X, Y) > X  because [12], by definition 
+  12] !times*(X, Y) >= X  because [13], by (Select) 
+  13] X >= X  by (Meta) 
+  14] D*(!times(X, Y)) >= !times(X, D(Y))  because D > !times, [15] and [17], by (Copy) 
+  15] D*(!times(X, Y)) >= X  because [16], by (Select) 
+  16] !times(X, Y) >= X  because [12], by (Star) 
+  17] D*(!times(X, Y)) >= D(Y)  because D in Mul and [18], by (Stat) 
+  18] !times(X, Y) > Y  because [19], by definition 
+  19] !times*(X, Y) >= Y  because [9], by (Select) 
+
+  20] D(!minus(X, Y)) >= !minus(D(X), D(Y))  because [21], by (Star) 
+  21] D*(!minus(X, Y)) >= !minus(D(X), D(Y))  because D = !minus, D in Mul, [22] and [25], by (Stat) 
+  22] !minus(X, Y) > D(X)  because [23], by definition 
+  23] !minus*(X, Y) >= D(X)  because !minus = D, !minus in Mul and [24], by (Stat) 
+  24] X >= X  by (Meta) 
+  25] !minus(X, Y) > D(Y)  because [26], by definition 
+  26] !minus*(X, Y) >= D(Y)  because !minus = D, !minus in Mul and [27], by (Stat) 
+  27] Y >= Y  by (Meta) 
+
+  28] D(minus(X)) > minus(D(X))  because [29], by definition 
+  29] D*(minus(X)) >= minus(D(X))  because D > minus and [30], by (Copy) 
+  30] D*(minus(X)) >= D(X)  because D in Mul and [31], by (Stat) 
+  31] minus(X) > X  because [32], by definition 
+  32] minus*(X) >= X  because [33], by (Select) 
+  33] X >= X  by (Meta) 
+
+  34] D(ln(X)) > div(D(X), X)  because [35], by definition 
+  35] D*(ln(X)) >= div(D(X), X)  because D > div, [36] and [41], by (Copy) 
+  36] D*(ln(X)) >= D(X)  because [37], by (Select) 
+  37] ln(X) >= D(X)  because [38], by (Star) 
+  38] ln*(X) >= D(X)  because ln > D and [39], by (Copy) 
+  39] ln*(X) >= X  because [40], by (Select) 
+  40] X >= X  by (Meta) 
+  41] D*(ln(X)) >= X  because [42], by (Select) 
+  42] ln(X) >= X  because [39], by (Star) 
+
+  43] map(F, _|_) >= _|_  by (Bot) 
+
+  44] filter(F, _|_) >= _|_  by (Bot) 
+
+  45] filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because [46], by (Star) 
+  46] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter = filter2, filter in Lex, [47], [48], [51], [52], [53] and [57], by (Stat) 
+  47] F >= F  by (Meta) 
+  48] cons(X, Y) > Y  because [49], by definition 
+  49] cons*(X, Y) >= Y  because [50], by (Select) 
+  50] Y >= Y  by (Meta) 
+  51] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [52] and [53], by (Copy) 
+  52] filter*(F, cons(X, Y)) >= F  because [47], by (Select) 
+  53] filter*(F, cons(X, Y)) >= X  because [54], by (Select) 
+  54] cons(X, Y) >= X  because [55], by (Star) 
+  55] cons*(X, Y) >= X  because [56], by (Select) 
+  56] X >= X  by (Meta) 
+  57] filter*(F, cons(X, Y)) >= Y  because [58], by (Select) 
+  58] cons(X, Y) >= Y  because [49], by (Star) 
+
+  59] filter2(true, F, X, Y) > cons(X, filter(F, Y))  because [60], by definition 
+  60] filter2*(true, F, X, Y) >= cons(X, filter(F, Y))  because filter2 > cons, [61] and [63], by (Copy) 
+  61] filter2*(true, F, X, Y) >= X  because [62], by (Select) 
+  62] X >= X  by (Meta) 
+  63] filter2*(true, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [64], [65], [66] and [67], by (Stat) 
+  64] F >= F  by (Meta) 
+  65] Y >= Y  by (Meta) 
+  66] filter2*(true, F, X, Y) >= F  because [64], by (Select) 
+  67] filter2*(true, F, X, Y) >= Y  because [65], by (Select) 
+
+  68] filter2(false, F, X, Y) > filter(F, Y)  because [69], by definition 
+  69] filter2*(false, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [70], [71], [72] and [73], by (Stat) 
+  70] F >= F  by (Meta) 
+  71] Y >= Y  by (Meta) 
+  72] filter2*(false, F, X, Y) >= F  because [70], by (Select) 
+  73] filter2*(false, F, X, Y) >= Y  because [71], by (Select) 
+
+We can thus remove the following rules:
+
+  D(minus(X)) => minus(D(X)) 
+  D(ln(X)) => div(D(X), X) 
+  filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  D(t) >? one 
+  D(constant) >? zero 
+  D(!times(X, Y)) >? !plus(!times(Y, D(X)), !times(X, D(Y))) 
+  D(!minus(X, Y)) >? !minus(D(X), D(Y)) 
+  map(F, nil) >? nil 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[nil]] = _|_ 
+  [[one]] = _|_ 
+  [[zero]] = _|_ 
+
+We choose Lex = {} and Mul = {!minus, !plus, !times, @_{o -> o}, D, cons, constant, filter, filter2, map, t}, and the following precedence: D > !minus > !times > !plus > cons > constant > filter > @_{o -> o} > filter2 > map > t
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  D(t) >= _|_ 
+  D(constant) >= _|_ 
+  D(!times(X, Y)) > !plus(!times(Y, D(X)), !times(X, D(Y))) 
+  D(!minus(X, Y)) > !minus(D(X), D(Y)) 
+  map(F, _|_) >= _|_ 
+  filter(F, _|_) >= _|_ 
+  filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y) 
+
+With these choices, we have:
+
+  1] D(t) >= _|_  by (Bot) 
+
+  2] D(constant) >= _|_  by (Bot) 
+
+  3] D(!times(X, Y)) > !plus(!times(Y, D(X)), !times(X, D(Y)))  because [4], by definition 
+  4] D*(!times(X, Y)) >= !plus(!times(Y, D(X)), !times(X, D(Y)))  because D > !plus, [5] and [14], by (Copy) 
+  5] D*(!times(X, Y)) >= !times(Y, D(X))  because D > !times, [6] and [10], by (Copy) 
+  6] D*(!times(X, Y)) >= Y  because [7], by (Select) 
+  7] !times(X, Y) >= Y  because [8], by (Star) 
+  8] !times*(X, Y) >= Y  because [9], by (Select) 
+  9] Y >= Y  by (Meta) 
+  10] D*(!times(X, Y)) >= D(X)  because D in Mul and [11], by (Stat) 
+  11] !times(X, Y) > X  because [12], by definition 
+  12] !times*(X, Y) >= X  because [13], by (Select) 
+  13] X >= X  by (Meta) 
+  14] D*(!times(X, Y)) >= !times(X, D(Y))  because D > !times, [15] and [17], by (Copy) 
+  15] D*(!times(X, Y)) >= X  because [16], by (Select) 
+  16] !times(X, Y) >= X  because [12], by (Star) 
+  17] D*(!times(X, Y)) >= D(Y)  because D in Mul and [18], by (Stat) 
+  18] !times(X, Y) > Y  because [19], by definition 
+  19] !times*(X, Y) >= Y  because [9], by (Select) 
+
+  20] D(!minus(X, Y)) > !minus(D(X), D(Y))  because [21], by definition 
+  21] D*(!minus(X, Y)) >= !minus(D(X), D(Y))  because D > !minus, [22] and [26], by (Copy) 
+  22] D*(!minus(X, Y)) >= D(X)  because D in Mul and [23], by (Stat) 
+  23] !minus(X, Y) > X  because [24], by definition 
+  24] !minus*(X, Y) >= X  because [25], by (Select) 
+  25] X >= X  by (Meta) 
+  26] D*(!minus(X, Y)) >= D(Y)  because D in Mul and [27], by (Stat) 
+  27] !minus(X, Y) > Y  because [28], by definition 
+  28] !minus*(X, Y) >= Y  because [29], by (Select) 
+  29] Y >= Y  by (Meta) 
+
+  30] map(F, _|_) >= _|_  by (Bot) 
+
+  31] filter(F, _|_) >= _|_  by (Bot) 
+
+  32] filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because [33], by (Star) 
+  33] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter > filter2, [34], [35], [37] and [41], by (Copy) 
+  34] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [35] and [37], by (Copy) 
+  35] filter*(F, cons(X, Y)) >= F  because [36], by (Select) 
+  36] F >= F  by (Meta) 
+  37] filter*(F, cons(X, Y)) >= X  because [38], by (Select) 
+  38] cons(X, Y) >= X  because [39], by (Star) 
+  39] cons*(X, Y) >= X  because [40], by (Select) 
+  40] X >= X  by (Meta) 
+  41] filter*(F, cons(X, Y)) >= Y  because [42], by (Select) 
+  42] cons(X, Y) >= Y  because [43], by (Star) 
+  43] cons*(X, Y) >= Y  because [44], by (Select) 
+  44] Y >= Y  by (Meta) 
+
+We can thus remove the following rules:
+
+  D(!times(X, Y)) => !plus(!times(Y, D(X)), !times(X, D(Y))) 
+  D(!minus(X, Y)) => !minus(D(X), D(Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  D(t) >? one 
+  D(constant) >? zero 
+  map(F, nil) >? nil 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  D = Lam[y0].3 + 3*y0 
+  cons = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  constant = 3 
+  filter = Lam[G0;y1].3 + 3*y1 + 2*G0(0) + 2*G0(y1) + 3*y1*G0(y1) 
+  filter2 = Lam[y0;G1;y2;y3].y0 + y2 + y3 + G1(0) 
+  map = Lam[G0;y1].3 + 3*y1 + G0(0) 
+  nil = 0 
+  one = 0 
+  t = 3 
+  zero = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[D(t)]] = 12 > 0 = [[one]] 
+  [[D(constant)]] = 12 > 0 = [[zero]] 
+  [[map(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+  [[filter(_F0, nil)]] = 3 + 4*F0(0) > 0 = [[nil]] 
+  [[filter(_F0, cons(_x1, _x2))]] = 12 + 9*x1 + 9*x2 + 2*F0(0) + 9*x1*F0(3 + 3*x1 + 3*x2) + 9*x2*F0(3 + 3*x1 + 3*x2) + 11*F0(3 + 3*x1 + 3*x2) > x2 + 2*x1 + F0(0) + F0(x1) = [[filter2(_F0 _x1, _F0, _x1, _x2)]] 
+
+We can thus remove the following rules:
+
+  D(t) => one 
+  D(constant) => zero 
+  map(F, nil) => nil 
+  filter(F, nil) => nil 
+  filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

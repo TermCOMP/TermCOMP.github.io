@@ -1,0 +1,1792 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/GnaFi.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+queens(g,a)
+
+w.r.t. the given Prolog program could successfully be proven:
+
+(0) Prolog
+(1) UndefinedPredicateHandlerProof [SOUND, 0 ms]
+(2) Prolog
+(3) PrologToPiTRSProof [SOUND, 0 ms]
+(4) PiTRS
+(5) DependencyPairsProof [EQUIVALENT, 6 ms]
+(6) PiDP
+(7) DependencyGraphProof [EQUIVALENT, 0 ms]
+(8) AND
+    (9) PiDP
+        (10) UsableRulesProof [EQUIVALENT, 0 ms]
+        (11) PiDP
+        (12) PiDPToQDPProof [SOUND, 1 ms]
+        (13) QDP
+        (14) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (15) YES
+    (16) PiDP
+        (17) UsableRulesProof [EQUIVALENT, 0 ms]
+        (18) PiDP
+        (19) PiDPToQDPProof [SOUND, 0 ms]
+        (20) QDP
+        (21) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (22) YES
+    (23) PiDP
+        (24) UsableRulesProof [EQUIVALENT, 0 ms]
+        (25) PiDP
+        (26) PiDPToQDPProof [SOUND, 0 ms]
+        (27) QDP
+        (28) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (29) YES
+    (30) PiDP
+        (31) UsableRulesProof [EQUIVALENT, 0 ms]
+        (32) PiDP
+        (33) PiDPToQDPProof [SOUND, 0 ms]
+        (34) QDP
+        (35) MRRProof [EQUIVALENT, 11 ms]
+        (36) QDP
+        (37) PisEmptyProof [EQUIVALENT, 0 ms]
+        (38) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+queens(X, Y) :- ','(perm(X, Y), safe(Y)).
+perm([], []).
+perm(.(X, Y), .(V, Res)) :- ','(delete(V, .(X, Y), Rest), perm(Rest, Res)).
+delete(X, .(X, Y), Y).
+delete(X, .(F, T), .(F, R)) :- delete(X, T, R).
+safe([]).
+safe(.(X, Y)) :- ','(noattack(X, Y, 1), safe(Y)).
+noattack(X, [], N).
+noattack(X, .(F, T), N) :- ','(=\=(X, F), ','(=\=(X, +(F, N)), ','(=\=(F, +(X, N)), ','(is(N1, +(N, 1)), noattack(X, T, N1))))).
+
+
+Query: queens(g,a)
+----------------------------------------
+
+(1) UndefinedPredicateHandlerProof (SOUND)
+Added facts for all undefined predicates [PROLOG].
+----------------------------------------
+
+(2)
+Obligation:
+Clauses:
+
+queens(X, Y) :- ','(perm(X, Y), safe(Y)).
+perm([], []).
+perm(.(X, Y), .(V, Res)) :- ','(delete(V, .(X, Y), Rest), perm(Rest, Res)).
+delete(X, .(X, Y), Y).
+delete(X, .(F, T), .(F, R)) :- delete(X, T, R).
+safe([]).
+safe(.(X, Y)) :- ','(noattack(X, Y, 1), safe(Y)).
+noattack(X, [], N).
+noattack(X, .(F, T), N) :- ','(=\=(X, F), ','(=\=(X, +(F, N)), ','(=\=(F, +(X, N)), ','(is(N1, +(N, 1)), noattack(X, T, N1))))).
+=\=(X0, X1).
+is(X0, X1).
+
+
+Query: queens(g,a)
+----------------------------------------
+
+(3) PrologToPiTRSProof (SOUND)
+We use the technique of [TOCL09]. With regard to the inferred argument filtering the predicates were used in the following modes:
+
+queens_in_2: (b,f)
+
+perm_in_2: (b,f)
+
+delete_in_3: (f,b,f)
+
+safe_in_1: (b)
+
+noattack_in_3: (b,b,b) (b,b,f)
+
+Transforming Prolog into the following Term Rewriting System:
+
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   queens_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, Y), .(V, Res)) -> U3_ga(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(F, T), .(F, R)) -> U5_aga(X, F, T, R, delete_in_aga(X, T, R))
+   U5_aga(X, F, T, R, delete_out_aga(X, T, R)) -> delete_out_aga(X, .(F, T), .(F, R))
+   U3_ga(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_ga(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U4_ga(X, Y, V, Res, perm_out_ga(Rest, Res)) -> perm_out_ga(.(X, Y), .(V, Res))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, safe_in_g(Y))
+   safe_in_g([]) -> safe_out_g([])
+   safe_in_g(.(X, Y)) -> U6_g(X, Y, noattack_in_ggg(X, Y, 1))
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg(X, [], N)
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+   U8_ggg(X, F, T, N, =\=_out_gg(X, F)) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U9_ggg(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_ggg(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_ggg(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U11_ggg(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_ggg(X, F, T, N, noattack_in_gga(X, T, N1))
+   noattack_in_gga(X, [], N) -> noattack_out_gga(X, [], N)
+   noattack_in_gga(X, .(F, T), N) -> U8_gga(X, F, T, N, =\=_in_gg(X, F))
+   U8_gga(X, F, T, N, =\=_out_gg(X, F)) -> U9_gga(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   U9_gga(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_gga(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_gga(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_gga(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U11_gga(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_gga(X, F, T, N, noattack_in_gga(X, T, N1))
+   U12_gga(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_gga(X, .(F, T), N)
+   U12_ggg(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_ggg(X, .(F, T), N)
+   U6_g(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_g(X, Y, safe_in_g(Y))
+   U7_g(X, Y, safe_out_g(Y)) -> safe_out_g(.(X, Y))
+   U2_ga(X, Y, safe_out_g(Y)) -> queens_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+queens_in_ga(x1, x2)  =  queens_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U5_aga(x1, x2, x3, x4, x5)  =  U5_aga(x2, x5)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+safe_in_g(x1)  =  safe_in_g(x1)
+
+safe_out_g(x1)  =  safe_out_g
+
+U6_g(x1, x2, x3)  =  U6_g(x2, x3)
+
+noattack_in_ggg(x1, x2, x3)  =  noattack_in_ggg(x1, x2, x3)
+
+noattack_out_ggg(x1, x2, x3)  =  noattack_out_ggg
+
+U8_ggg(x1, x2, x3, x4, x5)  =  U8_ggg(x1, x2, x3, x4, x5)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
+U9_ggg(x1, x2, x3, x4, x5)  =  U9_ggg(x1, x2, x3, x4, x5)
+
++(x1, x2)  =  +(x1, x2)
+
+U10_ggg(x1, x2, x3, x4, x5)  =  U10_ggg(x1, x3, x4, x5)
+
+U11_ggg(x1, x2, x3, x4, x5)  =  U11_ggg(x1, x3, x5)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag
+
+1  =  1
+
+U12_ggg(x1, x2, x3, x4, x5)  =  U12_ggg(x5)
+
+noattack_in_gga(x1, x2, x3)  =  noattack_in_gga(x1, x2)
+
+noattack_out_gga(x1, x2, x3)  =  noattack_out_gga
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+U9_gga(x1, x2, x3, x4, x5)  =  U9_gga(x1, x2, x3, x5)
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+U10_gga(x1, x2, x3, x4, x5)  =  U10_gga(x1, x3, x5)
+
+U11_gga(x1, x2, x3, x4, x5)  =  U11_gga(x1, x3, x5)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+U12_gga(x1, x2, x3, x4, x5)  =  U12_gga(x5)
+
+U7_g(x1, x2, x3)  =  U7_g(x3)
+
+queens_out_ga(x1, x2)  =  queens_out_ga(x2)
+
+
+
+
+
+Infinitary Constructor Rewriting Termination of PiTRS implies Termination of Prolog
+
+
+
+----------------------------------------
+
+(4)
+Obligation:
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   queens_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, Y), .(V, Res)) -> U3_ga(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(F, T), .(F, R)) -> U5_aga(X, F, T, R, delete_in_aga(X, T, R))
+   U5_aga(X, F, T, R, delete_out_aga(X, T, R)) -> delete_out_aga(X, .(F, T), .(F, R))
+   U3_ga(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_ga(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U4_ga(X, Y, V, Res, perm_out_ga(Rest, Res)) -> perm_out_ga(.(X, Y), .(V, Res))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, safe_in_g(Y))
+   safe_in_g([]) -> safe_out_g([])
+   safe_in_g(.(X, Y)) -> U6_g(X, Y, noattack_in_ggg(X, Y, 1))
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg(X, [], N)
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+   U8_ggg(X, F, T, N, =\=_out_gg(X, F)) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U9_ggg(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_ggg(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_ggg(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U11_ggg(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_ggg(X, F, T, N, noattack_in_gga(X, T, N1))
+   noattack_in_gga(X, [], N) -> noattack_out_gga(X, [], N)
+   noattack_in_gga(X, .(F, T), N) -> U8_gga(X, F, T, N, =\=_in_gg(X, F))
+   U8_gga(X, F, T, N, =\=_out_gg(X, F)) -> U9_gga(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   U9_gga(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_gga(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_gga(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_gga(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U11_gga(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_gga(X, F, T, N, noattack_in_gga(X, T, N1))
+   U12_gga(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_gga(X, .(F, T), N)
+   U12_ggg(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_ggg(X, .(F, T), N)
+   U6_g(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_g(X, Y, safe_in_g(Y))
+   U7_g(X, Y, safe_out_g(Y)) -> safe_out_g(.(X, Y))
+   U2_ga(X, Y, safe_out_g(Y)) -> queens_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+queens_in_ga(x1, x2)  =  queens_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U5_aga(x1, x2, x3, x4, x5)  =  U5_aga(x2, x5)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+safe_in_g(x1)  =  safe_in_g(x1)
+
+safe_out_g(x1)  =  safe_out_g
+
+U6_g(x1, x2, x3)  =  U6_g(x2, x3)
+
+noattack_in_ggg(x1, x2, x3)  =  noattack_in_ggg(x1, x2, x3)
+
+noattack_out_ggg(x1, x2, x3)  =  noattack_out_ggg
+
+U8_ggg(x1, x2, x3, x4, x5)  =  U8_ggg(x1, x2, x3, x4, x5)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
+U9_ggg(x1, x2, x3, x4, x5)  =  U9_ggg(x1, x2, x3, x4, x5)
+
++(x1, x2)  =  +(x1, x2)
+
+U10_ggg(x1, x2, x3, x4, x5)  =  U10_ggg(x1, x3, x4, x5)
+
+U11_ggg(x1, x2, x3, x4, x5)  =  U11_ggg(x1, x3, x5)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag
+
+1  =  1
+
+U12_ggg(x1, x2, x3, x4, x5)  =  U12_ggg(x5)
+
+noattack_in_gga(x1, x2, x3)  =  noattack_in_gga(x1, x2)
+
+noattack_out_gga(x1, x2, x3)  =  noattack_out_gga
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+U9_gga(x1, x2, x3, x4, x5)  =  U9_gga(x1, x2, x3, x5)
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+U10_gga(x1, x2, x3, x4, x5)  =  U10_gga(x1, x3, x5)
+
+U11_gga(x1, x2, x3, x4, x5)  =  U11_gga(x1, x3, x5)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+U12_gga(x1, x2, x3, x4, x5)  =  U12_gga(x5)
+
+U7_g(x1, x2, x3)  =  U7_g(x3)
+
+queens_out_ga(x1, x2)  =  queens_out_ga(x2)
+
+
+
+----------------------------------------
+
+(5) DependencyPairsProof (EQUIVALENT)
+Using Dependency Pairs [AG00,LOPSTR] we result in the following initial DP problem:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   QUEENS_IN_GA(X, Y) -> U1_GA(X, Y, perm_in_ga(X, Y))
+   QUEENS_IN_GA(X, Y) -> PERM_IN_GA(X, Y)
+   PERM_IN_GA(.(X, Y), .(V, Res)) -> U3_GA(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   PERM_IN_GA(.(X, Y), .(V, Res)) -> DELETE_IN_AGA(V, .(X, Y), Rest)
+   DELETE_IN_AGA(X, .(F, T), .(F, R)) -> U5_AGA(X, F, T, R, delete_in_aga(X, T, R))
+   DELETE_IN_AGA(X, .(F, T), .(F, R)) -> DELETE_IN_AGA(X, T, R)
+   U3_GA(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_GA(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U3_GA(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> PERM_IN_GA(Rest, Res)
+   U1_GA(X, Y, perm_out_ga(X, Y)) -> U2_GA(X, Y, safe_in_g(Y))
+   U1_GA(X, Y, perm_out_ga(X, Y)) -> SAFE_IN_G(Y)
+   SAFE_IN_G(.(X, Y)) -> U6_G(X, Y, noattack_in_ggg(X, Y, 1))
+   SAFE_IN_G(.(X, Y)) -> NOATTACK_IN_GGG(X, Y, 1)
+   NOATTACK_IN_GGG(X, .(F, T), N) -> U8_GGG(X, F, T, N, =\=_in_gg(X, F))
+   NOATTACK_IN_GGG(X, .(F, T), N) -> =\=_IN_GG(X, F)
+   U8_GGG(X, F, T, N, =\=_out_gg(X, F)) -> U9_GGG(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U8_GGG(X, F, T, N, =\=_out_gg(X, F)) -> =\=_IN_GG(X, +(F, N))
+   U9_GGG(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_GGG(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U9_GGG(X, F, T, N, =\=_out_gg(X, +(F, N))) -> =\=_IN_GG(F, +(X, N))
+   U10_GGG(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_GGG(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   U10_GGG(X, F, T, N, =\=_out_gg(F, +(X, N))) -> IS_IN_AG(N1, +(N, 1))
+   U11_GGG(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_GGG(X, F, T, N, noattack_in_gga(X, T, N1))
+   U11_GGG(X, F, T, N, is_out_ag(N1, +(N, 1))) -> NOATTACK_IN_GGA(X, T, N1)
+   NOATTACK_IN_GGA(X, .(F, T), N) -> U8_GGA(X, F, T, N, =\=_in_gg(X, F))
+   NOATTACK_IN_GGA(X, .(F, T), N) -> =\=_IN_GG(X, F)
+   U8_GGA(X, F, T, N, =\=_out_gg(X, F)) -> U9_GGA(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   U8_GGA(X, F, T, N, =\=_out_gg(X, F)) -> =\=_IN_GA(X, +(F, N))
+   U9_GGA(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_GGA(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U9_GGA(X, F, T, N, =\=_out_ga(X, +(F, N))) -> =\=_IN_GA(F, +(X, N))
+   U10_GGA(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_GGA(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   U10_GGA(X, F, T, N, =\=_out_ga(F, +(X, N))) -> IS_IN_AA(N1, +(N, 1))
+   U11_GGA(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_GGA(X, F, T, N, noattack_in_gga(X, T, N1))
+   U11_GGA(X, F, T, N, is_out_aa(N1, +(N, 1))) -> NOATTACK_IN_GGA(X, T, N1)
+   U6_G(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_G(X, Y, safe_in_g(Y))
+   U6_G(X, Y, noattack_out_ggg(X, Y, 1)) -> SAFE_IN_G(Y)
+
+The TRS R consists of the following rules:
+
+   queens_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, Y), .(V, Res)) -> U3_ga(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(F, T), .(F, R)) -> U5_aga(X, F, T, R, delete_in_aga(X, T, R))
+   U5_aga(X, F, T, R, delete_out_aga(X, T, R)) -> delete_out_aga(X, .(F, T), .(F, R))
+   U3_ga(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_ga(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U4_ga(X, Y, V, Res, perm_out_ga(Rest, Res)) -> perm_out_ga(.(X, Y), .(V, Res))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, safe_in_g(Y))
+   safe_in_g([]) -> safe_out_g([])
+   safe_in_g(.(X, Y)) -> U6_g(X, Y, noattack_in_ggg(X, Y, 1))
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg(X, [], N)
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+   U8_ggg(X, F, T, N, =\=_out_gg(X, F)) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U9_ggg(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_ggg(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_ggg(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U11_ggg(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_ggg(X, F, T, N, noattack_in_gga(X, T, N1))
+   noattack_in_gga(X, [], N) -> noattack_out_gga(X, [], N)
+   noattack_in_gga(X, .(F, T), N) -> U8_gga(X, F, T, N, =\=_in_gg(X, F))
+   U8_gga(X, F, T, N, =\=_out_gg(X, F)) -> U9_gga(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   U9_gga(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_gga(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_gga(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_gga(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U11_gga(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_gga(X, F, T, N, noattack_in_gga(X, T, N1))
+   U12_gga(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_gga(X, .(F, T), N)
+   U12_ggg(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_ggg(X, .(F, T), N)
+   U6_g(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_g(X, Y, safe_in_g(Y))
+   U7_g(X, Y, safe_out_g(Y)) -> safe_out_g(.(X, Y))
+   U2_ga(X, Y, safe_out_g(Y)) -> queens_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+queens_in_ga(x1, x2)  =  queens_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U5_aga(x1, x2, x3, x4, x5)  =  U5_aga(x2, x5)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+safe_in_g(x1)  =  safe_in_g(x1)
+
+safe_out_g(x1)  =  safe_out_g
+
+U6_g(x1, x2, x3)  =  U6_g(x2, x3)
+
+noattack_in_ggg(x1, x2, x3)  =  noattack_in_ggg(x1, x2, x3)
+
+noattack_out_ggg(x1, x2, x3)  =  noattack_out_ggg
+
+U8_ggg(x1, x2, x3, x4, x5)  =  U8_ggg(x1, x2, x3, x4, x5)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
+U9_ggg(x1, x2, x3, x4, x5)  =  U9_ggg(x1, x2, x3, x4, x5)
+
++(x1, x2)  =  +(x1, x2)
+
+U10_ggg(x1, x2, x3, x4, x5)  =  U10_ggg(x1, x3, x4, x5)
+
+U11_ggg(x1, x2, x3, x4, x5)  =  U11_ggg(x1, x3, x5)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag
+
+1  =  1
+
+U12_ggg(x1, x2, x3, x4, x5)  =  U12_ggg(x5)
+
+noattack_in_gga(x1, x2, x3)  =  noattack_in_gga(x1, x2)
+
+noattack_out_gga(x1, x2, x3)  =  noattack_out_gga
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+U9_gga(x1, x2, x3, x4, x5)  =  U9_gga(x1, x2, x3, x5)
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+U10_gga(x1, x2, x3, x4, x5)  =  U10_gga(x1, x3, x5)
+
+U11_gga(x1, x2, x3, x4, x5)  =  U11_gga(x1, x3, x5)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+U12_gga(x1, x2, x3, x4, x5)  =  U12_gga(x5)
+
+U7_g(x1, x2, x3)  =  U7_g(x3)
+
+queens_out_ga(x1, x2)  =  queens_out_ga(x2)
+
+QUEENS_IN_GA(x1, x2)  =  QUEENS_IN_GA(x1)
+
+U1_GA(x1, x2, x3)  =  U1_GA(x3)
+
+PERM_IN_GA(x1, x2)  =  PERM_IN_GA(x1)
+
+U3_GA(x1, x2, x3, x4, x5)  =  U3_GA(x5)
+
+DELETE_IN_AGA(x1, x2, x3)  =  DELETE_IN_AGA(x2)
+
+U5_AGA(x1, x2, x3, x4, x5)  =  U5_AGA(x2, x5)
+
+U4_GA(x1, x2, x3, x4, x5)  =  U4_GA(x3, x5)
+
+U2_GA(x1, x2, x3)  =  U2_GA(x2, x3)
+
+SAFE_IN_G(x1)  =  SAFE_IN_G(x1)
+
+U6_G(x1, x2, x3)  =  U6_G(x2, x3)
+
+NOATTACK_IN_GGG(x1, x2, x3)  =  NOATTACK_IN_GGG(x1, x2, x3)
+
+U8_GGG(x1, x2, x3, x4, x5)  =  U8_GGG(x1, x2, x3, x4, x5)
+
+=\=_IN_GG(x1, x2)  =  =\=_IN_GG(x1, x2)
+
+U9_GGG(x1, x2, x3, x4, x5)  =  U9_GGG(x1, x2, x3, x4, x5)
+
+U10_GGG(x1, x2, x3, x4, x5)  =  U10_GGG(x1, x3, x4, x5)
+
+U11_GGG(x1, x2, x3, x4, x5)  =  U11_GGG(x1, x3, x5)
+
+IS_IN_AG(x1, x2)  =  IS_IN_AG(x2)
+
+U12_GGG(x1, x2, x3, x4, x5)  =  U12_GGG(x5)
+
+NOATTACK_IN_GGA(x1, x2, x3)  =  NOATTACK_IN_GGA(x1, x2)
+
+U8_GGA(x1, x2, x3, x4, x5)  =  U8_GGA(x1, x2, x3, x5)
+
+U9_GGA(x1, x2, x3, x4, x5)  =  U9_GGA(x1, x2, x3, x5)
+
+=\=_IN_GA(x1, x2)  =  =\=_IN_GA(x1)
+
+U10_GGA(x1, x2, x3, x4, x5)  =  U10_GGA(x1, x3, x5)
+
+U11_GGA(x1, x2, x3, x4, x5)  =  U11_GGA(x1, x3, x5)
+
+IS_IN_AA(x1, x2)  =  IS_IN_AA
+
+U12_GGA(x1, x2, x3, x4, x5)  =  U12_GGA(x5)
+
+U7_G(x1, x2, x3)  =  U7_G(x3)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(6)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   QUEENS_IN_GA(X, Y) -> U1_GA(X, Y, perm_in_ga(X, Y))
+   QUEENS_IN_GA(X, Y) -> PERM_IN_GA(X, Y)
+   PERM_IN_GA(.(X, Y), .(V, Res)) -> U3_GA(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   PERM_IN_GA(.(X, Y), .(V, Res)) -> DELETE_IN_AGA(V, .(X, Y), Rest)
+   DELETE_IN_AGA(X, .(F, T), .(F, R)) -> U5_AGA(X, F, T, R, delete_in_aga(X, T, R))
+   DELETE_IN_AGA(X, .(F, T), .(F, R)) -> DELETE_IN_AGA(X, T, R)
+   U3_GA(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_GA(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U3_GA(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> PERM_IN_GA(Rest, Res)
+   U1_GA(X, Y, perm_out_ga(X, Y)) -> U2_GA(X, Y, safe_in_g(Y))
+   U1_GA(X, Y, perm_out_ga(X, Y)) -> SAFE_IN_G(Y)
+   SAFE_IN_G(.(X, Y)) -> U6_G(X, Y, noattack_in_ggg(X, Y, 1))
+   SAFE_IN_G(.(X, Y)) -> NOATTACK_IN_GGG(X, Y, 1)
+   NOATTACK_IN_GGG(X, .(F, T), N) -> U8_GGG(X, F, T, N, =\=_in_gg(X, F))
+   NOATTACK_IN_GGG(X, .(F, T), N) -> =\=_IN_GG(X, F)
+   U8_GGG(X, F, T, N, =\=_out_gg(X, F)) -> U9_GGG(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U8_GGG(X, F, T, N, =\=_out_gg(X, F)) -> =\=_IN_GG(X, +(F, N))
+   U9_GGG(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_GGG(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U9_GGG(X, F, T, N, =\=_out_gg(X, +(F, N))) -> =\=_IN_GG(F, +(X, N))
+   U10_GGG(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_GGG(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   U10_GGG(X, F, T, N, =\=_out_gg(F, +(X, N))) -> IS_IN_AG(N1, +(N, 1))
+   U11_GGG(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_GGG(X, F, T, N, noattack_in_gga(X, T, N1))
+   U11_GGG(X, F, T, N, is_out_ag(N1, +(N, 1))) -> NOATTACK_IN_GGA(X, T, N1)
+   NOATTACK_IN_GGA(X, .(F, T), N) -> U8_GGA(X, F, T, N, =\=_in_gg(X, F))
+   NOATTACK_IN_GGA(X, .(F, T), N) -> =\=_IN_GG(X, F)
+   U8_GGA(X, F, T, N, =\=_out_gg(X, F)) -> U9_GGA(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   U8_GGA(X, F, T, N, =\=_out_gg(X, F)) -> =\=_IN_GA(X, +(F, N))
+   U9_GGA(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_GGA(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U9_GGA(X, F, T, N, =\=_out_ga(X, +(F, N))) -> =\=_IN_GA(F, +(X, N))
+   U10_GGA(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_GGA(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   U10_GGA(X, F, T, N, =\=_out_ga(F, +(X, N))) -> IS_IN_AA(N1, +(N, 1))
+   U11_GGA(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_GGA(X, F, T, N, noattack_in_gga(X, T, N1))
+   U11_GGA(X, F, T, N, is_out_aa(N1, +(N, 1))) -> NOATTACK_IN_GGA(X, T, N1)
+   U6_G(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_G(X, Y, safe_in_g(Y))
+   U6_G(X, Y, noattack_out_ggg(X, Y, 1)) -> SAFE_IN_G(Y)
+
+The TRS R consists of the following rules:
+
+   queens_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, Y), .(V, Res)) -> U3_ga(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(F, T), .(F, R)) -> U5_aga(X, F, T, R, delete_in_aga(X, T, R))
+   U5_aga(X, F, T, R, delete_out_aga(X, T, R)) -> delete_out_aga(X, .(F, T), .(F, R))
+   U3_ga(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_ga(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U4_ga(X, Y, V, Res, perm_out_ga(Rest, Res)) -> perm_out_ga(.(X, Y), .(V, Res))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, safe_in_g(Y))
+   safe_in_g([]) -> safe_out_g([])
+   safe_in_g(.(X, Y)) -> U6_g(X, Y, noattack_in_ggg(X, Y, 1))
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg(X, [], N)
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+   U8_ggg(X, F, T, N, =\=_out_gg(X, F)) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U9_ggg(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_ggg(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_ggg(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U11_ggg(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_ggg(X, F, T, N, noattack_in_gga(X, T, N1))
+   noattack_in_gga(X, [], N) -> noattack_out_gga(X, [], N)
+   noattack_in_gga(X, .(F, T), N) -> U8_gga(X, F, T, N, =\=_in_gg(X, F))
+   U8_gga(X, F, T, N, =\=_out_gg(X, F)) -> U9_gga(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   U9_gga(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_gga(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_gga(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_gga(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U11_gga(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_gga(X, F, T, N, noattack_in_gga(X, T, N1))
+   U12_gga(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_gga(X, .(F, T), N)
+   U12_ggg(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_ggg(X, .(F, T), N)
+   U6_g(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_g(X, Y, safe_in_g(Y))
+   U7_g(X, Y, safe_out_g(Y)) -> safe_out_g(.(X, Y))
+   U2_ga(X, Y, safe_out_g(Y)) -> queens_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+queens_in_ga(x1, x2)  =  queens_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U5_aga(x1, x2, x3, x4, x5)  =  U5_aga(x2, x5)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+safe_in_g(x1)  =  safe_in_g(x1)
+
+safe_out_g(x1)  =  safe_out_g
+
+U6_g(x1, x2, x3)  =  U6_g(x2, x3)
+
+noattack_in_ggg(x1, x2, x3)  =  noattack_in_ggg(x1, x2, x3)
+
+noattack_out_ggg(x1, x2, x3)  =  noattack_out_ggg
+
+U8_ggg(x1, x2, x3, x4, x5)  =  U8_ggg(x1, x2, x3, x4, x5)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
+U9_ggg(x1, x2, x3, x4, x5)  =  U9_ggg(x1, x2, x3, x4, x5)
+
++(x1, x2)  =  +(x1, x2)
+
+U10_ggg(x1, x2, x3, x4, x5)  =  U10_ggg(x1, x3, x4, x5)
+
+U11_ggg(x1, x2, x3, x4, x5)  =  U11_ggg(x1, x3, x5)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag
+
+1  =  1
+
+U12_ggg(x1, x2, x3, x4, x5)  =  U12_ggg(x5)
+
+noattack_in_gga(x1, x2, x3)  =  noattack_in_gga(x1, x2)
+
+noattack_out_gga(x1, x2, x3)  =  noattack_out_gga
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+U9_gga(x1, x2, x3, x4, x5)  =  U9_gga(x1, x2, x3, x5)
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+U10_gga(x1, x2, x3, x4, x5)  =  U10_gga(x1, x3, x5)
+
+U11_gga(x1, x2, x3, x4, x5)  =  U11_gga(x1, x3, x5)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+U12_gga(x1, x2, x3, x4, x5)  =  U12_gga(x5)
+
+U7_g(x1, x2, x3)  =  U7_g(x3)
+
+queens_out_ga(x1, x2)  =  queens_out_ga(x2)
+
+QUEENS_IN_GA(x1, x2)  =  QUEENS_IN_GA(x1)
+
+U1_GA(x1, x2, x3)  =  U1_GA(x3)
+
+PERM_IN_GA(x1, x2)  =  PERM_IN_GA(x1)
+
+U3_GA(x1, x2, x3, x4, x5)  =  U3_GA(x5)
+
+DELETE_IN_AGA(x1, x2, x3)  =  DELETE_IN_AGA(x2)
+
+U5_AGA(x1, x2, x3, x4, x5)  =  U5_AGA(x2, x5)
+
+U4_GA(x1, x2, x3, x4, x5)  =  U4_GA(x3, x5)
+
+U2_GA(x1, x2, x3)  =  U2_GA(x2, x3)
+
+SAFE_IN_G(x1)  =  SAFE_IN_G(x1)
+
+U6_G(x1, x2, x3)  =  U6_G(x2, x3)
+
+NOATTACK_IN_GGG(x1, x2, x3)  =  NOATTACK_IN_GGG(x1, x2, x3)
+
+U8_GGG(x1, x2, x3, x4, x5)  =  U8_GGG(x1, x2, x3, x4, x5)
+
+=\=_IN_GG(x1, x2)  =  =\=_IN_GG(x1, x2)
+
+U9_GGG(x1, x2, x3, x4, x5)  =  U9_GGG(x1, x2, x3, x4, x5)
+
+U10_GGG(x1, x2, x3, x4, x5)  =  U10_GGG(x1, x3, x4, x5)
+
+U11_GGG(x1, x2, x3, x4, x5)  =  U11_GGG(x1, x3, x5)
+
+IS_IN_AG(x1, x2)  =  IS_IN_AG(x2)
+
+U12_GGG(x1, x2, x3, x4, x5)  =  U12_GGG(x5)
+
+NOATTACK_IN_GGA(x1, x2, x3)  =  NOATTACK_IN_GGA(x1, x2)
+
+U8_GGA(x1, x2, x3, x4, x5)  =  U8_GGA(x1, x2, x3, x5)
+
+U9_GGA(x1, x2, x3, x4, x5)  =  U9_GGA(x1, x2, x3, x5)
+
+=\=_IN_GA(x1, x2)  =  =\=_IN_GA(x1)
+
+U10_GGA(x1, x2, x3, x4, x5)  =  U10_GGA(x1, x3, x5)
+
+U11_GGA(x1, x2, x3, x4, x5)  =  U11_GGA(x1, x3, x5)
+
+IS_IN_AA(x1, x2)  =  IS_IN_AA
+
+U12_GGA(x1, x2, x3, x4, x5)  =  U12_GGA(x5)
+
+U7_G(x1, x2, x3)  =  U7_G(x3)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(7) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LOPSTR] contains 4 SCCs with 24 less nodes.
+----------------------------------------
+
+(8)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(9)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U8_GGA(X, F, T, N, =\=_out_gg(X, F)) -> U9_GGA(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   U9_GGA(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_GGA(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_GGA(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_GGA(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   U11_GGA(X, F, T, N, is_out_aa(N1, +(N, 1))) -> NOATTACK_IN_GGA(X, T, N1)
+   NOATTACK_IN_GGA(X, .(F, T), N) -> U8_GGA(X, F, T, N, =\=_in_gg(X, F))
+
+The TRS R consists of the following rules:
+
+   queens_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, Y), .(V, Res)) -> U3_ga(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(F, T), .(F, R)) -> U5_aga(X, F, T, R, delete_in_aga(X, T, R))
+   U5_aga(X, F, T, R, delete_out_aga(X, T, R)) -> delete_out_aga(X, .(F, T), .(F, R))
+   U3_ga(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_ga(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U4_ga(X, Y, V, Res, perm_out_ga(Rest, Res)) -> perm_out_ga(.(X, Y), .(V, Res))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, safe_in_g(Y))
+   safe_in_g([]) -> safe_out_g([])
+   safe_in_g(.(X, Y)) -> U6_g(X, Y, noattack_in_ggg(X, Y, 1))
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg(X, [], N)
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+   U8_ggg(X, F, T, N, =\=_out_gg(X, F)) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U9_ggg(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_ggg(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_ggg(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U11_ggg(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_ggg(X, F, T, N, noattack_in_gga(X, T, N1))
+   noattack_in_gga(X, [], N) -> noattack_out_gga(X, [], N)
+   noattack_in_gga(X, .(F, T), N) -> U8_gga(X, F, T, N, =\=_in_gg(X, F))
+   U8_gga(X, F, T, N, =\=_out_gg(X, F)) -> U9_gga(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   U9_gga(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_gga(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_gga(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_gga(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U11_gga(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_gga(X, F, T, N, noattack_in_gga(X, T, N1))
+   U12_gga(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_gga(X, .(F, T), N)
+   U12_ggg(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_ggg(X, .(F, T), N)
+   U6_g(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_g(X, Y, safe_in_g(Y))
+   U7_g(X, Y, safe_out_g(Y)) -> safe_out_g(.(X, Y))
+   U2_ga(X, Y, safe_out_g(Y)) -> queens_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+queens_in_ga(x1, x2)  =  queens_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U5_aga(x1, x2, x3, x4, x5)  =  U5_aga(x2, x5)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+safe_in_g(x1)  =  safe_in_g(x1)
+
+safe_out_g(x1)  =  safe_out_g
+
+U6_g(x1, x2, x3)  =  U6_g(x2, x3)
+
+noattack_in_ggg(x1, x2, x3)  =  noattack_in_ggg(x1, x2, x3)
+
+noattack_out_ggg(x1, x2, x3)  =  noattack_out_ggg
+
+U8_ggg(x1, x2, x3, x4, x5)  =  U8_ggg(x1, x2, x3, x4, x5)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
+U9_ggg(x1, x2, x3, x4, x5)  =  U9_ggg(x1, x2, x3, x4, x5)
+
++(x1, x2)  =  +(x1, x2)
+
+U10_ggg(x1, x2, x3, x4, x5)  =  U10_ggg(x1, x3, x4, x5)
+
+U11_ggg(x1, x2, x3, x4, x5)  =  U11_ggg(x1, x3, x5)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag
+
+1  =  1
+
+U12_ggg(x1, x2, x3, x4, x5)  =  U12_ggg(x5)
+
+noattack_in_gga(x1, x2, x3)  =  noattack_in_gga(x1, x2)
+
+noattack_out_gga(x1, x2, x3)  =  noattack_out_gga
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+U9_gga(x1, x2, x3, x4, x5)  =  U9_gga(x1, x2, x3, x5)
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+U10_gga(x1, x2, x3, x4, x5)  =  U10_gga(x1, x3, x5)
+
+U11_gga(x1, x2, x3, x4, x5)  =  U11_gga(x1, x3, x5)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+U12_gga(x1, x2, x3, x4, x5)  =  U12_gga(x5)
+
+U7_g(x1, x2, x3)  =  U7_g(x3)
+
+queens_out_ga(x1, x2)  =  queens_out_ga(x2)
+
+NOATTACK_IN_GGA(x1, x2, x3)  =  NOATTACK_IN_GGA(x1, x2)
+
+U8_GGA(x1, x2, x3, x4, x5)  =  U8_GGA(x1, x2, x3, x5)
+
+U9_GGA(x1, x2, x3, x4, x5)  =  U9_GGA(x1, x2, x3, x5)
+
+U10_GGA(x1, x2, x3, x4, x5)  =  U10_GGA(x1, x3, x5)
+
+U11_GGA(x1, x2, x3, x4, x5)  =  U11_GGA(x1, x3, x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(10) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(11)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U8_GGA(X, F, T, N, =\=_out_gg(X, F)) -> U9_GGA(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   U9_GGA(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_GGA(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_GGA(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_GGA(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   U11_GGA(X, F, T, N, is_out_aa(N1, +(N, 1))) -> NOATTACK_IN_GGA(X, T, N1)
+   NOATTACK_IN_GGA(X, .(F, T), N) -> U8_GGA(X, F, T, N, =\=_in_gg(X, F))
+
+The TRS R consists of the following rules:
+
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
++(x1, x2)  =  +(x1, x2)
+
+1  =  1
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+NOATTACK_IN_GGA(x1, x2, x3)  =  NOATTACK_IN_GGA(x1, x2)
+
+U8_GGA(x1, x2, x3, x4, x5)  =  U8_GGA(x1, x2, x3, x5)
+
+U9_GGA(x1, x2, x3, x4, x5)  =  U9_GGA(x1, x2, x3, x5)
+
+U10_GGA(x1, x2, x3, x4, x5)  =  U10_GGA(x1, x3, x5)
+
+U11_GGA(x1, x2, x3, x4, x5)  =  U11_GGA(x1, x3, x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(12) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(13)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U8_GGA(X, F, T, =\=_out_gg) -> U9_GGA(X, F, T, =\=_in_ga(X))
+   U9_GGA(X, F, T, =\=_out_ga) -> U10_GGA(X, T, =\=_in_ga(F))
+   U10_GGA(X, T, =\=_out_ga) -> U11_GGA(X, T, is_in_aa)
+   U11_GGA(X, T, is_out_aa) -> NOATTACK_IN_GGA(X, T)
+   NOATTACK_IN_GGA(X, .(F, T)) -> U8_GGA(X, F, T, =\=_in_gg(X, F))
+
+The TRS R consists of the following rules:
+
+   =\=_in_ga(X0) -> =\=_out_ga
+   is_in_aa -> is_out_aa
+   =\=_in_gg(X0, X1) -> =\=_out_gg
+
+The set Q consists of the following terms:
+
+   =\=_in_ga(x0)
+   is_in_aa
+   =\=_in_gg(x0, x1)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(14) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*U9_GGA(X, F, T, =\=_out_ga) -> U10_GGA(X, T, =\=_in_ga(F))
+The graph contains the following edges 1 >= 1, 3 >= 2
+
+
+*NOATTACK_IN_GGA(X, .(F, T)) -> U8_GGA(X, F, T, =\=_in_gg(X, F))
+The graph contains the following edges 1 >= 1, 2 > 2, 2 > 3
+
+
+*U10_GGA(X, T, =\=_out_ga) -> U11_GGA(X, T, is_in_aa)
+The graph contains the following edges 1 >= 1, 2 >= 2
+
+
+*U8_GGA(X, F, T, =\=_out_gg) -> U9_GGA(X, F, T, =\=_in_ga(X))
+The graph contains the following edges 1 >= 1, 2 >= 2, 3 >= 3
+
+
+*U11_GGA(X, T, is_out_aa) -> NOATTACK_IN_GGA(X, T)
+The graph contains the following edges 1 >= 1, 2 >= 2
+
+
+----------------------------------------
+
+(15)
+YES
+
+----------------------------------------
+
+(16)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U6_G(X, Y, noattack_out_ggg(X, Y, 1)) -> SAFE_IN_G(Y)
+   SAFE_IN_G(.(X, Y)) -> U6_G(X, Y, noattack_in_ggg(X, Y, 1))
+
+The TRS R consists of the following rules:
+
+   queens_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, Y), .(V, Res)) -> U3_ga(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(F, T), .(F, R)) -> U5_aga(X, F, T, R, delete_in_aga(X, T, R))
+   U5_aga(X, F, T, R, delete_out_aga(X, T, R)) -> delete_out_aga(X, .(F, T), .(F, R))
+   U3_ga(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_ga(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U4_ga(X, Y, V, Res, perm_out_ga(Rest, Res)) -> perm_out_ga(.(X, Y), .(V, Res))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, safe_in_g(Y))
+   safe_in_g([]) -> safe_out_g([])
+   safe_in_g(.(X, Y)) -> U6_g(X, Y, noattack_in_ggg(X, Y, 1))
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg(X, [], N)
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+   U8_ggg(X, F, T, N, =\=_out_gg(X, F)) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U9_ggg(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_ggg(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_ggg(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U11_ggg(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_ggg(X, F, T, N, noattack_in_gga(X, T, N1))
+   noattack_in_gga(X, [], N) -> noattack_out_gga(X, [], N)
+   noattack_in_gga(X, .(F, T), N) -> U8_gga(X, F, T, N, =\=_in_gg(X, F))
+   U8_gga(X, F, T, N, =\=_out_gg(X, F)) -> U9_gga(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   U9_gga(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_gga(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_gga(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_gga(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U11_gga(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_gga(X, F, T, N, noattack_in_gga(X, T, N1))
+   U12_gga(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_gga(X, .(F, T), N)
+   U12_ggg(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_ggg(X, .(F, T), N)
+   U6_g(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_g(X, Y, safe_in_g(Y))
+   U7_g(X, Y, safe_out_g(Y)) -> safe_out_g(.(X, Y))
+   U2_ga(X, Y, safe_out_g(Y)) -> queens_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+queens_in_ga(x1, x2)  =  queens_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U5_aga(x1, x2, x3, x4, x5)  =  U5_aga(x2, x5)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+safe_in_g(x1)  =  safe_in_g(x1)
+
+safe_out_g(x1)  =  safe_out_g
+
+U6_g(x1, x2, x3)  =  U6_g(x2, x3)
+
+noattack_in_ggg(x1, x2, x3)  =  noattack_in_ggg(x1, x2, x3)
+
+noattack_out_ggg(x1, x2, x3)  =  noattack_out_ggg
+
+U8_ggg(x1, x2, x3, x4, x5)  =  U8_ggg(x1, x2, x3, x4, x5)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
+U9_ggg(x1, x2, x3, x4, x5)  =  U9_ggg(x1, x2, x3, x4, x5)
+
++(x1, x2)  =  +(x1, x2)
+
+U10_ggg(x1, x2, x3, x4, x5)  =  U10_ggg(x1, x3, x4, x5)
+
+U11_ggg(x1, x2, x3, x4, x5)  =  U11_ggg(x1, x3, x5)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag
+
+1  =  1
+
+U12_ggg(x1, x2, x3, x4, x5)  =  U12_ggg(x5)
+
+noattack_in_gga(x1, x2, x3)  =  noattack_in_gga(x1, x2)
+
+noattack_out_gga(x1, x2, x3)  =  noattack_out_gga
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+U9_gga(x1, x2, x3, x4, x5)  =  U9_gga(x1, x2, x3, x5)
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+U10_gga(x1, x2, x3, x4, x5)  =  U10_gga(x1, x3, x5)
+
+U11_gga(x1, x2, x3, x4, x5)  =  U11_gga(x1, x3, x5)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+U12_gga(x1, x2, x3, x4, x5)  =  U12_gga(x5)
+
+U7_g(x1, x2, x3)  =  U7_g(x3)
+
+queens_out_ga(x1, x2)  =  queens_out_ga(x2)
+
+SAFE_IN_G(x1)  =  SAFE_IN_G(x1)
+
+U6_G(x1, x2, x3)  =  U6_G(x2, x3)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(17) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(18)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U6_G(X, Y, noattack_out_ggg(X, Y, 1)) -> SAFE_IN_G(Y)
+   SAFE_IN_G(.(X, Y)) -> U6_G(X, Y, noattack_in_ggg(X, Y, 1))
+
+The TRS R consists of the following rules:
+
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg(X, [], N)
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   U8_ggg(X, F, T, N, =\=_out_gg(X, F)) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+   U9_ggg(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_ggg(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_ggg(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   U11_ggg(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_ggg(X, F, T, N, noattack_in_gga(X, T, N1))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U12_ggg(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_ggg(X, .(F, T), N)
+   noattack_in_gga(X, [], N) -> noattack_out_gga(X, [], N)
+   noattack_in_gga(X, .(F, T), N) -> U8_gga(X, F, T, N, =\=_in_gg(X, F))
+   U8_gga(X, F, T, N, =\=_out_gg(X, F)) -> U9_gga(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   U9_gga(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_gga(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   U10_gga(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_gga(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   U11_gga(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_gga(X, F, T, N, noattack_in_gga(X, T, N1))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U12_gga(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_gga(X, .(F, T), N)
+
+The argument filtering Pi contains the following mapping:
+[]  =  []
+
+.(x1, x2)  =  .(x1, x2)
+
+noattack_in_ggg(x1, x2, x3)  =  noattack_in_ggg(x1, x2, x3)
+
+noattack_out_ggg(x1, x2, x3)  =  noattack_out_ggg
+
+U8_ggg(x1, x2, x3, x4, x5)  =  U8_ggg(x1, x2, x3, x4, x5)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
+U9_ggg(x1, x2, x3, x4, x5)  =  U9_ggg(x1, x2, x3, x4, x5)
+
++(x1, x2)  =  +(x1, x2)
+
+U10_ggg(x1, x2, x3, x4, x5)  =  U10_ggg(x1, x3, x4, x5)
+
+U11_ggg(x1, x2, x3, x4, x5)  =  U11_ggg(x1, x3, x5)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag
+
+1  =  1
+
+U12_ggg(x1, x2, x3, x4, x5)  =  U12_ggg(x5)
+
+noattack_in_gga(x1, x2, x3)  =  noattack_in_gga(x1, x2)
+
+noattack_out_gga(x1, x2, x3)  =  noattack_out_gga
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+U9_gga(x1, x2, x3, x4, x5)  =  U9_gga(x1, x2, x3, x5)
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+U10_gga(x1, x2, x3, x4, x5)  =  U10_gga(x1, x3, x5)
+
+U11_gga(x1, x2, x3, x4, x5)  =  U11_gga(x1, x3, x5)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+U12_gga(x1, x2, x3, x4, x5)  =  U12_gga(x5)
+
+SAFE_IN_G(x1)  =  SAFE_IN_G(x1)
+
+U6_G(x1, x2, x3)  =  U6_G(x2, x3)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(19) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(20)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U6_G(Y, noattack_out_ggg) -> SAFE_IN_G(Y)
+   SAFE_IN_G(.(X, Y)) -> U6_G(Y, noattack_in_ggg(X, Y, 1))
+
+The TRS R consists of the following rules:
+
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   U8_ggg(X, F, T, N, =\=_out_gg) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   =\=_in_gg(X0, X1) -> =\=_out_gg
+   U9_ggg(X, F, T, N, =\=_out_gg) -> U10_ggg(X, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, T, N, =\=_out_gg) -> U11_ggg(X, T, is_in_ag(+(N, 1)))
+   U11_ggg(X, T, is_out_ag) -> U12_ggg(noattack_in_gga(X, T))
+   is_in_ag(X1) -> is_out_ag
+   U12_ggg(noattack_out_gga) -> noattack_out_ggg
+   noattack_in_gga(X, []) -> noattack_out_gga
+   noattack_in_gga(X, .(F, T)) -> U8_gga(X, F, T, =\=_in_gg(X, F))
+   U8_gga(X, F, T, =\=_out_gg) -> U9_gga(X, F, T, =\=_in_ga(X))
+   U9_gga(X, F, T, =\=_out_ga) -> U10_gga(X, T, =\=_in_ga(F))
+   =\=_in_ga(X0) -> =\=_out_ga
+   U10_gga(X, T, =\=_out_ga) -> U11_gga(X, T, is_in_aa)
+   U11_gga(X, T, is_out_aa) -> U12_gga(noattack_in_gga(X, T))
+   is_in_aa -> is_out_aa
+   U12_gga(noattack_out_gga) -> noattack_out_gga
+
+The set Q consists of the following terms:
+
+   noattack_in_ggg(x0, x1, x2)
+   U8_ggg(x0, x1, x2, x3, x4)
+   =\=_in_gg(x0, x1)
+   U9_ggg(x0, x1, x2, x3, x4)
+   U10_ggg(x0, x1, x2, x3)
+   U11_ggg(x0, x1, x2)
+   is_in_ag(x0)
+   U12_ggg(x0)
+   noattack_in_gga(x0, x1)
+   U8_gga(x0, x1, x2, x3)
+   U9_gga(x0, x1, x2, x3)
+   =\=_in_ga(x0)
+   U10_gga(x0, x1, x2)
+   U11_gga(x0, x1, x2)
+   is_in_aa
+   U12_gga(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(21) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*SAFE_IN_G(.(X, Y)) -> U6_G(Y, noattack_in_ggg(X, Y, 1))
+The graph contains the following edges 1 > 1
+
+
+*U6_G(Y, noattack_out_ggg) -> SAFE_IN_G(Y)
+The graph contains the following edges 1 >= 1
+
+
+----------------------------------------
+
+(22)
+YES
+
+----------------------------------------
+
+(23)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_AGA(X, .(F, T), .(F, R)) -> DELETE_IN_AGA(X, T, R)
+
+The TRS R consists of the following rules:
+
+   queens_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, Y), .(V, Res)) -> U3_ga(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(F, T), .(F, R)) -> U5_aga(X, F, T, R, delete_in_aga(X, T, R))
+   U5_aga(X, F, T, R, delete_out_aga(X, T, R)) -> delete_out_aga(X, .(F, T), .(F, R))
+   U3_ga(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_ga(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U4_ga(X, Y, V, Res, perm_out_ga(Rest, Res)) -> perm_out_ga(.(X, Y), .(V, Res))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, safe_in_g(Y))
+   safe_in_g([]) -> safe_out_g([])
+   safe_in_g(.(X, Y)) -> U6_g(X, Y, noattack_in_ggg(X, Y, 1))
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg(X, [], N)
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+   U8_ggg(X, F, T, N, =\=_out_gg(X, F)) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U9_ggg(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_ggg(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_ggg(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U11_ggg(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_ggg(X, F, T, N, noattack_in_gga(X, T, N1))
+   noattack_in_gga(X, [], N) -> noattack_out_gga(X, [], N)
+   noattack_in_gga(X, .(F, T), N) -> U8_gga(X, F, T, N, =\=_in_gg(X, F))
+   U8_gga(X, F, T, N, =\=_out_gg(X, F)) -> U9_gga(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   U9_gga(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_gga(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_gga(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_gga(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U11_gga(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_gga(X, F, T, N, noattack_in_gga(X, T, N1))
+   U12_gga(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_gga(X, .(F, T), N)
+   U12_ggg(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_ggg(X, .(F, T), N)
+   U6_g(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_g(X, Y, safe_in_g(Y))
+   U7_g(X, Y, safe_out_g(Y)) -> safe_out_g(.(X, Y))
+   U2_ga(X, Y, safe_out_g(Y)) -> queens_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+queens_in_ga(x1, x2)  =  queens_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U5_aga(x1, x2, x3, x4, x5)  =  U5_aga(x2, x5)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+safe_in_g(x1)  =  safe_in_g(x1)
+
+safe_out_g(x1)  =  safe_out_g
+
+U6_g(x1, x2, x3)  =  U6_g(x2, x3)
+
+noattack_in_ggg(x1, x2, x3)  =  noattack_in_ggg(x1, x2, x3)
+
+noattack_out_ggg(x1, x2, x3)  =  noattack_out_ggg
+
+U8_ggg(x1, x2, x3, x4, x5)  =  U8_ggg(x1, x2, x3, x4, x5)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
+U9_ggg(x1, x2, x3, x4, x5)  =  U9_ggg(x1, x2, x3, x4, x5)
+
++(x1, x2)  =  +(x1, x2)
+
+U10_ggg(x1, x2, x3, x4, x5)  =  U10_ggg(x1, x3, x4, x5)
+
+U11_ggg(x1, x2, x3, x4, x5)  =  U11_ggg(x1, x3, x5)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag
+
+1  =  1
+
+U12_ggg(x1, x2, x3, x4, x5)  =  U12_ggg(x5)
+
+noattack_in_gga(x1, x2, x3)  =  noattack_in_gga(x1, x2)
+
+noattack_out_gga(x1, x2, x3)  =  noattack_out_gga
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+U9_gga(x1, x2, x3, x4, x5)  =  U9_gga(x1, x2, x3, x5)
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+U10_gga(x1, x2, x3, x4, x5)  =  U10_gga(x1, x3, x5)
+
+U11_gga(x1, x2, x3, x4, x5)  =  U11_gga(x1, x3, x5)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+U12_gga(x1, x2, x3, x4, x5)  =  U12_gga(x5)
+
+U7_g(x1, x2, x3)  =  U7_g(x3)
+
+queens_out_ga(x1, x2)  =  queens_out_ga(x2)
+
+DELETE_IN_AGA(x1, x2, x3)  =  DELETE_IN_AGA(x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(24) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(25)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_AGA(X, .(F, T), .(F, R)) -> DELETE_IN_AGA(X, T, R)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+DELETE_IN_AGA(x1, x2, x3)  =  DELETE_IN_AGA(x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(26) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(27)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_AGA(.(F, T)) -> DELETE_IN_AGA(T)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(28) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*DELETE_IN_AGA(.(F, T)) -> DELETE_IN_AGA(T)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(29)
+YES
+
+----------------------------------------
+
+(30)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U3_GA(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> PERM_IN_GA(Rest, Res)
+   PERM_IN_GA(.(X, Y), .(V, Res)) -> U3_GA(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+
+The TRS R consists of the following rules:
+
+   queens_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, Y), .(V, Res)) -> U3_ga(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(F, T), .(F, R)) -> U5_aga(X, F, T, R, delete_in_aga(X, T, R))
+   U5_aga(X, F, T, R, delete_out_aga(X, T, R)) -> delete_out_aga(X, .(F, T), .(F, R))
+   U3_ga(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> U4_ga(X, Y, V, Res, perm_in_ga(Rest, Res))
+   U4_ga(X, Y, V, Res, perm_out_ga(Rest, Res)) -> perm_out_ga(.(X, Y), .(V, Res))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, safe_in_g(Y))
+   safe_in_g([]) -> safe_out_g([])
+   safe_in_g(.(X, Y)) -> U6_g(X, Y, noattack_in_ggg(X, Y, 1))
+   noattack_in_ggg(X, [], N) -> noattack_out_ggg(X, [], N)
+   noattack_in_ggg(X, .(F, T), N) -> U8_ggg(X, F, T, N, =\=_in_gg(X, F))
+   =\=_in_gg(X0, X1) -> =\=_out_gg(X0, X1)
+   U8_ggg(X, F, T, N, =\=_out_gg(X, F)) -> U9_ggg(X, F, T, N, =\=_in_gg(X, +(F, N)))
+   U9_ggg(X, F, T, N, =\=_out_gg(X, +(F, N))) -> U10_ggg(X, F, T, N, =\=_in_gg(F, +(X, N)))
+   U10_ggg(X, F, T, N, =\=_out_gg(F, +(X, N))) -> U11_ggg(X, F, T, N, is_in_ag(N1, +(N, 1)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U11_ggg(X, F, T, N, is_out_ag(N1, +(N, 1))) -> U12_ggg(X, F, T, N, noattack_in_gga(X, T, N1))
+   noattack_in_gga(X, [], N) -> noattack_out_gga(X, [], N)
+   noattack_in_gga(X, .(F, T), N) -> U8_gga(X, F, T, N, =\=_in_gg(X, F))
+   U8_gga(X, F, T, N, =\=_out_gg(X, F)) -> U9_gga(X, F, T, N, =\=_in_ga(X, +(F, N)))
+   =\=_in_ga(X0, X1) -> =\=_out_ga(X0, X1)
+   U9_gga(X, F, T, N, =\=_out_ga(X, +(F, N))) -> U10_gga(X, F, T, N, =\=_in_ga(F, +(X, N)))
+   U10_gga(X, F, T, N, =\=_out_ga(F, +(X, N))) -> U11_gga(X, F, T, N, is_in_aa(N1, +(N, 1)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U11_gga(X, F, T, N, is_out_aa(N1, +(N, 1))) -> U12_gga(X, F, T, N, noattack_in_gga(X, T, N1))
+   U12_gga(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_gga(X, .(F, T), N)
+   U12_ggg(X, F, T, N, noattack_out_gga(X, T, N1)) -> noattack_out_ggg(X, .(F, T), N)
+   U6_g(X, Y, noattack_out_ggg(X, Y, 1)) -> U7_g(X, Y, safe_in_g(Y))
+   U7_g(X, Y, safe_out_g(Y)) -> safe_out_g(.(X, Y))
+   U2_ga(X, Y, safe_out_g(Y)) -> queens_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+queens_in_ga(x1, x2)  =  queens_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U3_ga(x1, x2, x3, x4, x5)  =  U3_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U5_aga(x1, x2, x3, x4, x5)  =  U5_aga(x2, x5)
+
+U4_ga(x1, x2, x3, x4, x5)  =  U4_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+safe_in_g(x1)  =  safe_in_g(x1)
+
+safe_out_g(x1)  =  safe_out_g
+
+U6_g(x1, x2, x3)  =  U6_g(x2, x3)
+
+noattack_in_ggg(x1, x2, x3)  =  noattack_in_ggg(x1, x2, x3)
+
+noattack_out_ggg(x1, x2, x3)  =  noattack_out_ggg
+
+U8_ggg(x1, x2, x3, x4, x5)  =  U8_ggg(x1, x2, x3, x4, x5)
+
+=\=_in_gg(x1, x2)  =  =\=_in_gg(x1, x2)
+
+=\=_out_gg(x1, x2)  =  =\=_out_gg
+
+U9_ggg(x1, x2, x3, x4, x5)  =  U9_ggg(x1, x2, x3, x4, x5)
+
++(x1, x2)  =  +(x1, x2)
+
+U10_ggg(x1, x2, x3, x4, x5)  =  U10_ggg(x1, x3, x4, x5)
+
+U11_ggg(x1, x2, x3, x4, x5)  =  U11_ggg(x1, x3, x5)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag
+
+1  =  1
+
+U12_ggg(x1, x2, x3, x4, x5)  =  U12_ggg(x5)
+
+noattack_in_gga(x1, x2, x3)  =  noattack_in_gga(x1, x2)
+
+noattack_out_gga(x1, x2, x3)  =  noattack_out_gga
+
+U8_gga(x1, x2, x3, x4, x5)  =  U8_gga(x1, x2, x3, x5)
+
+U9_gga(x1, x2, x3, x4, x5)  =  U9_gga(x1, x2, x3, x5)
+
+=\=_in_ga(x1, x2)  =  =\=_in_ga(x1)
+
+=\=_out_ga(x1, x2)  =  =\=_out_ga
+
+U10_gga(x1, x2, x3, x4, x5)  =  U10_gga(x1, x3, x5)
+
+U11_gga(x1, x2, x3, x4, x5)  =  U11_gga(x1, x3, x5)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+U12_gga(x1, x2, x3, x4, x5)  =  U12_gga(x5)
+
+U7_g(x1, x2, x3)  =  U7_g(x3)
+
+queens_out_ga(x1, x2)  =  queens_out_ga(x2)
+
+PERM_IN_GA(x1, x2)  =  PERM_IN_GA(x1)
+
+U3_GA(x1, x2, x3, x4, x5)  =  U3_GA(x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(31) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(32)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U3_GA(X, Y, V, Res, delete_out_aga(V, .(X, Y), Rest)) -> PERM_IN_GA(Rest, Res)
+   PERM_IN_GA(.(X, Y), .(V, Res)) -> U3_GA(X, Y, V, Res, delete_in_aga(V, .(X, Y), Rest))
+
+The TRS R consists of the following rules:
+
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(F, T), .(F, R)) -> U5_aga(X, F, T, R, delete_in_aga(X, T, R))
+   U5_aga(X, F, T, R, delete_out_aga(X, T, R)) -> delete_out_aga(X, .(F, T), .(F, R))
+
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U5_aga(x1, x2, x3, x4, x5)  =  U5_aga(x2, x5)
+
+PERM_IN_GA(x1, x2)  =  PERM_IN_GA(x1)
+
+U3_GA(x1, x2, x3, x4, x5)  =  U3_GA(x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(33) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(34)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U3_GA(delete_out_aga(V, Rest)) -> PERM_IN_GA(Rest)
+   PERM_IN_GA(.(X, Y)) -> U3_GA(delete_in_aga(.(X, Y)))
+
+The TRS R consists of the following rules:
+
+   delete_in_aga(.(X, Y)) -> delete_out_aga(X, Y)
+   delete_in_aga(.(F, T)) -> U5_aga(F, delete_in_aga(T))
+   U5_aga(F, delete_out_aga(X, R)) -> delete_out_aga(X, .(F, R))
+
+The set Q consists of the following terms:
+
+   delete_in_aga(x0)
+   U5_aga(x0, x1)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(35) MRRProof (EQUIVALENT)
+By using the rule removal processor [LPAR04] with the following ordering, at least one Dependency Pair or term rewrite system rule of this QDP problem can be strictly oriented.
+
+Strictly oriented dependency pairs:
+
+   U3_GA(delete_out_aga(V, Rest)) -> PERM_IN_GA(Rest)
+   PERM_IN_GA(.(X, Y)) -> U3_GA(delete_in_aga(.(X, Y)))
+
+Strictly oriented rules of the TRS R:
+
+   delete_in_aga(.(X, Y)) -> delete_out_aga(X, Y)
+   delete_in_aga(.(F, T)) -> U5_aga(F, delete_in_aga(T))
+   U5_aga(F, delete_out_aga(X, R)) -> delete_out_aga(X, .(F, R))
+
+Used ordering: Knuth-Bendix order [KBO] with precedence:._2 > delete_in_aga_1 > U5_aga_2 > U3_GA_1 > PERM_IN_GA_1 > delete_out_aga_2
+
+and weight map:
+
+   delete_in_aga_1=1
+   U3_GA_1=1
+   PERM_IN_GA_1=3
+   ._2=0
+   delete_out_aga_2=1
+   U5_aga_2=0
+
+The variable weight is 1
+
+----------------------------------------
+
+(36)
+Obligation:
+Q DP problem:
+P is empty.
+R is empty.
+The set Q consists of the following terms:
+
+   delete_in_aga(x0)
+   U5_aga(x0, x1)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(37) PisEmptyProof (EQUIVALENT)
+The TRS P is empty. Hence, there is no (P,Q,R) chain.
+----------------------------------------
+
+(38)
+YES

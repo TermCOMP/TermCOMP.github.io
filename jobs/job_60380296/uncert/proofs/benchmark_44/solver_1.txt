@@ -1,0 +1,778 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/dOWNK.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 45 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 832 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 679 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 25 ms]
+        (13) IRSwT
+        (14) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (15) IRSwT
+        (16) TempFilterProof [SOUND, 11 ms]
+        (17) IRSwT
+        (18) IRSwTToQDPProof [SOUND, 6 ms]
+        (19) QDP
+        (20) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (21) YES
+    (22) JBCTerminationSCC
+        (23) SCCToIRSProof [SOUND, 204 ms]
+        (24) IRSwT
+        (25) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (26) IRSwT
+        (27) IRSwTTerminationDigraphProof [EQUIVALENT, 97 ms]
+        (28) IRSwT
+        (29) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (30) IRSwT
+        (31) TempFilterProof [SOUND, 64 ms]
+        (32) IntTRS
+        (33) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (34) IntTRS
+        (35) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (36) IntTRS
+        (37) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (38) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package MirrorMultiTreeRec;
+
+public class MirrorMultiTreeRec {
+  public static void main(final String[] args) {
+    Random.args = args;
+
+    final Tree t = Tree.createTree(Random.random());
+    mirror(t.children);
+  }
+
+  public static TreeList mirror(final TreeList l) {
+      if (l == null || l.next==null) return l;
+      final TreeList nextItem = l.next;
+      final TreeList reverseRest = mirror(nextItem);
+      l.next = null;
+      mirror(l.value.children);
+      nextItem.next = l;
+      return reverseRest;
+  }
+}
+
+
+package MirrorMultiTreeRec;
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package MirrorMultiTreeRec;
+public class Tree {
+    TreeList children;
+
+    public Tree() {
+        this.children = null;
+    }
+
+    public void addChild(final Tree t) {
+        this.children = new TreeList(t, this.children);
+    }
+
+    public static Tree createNode() {
+        final Tree result = new Tree();
+        return result;
+    }
+
+    public static Tree createTree(int depth) {
+        if (depth <= 0) {
+            return null;
+        }
+        depth = depth - 1;
+
+        final Tree result = new Tree();
+        final int numberOfChildren = Random.random();
+
+        for (int i = 0; i < numberOfChildren; i++) {
+            result.addChild(createTree(depth - 1));
+        }
+
+        return result;
+    }
+}
+
+
+package MirrorMultiTreeRec;
+public class TreeList {
+  Tree value;
+  TreeList next;
+
+  public TreeList(final Tree value, final TreeList next) {
+    this.value = value;
+    this.next = next;
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package MirrorMultiTreeRec;
+
+public class MirrorMultiTreeRec {
+  public static void main(final String[] args) {
+    Random.args = args;
+
+    final Tree t = Tree.createTree(Random.random());
+    mirror(t.children);
+  }
+
+  public static TreeList mirror(final TreeList l) {
+      if (l == null || l.next==null) return l;
+      final TreeList nextItem = l.next;
+      final TreeList reverseRest = mirror(nextItem);
+      l.next = null;
+      mirror(l.value.children);
+      nextItem.next = l;
+      return reverseRest;
+  }
+}
+
+
+package MirrorMultiTreeRec;
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    final String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package MirrorMultiTreeRec;
+public class Tree {
+    TreeList children;
+
+    public Tree() {
+        this.children = null;
+    }
+
+    public void addChild(final Tree t) {
+        this.children = new TreeList(t, this.children);
+    }
+
+    public static Tree createNode() {
+        final Tree result = new Tree();
+        return result;
+    }
+
+    public static Tree createTree(int depth) {
+        if (depth <= 0) {
+            return null;
+        }
+        depth = depth - 1;
+
+        final Tree result = new Tree();
+        final int numberOfChildren = Random.random();
+
+        for (int i = 0; i < numberOfChildren; i++) {
+            result.addChild(createTree(depth - 1));
+        }
+
+        return result;
+    }
+}
+
+
+package MirrorMultiTreeRec;
+public class TreeList {
+  Tree value;
+  TreeList next;
+
+  public TreeList(final Tree value, final TreeList next) {
+    this.value = value;
+    this.next = next;
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+MirrorMultiTreeRec.MirrorMultiTreeRec.main([Ljava/lang/String;)V: Graph of 180 nodes with 0 SCCs.
+
+
+
+MirrorMultiTreeRec.Tree.createTree(I)LMirrorMultiTreeRec/Tree;: Graph of 163 nodes with 1 SCC.
+
+
+
+MirrorMultiTreeRec.MirrorMultiTreeRec.mirror(LMirrorMultiTreeRec/TreeList;)LMirrorMultiTreeRec/TreeList;: Graph of 206 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: MirrorMultiTreeRec.MirrorMultiTreeRec.mirror(LMirrorMultiTreeRec/TreeList;)LMirrorMultiTreeRec/TreeList;
+SCC calls the following helper methods: MirrorMultiTreeRec.MirrorMultiTreeRec.mirror(LMirrorMultiTreeRec/TreeList;)LMirrorMultiTreeRec/TreeList;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*MirrorMultiTreeRec.TreeList: [next, value]
+*MirrorMultiTreeRec.Tree: [children]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 53 IRulesP rules:
+f11526_0_mirror_NULL(EOS(STATIC_11526), java.lang.Object(o1519sub), java.lang.Object(o1519sub), java.lang.Object(o1519sub)) -> f11532_0_mirror_NULL(EOS(STATIC_11532), java.lang.Object(o1519sub), java.lang.Object(o1519sub), java.lang.Object(o1519sub)) :|: TRUE
+f11532_0_mirror_NULL(EOS(STATIC_11532), java.lang.Object(o1519sub), java.lang.Object(o1519sub), java.lang.Object(o1519sub)) -> f11538_0_mirror_Load(EOS(STATIC_11538), java.lang.Object(o1519sub), java.lang.Object(o1519sub)) :|: TRUE
+f11538_0_mirror_Load(EOS(STATIC_11538), java.lang.Object(o1519sub), java.lang.Object(o1519sub)) -> f11543_0_mirror_FieldAccess(EOS(STATIC_11543), java.lang.Object(o1519sub), java.lang.Object(o1519sub), java.lang.Object(o1519sub)) :|: TRUE
+f11543_0_mirror_FieldAccess(EOS(STATIC_11543), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539))) -> f11547_0_mirror_FieldAccess(EOS(STATIC_11547), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539))) :|: TRUE
+f11547_0_mirror_FieldAccess(EOS(STATIC_11547), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539))) -> f11551_0_mirror_NONNULL(EOS(STATIC_11551), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o1540, o1539)), o1540) :|: TRUE
+f11551_0_mirror_NONNULL(EOS(STATIC_11551), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub)) -> f11554_0_mirror_NONNULL(EOS(STATIC_11554), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub)) :|: TRUE
+f11554_0_mirror_NONNULL(EOS(STATIC_11554), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub)) -> f11559_0_mirror_Load(EOS(STATIC_11559), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539))) :|: TRUE
+f11559_0_mirror_Load(EOS(STATIC_11559), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539))) -> f11562_0_mirror_FieldAccess(EOS(STATIC_11562), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539))) :|: TRUE
+f11562_0_mirror_FieldAccess(EOS(STATIC_11562), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539))) -> f11567_0_mirror_Store(EOS(STATIC_11567), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub)) :|: TRUE
+f11567_0_mirror_Store(EOS(STATIC_11567), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub)) -> f11572_0_mirror_Load(EOS(STATIC_11572), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub)) :|: TRUE
+f11572_0_mirror_Load(EOS(STATIC_11572), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub)) -> f11575_0_mirror_InvokeMethod(EOS(STATIC_11575), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) :|: TRUE
+f11575_0_mirror_InvokeMethod(EOS(STATIC_11575), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) -> f11580_0_mirror_Load(EOS(STATIC_11580), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) :|: i1766 > 1
+f11575_0_mirror_InvokeMethod(EOS(STATIC_11575), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) -> f11580_1_mirror_Load(EOS(STATIC_11580), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) :|: i1766 > 1
+f11580_0_mirror_Load(EOS(STATIC_11580), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) -> f11584_0_mirror_Load(EOS(STATIC_11584), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) :|: TRUE
+f11584_0_mirror_Load(EOS(STATIC_11584), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) -> f11524_0_mirror_Load(EOS(STATIC_11524), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) :|: TRUE
+f11524_0_mirror_Load(EOS(STATIC_11524), o1492, o1492) -> f11526_0_mirror_NULL(EOS(STATIC_11526), o1492, o1492, o1492) :|: TRUE
+f11596_0_mirror_Return(EOS(STATIC_11596), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594))) -> f11599_0_mirror_Store(EOS(STATIC_11599), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594))) :|: TRUE
+f11599_0_mirror_Store(EOS(STATIC_11599), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594))) -> f11602_0_mirror_Load(EOS(STATIC_11602), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594))) :|: TRUE
+f11602_0_mirror_Load(EOS(STATIC_11602), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594))) -> f11605_0_mirror_ConstantStackPush(EOS(STATIC_11605), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539))) :|: TRUE
+f11605_0_mirror_ConstantStackPush(EOS(STATIC_11605), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539))) -> f11608_0_mirror_FieldAccess(EOS(STATIC_11608), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), NULL) :|: TRUE
+f11608_0_mirror_FieldAccess(EOS(STATIC_11608), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), NULL) -> f11609_0_mirror_Load(EOS(STATIC_11609), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594))) :|: TRUE
+f11609_0_mirror_Load(EOS(STATIC_11609), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594))) -> f11610_0_mirror_FieldAccess(EOS(STATIC_11610), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539))) :|: TRUE
+f11610_0_mirror_FieldAccess(EOS(STATIC_11610), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539))) -> f11611_0_mirror_FieldAccess(EOS(STATIC_11611), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539) :|: TRUE
+f11611_0_mirror_FieldAccess(EOS(STATIC_11611), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(o1625sub))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(o1625sub))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(o1625sub)) -> f11612_0_mirror_FieldAccess(EOS(STATIC_11612), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(o1625sub))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(o1625sub))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(o1625sub)) :|: TRUE
+f11612_0_mirror_FieldAccess(EOS(STATIC_11612), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627))) -> f11614_0_mirror_FieldAccess(EOS(STATIC_11614), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627))) :|: TRUE
+f11614_0_mirror_FieldAccess(EOS(STATIC_11614), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627))) -> f11616_0_mirror_InvokeMethod(EOS(STATIC_11616), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1627) :|: TRUE
+f11616_0_mirror_InvokeMethod(EOS(STATIC_11616), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1627) -> f11617_0_mirror_Load(EOS(STATIC_11617), o1627, o1627) :|: i1852 > 1
+f11616_0_mirror_InvokeMethod(EOS(STATIC_11616), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1627) -> f11617_1_mirror_Load(EOS(STATIC_11617), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1627) :|: i1852 > 1
+f11617_0_mirror_Load(EOS(STATIC_11617), o1627, o1627) -> f11619_0_mirror_Load(EOS(STATIC_11619), o1627, o1627) :|: TRUE
+f11619_0_mirror_Load(EOS(STATIC_11619), o1627, o1627) -> f11524_0_mirror_Load(EOS(STATIC_11524), o1627, o1627) :|: TRUE
+f11641_0_mirror_Return(EOS(STATIC_11641), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), o1675))) -> f11819_0_mirror_Return(EOS(STATIC_11819), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), o1675))) :|: TRUE
+f11819_0_mirror_Return(EOS(STATIC_11819), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260))) -> f11826_0_mirror_Store(EOS(STATIC_11826), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260))) :|: TRUE
+f11826_0_mirror_Store(EOS(STATIC_11826), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260))) -> f11829_0_mirror_Load(EOS(STATIC_11829), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260))) :|: TRUE
+f11829_0_mirror_Load(EOS(STATIC_11829), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260))) -> f11831_0_mirror_ConstantStackPush(EOS(STATIC_11831), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263))) :|: TRUE
+f11831_0_mirror_ConstantStackPush(EOS(STATIC_11831), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263))) -> f11833_0_mirror_FieldAccess(EOS(STATIC_11833), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), NULL) :|: TRUE
+f11833_0_mirror_FieldAccess(EOS(STATIC_11833), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o4262sub), o4263)), NULL) -> f11835_0_mirror_Load(EOS(STATIC_11835), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260))) :|: TRUE
+f11835_0_mirror_Load(EOS(STATIC_11835), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260))) -> f11837_0_mirror_FieldAccess(EOS(STATIC_11837), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263))) :|: TRUE
+f11837_0_mirror_FieldAccess(EOS(STATIC_11837), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263))) -> f11839_0_mirror_FieldAccess(EOS(STATIC_11839), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o4263)), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), o4263) :|: TRUE
+f11839_0_mirror_FieldAccess(EOS(STATIC_11839), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(o4455sub))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(o4455sub))), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(o4455sub)) -> f11841_0_mirror_FieldAccess(EOS(STATIC_11841), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(o4455sub))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(o4455sub))), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(o4455sub)) :|: TRUE
+f11841_0_mirror_FieldAccess(EOS(STATIC_11841), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486))) -> f11843_0_mirror_FieldAccess(EOS(STATIC_11843), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486))) :|: TRUE
+f11843_0_mirror_FieldAccess(EOS(STATIC_11843), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486))) -> f11848_0_mirror_InvokeMethod(EOS(STATIC_11848), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), o4486) :|: TRUE
+f11848_0_mirror_InvokeMethod(EOS(STATIC_11848), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), o4486) -> f11849_0_mirror_Load(EOS(STATIC_11849), o4486, o4486) :|: i2375 > 1
+f11848_0_mirror_InvokeMethod(EOS(STATIC_11848), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), o4486) -> f11849_1_mirror_Load(EOS(STATIC_11849), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486)))), java.lang.Object(o4262sub), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259)))), o4260)), o4486) :|: i2375 > 1
+f11849_0_mirror_Load(EOS(STATIC_11849), o4486, o4486) -> f11851_0_mirror_Load(EOS(STATIC_11851), o4486, o4486) :|: TRUE
+f11851_0_mirror_Load(EOS(STATIC_11851), o4486, o4486) -> f11524_0_mirror_Load(EOS(STATIC_11524), o4486, o4486) :|: TRUE
+f11846_0_mirror_Return(EOS(STATIC_11846), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField5)))))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField6)))))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField7)))))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField8)))))), o4468))) -> f11819_0_mirror_Return(EOS(STATIC_11819), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField9)))))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField10)))))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField11)))))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField12)))))), o4468))) :|: TRUE
+f11937_0_mirror_Return(EOS(STATIC_11937), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o6229, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6231)))), o6227))) -> f11819_0_mirror_Return(EOS(STATIC_11819), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o6229, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6231)))), o6227))) :|: TRUE
+f11942_0_mirror_Return(EOS(STATIC_11942), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6285)))), o6282))) -> f11819_0_mirror_Return(EOS(STATIC_11819), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6285)))), o6282))) :|: TRUE
+f11580_1_mirror_Load(EOS(STATIC_11580), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594))) -> f11596_0_mirror_Return(EOS(STATIC_11596), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594))) :|: TRUE
+f11580_1_mirror_Load(EOS(STATIC_11580), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) -> f11641_0_mirror_Return(EOS(STATIC_11641), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676)))), o1675))) :|: TRUE
+f11580_1_mirror_Load(EOS(STATIC_11580), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) -> f11846_0_mirror_Return(EOS(STATIC_11846), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField1)))))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField2)))))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField3)))))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField4)))))), o4468))) :|: TRUE
+f11580_1_mirror_Load(EOS(STATIC_11580), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) -> f11937_0_mirror_Return(EOS(STATIC_11937), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o6229, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6231)))), o6227))) :|: TRUE
+f11580_1_mirror_Load(EOS(STATIC_11580), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub), o1539)), java.lang.Object(o1548sub), java.lang.Object(o1548sub)) -> f11942_0_mirror_Return(EOS(STATIC_11942), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), o1539)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283)))), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6285)))), o6282))) :|: TRUE
+Combined rules. Obtained 9 IRulesP rules:
+f11526_0_mirror_NULL(EOS(STATIC_11526), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0))))) -> f11848_0_mirror_InvokeMethod(EOS(STATIC_11848), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1676:0)))), o1675:0)), o4486:0) :|: TRUE
+f11848_0_mirror_InvokeMethod(EOS(STATIC_11848), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(o4262sub:0), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257:0, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259:0)))), o4260:0)), o4486:0) -> f11526_0_mirror_NULL(EOS(STATIC_11526), o4486:0, o4486:0, o4486:0) :|: TRUE
+f11526_0_mirror_NULL(EOS(STATIC_11526), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0))))) -> f11848_0_mirror_InvokeMethod(EOS(STATIC_11848), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField9:0)))))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, abstractField12:0)))))), o4468:0)), o4486:0) :|: TRUE
+f11526_0_mirror_NULL(EOS(STATIC_11526), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0))))) -> f11848_0_mirror_InvokeMethod(EOS(STATIC_11848), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6283:0)))), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6285:0)))), o6282:0)), o4486:0) :|: TRUE
+f11526_0_mirror_NULL(EOS(STATIC_11526), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0))))) -> f11848_0_mirror_InvokeMethod(EOS(STATIC_11848), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6228:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o6229:0, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o6231:0)))), o6227:0)), o4486:0) :|: TRUE
+f11526_0_mirror_NULL(EOS(STATIC_11526), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), o1539:0)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), o1539:0)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(o1548sub:0), o1539:0))) -> f11526_0_mirror_NULL(EOS(STATIC_11526), java.lang.Object(o1548sub:0), java.lang.Object(o1548sub:0), java.lang.Object(o1548sub:0)) :|: TRUE
+f11526_0_mirror_NULL(EOS(STATIC_11526), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627:0))))) -> f11526_0_mirror_NULL(EOS(STATIC_11526), o1627:0, o1627:0, o1627:0) :|: TRUE
+Removed following non-SCC rules:
+f11848_0_mirror_InvokeMethod(EOS(STATIC_11848), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(o4262sub:0), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257:0, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259:0)))), o4260:0)), o4486:0) -> f11849_1_mirror_Load(EOS(STATIC_11849), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4486:0)))), java.lang.Object(o4262sub:0), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, o4257:0, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o4259:0)))), o4260:0)), o4486:0) :|: TRUE
+f11526_0_mirror_NULL(EOS(STATIC_11526), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627:0))))) -> f11617_1_mirror_Load(EOS(STATIC_11617), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, java.lang.Object(MirrorMultiTreeRec.Tree(EOC, o1627:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.TreeList(EOC, NULL, o1594:0)), o1627:0) :|: TRUE
+Filtered constant ground arguments:
+   f11526_0_mirror_NULL(x1, x2, x3, x4) -> f11526_0_mirror_NULL(x2, x3, x4)
+   f11848_0_mirror_InvokeMethod(x1, x2, x3, x4, x5, x6) -> f11848_0_mirror_InvokeMethod(x2, x3, x4, x5, x6)
+   MirrorMultiTreeRec.TreeList(x1, x2, x3) -> MirrorMultiTreeRec.TreeList(x2, x3)
+   MirrorMultiTreeRec.Tree(x1, x2) -> MirrorMultiTreeRec.Tree(x2)
+Filtered duplicate arguments:
+   f11526_0_mirror_NULL(x1, x2, x3) -> f11526_0_mirror_NULL(x3)
+   f11848_0_mirror_InvokeMethod(x1, x2, x3, x4, x5) -> f11848_0_mirror_InvokeMethod(x2, x3, x4, x5)
+Finished conversion. Obtained 7 rules.P rules:
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), o1675:0)), o4486:0, o4486:0, o1675:0) :|: TRUE
+f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0)))), java.lang.Object(o4262sub:0), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(o4257:0, java.lang.Object(MirrorMultiTreeRec.Tree(o4259:0)))), o4260:0)), o4486:0, o4486:0, o4260:0) -> f11526_0_mirror_NULL(o4486:0) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, abstractField9:0)))))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, abstractField12:0)))))), o4468:0)), o4486:0, o4486:0, o4468:0) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o6283:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o6283:0)))), java.lang.Object(MirrorMultiTreeRec.Tree(o6285:0)))), o6282:0)), o4486:0, o4486:0, o6282:0) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o6228:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(o6229:0, java.lang.Object(MirrorMultiTreeRec.Tree(o6231:0)))), o6227:0)), o4486:0, o4486:0, o6227:0) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0), o1539:0))) -> f11526_0_mirror_NULL(java.lang.Object(o1548sub:0)) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(o1627:0))))) -> f11526_0_mirror_NULL(o1627:0) :|: TRUE
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), o1675:0)), o4486:0, o4486:0, o1675:0) :|: TRUE
+f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x)))), java.lang.Object(x1), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(x2, java.lang.Object(MirrorMultiTreeRec.Tree(x3)))), x4)), x, x, x4) -> f11526_0_mirror_NULL(x) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x5), java.lang.Object(MirrorMultiTreeRec.Tree(x6))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x6)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, x7)))))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, x8)))))), x9)), x6, x6, x9) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x10), java.lang.Object(MirrorMultiTreeRec.Tree(x11))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x11)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x12)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x12)))), java.lang.Object(MirrorMultiTreeRec.Tree(x13)))), x14)), x11, x11, x14) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x15), java.lang.Object(MirrorMultiTreeRec.Tree(x16))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x16)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x17)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(x18, java.lang.Object(MirrorMultiTreeRec.Tree(x19)))), x20)), x16, x16, x20) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x21), x22))) -> f11526_0_mirror_NULL(java.lang.Object(x21)) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(o1627:0))))) -> f11526_0_mirror_NULL(o1627:0) :|: TRUE
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), o1675:0)), o4486:0, o4486:0, o1675:0) :|: TRUE
+f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x)))), java.lang.Object(x1), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(x2, java.lang.Object(MirrorMultiTreeRec.Tree(x3)))), x4)), x, x, x4) -> f11526_0_mirror_NULL(x) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x5), java.lang.Object(MirrorMultiTreeRec.Tree(x6))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x6)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, x7)))))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, x8)))))), x9)), x6, x6, x9) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x10), java.lang.Object(MirrorMultiTreeRec.Tree(x11))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x11)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x12)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x12)))), java.lang.Object(MirrorMultiTreeRec.Tree(x13)))), x14)), x11, x11, x14) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x15), java.lang.Object(MirrorMultiTreeRec.Tree(x16))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x16)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x17)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(x18, java.lang.Object(MirrorMultiTreeRec.Tree(x19)))), x20)), x16, x16, x20) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x21), x22))) -> f11526_0_mirror_NULL(java.lang.Object(x21)) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(o1627:0))))) -> f11526_0_mirror_NULL(o1627:0) :|: TRUE
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), o1675:0)), o4486:0, o4486:0, o1675:0) :|: TRUE
+(2) f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x)))), java.lang.Object(x1), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(x2, java.lang.Object(MirrorMultiTreeRec.Tree(x3)))), x4)), x, x, x4) -> f11526_0_mirror_NULL(x) :|: TRUE
+(3) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x5), java.lang.Object(MirrorMultiTreeRec.Tree(x6))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x6)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, x7)))))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, x8)))))), x9)), x6, x6, x9) :|: TRUE
+(4) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x10), java.lang.Object(MirrorMultiTreeRec.Tree(x11))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x11)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x12)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x12)))), java.lang.Object(MirrorMultiTreeRec.Tree(x13)))), x14)), x11, x11, x14) :|: TRUE
+(5) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x15), java.lang.Object(MirrorMultiTreeRec.Tree(x16))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x16)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x17)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(x18, java.lang.Object(MirrorMultiTreeRec.Tree(x19)))), x20)), x16, x16, x20) :|: TRUE
+(6) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x21), x22))) -> f11526_0_mirror_NULL(java.lang.Object(x21)) :|: TRUE
+(7) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(o1627:0))))) -> f11526_0_mirror_NULL(o1627:0) :|: TRUE
+
+Arcs:
+(1) -> (2)
+(2) -> (1), (3), (4), (5), (6), (7)
+(3) -> (2)
+(4) -> (2)
+(5) -> (2)
+(6) -> (1), (3), (4), (5), (6), (7)
+(7) -> (1), (3), (4), (5), (6), (7)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(o1676:0)))), o1675:0)), o4486:0, o4486:0, o1675:0) :|: TRUE
+(2) f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x)))), java.lang.Object(x1), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(x2, java.lang.Object(MirrorMultiTreeRec.Tree(x3)))), x4)), x, x, x4) -> f11526_0_mirror_NULL(x) :|: TRUE
+(3) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x15), java.lang.Object(MirrorMultiTreeRec.Tree(x16))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x16)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x17)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(x18, java.lang.Object(MirrorMultiTreeRec.Tree(x19)))), x20)), x16, x16, x20) :|: TRUE
+(4) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x10), java.lang.Object(MirrorMultiTreeRec.Tree(x11))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x11)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x12)))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x12)))), java.lang.Object(MirrorMultiTreeRec.Tree(x13)))), x14)), x11, x11, x14) :|: TRUE
+(5) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x5), java.lang.Object(MirrorMultiTreeRec.Tree(x6))))) -> f11848_0_mirror_InvokeMethod(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(x6)))), java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, x7)))))), java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, java.lang.Object(MirrorMultiTreeRec.Tree(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, x8)))))), x9)), x6, x6, x9) :|: TRUE
+(6) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x21), x22))) -> f11526_0_mirror_NULL(java.lang.Object(x21)) :|: TRUE
+(7) f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, o1594:0)), java.lang.Object(MirrorMultiTreeRec.Tree(o1627:0))))) -> f11526_0_mirror_NULL(o1627:0) :|: TRUE
+
+Arcs:
+(1) -> (2)
+(2) -> (1), (3), (4), (5), (6), (7)
+(3) -> (2)
+(4) -> (2)
+(5) -> (2)
+(6) -> (1), (3), (4), (5), (6), (7)
+(7) -> (1), (3), (4), (5), (6), (7)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(14) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(15)
+Obligation:
+Rules:
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, o1594:0:0)), java.lang.Object(MirrorMultiTreeRec.Tree(o1627:0:0))))) -> f11526_0_mirror_NULL(o1627:0:0) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0:0))))) -> f11526_0_mirror_NULL(o4486:0:0) :|: TRUE
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x21:0), x22:0))) -> f11526_0_mirror_NULL(java.lang.Object(x21:0)) :|: TRUE
+
+----------------------------------------
+
+(16) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f11526_0_mirror_NULL(VARIABLE)
+java.lang.Object(VARIABLE)
+MirrorMultiTreeRec.TreeList(VARIABLE, VARIABLE)
+NULL()
+MirrorMultiTreeRec.Tree(VARIABLE)
+Removed predefined arithmetic.
+----------------------------------------
+
+(17)
+Obligation:
+Rules:
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, o1594:0:0)), java.lang.Object(MirrorMultiTreeRec.Tree(o1627:0:0))))) -> f11526_0_mirror_NULL(o1627:0:0)
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0:0))))) -> f11526_0_mirror_NULL(o4486:0:0)
+f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x21:0), x22:0))) -> f11526_0_mirror_NULL(java.lang.Object(x21:0))
+
+----------------------------------------
+
+(18) IRSwTToQDPProof (SOUND)
+Removed the integers and created a QDP-Problem.
+----------------------------------------
+
+(19)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, o1594:0:0)), java.lang.Object(MirrorMultiTreeRec.Tree(o1627:0:0))))) -> f11526_0_mirror_NULL(o1627:0:0)
+   f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0:0))))) -> f11526_0_mirror_NULL(o4486:0:0)
+   f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x21:0), x22:0))) -> f11526_0_mirror_NULL(java.lang.Object(x21:0))
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(20) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(MirrorMultiTreeRec.TreeList(NULL, o1594:0:0)), java.lang.Object(MirrorMultiTreeRec.Tree(o1627:0:0))))) -> f11526_0_mirror_NULL(o1627:0:0)
+The graph contains the following edges 1 > 1
+
+
+*f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(o1548sub:0:0), java.lang.Object(MirrorMultiTreeRec.Tree(o4486:0:0))))) -> f11526_0_mirror_NULL(o4486:0:0)
+The graph contains the following edges 1 > 1
+
+
+*f11526_0_mirror_NULL(java.lang.Object(MirrorMultiTreeRec.TreeList(java.lang.Object(x21:0), x22:0))) -> f11526_0_mirror_NULL(java.lang.Object(x21:0))
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(21)
+YES
+
+----------------------------------------
+
+(22)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: MirrorMultiTreeRec.Tree.createTree(I)LMirrorMultiTreeRec/Tree;
+SCC calls the following helper methods: MirrorMultiTreeRec.Tree.createTree(I)LMirrorMultiTreeRec/Tree;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*MirrorMultiTreeRec.Tree: [children]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(23) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 104 IRulesP rules:
+f565_0_createTree_GT(EOS(STATIC_565(java.lang.Object(o57sub), i87)), i96, i96, i96) -> f577_0_createTree_GT(EOS(STATIC_577(java.lang.Object(o57sub), i87)), i96, i96, i96) :|: TRUE
+f577_0_createTree_GT(EOS(STATIC_577(java.lang.Object(o57sub), i87)), i96, i96, i96) -> f582_0_createTree_Load(EOS(STATIC_582(java.lang.Object(o57sub), i87)), i96, i96) :|: i96 > 0
+f582_0_createTree_Load(EOS(STATIC_582(java.lang.Object(o57sub), i87)), i96, i96) -> f590_0_createTree_ConstantStackPush(EOS(STATIC_590(java.lang.Object(o57sub), i87)), i96, i96) :|: TRUE
+f590_0_createTree_ConstantStackPush(EOS(STATIC_590(java.lang.Object(o57sub), i87)), i96, i96) -> f596_0_createTree_IntArithmetic(EOS(STATIC_596(java.lang.Object(o57sub), i87)), i96, i96, 1) :|: TRUE
+f596_0_createTree_IntArithmetic(EOS(STATIC_596(java.lang.Object(o57sub), i87)), i96, i96, matching1) -> f608_0_createTree_Store(EOS(STATIC_608(java.lang.Object(o57sub), i87)), i96, i96 - 1) :|: i96 > 0 && matching1 = 1
+f608_0_createTree_Store(EOS(STATIC_608(java.lang.Object(o57sub), i87)), i96, i106) -> f626_0_createTree_New(EOS(STATIC_626(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f626_0_createTree_New(EOS(STATIC_626(java.lang.Object(o57sub), i87)), i96, i106) -> f632_0_createTree_Duplicate(EOS(STATIC_632(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f632_0_createTree_Duplicate(EOS(STATIC_632(java.lang.Object(o57sub), i87)), i96, i106) -> f635_0_createTree_InvokeMethod(EOS(STATIC_635(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f635_0_createTree_InvokeMethod(EOS(STATIC_635(java.lang.Object(o57sub), i87)), i96, i106) -> f638_0__init__Load(EOS(STATIC_638(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f638_0__init__Load(EOS(STATIC_638(java.lang.Object(o57sub), i87)), i96, i106) -> f646_0__init__InvokeMethod(EOS(STATIC_646(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f646_0__init__InvokeMethod(EOS(STATIC_646(java.lang.Object(o57sub), i87)), i96, i106) -> f653_0__init__Load(EOS(STATIC_653(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f653_0__init__Load(EOS(STATIC_653(java.lang.Object(o57sub), i87)), i96, i106) -> f655_0__init__ConstantStackPush(EOS(STATIC_655(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f655_0__init__ConstantStackPush(EOS(STATIC_655(java.lang.Object(o57sub), i87)), i96, i106) -> f656_0__init__FieldAccess(EOS(STATIC_656(java.lang.Object(o57sub), i87)), i96, i106, NULL) :|: TRUE
+f656_0__init__FieldAccess(EOS(STATIC_656(java.lang.Object(o57sub), i87)), i96, i106, NULL) -> f661_0__init__Return(EOS(STATIC_661(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f661_0__init__Return(EOS(STATIC_661(java.lang.Object(o57sub), i87)), i96, i106) -> f666_0_createTree_Store(EOS(STATIC_666(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f666_0_createTree_Store(EOS(STATIC_666(java.lang.Object(o57sub), i87)), i96, i106) -> f669_0_createTree_InvokeMethod(EOS(STATIC_669(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f669_0_createTree_InvokeMethod(EOS(STATIC_669(java.lang.Object(o57sub), i87)), i96, i106) -> f674_0_random_FieldAccess(EOS(STATIC_674(java.lang.Object(o57sub), i87)), i96, i106) :|: TRUE
+f674_0_random_FieldAccess(EOS(STATIC_674(java.lang.Object(o57sub), i87)), i96, i106) -> f678_0_random_FieldAccess(EOS(STATIC_678(java.lang.Object(o57sub), i87)), i96, i106, java.lang.Object(o57sub)) :|: TRUE
+f678_0_random_FieldAccess(EOS(STATIC_678(java.lang.Object(o57sub), i87)), i96, i106, java.lang.Object(o57sub)) -> f683_0_random_ArrayAccess(EOS(STATIC_683(java.lang.Object(o57sub), i87)), i96, i106, java.lang.Object(o57sub), i87) :|: TRUE
+f683_0_random_ArrayAccess(EOS(STATIC_683(java.lang.Object(ARRAY(i127)), i87)), i96, i106, java.lang.Object(ARRAY(i127)), i87) -> f690_0_random_ArrayAccess(EOS(STATIC_690(java.lang.Object(ARRAY(i127)), i87)), i96, i106, java.lang.Object(ARRAY(i127)), i87) :|: i127 >= 0
+f690_0_random_ArrayAccess(EOS(STATIC_690(java.lang.Object(ARRAY(i127)), i87)), i96, i106, java.lang.Object(ARRAY(i127)), i87) -> f698_0_random_ArrayAccess(EOS(STATIC_698(java.lang.Object(ARRAY(i127)), i87)), i96, i106, java.lang.Object(ARRAY(i127)), i87) :|: TRUE
+f698_0_random_ArrayAccess(EOS(STATIC_698(java.lang.Object(ARRAY(i127)), i87)), i96, i106, java.lang.Object(ARRAY(i127)), i87) -> f707_0_random_Store(EOS(STATIC_707(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76) :|: i87 < i127
+f707_0_random_Store(EOS(STATIC_707(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76) -> f719_0_random_FieldAccess(EOS(STATIC_719(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76) :|: TRUE
+f719_0_random_FieldAccess(EOS(STATIC_719(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76) -> f728_0_random_ConstantStackPush(EOS(STATIC_728(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76, i87) :|: TRUE
+f728_0_random_ConstantStackPush(EOS(STATIC_728(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76, i87) -> f739_0_random_IntArithmetic(EOS(STATIC_739(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76, i87, 1) :|: TRUE
+f739_0_random_IntArithmetic(EOS(STATIC_739(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76, i87, matching1) -> f747_0_random_FieldAccess(EOS(STATIC_747(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76, i87 + 1) :|: i87 > 0 && matching1 = 1
+f747_0_random_FieldAccess(EOS(STATIC_747(java.lang.Object(ARRAY(i127)), i87)), i96, i106, o76, i137) -> f754_0_random_Load(EOS(STATIC_754(java.lang.Object(ARRAY(i127)), i137)), i96, i106, o76) :|: TRUE
+f754_0_random_Load(EOS(STATIC_754(java.lang.Object(ARRAY(i127)), i137)), i96, i106, o76) -> f763_0_random_InvokeMethod(EOS(STATIC_763(java.lang.Object(ARRAY(i127)), i137)), i96, i106, o76) :|: TRUE
+f763_0_random_InvokeMethod(EOS(STATIC_763(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(o79sub)) -> f766_0_random_InvokeMethod(EOS(STATIC_766(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(o79sub)) :|: TRUE
+f766_0_random_InvokeMethod(EOS(STATIC_766(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(o80sub)) -> f773_0_random_InvokeMethod(EOS(STATIC_773(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(o80sub)) :|: TRUE
+f773_0_random_InvokeMethod(EOS(STATIC_773(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(o80sub)) -> f781_0_length_Load(EOS(STATIC_781(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(o80sub)) :|: TRUE
+f781_0_length_Load(EOS(STATIC_781(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(o80sub)) -> f788_0_length_FieldAccess(EOS(STATIC_788(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(o80sub)) :|: TRUE
+f788_0_length_FieldAccess(EOS(STATIC_788(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(java.lang.String(EOC, i145))) -> f793_0_length_FieldAccess(EOS(STATIC_793(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(java.lang.String(EOC, i145))) :|: i145 >= 0
+f793_0_length_FieldAccess(EOS(STATIC_793(java.lang.Object(ARRAY(i127)), i137)), i96, i106, java.lang.Object(java.lang.String(EOC, i145))) -> f795_0_length_Return(EOS(STATIC_795(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145) :|: TRUE
+f795_0_length_Return(EOS(STATIC_795(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145) -> f800_0_random_Return(EOS(STATIC_800(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145) :|: TRUE
+f800_0_random_Return(EOS(STATIC_800(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145) -> f807_0_createTree_Store(EOS(STATIC_807(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145) :|: TRUE
+f807_0_createTree_Store(EOS(STATIC_807(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145) -> f812_0_createTree_ConstantStackPush(EOS(STATIC_812(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145) :|: TRUE
+f812_0_createTree_ConstantStackPush(EOS(STATIC_812(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145) -> f820_0_createTree_Store(EOS(STATIC_820(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145, 0) :|: TRUE
+f820_0_createTree_Store(EOS(STATIC_820(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145, matching1) -> f825_0_createTree_Load(EOS(STATIC_825(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145, 0) :|: TRUE && matching1 = 0
+f825_0_createTree_Load(EOS(STATIC_825(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145, matching1) -> f4422_0_createTree_Load(EOS(STATIC_4422(java.lang.Object(ARRAY(i127)), i137)), i96, i106, i145, 0) :|: TRUE && matching1 = 0
+f4422_0_createTree_Load(EOS(STATIC_4422(java.lang.Object(ARRAY(i127)), i598)), i96, i106, i599, i600) -> f7348_0_createTree_Load(EOS(STATIC_7348(java.lang.Object(ARRAY(i127)), i598)), i96, i106, i599, i600) :|: TRUE
+f7348_0_createTree_Load(EOS(STATIC_7348(java.lang.Object(ARRAY(i127)), i1012)), i96, i106, i1013, i1014) -> f10581_0_createTree_Load(EOS(STATIC_10581(java.lang.Object(ARRAY(i127)), i1012)), i96, i106, i1013, i1014) :|: TRUE
+f10581_0_createTree_Load(EOS(STATIC_10581(java.lang.Object(ARRAY(i127)), i1433)), i96, i106, i1434, i1435) -> f11483_0_createTree_Load(EOS(STATIC_11483(java.lang.Object(ARRAY(i127)), i1433)), i96, i106, i1434, i1435) :|: TRUE
+f11483_0_createTree_Load(EOS(STATIC_11483(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680) -> f11486_0_createTree_Load(EOS(STATIC_11486(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i1680) :|: TRUE
+f11486_0_createTree_Load(EOS(STATIC_11486(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i1680) -> f11488_0_createTree_GE(EOS(STATIC_11488(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i1680, i1679) :|: TRUE
+f11488_0_createTree_GE(EOS(STATIC_11488(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i1680, i1679) -> f11490_0_createTree_GE(EOS(STATIC_11490(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i1680, i1679) :|: i1680 < i1679
+f11490_0_createTree_GE(EOS(STATIC_11490(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i1680, i1679) -> f11494_0_createTree_Load(EOS(STATIC_11494(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680) :|: i1680 < i1679
+f11494_0_createTree_Load(EOS(STATIC_11494(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680) -> f11496_0_createTree_Load(EOS(STATIC_11496(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680) :|: TRUE
+f11496_0_createTree_Load(EOS(STATIC_11496(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680) -> f11498_0_createTree_ConstantStackPush(EOS(STATIC_11498(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i106) :|: TRUE
+f11498_0_createTree_ConstantStackPush(EOS(STATIC_11498(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i106) -> f11499_0_createTree_IntArithmetic(EOS(STATIC_11499(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i106, 1) :|: TRUE
+f11499_0_createTree_IntArithmetic(EOS(STATIC_11499(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i106, matching1) -> f11502_0_createTree_InvokeMethod(EOS(STATIC_11502(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i106 - 1) :|: i106 >= 0 && matching1 = 1
+f11502_0_createTree_InvokeMethod(EOS(STATIC_11502(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i1714) -> f11504_0_createTree_Load(EOS(STATIC_11504(java.lang.Object(ARRAY(i1677)), i1678)), i1714, i1714) :|: i96 >= 1 && i1679 >= 1 && i1678 > 1 && i96 > i106 && i1680 < i1679 && i1714 < i106 && i1714 < i96
+f11502_0_createTree_InvokeMethod(EOS(STATIC_11502(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i1714) -> f11504_1_createTree_Load(EOS(STATIC_11504(java.lang.Object(ARRAY(i1677)), i1678)), i96, i106, i1679, i1680, i1714) :|: i96 >= 1 && i1679 >= 1 && i1678 > 1 && i96 > i106 && i1680 < i1679 && i1714 < i106 && i1714 < i96
+f11504_0_createTree_Load(EOS(STATIC_11504(java.lang.Object(ARRAY(i1677)), i1678)), i1714, i1714) -> f11506_0_createTree_Load(EOS(STATIC_11506(java.lang.Object(ARRAY(i1677)), i1678)), i1714, i1714) :|: TRUE
+f11506_0_createTree_Load(EOS(STATIC_11506(java.lang.Object(ARRAY(i1677)), i1678)), i1714, i1714) -> f549_0_createTree_Load(EOS(STATIC_549(java.lang.Object(ARRAY(i1677)), i1678)), i1714, i1714) :|: TRUE
+f549_0_createTree_Load(EOS(STATIC_549(java.lang.Object(o57sub), i87)), i88, i88) -> f565_0_createTree_GT(EOS(STATIC_565(java.lang.Object(o57sub), i87)), i88, i88, i88) :|: TRUE
+f11511_0_createTree_Return(EOS(STATIC_11511(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11517_0_createTree_InvokeMethod(EOS(STATIC_11517(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11517_0_createTree_InvokeMethod(EOS(STATIC_11517(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11521_0_addChild_Load(EOS(STATIC_11521(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11521_0_addChild_Load(EOS(STATIC_11521(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11527_0_addChild_New(EOS(STATIC_11527(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11527_0_addChild_New(EOS(STATIC_11527(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11534_0_addChild_Duplicate(EOS(STATIC_11534(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11534_0_addChild_Duplicate(EOS(STATIC_11534(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11540_0_addChild_Load(EOS(STATIC_11540(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11540_0_addChild_Load(EOS(STATIC_11540(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11545_0_addChild_Load(EOS(STATIC_11545(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11545_0_addChild_Load(EOS(STATIC_11545(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11549_0_addChild_FieldAccess(EOS(STATIC_11549(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11549_0_addChild_FieldAccess(EOS(STATIC_11549(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11552_0_addChild_InvokeMethod(EOS(STATIC_11552(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11552_0_addChild_InvokeMethod(EOS(STATIC_11552(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11557_0__init__Load(EOS(STATIC_11557(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11557_0__init__Load(EOS(STATIC_11557(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11565_0__init__InvokeMethod(EOS(STATIC_11565(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11565_0__init__InvokeMethod(EOS(STATIC_11565(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11570_0__init__Load(EOS(STATIC_11570(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11570_0__init__Load(EOS(STATIC_11570(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11573_0__init__Load(EOS(STATIC_11573(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11573_0__init__Load(EOS(STATIC_11573(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11578_0__init__FieldAccess(EOS(STATIC_11578(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11578_0__init__FieldAccess(EOS(STATIC_11578(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11582_0__init__Load(EOS(STATIC_11582(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11582_0__init__Load(EOS(STATIC_11582(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11586_0__init__Load(EOS(STATIC_11586(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11586_0__init__Load(EOS(STATIC_11586(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11589_0__init__FieldAccess(EOS(STATIC_11589(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11589_0__init__FieldAccess(EOS(STATIC_11589(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11591_0__init__Return(EOS(STATIC_11591(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11591_0__init__Return(EOS(STATIC_11591(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11593_0_addChild_FieldAccess(EOS(STATIC_11593(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11593_0_addChild_FieldAccess(EOS(STATIC_11593(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11597_0_addChild_Return(EOS(STATIC_11597(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11597_0_addChild_Return(EOS(STATIC_11597(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11600_0_createTree_Inc(EOS(STATIC_11600(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11600_0_createTree_Inc(EOS(STATIC_11600(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) -> f11603_0_createTree_JMP(EOS(STATIC_11603(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680 + 1) :|: TRUE
+f11603_0_createTree_JMP(EOS(STATIC_11603(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1859) -> f11606_0_createTree_Load(EOS(STATIC_11606(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1859) :|: TRUE
+f11606_0_createTree_Load(EOS(STATIC_11606(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1859) -> f11483_0_createTree_Load(EOS(STATIC_11483(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1859) :|: TRUE
+f11515_0_createTree_Return(EOS(STATIC_11515(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11519_0_createTree_InvokeMethod(EOS(STATIC_11519(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11519_0_createTree_InvokeMethod(EOS(STATIC_11519(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11523_0_addChild_Load(EOS(STATIC_11523(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11523_0_addChild_Load(EOS(STATIC_11523(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11531_0_addChild_New(EOS(STATIC_11531(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11531_0_addChild_New(EOS(STATIC_11531(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11537_0_addChild_Duplicate(EOS(STATIC_11537(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11537_0_addChild_Duplicate(EOS(STATIC_11537(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11542_0_addChild_Load(EOS(STATIC_11542(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11542_0_addChild_Load(EOS(STATIC_11542(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11546_0_addChild_Load(EOS(STATIC_11546(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11546_0_addChild_Load(EOS(STATIC_11546(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11550_0_addChild_FieldAccess(EOS(STATIC_11550(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11550_0_addChild_FieldAccess(EOS(STATIC_11550(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11553_0_addChild_InvokeMethod(EOS(STATIC_11553(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11553_0_addChild_InvokeMethod(EOS(STATIC_11553(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11558_0__init__Load(EOS(STATIC_11558(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11558_0__init__Load(EOS(STATIC_11558(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11566_0__init__InvokeMethod(EOS(STATIC_11566(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11566_0__init__InvokeMethod(EOS(STATIC_11566(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11571_0__init__Load(EOS(STATIC_11571(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11571_0__init__Load(EOS(STATIC_11571(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11574_0__init__Load(EOS(STATIC_11574(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11574_0__init__Load(EOS(STATIC_11574(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11579_0__init__FieldAccess(EOS(STATIC_11579(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11579_0__init__FieldAccess(EOS(STATIC_11579(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11583_0__init__Load(EOS(STATIC_11583(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11583_0__init__Load(EOS(STATIC_11583(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11587_0__init__Load(EOS(STATIC_11587(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11587_0__init__Load(EOS(STATIC_11587(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11590_0__init__FieldAccess(EOS(STATIC_11590(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11590_0__init__FieldAccess(EOS(STATIC_11590(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11592_0__init__Return(EOS(STATIC_11592(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11592_0__init__Return(EOS(STATIC_11592(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11594_0_addChild_FieldAccess(EOS(STATIC_11594(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11594_0_addChild_FieldAccess(EOS(STATIC_11594(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11598_0_addChild_Return(EOS(STATIC_11598(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11598_0_addChild_Return(EOS(STATIC_11598(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11601_0_createTree_Inc(EOS(STATIC_11601(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+f11601_0_createTree_Inc(EOS(STATIC_11601(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) -> f11604_0_createTree_JMP(EOS(STATIC_11604(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680 + 1) :|: TRUE
+f11604_0_createTree_JMP(EOS(STATIC_11604(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1860) -> f11607_0_createTree_Load(EOS(STATIC_11607(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1860) :|: TRUE
+f11607_0_createTree_Load(EOS(STATIC_11607(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1860) -> f11483_0_createTree_Load(EOS(STATIC_11483(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1860) :|: TRUE
+f11504_1_createTree_Load(EOS(STATIC_11504(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680, i1714) -> f11511_0_createTree_Return(EOS(STATIC_11511(java.lang.Object(ARRAY(i1677)), i1725)), i96, i106, i1679, i1680) :|: TRUE
+f11504_1_createTree_Load(EOS(STATIC_11504(java.lang.Object(ARRAY(i1750)), i1678)), i96, i106, i1679, i1680, i1714) -> f11515_0_createTree_Return(EOS(STATIC_11515(java.lang.Object(ARRAY(i1750)), i1747)), i96, i106, i1679, i1680) :|: TRUE
+Combined rules. Obtained 3 IRulesP rules:
+f11502_0_createTree_InvokeMethod(EOS(STATIC_11502(java.lang.Object(ARRAY(i1677:0)), i1678:0)), i96:0, i106:0, i1679:0, i1680:0, i1714:0) -> f11502_0_createTree_InvokeMethod(EOS(STATIC_11502(java.lang.Object(ARRAY(i1677:0)), i1678:0)), i96:0, i106:0, i1679:0, i1680:0 + 1, i106:0 - 1) :|: i1680:0 + 1 < i1679:0 && i1679:0 > 0 && i96:0 > 0 && i1678:0 > 1 && i96:0 > i106:0 && i106:0 > -1 && i96:0 > i1714:0 && i1714:0 < i106:0
+f11502_0_createTree_InvokeMethod(EOS(STATIC_11502(java.lang.Object(ARRAY(i1677:0)), i1678:0)), i96:0, i106:0, i1679:0, i1680:0, i1714:0) -> f11502_0_createTree_InvokeMethod(EOS(STATIC_11502(java.lang.Object(ARRAY(i1677:0)), i1747:0)), i96:0, i106:0, i1679:0, i1680:0 + 1, i106:0 - 1) :|: i1680:0 + 1 < i1679:0 && i1679:0 > 0 && i96:0 > 0 && i1678:0 > 1 && i96:0 > i106:0 && i106:0 > -1 && i96:0 > i1714:0 && i1714:0 < i106:0
+f11502_0_createTree_InvokeMethod(EOS(STATIC_11502(java.lang.Object(ARRAY(i1677:0)), i1678:0)), i96:0, i106:0, i1679:0, i1680:0, i1714:0) -> f11502_0_createTree_InvokeMethod(EOS(STATIC_11502(java.lang.Object(ARRAY(i1677:0)), i1678:0 + 1)), i1714:0, i1714:0 - 1, i145:0, 0, i1714:0 - 2) :|: i1678:0 > 1 && i145:0 > 0 && i1714:0 > 0 && i1677:0 > -1 && i1678:0 < i1677:0 && i1679:0 > 0 && i96:0 > 0 && i96:0 > i106:0 && i1680:0 < i1679:0 && i1714:0 < i106:0 && i96:0 > i1714:0
+Finished conversion. Obtained 3 rules.P rules:
+f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0, i1714:0, i1677:0, i1678:0) -> f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0 + 1, i106:0 - 1, i1677:0, i1678:0) :|: i1679:0 > 0 && i1680:0 + 1 < i1679:0 && i96:0 > 0 && i1678:0 > 1 && i96:0 > i106:0 && i106:0 > -1 && i1714:0 < i106:0 && i96:0 > i1714:0
+f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0, i1714:0, i1677:0, i1678:0) -> f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0 + 1, i106:0 - 1, i1677:0, i1747:0) :|: i1679:0 > 0 && i1680:0 + 1 < i1679:0 && i96:0 > 0 && i1678:0 > 1 && i96:0 > i106:0 && i106:0 > -1 && i1714:0 < i106:0 && i96:0 > i1714:0
+f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0, i1714:0, i1677:0, i1678:0) -> f11502_0_createTree_InvokeMethod(i1714:0, i1714:0 - 1, i145:0, 0, i1714:0 - 2, i1677:0, i1678:0 + 1) :|: i145:0 > 0 && i1678:0 > 1 && i1714:0 > 0 && i1677:0 > -1 && i1678:0 < i1677:0 && i1679:0 > 0 && i96:0 > 0 && i96:0 > i106:0 && i1680:0 < i1679:0 && i96:0 > i1714:0 && i1714:0 < i106:0
+
+----------------------------------------
+
+(24)
+Obligation:
+Rules:
+f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0, i1714:0, i1677:0, i1678:0) -> f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0 + 1, i106:0 - 1, i1677:0, i1678:0) :|: i1679:0 > 0 && i1680:0 + 1 < i1679:0 && i96:0 > 0 && i1678:0 > 1 && i96:0 > i106:0 && i106:0 > -1 && i1714:0 < i106:0 && i96:0 > i1714:0
+f11502_0_createTree_InvokeMethod(x, x1, x2, x3, x4, x5, x6) -> f11502_0_createTree_InvokeMethod(x, x1, x2, x3 + 1, x1 - 1, x5, x7) :|: x2 > 0 && x3 + 1 < x2 && x > 0 && x6 > 1 && x > x1 && x1 > -1 && x4 < x1 && x > x4
+f11502_0_createTree_InvokeMethod(x8, x9, x10, x11, x12, x13, x14) -> f11502_0_createTree_InvokeMethod(x12, x12 - 1, x15, 0, x12 - 2, x13, x14 + 1) :|: x15 > 0 && x14 > 1 && x12 > 0 && x13 > -1 && x14 < x13 && x10 > 0 && x8 > 0 && x8 > x9 && x11 < x10 && x8 > x12 && x12 < x9
+
+----------------------------------------
+
+(25) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(26)
+Obligation:
+Rules:
+f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0, i1714:0, i1677:0, i1678:0) -> f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, arith, arith1, i1677:0, i1678:0) :|: i1679:0 > 0 && i1680:0 + 1 < i1679:0 && i96:0 > 0 && i1678:0 > 1 && i96:0 > i106:0 && i106:0 > -1 && i1714:0 < i106:0 && i96:0 > i1714:0 && arith = i1680:0 + 1 && arith1 = i106:0 - 1
+f11502_0_createTree_InvokeMethod(x16, x17, x18, x19, x20, x21, x22) -> f11502_0_createTree_InvokeMethod(x16, x17, x18, x23, x24, x21, x25) :|: x18 > 0 && x19 + 1 < x18 && x16 > 0 && x22 > 1 && x16 > x17 && x17 > -1 && x20 < x17 && x16 > x20 && x23 = x19 + 1 && x24 = x17 - 1
+f11502_0_createTree_InvokeMethod(x26, x27, x28, x29, x30, x31, x32) -> f11502_0_createTree_InvokeMethod(x30, x33, x34, 0, x35, x31, x36) :|: x34 > 0 && x32 > 1 && x30 > 0 && x31 > -1 && x32 < x31 && x28 > 0 && x26 > 0 && x26 > x27 && x29 < x28 && x26 > x30 && x30 < x27 && x33 = x30 - 1 && x35 = x30 - 2 && x36 = x32 + 1
+
+----------------------------------------
+
+(27) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0, i1714:0, i1677:0, i1678:0) -> f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, arith, arith1, i1677:0, i1678:0) :|: i1679:0 > 0 && i1680:0 + 1 < i1679:0 && i96:0 > 0 && i1678:0 > 1 && i96:0 > i106:0 && i106:0 > -1 && i1714:0 < i106:0 && i96:0 > i1714:0 && arith = i1680:0 + 1 && arith1 = i106:0 - 1
+(2) f11502_0_createTree_InvokeMethod(x16, x17, x18, x19, x20, x21, x22) -> f11502_0_createTree_InvokeMethod(x16, x17, x18, x23, x24, x21, x25) :|: x18 > 0 && x19 + 1 < x18 && x16 > 0 && x22 > 1 && x16 > x17 && x17 > -1 && x20 < x17 && x16 > x20 && x23 = x19 + 1 && x24 = x17 - 1
+(3) f11502_0_createTree_InvokeMethod(x26, x27, x28, x29, x30, x31, x32) -> f11502_0_createTree_InvokeMethod(x30, x33, x34, 0, x35, x31, x36) :|: x34 > 0 && x32 > 1 && x30 > 0 && x31 > -1 && x32 < x31 && x28 > 0 && x26 > 0 && x26 > x27 && x29 < x28 && x26 > x30 && x30 < x27 && x33 = x30 - 1 && x35 = x30 - 2 && x36 = x32 + 1
+
+Arcs:
+(1) -> (1), (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (1), (2), (3)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(28)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, i1680:0, i1714:0, i1677:0, i1678:0) -> f11502_0_createTree_InvokeMethod(i96:0, i106:0, i1679:0, arith, arith1, i1677:0, i1678:0) :|: i1679:0 > 0 && i1680:0 + 1 < i1679:0 && i96:0 > 0 && i1678:0 > 1 && i96:0 > i106:0 && i106:0 > -1 && i1714:0 < i106:0 && i96:0 > i1714:0 && arith = i1680:0 + 1 && arith1 = i106:0 - 1
+(2) f11502_0_createTree_InvokeMethod(x16, x17, x18, x19, x20, x21, x22) -> f11502_0_createTree_InvokeMethod(x16, x17, x18, x23, x24, x21, x25) :|: x18 > 0 && x19 + 1 < x18 && x16 > 0 && x22 > 1 && x16 > x17 && x17 > -1 && x20 < x17 && x16 > x20 && x23 = x19 + 1 && x24 = x17 - 1
+(3) f11502_0_createTree_InvokeMethod(x26, x27, x28, x29, x30, x31, x32) -> f11502_0_createTree_InvokeMethod(x30, x33, x34, 0, x35, x31, x36) :|: x34 > 0 && x32 > 1 && x30 > 0 && x31 > -1 && x32 < x31 && x28 > 0 && x26 > 0 && x26 > x27 && x29 < x28 && x26 > x30 && x30 < x27 && x33 = x30 - 1 && x35 = x30 - 2 && x36 = x32 + 1
+
+Arcs:
+(1) -> (1), (2), (3)
+(2) -> (1), (2), (3)
+(3) -> (1), (2), (3)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(29) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(30)
+Obligation:
+Rules:
+f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, i1680:0:0, i1714:0:0, i1677:0:0, i1678:0:0) -> f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, i1680:0:0 + 1, i106:0:0 - 1, i1677:0:0, i1678:0:0) :|: i1714:0:0 < i106:0:0 && i96:0:0 > i1714:0:0 && i106:0:0 > -1 && i96:0:0 > i106:0:0 && i1678:0:0 > 1 && i96:0:0 > 0 && i1680:0:0 + 1 < i1679:0:0 && i1679:0:0 > 0
+f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x20:0, x21:0, x22:0) -> f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, x19:0 + 1, x17:0 - 1, x21:0, x25:0) :|: x20:0 < x17:0 && x20:0 < x16:0 && x17:0 > -1 && x17:0 < x16:0 && x22:0 > 1 && x16:0 > 0 && x19:0 + 1 < x18:0 && x18:0 > 0
+f11502_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f11502_0_createTree_InvokeMethod(x30:0, x30:0 - 1, x34:0, 0, x30:0 - 2, x31:0, x32:0 + 1) :|: x30:0 < x26:0 && x30:0 < x27:0 && x29:0 < x28:0 && x27:0 < x26:0 && x26:0 > 0 && x28:0 > 0 && x32:0 < x31:0 && x31:0 > -1 && x30:0 > 0 && x32:0 > 1 && x34:0 > 0
+
+----------------------------------------
+
+(31) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f11502_0_createTree_InvokeMethod(INTEGER, INTEGER, INTEGER, VARIABLE, INTEGER, VARIABLE, VARIABLE)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(32)
+Obligation:
+Rules:
+f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, i1680:0:0, i1714:0:0, i1677:0:0, i1678:0:0) -> f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, c, c1, i1677:0:0, i1678:0:0) :|: c1 = i106:0:0 - 1 && c = i1680:0:0 + 1 && (i1714:0:0 < i106:0:0 && i96:0:0 > i1714:0:0 && i106:0:0 > -1 && i96:0:0 > i106:0:0 && i1678:0:0 > 1 && i96:0:0 > 0 && i1680:0:0 + 1 < i1679:0:0 && i1679:0:0 > 0)
+f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x20:0, x21:0, x22:0) -> f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, c2, c3, x21:0, x25:0) :|: c3 = x17:0 - 1 && c2 = x19:0 + 1 && (x20:0 < x17:0 && x20:0 < x16:0 && x17:0 > -1 && x17:0 < x16:0 && x22:0 > 1 && x16:0 > 0 && x19:0 + 1 < x18:0 && x18:0 > 0)
+f11502_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f11502_0_createTree_InvokeMethod(x30:0, c4, x34:0, c5, c6, x31:0, c7) :|: c7 = x32:0 + 1 && (c6 = x30:0 - 2 && (c5 = 0 && c4 = x30:0 - 1)) && (x30:0 < x26:0 && x30:0 < x27:0 && x29:0 < x28:0 && x27:0 < x26:0 && x26:0 > 0 && x28:0 > 0 && x32:0 < x31:0 && x31:0 > -1 && x30:0 > 0 && x32:0 > 1 && x34:0 > 0)
+
+----------------------------------------
+
+(33) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f11502_0_createTree_InvokeMethod(x, x1, x2, x3, x4, x5, x6)] = -2 + x + x5
+
+The following rules are decreasing:
+f11502_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f11502_0_createTree_InvokeMethod(x30:0, c4, x34:0, c5, c6, x31:0, c7) :|: c7 = x32:0 + 1 && (c6 = x30:0 - 2 && (c5 = 0 && c4 = x30:0 - 1)) && (x30:0 < x26:0 && x30:0 < x27:0 && x29:0 < x28:0 && x27:0 < x26:0 && x26:0 > 0 && x28:0 > 0 && x32:0 < x31:0 && x31:0 > -1 && x30:0 > 0 && x32:0 > 1 && x34:0 > 0)
+The following rules are bounded:
+f11502_0_createTree_InvokeMethod(x26:0, x27:0, x28:0, x29:0, x30:0, x31:0, x32:0) -> f11502_0_createTree_InvokeMethod(x30:0, c4, x34:0, c5, c6, x31:0, c7) :|: c7 = x32:0 + 1 && (c6 = x30:0 - 2 && (c5 = 0 && c4 = x30:0 - 1)) && (x30:0 < x26:0 && x30:0 < x27:0 && x29:0 < x28:0 && x27:0 < x26:0 && x26:0 > 0 && x28:0 > 0 && x32:0 < x31:0 && x31:0 > -1 && x30:0 > 0 && x32:0 > 1 && x34:0 > 0)
+
+----------------------------------------
+
+(34)
+Obligation:
+Rules:
+f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, i1680:0:0, i1714:0:0, i1677:0:0, i1678:0:0) -> f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, c, c1, i1677:0:0, i1678:0:0) :|: c1 = i106:0:0 - 1 && c = i1680:0:0 + 1 && (i1714:0:0 < i106:0:0 && i96:0:0 > i1714:0:0 && i106:0:0 > -1 && i96:0:0 > i106:0:0 && i1678:0:0 > 1 && i96:0:0 > 0 && i1680:0:0 + 1 < i1679:0:0 && i1679:0:0 > 0)
+f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x20:0, x21:0, x22:0) -> f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, c2, c3, x21:0, x25:0) :|: c3 = x17:0 - 1 && c2 = x19:0 + 1 && (x20:0 < x17:0 && x20:0 < x16:0 && x17:0 > -1 && x17:0 < x16:0 && x22:0 > 1 && x16:0 > 0 && x19:0 + 1 < x18:0 && x18:0 > 0)
+
+----------------------------------------
+
+(35) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f11502_0_createTree_InvokeMethod(x, x1, x2, x3, x4, x5, x6)] = x1 + x2 - x3
+
+The following rules are decreasing:
+f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, i1680:0:0, i1714:0:0, i1677:0:0, i1678:0:0) -> f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, c, c1, i1677:0:0, i1678:0:0) :|: c1 = i106:0:0 - 1 && c = i1680:0:0 + 1 && (i1714:0:0 < i106:0:0 && i96:0:0 > i1714:0:0 && i106:0:0 > -1 && i96:0:0 > i106:0:0 && i1678:0:0 > 1 && i96:0:0 > 0 && i1680:0:0 + 1 < i1679:0:0 && i1679:0:0 > 0)
+f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x20:0, x21:0, x22:0) -> f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, c2, c3, x21:0, x25:0) :|: c3 = x17:0 - 1 && c2 = x19:0 + 1 && (x20:0 < x17:0 && x20:0 < x16:0 && x17:0 > -1 && x17:0 < x16:0 && x22:0 > 1 && x16:0 > 0 && x19:0 + 1 < x18:0 && x18:0 > 0)
+The following rules are bounded:
+f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, i1680:0:0, i1714:0:0, i1677:0:0, i1678:0:0) -> f11502_0_createTree_InvokeMethod(i96:0:0, i106:0:0, i1679:0:0, c, c1, i1677:0:0, i1678:0:0) :|: c1 = i106:0:0 - 1 && c = i1680:0:0 + 1 && (i1714:0:0 < i106:0:0 && i96:0:0 > i1714:0:0 && i106:0:0 > -1 && i96:0:0 > i106:0:0 && i1678:0:0 > 1 && i96:0:0 > 0 && i1680:0:0 + 1 < i1679:0:0 && i1679:0:0 > 0)
+
+----------------------------------------
+
+(36)
+Obligation:
+Rules:
+f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x20:0, x21:0, x22:0) -> f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, c2, c3, x21:0, x25:0) :|: c3 = x17:0 - 1 && c2 = x19:0 + 1 && (x20:0 < x17:0 && x20:0 < x16:0 && x17:0 > -1 && x17:0 < x16:0 && x22:0 > 1 && x16:0 > 0 && x19:0 + 1 < x18:0 && x18:0 > 0)
+
+----------------------------------------
+
+(37) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f11502_0_createTree_InvokeMethod(x, x1, x2, x3, x4, x5, x6)] = x2 - x3
+
+The following rules are decreasing:
+f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x20:0, x21:0, x22:0) -> f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, c2, c3, x21:0, x25:0) :|: c3 = x17:0 - 1 && c2 = x19:0 + 1 && (x20:0 < x17:0 && x20:0 < x16:0 && x17:0 > -1 && x17:0 < x16:0 && x22:0 > 1 && x16:0 > 0 && x19:0 + 1 < x18:0 && x18:0 > 0)
+The following rules are bounded:
+f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, x19:0, x20:0, x21:0, x22:0) -> f11502_0_createTree_InvokeMethod(x16:0, x17:0, x18:0, c2, c3, x21:0, x25:0) :|: c3 = x17:0 - 1 && c2 = x19:0 + 1 && (x20:0 < x17:0 && x20:0 < x16:0 && x17:0 > -1 && x17:0 < x16:0 && x22:0 > 1 && x16:0 > 0 && x19:0 + 1 < x18:0 && x18:0 > 0)
+
+----------------------------------------
+
+(38)
+YES

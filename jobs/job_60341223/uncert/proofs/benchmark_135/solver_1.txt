@@ -1,0 +1,87 @@
+YES
+We consider the system Jv5ga.
+
+  Alphabet:
+
+    O : [] --> nat 
+    rec : [nat * a * nat -> a -> a] --> a 
+    s : [nat] --> nat 
+
+  Rules:
+
+    rec(O, X, F) => X 
+    rec(s(X), Y, F) => F X rec(X, Y, F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(O, X, F) >? X 
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, O, rec, s}, and the following precedence: O > rec > @_{o -> o} > @_{o -> o -> o} > s
+
+With these choices, we have:
+
+  1] rec(O, X, F) > X  because [2], by definition 
+  2] rec*(O, X, F) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [5], by (Star) 
+  5] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [6] and [13], by (Copy) 
+  6] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec > @_{o -> o -> o}, [7] and [9], by (Copy) 
+  7] rec*(s(X), Y, F) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] rec*(s(X), Y, F) >= X  because [10], by (Select) 
+  10] s(X) >= X  because [11], by (Star) 
+  11] s*(X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+  13] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [14], [16] and [17], by (Stat) 
+  14] s(X) > X  because [15], by definition 
+  15] s*(X) >= X  because [12], by (Select) 
+  16] Y >= Y  by (Meta) 
+  17] F >= F  by (Meta) 
+
+We can thus remove the following rules:
+
+  rec(O, X, F) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, rec, s}, and the following precedence: rec > @_{o -> o -> o} > @_{o -> o} > s
+
+With these choices, we have:
+
+  1] rec(s(X), Y, F) > @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [2], by definition 
+  2] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [3] and [10], by (Copy) 
+  3] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec > @_{o -> o -> o}, [4] and [6], by (Copy) 
+  4] rec*(s(X), Y, F) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] rec*(s(X), Y, F) >= X  because [7], by (Select) 
+  7] s(X) >= X  because [8], by (Star) 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [11], [13] and [14], by (Stat) 
+  11] s(X) > X  because [12], by definition 
+  12] s*(X) >= X  because [9], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] F >= F  by (Meta) 
+
+We can thus remove the following rules:
+
+  rec(s(X), Y, F) => F X rec(X, Y, F) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

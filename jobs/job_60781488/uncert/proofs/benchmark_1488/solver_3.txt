@@ -1,0 +1,486 @@
+YES
+
+Problem 1: 
+
+(VAR vu95NonEmpty x)
+(RULES
+f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+)
+
+
+Problem 1: 
+
+Dependency Pairs Processor:
+-> Pairs:
+ F(a,f(b,x)) -> F(a,f(a,f(a,x)))
+ F(a,f(b,x)) -> F(a,f(a,x))
+ F(a,f(b,x)) -> F(a,x)
+ F(b,f(a,x)) -> F(b,f(b,f(b,x)))
+ F(b,f(a,x)) -> F(b,f(b,x))
+ F(b,f(a,x)) -> F(b,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+
+Problem 1: 
+
+SCC Processor:
+-> Pairs:
+ F(a,f(b,x)) -> F(a,f(a,f(a,x)))
+ F(a,f(b,x)) -> F(a,f(a,x))
+ F(a,f(b,x)) -> F(a,x)
+ F(b,f(a,x)) -> F(b,f(b,f(b,x)))
+ F(b,f(a,x)) -> F(b,f(b,x))
+ F(b,f(a,x)) -> F(b,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->Strongly Connected Components:
+->->Cycle:
+->->-> Pairs:
+ F(b,f(a,x)) -> F(b,f(b,f(b,x)))
+ F(b,f(a,x)) -> F(b,f(b,x))
+ F(b,f(a,x)) -> F(b,x)
+->->-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->->Cycle:
+->->-> Pairs:
+ F(a,f(b,x)) -> F(a,f(a,f(a,x)))
+ F(a,f(b,x)) -> F(a,f(a,x))
+ F(a,f(b,x)) -> F(a,x)
+->->-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+
+
+The problem is decomposed in 2 subproblems.
+
+Problem 1.1: 
+
+Reduction Pair Processor:
+-> Pairs:
+ F(b,f(a,x)) -> F(b,f(b,f(b,x)))
+ F(b,f(a,x)) -> F(b,f(b,x))
+ F(b,f(a,x)) -> F(b,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+-> Usable rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->AGES Output:
+ 
+Model Results
+
+System:
+mod InTheory is
+sort S .
+sort Bool .
+sort PSharp .
+
+
+op _->*_ : S S -> Bool [m = 2] .
+op _->_ : S S -> Bool [m = 2] .
+op f : S S -> S .
+op a :  -> S .
+op b :  -> S .
+op fSNonEmpty :  -> S .
+op _->P_ : PSharp PSharp -> Bool .
+op F : S S -> PSharp .
+op pi : S S -> S .
+op gtrsim : PSharp PSharp -> Bool .
+op succeq : PSharp PSharp -> Bool .
+op sqsupset : PSharp PSharp -> Bool [m = 1 wellfounded] .
+
+endm
+
+
+Property:
+gtrsim(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+succeq(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+gtrsim(x,y) /\ succeq(y,z) => gtrsim(x,z)
+x ->R y => gtrsim(x,y)
+_->P_(x,y) => gtrsim(x,y) \/ succeq(x,y) \/ sqsupset(x,y)
+x1 ->R y1 => f(x1,x2) ->R f(y1,x2)
+x2 ->R y2 => f(x1,x2) ->R f(x1,y2)
+x1 ->R y1 => F(x1,x2) ->R F(y1,x2)
+x2 ->R y2 => F(x1,x2) ->R F(x1,y2)
+f(a,f(b,x)) ->R f(a,f(a,f(a,x)))
+f(b,f(a,x)) ->R f(b,f(b,f(b,x)))
+_->P_(F(b,f(a,x)),F(b,f(b,x)))
+_->P_(F(b,f(a,x)),F(b,x))
+sqsupset(F(b,f(a,x)),F(b,f(b,f(b,x))))
+
+Results:
+
+
+Domains:
+S: {0 , 1}
+PSharp: -|N
+
+Function Interpretations:
+|[F(x_1_1:S,x_2_1:S)]| = - 1 - x_1_1:S - x_2_1:S
+|[a]| = 0
+|[b]| = 1
+|[f(x_1_1:S,x_2_1:S)]| = 1 - x_1_1:S
+|[fSNonEmpty]| = 1
+|[pi(x_1_1:S,x_2_1:S)]| = 0
+
+Predicate Interpretations:
+ x_1_1:PSharp ->P x_2_1:PSharp <=> ((1 + x_1_1:PSharp >= x_2_1:PSharp) /\ (x_2_1:PSharp >= x_1_1:PSharp))
+ x_1_1:S -> x_2_1:S <=> ((x_2_1:S >= x_1_1:S) /\ (x_1_1:S >= x_2_1:S))
+ x_1_1:PSharp -> x_2_1:PSharp <=> ((3 + x_1_1:PSharp >= 0) /\ (x_2_1:PSharp >= x_1_1:PSharp))
+gtrsim(x_1_1:PSharp,x_2_1:PSharp) <=> (x_2_1:PSharp >= x_1_1:PSharp)
+sqsupset(x_1_1:PSharp,x_2_1:PSharp) <=> (x_2_1:PSharp >= 1 + x_1_1:PSharp)
+succeq(x_1_1:PSharp,x_2_1:PSharp) <=> ((x_2_1:PSharp >= 1) /\ (x_2_1:PSharp >= x_1_1:PSharp))
+
+Problem 1.1: 
+
+SCC Processor:
+-> Pairs:
+ F(b,f(a,x)) -> F(b,f(b,x))
+ F(b,f(a,x)) -> F(b,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->Strongly Connected Components:
+->->Cycle:
+->->-> Pairs:
+ F(b,f(a,x)) -> F(b,f(b,x))
+ F(b,f(a,x)) -> F(b,x)
+->->-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+
+Problem 1.1: 
+
+Reduction Pair Processor:
+-> Pairs:
+ F(b,f(a,x)) -> F(b,f(b,x))
+ F(b,f(a,x)) -> F(b,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+-> Usable rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->AGES Output:
+ 
+Model Results
+
+System:
+mod InTheory is
+sort S .
+sort Bool .
+sort PSharp .
+
+
+op _->*_ : S S -> Bool [m = 2] .
+op _->_ : S S -> Bool [m = 2] .
+op f : S S -> S .
+op a :  -> S .
+op b :  -> S .
+op fSNonEmpty :  -> S .
+op _->P_ : PSharp PSharp -> Bool .
+op F : S S -> PSharp .
+op pi : S S -> S .
+op gtrsim : PSharp PSharp -> Bool .
+op succeq : PSharp PSharp -> Bool .
+op sqsupset : PSharp PSharp -> Bool [m = 1 wellfounded] .
+
+endm
+
+
+Property:
+gtrsim(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+succeq(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+gtrsim(x,y) /\ succeq(y,z) => gtrsim(x,z)
+x ->R y => gtrsim(x,y)
+_->P_(x,y) => gtrsim(x,y) \/ succeq(x,y) \/ sqsupset(x,y)
+x1 ->R y1 => f(x1,x2) ->R f(y1,x2)
+x2 ->R y2 => f(x1,x2) ->R f(x1,y2)
+x1 ->R y1 => F(x1,x2) ->R F(y1,x2)
+x2 ->R y2 => F(x1,x2) ->R F(x1,y2)
+f(a,f(b,x)) ->R f(a,f(a,f(a,x)))
+f(b,f(a,x)) ->R f(b,f(b,f(b,x)))
+_->P_(F(b,f(a,x)),F(b,x))
+sqsupset(F(b,f(a,x)),F(b,f(b,x)))
+
+Results:
+
+
+Domains:
+S: {0 , 1}
+PSharp: {-1 , 0 , 1}
+
+Function Interpretations:
+|[F(x_1_1:S,x_2_1:S)]| = x_2_1:S
+|[a]| = 1
+|[b]| = 0
+|[f(x_1_1:S,x_2_1:S)]| = x_1_1:S
+|[fSNonEmpty]| = 0
+|[pi(x_1_1:S,x_2_1:S)]| = 0
+
+Predicate Interpretations:
+ x_1_1:PSharp ->P x_2_1:PSharp <=> ((x_1_1:PSharp >= 1) /\ (1 >= x_2_1:PSharp))
+ x_1_1:S -> x_2_1:S <=> ((x_1_1:S >= x_2_1:S) /\ (x_1_1:S + x_2_1:S >= 0))
+ x_1_1:PSharp -> x_2_1:PSharp <=> ((x_1_1:PSharp >= x_2_1:PSharp) /\ (2.x_1_1:PSharp >= x_2_1:PSharp))
+gtrsim(x_1_1:PSharp,x_2_1:PSharp) <=> ((1 + x_1_1:PSharp >= 0) /\ (x_1_1:PSharp >= x_2_1:PSharp))
+sqsupset(x_1_1:PSharp,x_2_1:PSharp) <=> (x_1_1:PSharp >= 1 + x_2_1:PSharp)
+succeq(x_1_1:PSharp,x_2_1:PSharp) <=> ((x_2_1:PSharp >= 1 + x_1_1:PSharp) /\ (x_1_1:PSharp >= 1 + x_2_1:PSharp))
+
+Problem 1.1: 
+
+SCC Processor:
+-> Pairs:
+ F(b,f(a,x)) -> F(b,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->Strongly Connected Components:
+->->Cycle:
+->->-> Pairs:
+ F(b,f(a,x)) -> F(b,x)
+->->-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+
+Problem 1.1: 
+
+Subterm Processor:
+-> Pairs:
+ F(b,f(a,x)) -> F(b,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->Projection:
+ pi(F) = 2
+
+Problem 1.1: 
+
+SCC Processor:
+-> Pairs:
+ Empty
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->Strongly Connected Components:
+ There is no strongly connected component
+
+The problem is finite.
+
+Problem 1.2: 
+
+Reduction Pair Processor:
+-> Pairs:
+ F(a,f(b,x)) -> F(a,f(a,f(a,x)))
+ F(a,f(b,x)) -> F(a,f(a,x))
+ F(a,f(b,x)) -> F(a,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+-> Usable rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->AGES Output:
+ 
+Model Results
+
+System:
+mod InTheory is
+sort S .
+sort Bool .
+sort PSharp .
+
+
+op _->*_ : S S -> Bool [m = 2] .
+op _->_ : S S -> Bool [m = 2] .
+op f : S S -> S .
+op a :  -> S .
+op b :  -> S .
+op fSNonEmpty :  -> S .
+op _->P_ : PSharp PSharp -> Bool .
+op F : S S -> PSharp .
+op pi : S S -> S .
+op gtrsim : PSharp PSharp -> Bool .
+op succeq : PSharp PSharp -> Bool .
+op sqsupset : PSharp PSharp -> Bool [m = 1 wellfounded] .
+
+endm
+
+
+Property:
+gtrsim(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+succeq(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+gtrsim(x,y) /\ succeq(y,z) => gtrsim(x,z)
+x ->R y => gtrsim(x,y)
+_->P_(x,y) => gtrsim(x,y) \/ succeq(x,y) \/ sqsupset(x,y)
+x1 ->R y1 => f(x1,x2) ->R f(y1,x2)
+x2 ->R y2 => f(x1,x2) ->R f(x1,y2)
+x1 ->R y1 => F(x1,x2) ->R F(y1,x2)
+x2 ->R y2 => F(x1,x2) ->R F(x1,y2)
+f(a,f(b,x)) ->R f(a,f(a,f(a,x)))
+f(b,f(a,x)) ->R f(b,f(b,f(b,x)))
+_->P_(F(a,f(b,x)),F(a,f(a,x)))
+_->P_(F(a,f(b,x)),F(a,x))
+sqsupset(F(a,f(b,x)),F(a,f(a,f(a,x))))
+
+Results:
+
+
+Domains:
+S: {-1 , 0}
+PSharp: {-1 , 0}
+
+Function Interpretations:
+|[F(x_1_1:S,x_2_1:S)]| = x_2_1:S
+|[a]| = 0
+|[b]| = - 1
+|[f(x_1_1:S,x_2_1:S)]| = x_1_1:S
+|[fSNonEmpty]| = 0
+|[pi(x_1_1:S,x_2_1:S)]| = 0
+
+Predicate Interpretations:
+ x_1_1:PSharp ->P x_2_1:PSharp <=> ((0 >= 1 + x_1_1:PSharp + x_2_1:PSharp) /\ (x_2_1:PSharp >= x_1_1:PSharp))
+ x_1_1:S -> x_2_1:S <=> ((x_2_1:S >= x_1_1:S) /\ (x_1_1:S >= x_2_1:S))
+ x_1_1:PSharp -> x_2_1:PSharp <=> ((x_2_1:PSharp >= x_1_1:PSharp) /\ (x_1_1:PSharp >= x_2_1:PSharp))
+gtrsim(x_1_1:PSharp,x_2_1:PSharp) <=> ((x_2_1:PSharp >= x_1_1:PSharp) /\ (x_1_1:PSharp >= x_2_1:PSharp))
+sqsupset(x_1_1:PSharp,x_2_1:PSharp) <=> (x_2_1:PSharp >= 1 + x_1_1:PSharp)
+succeq(x_1_1:PSharp,x_2_1:PSharp) <=> ((0 >= 1 + x_2_1:PSharp) /\ (x_2_1:PSharp >= x_1_1:PSharp))
+
+Problem 1.2: 
+
+SCC Processor:
+-> Pairs:
+ F(a,f(b,x)) -> F(a,f(a,x))
+ F(a,f(b,x)) -> F(a,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->Strongly Connected Components:
+->->Cycle:
+->->-> Pairs:
+ F(a,f(b,x)) -> F(a,f(a,x))
+ F(a,f(b,x)) -> F(a,x)
+->->-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+
+Problem 1.2: 
+
+Reduction Pair Processor:
+-> Pairs:
+ F(a,f(b,x)) -> F(a,f(a,x))
+ F(a,f(b,x)) -> F(a,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+-> Usable rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->AGES Output:
+ 
+Model Results
+
+System:
+mod InTheory is
+sort S .
+sort Bool .
+sort PSharp .
+
+
+op _->*_ : S S -> Bool [m = 2] .
+op _->_ : S S -> Bool [m = 2] .
+op f : S S -> S .
+op a :  -> S .
+op b :  -> S .
+op fSNonEmpty :  -> S .
+op _->P_ : PSharp PSharp -> Bool .
+op F : S S -> PSharp .
+op pi : S S -> S .
+op gtrsim : PSharp PSharp -> Bool .
+op succeq : PSharp PSharp -> Bool .
+op sqsupset : PSharp PSharp -> Bool [m = 1 wellfounded] .
+
+endm
+
+
+Property:
+gtrsim(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+succeq(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+gtrsim(x,y) /\ succeq(y,z) => gtrsim(x,z)
+x ->R y => gtrsim(x,y)
+_->P_(x,y) => gtrsim(x,y) \/ succeq(x,y) \/ sqsupset(x,y)
+x1 ->R y1 => f(x1,x2) ->R f(y1,x2)
+x2 ->R y2 => f(x1,x2) ->R f(x1,y2)
+x1 ->R y1 => F(x1,x2) ->R F(y1,x2)
+x2 ->R y2 => F(x1,x2) ->R F(x1,y2)
+f(a,f(b,x)) ->R f(a,f(a,f(a,x)))
+f(b,f(a,x)) ->R f(b,f(b,f(b,x)))
+_->P_(F(a,f(b,x)),F(a,x))
+sqsupset(F(a,f(b,x)),F(a,f(a,x)))
+
+Results:
+
+
+Domains:
+S: {-1 , 0}
+PSharp: {-1 , 0}
+
+Function Interpretations:
+|[F(x_1_1:S,x_2_1:S)]| = x_2_1:S
+|[a]| = 0
+|[b]| = - 1
+|[f(x_1_1:S,x_2_1:S)]| = x_1_1:S
+|[fSNonEmpty]| = 0
+|[pi(x_1_1:S,x_2_1:S)]| = - 1
+
+Predicate Interpretations:
+ x_1_1:PSharp ->P x_2_1:PSharp <=> ((x_2_1:PSharp >= x_1_1:PSharp) /\ (0 >= x_1_1:PSharp))
+ x_1_1:S -> x_2_1:S <=> ((x_2_1:S >= x_1_1:S) /\ (x_1_1:S >= x_2_1:S))
+ x_1_1:PSharp -> x_2_1:PSharp <=> ((x_2_1:PSharp >= x_1_1:PSharp) /\ (x_1_1:PSharp >= x_2_1:PSharp))
+gtrsim(x_1_1:PSharp,x_2_1:PSharp) <=> ((1 >= x_2_1:PSharp) /\ (x_2_1:PSharp >= x_1_1:PSharp))
+sqsupset(x_1_1:PSharp,x_2_1:PSharp) <=> (x_2_1:PSharp >= 1 + x_1_1:PSharp)
+succeq(x_1_1:PSharp,x_2_1:PSharp) <=> ((x_2_1:PSharp >= x_1_1:PSharp) /\ (1 + x_1_1:PSharp >= x_2_1:PSharp))
+
+Problem 1.2: 
+
+SCC Processor:
+-> Pairs:
+ F(a,f(b,x)) -> F(a,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->Strongly Connected Components:
+->->Cycle:
+->->-> Pairs:
+ F(a,f(b,x)) -> F(a,x)
+->->-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+
+Problem 1.2: 
+
+Subterm Processor:
+-> Pairs:
+ F(a,f(b,x)) -> F(a,x)
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->Projection:
+ pi(F) = 2
+
+Problem 1.2: 
+
+SCC Processor:
+-> Pairs:
+ Empty
+-> Rules:
+ f(a,f(b,x)) -> f(a,f(a,f(a,x)))
+ f(b,f(a,x)) -> f(b,f(b,f(b,x)))
+->Strongly Connected Components:
+ There is no strongly connected component
+
+The problem is finite.

@@ -1,0 +1,68 @@
+YES
+We consider the system QadkA.
+
+  Alphabet:
+
+    O : [] --> a 
+    add : [] --> a -> a -> a 
+    curry : [a -> a -> a] --> a -> a -> a 
+    plus : [] --> a -> a -> a 
+    s : [a] --> a 
+
+  Rules:
+
+    plus O X => X 
+    plus s(X) Y => s(plus X Y) 
+    curry(F) X Y => F X Y 
+    add => curry(plus) 
+
+Symbol curry is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    O : [] --> a 
+    add : [] --> a -> a -> a 
+    plus : [] --> a -> a -> a 
+    s : [a] --> a 
+
+  Rules:
+
+    plus O X => X 
+    plus s(X) Y => s(plus X Y) 
+    add => plus 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus O X >? X 
+  plus s(X) Y >? s(plus X Y) 
+  add >? plus 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  add = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  plus = Lam[y0;y1].3*y0 + 3*y1 
+  s = Lam[y0].3 + y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[plus O _x0]] = 12 + 4*x0 > x0 = [[_x0]] 
+  [[plus s(_x0) _x1]] = 12 + 4*x0 + 4*x1 > 3 + 4*x0 + 4*x1 = [[s(plus _x0 _x1)]] 
+  [[add]] = Lam[y0;y1].3 + 3*y0 + 3*y1 > Lam[y0;y1].3*y0 + 3*y1 = [[plus]] 
+
+We can thus remove the following rules:
+
+  plus O X => X 
+  plus s(X) Y => s(plus X Y) 
+  add => plus 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

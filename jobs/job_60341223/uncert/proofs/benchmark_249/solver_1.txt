@@ -1,0 +1,442 @@
+YES
+We consider the system mBTDj.
+
+  Alphabet:
+
+    O : [] --> b 
+    add : [b * c] --> c 
+    app : [c * c] --> c 
+    false : [] --> a 
+    filter : [b -> a * c] --> c 
+    filter2 : [a * b -> a * b * c] --> c 
+    high : [b * c] --> c 
+    if!6220high : [a * b * c] --> c 
+    if!6220low : [a * b * c] --> c 
+    le : [b * b] --> a 
+    low : [b * c] --> c 
+    map : [b -> b * c] --> c 
+    minus : [b * b] --> b 
+    nil : [] --> c 
+    quicksort : [c] --> c 
+    quot : [b * b] --> b 
+    s : [b] --> b 
+    true : [] --> a 
+
+  Rules:
+
+    minus(X, O) => X 
+    minus(s(X), s(Y)) => minus(X, Y) 
+    quot(O, s(X)) => O 
+    quot(s(X), s(Y)) => s(quot(minus(X, Y), s(Y))) 
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    app(nil, X) => X 
+    app(add(X, Y), Z) => add(X, app(Y, Z)) 
+    low(X, nil) => nil 
+    low(X, add(Y, Z)) => if!6220low(le(Y, X), X, add(Y, Z)) 
+    if!6220low(true, X, add(Y, Z)) => add(Y, low(X, Z)) 
+    if!6220low(false, X, add(Y, Z)) => low(X, Z) 
+    high(X, nil) => nil 
+    high(X, add(Y, Z)) => if!6220high(le(Y, X), X, add(Y, Z)) 
+    if!6220high(true, X, add(Y, Z)) => high(X, Z) 
+    if!6220high(false, X, add(Y, Z)) => add(Y, high(X, Z)) 
+    quicksort(nil) => nil 
+    quicksort(add(X, Y)) => app(quicksort(low(X, Y)), add(X, quicksort(high(X, Y)))) 
+    map(F, nil) => nil 
+    map(F, add(X, Y)) => add(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, add(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => add(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We observe that the rules contain a first-order subset:
+
+  minus(X, O) => X 
+  minus(s(X), s(Y)) => minus(X, Y) 
+  quot(O, s(X)) => O 
+  quot(s(X), s(Y)) => s(quot(minus(X, Y), s(Y))) 
+  le(O, X) => true 
+  le(s(X), O) => false 
+  le(s(X), s(Y)) => le(X, Y) 
+  app(nil, X) => X 
+  app(add(X, Y), Z) => add(X, app(Y, Z)) 
+  low(X, nil) => nil 
+  low(X, add(Y, Z)) => if!6220low(le(Y, X), X, add(Y, Z)) 
+  if!6220low(true, X, add(Y, Z)) => add(Y, low(X, Z)) 
+  if!6220low(false, X, add(Y, Z)) => low(X, Z) 
+  high(X, nil) => nil 
+  high(X, add(Y, Z)) => if!6220high(le(Y, X), X, add(Y, Z)) 
+  if!6220high(true, X, add(Y, Z)) => high(X, Z) 
+  if!6220high(false, X, add(Y, Z)) => add(Y, high(X, Z)) 
+  quicksort(nil) => nil 
+  quicksort(add(X, Y)) => app(quicksort(low(X, Y)), add(X, quicksort(high(X, Y)))) 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: minus(PeRCenTX,O()) -> PeRCenTX
+ ||     2: minus(s(PeRCenTX),s(PeRCenTY)) -> minus(PeRCenTX,PeRCenTY)
+ ||     3: quot(O(),s(PeRCenTX)) -> O()
+ ||     4: quot(s(PeRCenTX),s(PeRCenTY)) -> s(quot(minus(PeRCenTX,PeRCenTY),s(PeRCenTY)))
+ ||     5: le(O(),PeRCenTX) -> true()
+ ||     6: le(s(PeRCenTX),O()) -> false()
+ ||     7: le(s(PeRCenTX),s(PeRCenTY)) -> le(PeRCenTX,PeRCenTY)
+ ||     8: app(nil(),PeRCenTX) -> PeRCenTX
+ ||     9: app(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> add(PeRCenTX,app(PeRCenTY,PeRCenTZ))
+ ||     10: low(PeRCenTX,nil()) -> nil()
+ ||     11: low(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> if!6220low(le(PeRCenTY,PeRCenTX),PeRCenTX,add(PeRCenTY,PeRCenTZ))
+ ||     12: if!6220low(true(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> add(PeRCenTY,low(PeRCenTX,PeRCenTZ))
+ ||     13: if!6220low(false(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> low(PeRCenTX,PeRCenTZ)
+ ||     14: high(PeRCenTX,nil()) -> nil()
+ ||     15: high(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> if!6220high(le(PeRCenTY,PeRCenTX),PeRCenTX,add(PeRCenTY,PeRCenTZ))
+ ||     16: if!6220high(true(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> high(PeRCenTX,PeRCenTZ)
+ ||     17: if!6220high(false(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> add(PeRCenTY,high(PeRCenTX,PeRCenTZ))
+ ||     18: quicksort(nil()) -> nil()
+ ||     19: quicksort(add(PeRCenTX,PeRCenTY)) -> app(quicksort(low(PeRCenTX,PeRCenTY)),add(PeRCenTX,quicksort(high(PeRCenTX,PeRCenTY))))
+ || Number of strict rules: 19
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #minus(s(PeRCenTX),s(PeRCenTY)) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #2: #if!6220low(false(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #low(PeRCenTX,PeRCenTZ)
+ ||    #3: #app(add(PeRCenTX,PeRCenTY),PeRCenTZ) -> #app(PeRCenTY,PeRCenTZ)
+ ||    #4: #low(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #if!6220low(le(PeRCenTY,PeRCenTX),PeRCenTX,add(PeRCenTY,PeRCenTZ))
+ ||    #5: #low(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #le(PeRCenTY,PeRCenTX)
+ ||    #6: #if!6220low(true(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #low(PeRCenTX,PeRCenTZ)
+ ||    #7: #le(s(PeRCenTX),s(PeRCenTY)) -> #le(PeRCenTX,PeRCenTY)
+ ||    #8: #if!6220high(false(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #high(PeRCenTX,PeRCenTZ)
+ ||    #9: #quicksort(add(PeRCenTX,PeRCenTY)) -> #app(quicksort(low(PeRCenTX,PeRCenTY)),add(PeRCenTX,quicksort(high(PeRCenTX,PeRCenTY))))
+ ||    #10: #quicksort(add(PeRCenTX,PeRCenTY)) -> #quicksort(low(PeRCenTX,PeRCenTY))
+ ||    #11: #quicksort(add(PeRCenTX,PeRCenTY)) -> #low(PeRCenTX,PeRCenTY)
+ ||    #12: #quicksort(add(PeRCenTX,PeRCenTY)) -> #quicksort(high(PeRCenTX,PeRCenTY))
+ ||    #13: #quicksort(add(PeRCenTX,PeRCenTY)) -> #high(PeRCenTX,PeRCenTY)
+ ||    #14: #if!6220high(true(),PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #high(PeRCenTX,PeRCenTZ)
+ ||    #15: #high(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #if!6220high(le(PeRCenTY,PeRCenTX),PeRCenTX,add(PeRCenTY,PeRCenTZ))
+ ||    #16: #high(PeRCenTX,add(PeRCenTY,PeRCenTZ)) -> #le(PeRCenTY,PeRCenTX)
+ ||    #17: #quot(s(PeRCenTX),s(PeRCenTY)) -> #quot(minus(PeRCenTX,PeRCenTY),s(PeRCenTY))
+ ||    #18: #quot(s(PeRCenTX),s(PeRCenTY)) -> #minus(PeRCenTX,PeRCenTY)
+ || Number of SCCs: 7, DPs: 12
+ ||   SCC { #1 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       s 	w: x1 + 1
+ ||       #le	w: 0
+ ||       minus	w: 0
+ ||       if!6220high	w: 0
+ ||       #if!6220high	w: 0
+ ||       #quicksort	w: 0
+ ||       #high	w: 0
+ ||       false	w: 0
+ ||       O 	w: 0
+ ||       quicksort	w: 0
+ ||       true	w: 0
+ ||       quot	w: 0
+ ||       high	w: 0
+ ||       nil	w: 0
+ ||       #app	w: 0
+ ||       #minus	w: x1 + x2
+ ||       low	w: 0
+ ||       if!6220low	w: 0
+ ||       add	w: 0
+ ||       #quot	w: 0
+ ||       #if!6220low	w: 0
+ ||       #low	w: 0
+ ||       app	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #1
+ || Number of SCCs: 6, DPs: 11
+ ||   SCC { #3 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       s 	w: 1
+ ||       #le	w: 0
+ ||       minus	w: 0
+ ||       if!6220high	w: 0
+ ||       #if!6220high	w: 0
+ ||       #quicksort	w: 0
+ ||       #high	w: 0
+ ||       false	w: 0
+ ||       O 	w: 0
+ ||       quicksort	w: 0
+ ||       true	w: 0
+ ||       quot	w: 0
+ ||       high	w: 0
+ ||       nil	w: 0
+ ||       #app	w: x1
+ ||       #minus	w: 0
+ ||       low	w: 0
+ ||       if!6220low	w: 0
+ ||       add	w: x2 + 1
+ ||       #quot	w: 0
+ ||       #if!6220low	w: 0
+ ||       #low	w: 0
+ ||       app	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #3
+ || Number of SCCs: 5, DPs: 10
+ ||   SCC { #7 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       s 	w: x1 + 1
+ ||       #le	w: x1
+ ||       minus	w: 0
+ ||       if!6220high	w: 0
+ ||       #if!6220high	w: 0
+ ||       #quicksort	w: 0
+ ||       #high	w: 0
+ ||       false	w: 0
+ ||       O 	w: 0
+ ||       quicksort	w: 0
+ ||       true	w: 0
+ ||       quot	w: 0
+ ||       high	w: 0
+ ||       nil	w: 0
+ ||       #app	w: 0
+ ||       #minus	w: 0
+ ||       low	w: 0
+ ||       if!6220low	w: 0
+ ||       add	w: 1
+ ||       #quot	w: 0
+ ||       #if!6220low	w: 0
+ ||       #low	w: 0
+ ||       app	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #7
+ || Number of SCCs: 4, DPs: 9
+ ||   SCC { #17 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       s 	w: x1 + 2
+ ||       #le	w: 0
+ ||       minus	w: x1 + 1
+ ||       if!6220high	w: 0
+ ||       #if!6220high	w: 0
+ ||       #quicksort	w: 0
+ ||       #high	w: 0
+ ||       false	w: 0
+ ||       O 	w: 1
+ ||       quicksort	w: 0
+ ||       true	w: 0
+ ||       quot	w: 0
+ ||       high	w: 0
+ ||       nil	w: 0
+ ||       #app	w: 0
+ ||       #minus	w: 0
+ ||       low	w: 0
+ ||       if!6220low	w: 0
+ ||       add	w: 1
+ ||       #quot	w: x1
+ ||       #if!6220low	w: 0
+ ||       #low	w: 0
+ ||       app	w: 0
+ ||     USABLE RULES: { 1 2 }
+ ||     Removed DPs: #17
+ || Number of SCCs: 3, DPs: 8
+ ||   SCC { #10 #12 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: x1 + x2 + 1
+ ||       s 	w: x1 + 1
+ ||       #le	w: 0
+ ||       minus	w: x1 + 1
+ ||       if!6220high	w: x2 + x3 + 1
+ ||       #if!6220high	w: 0
+ ||       #quicksort	w: x1
+ ||       #high	w: 0
+ ||       false	w: 4
+ ||       O 	w: 1
+ ||       quicksort	w: 0
+ ||       true	w: 3
+ ||       quot	w: 0
+ ||       high	w: x1 + x2 + 1
+ ||       nil	w: 1
+ ||       #app	w: 0
+ ||       #minus	w: 0
+ ||       low	w: x1 + x2 + 1
+ ||       if!6220low	w: x2 + x3 + 1
+ ||       add	w: x1 + x2 + 2
+ ||       #quot	w: x1
+ ||       #if!6220low	w: 0
+ ||       #low	w: 0
+ ||       app	w: 0
+ ||     USABLE RULES: { 1 2 10..17 }
+ ||     Removed DPs: #10 #12
+ || Number of SCCs: 2, DPs: 6
+ ||   SCC { #8 #14 #15 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 1
+ ||       s 	w: x1
+ ||       #le	w: 0
+ ||       minus	w: x1 + 1
+ ||       if!6220high	w: x2 + x3 + 1
+ ||       #if!6220high	w: x1 + x2 + x3
+ ||       #quicksort	w: x1
+ ||       #high	w: x1 + x2 + 2
+ ||       false	w: 1
+ ||       O 	w: 0
+ ||       quicksort	w: 0
+ ||       true	w: 1
+ ||       quot	w: 0
+ ||       high	w: x1 + x2 + 1
+ ||       nil	w: 1
+ ||       #app	w: 0
+ ||       #minus	w: 0
+ ||       low	w: x1 + x2 + 1
+ ||       if!6220low	w: x2 + x3 + 1
+ ||       add	w: x2 + 2
+ ||       #quot	w: x1
+ ||       #if!6220low	w: 0
+ ||       #low	w: 0
+ ||       app	w: 0
+ ||     USABLE RULES: { 1 2 5..7 10..17 }
+ ||     Removed DPs: #8 #14 #15
+ || Number of SCCs: 1, DPs: 3
+ ||   SCC { #2 #4 #6 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: x1 + x2 + 1
+ ||       s 	w: x1 + 1
+ ||       #le	w: 0
+ ||       minus	w: x1 + 1
+ ||       if!6220high	w: x1 + x2 + x3 + 1
+ ||       #if!6220high	w: 0
+ ||       #quicksort	w: 0
+ ||       #high	w: 2
+ ||       false	w: 3
+ ||       O 	w: 2
+ ||       quicksort	w: 0
+ ||       true	w: 3
+ ||       quot	w: 0
+ ||       high	w: x1 + 4
+ ||       nil	w: 0
+ ||       #app	w: 0
+ ||       #minus	w: 0
+ ||       low	w: x1 + 3
+ ||       if!6220low	w: x3 + 1
+ ||       add	w: x1 + x2 + 2
+ ||       #quot	w: x1
+ ||       #if!6220low	w: x2 + x3
+ ||       #low	w: x1 + x2 + 1
+ ||       app	w: 0
+ ||     USABLE RULES: { 1 2 10 14 }
+ ||     Removed DPs: #2 #4 #6
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] map#(F, add(X, Y)) =#> map#(F, Y)   
+    1] filter#(F, add(X, Y)) =#> filter2#(F X, F, X, Y)   
+    2] filter2#(true, F, X, Y) =#> filter#(F, Y)   
+    3] filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+  Rules R_0:
+
+    minus(X, O) => X 
+    minus(s(X), s(Y)) => minus(X, Y) 
+    quot(O, s(X)) => O 
+    quot(s(X), s(Y)) => s(quot(minus(X, Y), s(Y))) 
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    app(nil, X) => X 
+    app(add(X, Y), Z) => add(X, app(Y, Z)) 
+    low(X, nil) => nil 
+    low(X, add(Y, Z)) => if!6220low(le(Y, X), X, add(Y, Z)) 
+    if!6220low(true, X, add(Y, Z)) => add(Y, low(X, Z)) 
+    if!6220low(false, X, add(Y, Z)) => low(X, Z) 
+    high(X, nil) => nil 
+    high(X, add(Y, Z)) => if!6220high(le(Y, X), X, add(Y, Z)) 
+    if!6220high(true, X, add(Y, Z)) => high(X, Z) 
+    if!6220high(false, X, add(Y, Z)) => add(Y, high(X, Z)) 
+    quicksort(nil) => nil 
+    quicksort(add(X, Y)) => app(quicksort(low(X, Y)), add(X, quicksort(high(X, Y)))) 
+    map(F, nil) => nil 
+    map(F, add(X, Y)) => add(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, add(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => add(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0 
+    * 1 : 2, 3 
+    * 2 : 1 
+    * 3 : 1 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    map#(F, add(X, Y)) =#> map#(F, Y)   
+
+  P_2:
+
+    filter#(F, add(X, Y)) =#> filter2#(F X, F, X, Y)   
+    filter2#(true, F, X, Y) =#> filter#(F, Y)   
+    filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f) and (P_2, R_0, m, f).
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_2, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(filter2#) = 4 
+  nu(filter#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(filter#(F, add(X, Y))) = add(X, Y) |> Y = nu(filter2#(F X, F, X, Y)) 
+  nu(filter2#(true, F, X, Y)) = Y = Y = nu(filter#(F, Y)) 
+  nu(filter2#(false, F, X, Y)) = Y = Y = nu(filter#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_2, R_0, computable, f) by (P_3, R_0, computable, f), where P_3 contains:
+
+  filter2#(true, F, X, Y) =#> filter#(F, Y)   
+  filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_3, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_3, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+    * 1 :  
+
+This graph has no strongly connected components.  By [Kop12, Thm. 7.31], this implies finiteness of the dependency pair problem.
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(map#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(map#(F, add(X, Y))) = add(X, Y) |> Y = nu(map#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

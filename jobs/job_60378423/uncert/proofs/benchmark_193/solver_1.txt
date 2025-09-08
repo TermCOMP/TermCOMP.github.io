@@ -1,0 +1,888 @@
+MAYBE
+proof of /hpcwork/ff862203/termcomp25/benchmarks/BSat5.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could not be shown:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 435 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 60 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (13) IRSwT
+        (14) TempFilterProof [SOUND, 692 ms]
+        (15) IRSwT
+        (16) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (17) IRSwT
+    (18) JBCTerminationSCC
+        (19) SCCToIRSProof [SOUND, 36 ms]
+        (20) IRSwT
+        (21) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (22) IRSwT
+        (23) IRSwTTerminationDigraphProof [EQUIVALENT, 23 ms]
+        (24) IRSwT
+        (25) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (26) IRSwT
+        (27) FilterProof [EQUIVALENT, 0 ms]
+        (28) IntTRS
+        (29) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (30) IntTRS
+        (31) IntTRSPeriodicNontermProof [COMPLETE, 46 ms]
+        (32) NO
+    (33) JBCTerminationSCC
+        (34) SCCToIRSProof [SOUND, 42 ms]
+        (35) IRSwT
+        (36) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (37) IRSwT
+        (38) IRSwTTerminationDigraphProof [EQUIVALENT, 14 ms]
+        (39) IRSwT
+        (40) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (41) IRSwT
+        (42) TempFilterProof [SOUND, 16 ms]
+        (43) IntTRS
+        (44) PolynomialOrderProcessor [EQUIVALENT, 6 ms]
+        (45) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+/**
+ * Rather inefficient random number generator that can generate infinitely
+ * many positive integers from a single positive integer (the
+ * "random source") by taking the exponents of its prime factorization.
+ */
+public class RandomHard {
+
+  // a single natural number, to give rise to infinitely many natural numbers
+  // from its prime factorization (if the datatype int had infinite precision)
+  final private int source;
+
+  // use the exponent of the nextPrimeIndex-th prime in the unique
+  // prime factorization of source as the next "randomly generated"
+  // natural number
+  private int nextPrimeIndex;
+  
+  public RandomHard(int source) {
+    this.source = source;
+    this.nextPrimeIndex = 1;
+  }
+
+  public static void main(String[] args) {
+    int source = args[0].length();
+
+    if (source < 1) {
+      return;
+    }
+    RandomHard random = new RandomHard(source);
+    int limit = args[1].length();
+    for (int i = 0; i < limit; ++i) {
+      random.getNext();
+    }
+  }
+  
+  /** @return the next (random!) natural number */
+  public int getNext() {
+    int prime = findKthPrime(this.nextPrimeIndex);
+    ++this.nextPrimeIndex;
+    int res = getPowerOfKInSource(prime);
+    return res;
+  }
+
+  /** @return How often can we divide source by k without remainder? */
+  private int getPowerOfKInSource(int k) {
+    /*if (k < 2) {
+      throw new RuntimeException("Divide only by primes -- they are >= 2!");
+    }*/
+    int divisor = this.source;
+    int res = 0;
+    while (divisor % k == 0) {
+      divisor = divisor / k;
+      ++res;
+    }
+    return res;
+  }
+  
+  /** @return the k-th prime number for k &gt; 0 */
+  private int findKthPrime(int k) {
+    int yippi = 0;
+    int cand = 1;
+    // termination of this loop on the integers follows from
+    // the existence of infinitely many prime numbers
+    while (yippi < k) {
+      ++cand;  // all prime numbers are >= 2, so increment
+      boolean isPrime = checkPrime(cand);
+      if (isPrime) {
+        ++yippi;
+      }
+    }
+    return cand;
+  }
+
+  /** @return Is n prime? */
+  private static boolean checkPrime(int n) {
+    if (n < 2) {
+      return false;
+    }
+    for (int i = 2; i < n; ++i) {
+      if (n % i == 0) { // i divides n and 1 < i < n
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+/**
+ * Rather inefficient random number generator that can generate infinitely
+ * many positive integers from a single positive integer (the
+ * "random source") by taking the exponents of its prime factorization.
+ */
+public class RandomHard {
+
+  // a single natural number, to give rise to infinitely many natural numbers
+  // from its prime factorization (if the datatype int had infinite precision)
+  final private int source;
+
+  // use the exponent of the nextPrimeIndex-th prime in the unique
+  // prime factorization of source as the next "randomly generated"
+  // natural number
+  private int nextPrimeIndex;
+  
+  public RandomHard(int source) {
+    this.source = source;
+    this.nextPrimeIndex = 1;
+  }
+
+  public static void main(String[] args) {
+    int source = args[0].length();
+
+    if (source < 1) {
+      return;
+    }
+    RandomHard random = new RandomHard(source);
+    int limit = args[1].length();
+    for (int i = 0; i < limit; ++i) {
+      random.getNext();
+    }
+  }
+  
+  /** @return the next (random!) natural number */
+  public int getNext() {
+    int prime = findKthPrime(this.nextPrimeIndex);
+    ++this.nextPrimeIndex;
+    int res = getPowerOfKInSource(prime);
+    return res;
+  }
+
+  /** @return How often can we divide source by k without remainder? */
+  private int getPowerOfKInSource(int k) {
+    /*if (k < 2) {
+      throw new RuntimeException("Divide only by primes -- they are >= 2!");
+    }*/
+    int divisor = this.source;
+    int res = 0;
+    while (divisor % k == 0) {
+      divisor = divisor / k;
+      ++res;
+    }
+    return res;
+  }
+  
+  /** @return the k-th prime number for k &gt; 0 */
+  private int findKthPrime(int k) {
+    int yippi = 0;
+    int cand = 1;
+    // termination of this loop on the integers follows from
+    // the existence of infinitely many prime numbers
+    while (yippi < k) {
+      ++cand;  // all prime numbers are >= 2, so increment
+      boolean isPrime = checkPrime(cand);
+      if (isPrime) {
+        ++yippi;
+      }
+    }
+    return cand;
+  }
+
+  /** @return Is n prime? */
+  private static boolean checkPrime(int n) {
+    if (n < 2) {
+      return false;
+    }
+    for (int i = 2; i < n; ++i) {
+      if (n % i == 0) { // i divides n and 1 < i < n
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+RandomHard.main([Ljava/lang/String;)V: Graph of 161 nodes with 1 SCC.
+
+
+
+RandomHard.getNext()I: Graph of 68 nodes with 1 SCC.
+
+
+
+RandomHard.findKthPrime(I)I: Graph of 64 nodes with 1 SCC.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 3 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: RandomHard.findKthPrime(I)I
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 56 IRulesP rules:
+f7820_0_findKthPrime_Load(EOS(STATIC_7820), i687, i687, i688, i689, i688) -> f7823_0_findKthPrime_GE(EOS(STATIC_7823), i687, i687, i688, i689, i688, i687) :|: TRUE
+f7823_0_findKthPrime_GE(EOS(STATIC_7823), i687, i687, i688, i689, i688, i687) -> f7828_0_findKthPrime_GE(EOS(STATIC_7828), i687, i687, i688, i689, i688, i687) :|: i688 < i687
+f7828_0_findKthPrime_GE(EOS(STATIC_7828), i687, i687, i688, i689, i688, i687) -> f7857_0_findKthPrime_Inc(EOS(STATIC_7857), i687, i687, i688, i689) :|: i688 < i687
+f7857_0_findKthPrime_Inc(EOS(STATIC_7857), i687, i687, i688, i689) -> f7861_0_findKthPrime_Load(EOS(STATIC_7861), i687, i687, i688, i689 + 1) :|: TRUE
+f7861_0_findKthPrime_Load(EOS(STATIC_7861), i687, i687, i688, i696) -> f7865_0_findKthPrime_InvokeMethod(EOS(STATIC_7865), i687, i687, i688, i696, i696) :|: TRUE
+f7865_0_findKthPrime_InvokeMethod(EOS(STATIC_7865), i687, i687, i688, i696, i696) -> f7868_0_checkPrime_Load(EOS(STATIC_7868), i687, i687, i688, i696, i696) :|: TRUE
+f7868_0_checkPrime_Load(EOS(STATIC_7868), i687, i687, i688, i696, i696) -> f7874_0_checkPrime_ConstantStackPush(EOS(STATIC_7874), i687, i687, i688, i696, i696, i696) :|: TRUE
+f7874_0_checkPrime_ConstantStackPush(EOS(STATIC_7874), i687, i687, i688, i696, i696, i696) -> f7876_0_checkPrime_GE(EOS(STATIC_7876), i687, i687, i688, i696, i696, i696, 2) :|: TRUE
+f7876_0_checkPrime_GE(EOS(STATIC_7876), i687, i687, i688, i705, i705, i705, matching1) -> f7878_0_checkPrime_GE(EOS(STATIC_7878), i687, i687, i688, i705, i705, i705, 2) :|: TRUE && matching1 = 2
+f7876_0_checkPrime_GE(EOS(STATIC_7876), i687, i687, i688, i706, i706, i706, matching1) -> f7879_0_checkPrime_GE(EOS(STATIC_7879), i687, i687, i688, i706, i706, i706, 2) :|: TRUE && matching1 = 2
+f7878_0_checkPrime_GE(EOS(STATIC_7878), i687, i687, i688, i705, i705, i705, matching1) -> f7881_0_checkPrime_ConstantStackPush(EOS(STATIC_7881), i687, i687, i688, i705) :|: i705 < 2 && matching1 = 2
+f7881_0_checkPrime_ConstantStackPush(EOS(STATIC_7881), i687, i687, i688, i705) -> f7884_0_checkPrime_Return(EOS(STATIC_7884), i687, i687, i688, i705, 0) :|: TRUE
+f7884_0_checkPrime_Return(EOS(STATIC_7884), i687, i687, i688, i705, matching1) -> f7887_0_findKthPrime_Store(EOS(STATIC_7887), i687, i687, i688, i705, 0) :|: TRUE && matching1 = 0
+f7887_0_findKthPrime_Store(EOS(STATIC_7887), i687, i687, i688, i705, matching1) -> f7890_0_findKthPrime_Load(EOS(STATIC_7890), i687, i687, i688, i705, 0) :|: TRUE && matching1 = 0
+f7890_0_findKthPrime_Load(EOS(STATIC_7890), i687, i687, i688, i705, matching1) -> f7893_0_findKthPrime_EQ(EOS(STATIC_7893), i687, i687, i688, i705, 0) :|: TRUE && matching1 = 0
+f7893_0_findKthPrime_EQ(EOS(STATIC_7893), i687, i687, i688, i705, matching1) -> f7896_0_findKthPrime_JMP(EOS(STATIC_7896), i687, i687, i688, i705) :|: TRUE && matching1 = 0
+f7896_0_findKthPrime_JMP(EOS(STATIC_7896), i687, i687, i688, i705) -> f7907_0_findKthPrime_Load(EOS(STATIC_7907), i687, i687, i688, i705) :|: TRUE
+f7907_0_findKthPrime_Load(EOS(STATIC_7907), i687, i687, i688, i705) -> f7815_0_findKthPrime_Load(EOS(STATIC_7815), i687, i687, i688, i705) :|: TRUE
+f7815_0_findKthPrime_Load(EOS(STATIC_7815), i687, i687, i688, i689) -> f7820_0_findKthPrime_Load(EOS(STATIC_7820), i687, i687, i688, i689, i688) :|: TRUE
+f7879_0_checkPrime_GE(EOS(STATIC_7879), i687, i687, i688, i706, i706, i706, matching1) -> f7882_0_checkPrime_ConstantStackPush(EOS(STATIC_7882), i687, i687, i688, i706, i706) :|: i706 >= 2 && matching1 = 2
+f7882_0_checkPrime_ConstantStackPush(EOS(STATIC_7882), i687, i687, i688, i706, i706) -> f7885_0_checkPrime_Store(EOS(STATIC_7885), i687, i687, i688, i706, i706, 2) :|: TRUE
+f7885_0_checkPrime_Store(EOS(STATIC_7885), i687, i687, i688, i706, i706, matching1) -> f7888_0_checkPrime_Load(EOS(STATIC_7888), i687, i687, i688, i706, i706, 2) :|: TRUE && matching1 = 2
+f7888_0_checkPrime_Load(EOS(STATIC_7888), i687, i687, i688, i706, i706, matching1) -> f8016_0_checkPrime_Load(EOS(STATIC_8016), i687, i687, i688, i706, i706, 2) :|: TRUE && matching1 = 2
+f8016_0_checkPrime_Load(EOS(STATIC_8016), i687, i687, i688, i717, i717, i718) -> f8252_0_checkPrime_Load(EOS(STATIC_8252), i687, i687, i688, i717, i717, i718) :|: TRUE
+f8252_0_checkPrime_Load(EOS(STATIC_8252), i687, i687, i688, i755, i755, i756) -> f8485_0_checkPrime_Load(EOS(STATIC_8485), i687, i687, i688, i755, i755, i756) :|: TRUE
+f8485_0_checkPrime_Load(EOS(STATIC_8485), i687, i687, i688, i793, i793, i794) -> f8496_0_checkPrime_Load(EOS(STATIC_8496), i687, i687, i688, i793, i793, i794, i794) :|: TRUE
+f8496_0_checkPrime_Load(EOS(STATIC_8496), i687, i687, i688, i793, i793, i794, i794) -> f8540_0_checkPrime_GE(EOS(STATIC_8540), i687, i687, i688, i793, i793, i794, i794, i793) :|: TRUE
+f8540_0_checkPrime_GE(EOS(STATIC_8540), i687, i687, i688, i793, i793, i794, i794, i793) -> f8671_0_checkPrime_GE(EOS(STATIC_8671), i687, i687, i688, i793, i793, i794, i794, i793) :|: i794 >= i793
+f8540_0_checkPrime_GE(EOS(STATIC_8540), i687, i687, i688, i793, i793, i794, i794, i793) -> f8673_0_checkPrime_GE(EOS(STATIC_8673), i687, i687, i688, i793, i793, i794, i794, i793) :|: i794 < i793
+f8671_0_checkPrime_GE(EOS(STATIC_8671), i687, i687, i688, i793, i793, i794, i794, i793) -> f8684_0_checkPrime_ConstantStackPush(EOS(STATIC_8684), i687, i687, i688, i793) :|: i794 >= i793
+f8684_0_checkPrime_ConstantStackPush(EOS(STATIC_8684), i687, i687, i688, i793) -> f8744_0_checkPrime_Return(EOS(STATIC_8744), i687, i687, i688, i793, 1) :|: TRUE
+f8744_0_checkPrime_Return(EOS(STATIC_8744), i687, i687, i688, i793, matching1) -> f8764_0_findKthPrime_Store(EOS(STATIC_8764), i687, i687, i688, i793, 1) :|: TRUE && matching1 = 1
+f8764_0_findKthPrime_Store(EOS(STATIC_8764), i687, i687, i688, i793, matching1) -> f8886_0_findKthPrime_Load(EOS(STATIC_8886), i687, i687, i688, i793, 1) :|: TRUE && matching1 = 1
+f8886_0_findKthPrime_Load(EOS(STATIC_8886), i687, i687, i688, i793, matching1) -> f8903_0_findKthPrime_EQ(EOS(STATIC_8903), i687, i687, i688, i793, 1) :|: TRUE && matching1 = 1
+f8903_0_findKthPrime_EQ(EOS(STATIC_8903), i687, i687, i688, i793, matching1) -> f8916_0_findKthPrime_Inc(EOS(STATIC_8916), i687, i687, i688, i793) :|: 1 > 0 && matching1 = 1
+f8916_0_findKthPrime_Inc(EOS(STATIC_8916), i687, i687, i688, i793) -> f8921_0_findKthPrime_JMP(EOS(STATIC_8921), i687, i687, i688 + 1, i793) :|: TRUE
+f8921_0_findKthPrime_JMP(EOS(STATIC_8921), i687, i687, i852, i793) -> f8944_0_findKthPrime_Load(EOS(STATIC_8944), i687, i687, i852, i793) :|: TRUE
+f8944_0_findKthPrime_Load(EOS(STATIC_8944), i687, i687, i852, i793) -> f7815_0_findKthPrime_Load(EOS(STATIC_7815), i687, i687, i852, i793) :|: TRUE
+f8673_0_checkPrime_GE(EOS(STATIC_8673), i687, i687, i688, i793, i793, i794, i794, i793) -> f8734_0_checkPrime_Load(EOS(STATIC_8734), i687, i687, i688, i793, i793, i794) :|: i794 < i793
+f8734_0_checkPrime_Load(EOS(STATIC_8734), i687, i687, i688, i793, i793, i794) -> f8746_0_checkPrime_Load(EOS(STATIC_8746), i687, i687, i688, i793, i793, i794, i793) :|: TRUE
+f8746_0_checkPrime_Load(EOS(STATIC_8746), i687, i687, i688, i793, i793, i794, i793) -> f8766_0_checkPrime_IntArithmetic(EOS(STATIC_8766), i687, i687, i688, i793, i793, i794, i793, i794) :|: TRUE
+f8766_0_checkPrime_IntArithmetic(EOS(STATIC_8766), i687, i687, i688, i793, i793, i794, i793, i794) -> f8890_0_checkPrime_NE(EOS(STATIC_8890), i687, i687, i688, i793, i793, i794, i793 % i794) :|: TRUE
+f8890_0_checkPrime_NE(EOS(STATIC_8890), i687, i687, i688, i793, i793, i794, i851) -> f8906_0_checkPrime_NE(EOS(STATIC_8906), i687, i687, i688, i793, i793, i794, i851) :|: TRUE
+f8890_0_checkPrime_NE(EOS(STATIC_8890), i687, i687, i688, i793, i793, i794, matching1) -> f8907_0_checkPrime_NE(EOS(STATIC_8907), i687, i687, i688, i793, i793, i794, 0) :|: TRUE && matching1 = 0
+f8906_0_checkPrime_NE(EOS(STATIC_8906), i687, i687, i688, i793, i793, i794, i851) -> f8917_0_checkPrime_Inc(EOS(STATIC_8917), i687, i687, i688, i793, i793, i794) :|: i851 > 0
+f8917_0_checkPrime_Inc(EOS(STATIC_8917), i687, i687, i688, i793, i793, i794) -> f8924_0_checkPrime_JMP(EOS(STATIC_8924), i687, i687, i688, i793, i793, i794 + 1) :|: TRUE
+f8924_0_checkPrime_JMP(EOS(STATIC_8924), i687, i687, i688, i793, i793, i853) -> f8981_0_checkPrime_Load(EOS(STATIC_8981), i687, i687, i688, i793, i793, i853) :|: TRUE
+f8981_0_checkPrime_Load(EOS(STATIC_8981), i687, i687, i688, i793, i793, i853) -> f8485_0_checkPrime_Load(EOS(STATIC_8485), i687, i687, i688, i793, i793, i853) :|: TRUE
+f8907_0_checkPrime_NE(EOS(STATIC_8907), i687, i687, i688, i793, i793, i794, matching1) -> f8918_0_checkPrime_ConstantStackPush(EOS(STATIC_8918), i687, i687, i688, i793) :|: TRUE && matching1 = 0
+f8918_0_checkPrime_ConstantStackPush(EOS(STATIC_8918), i687, i687, i688, i793) -> f8926_0_checkPrime_Return(EOS(STATIC_8926), i687, i687, i688, i793, 0) :|: TRUE
+f8926_0_checkPrime_Return(EOS(STATIC_8926), i687, i687, i688, i793, matching1) -> f8984_0_findKthPrime_Store(EOS(STATIC_8984), i687, i687, i688, i793, 0) :|: TRUE && matching1 = 0
+f8984_0_findKthPrime_Store(EOS(STATIC_8984), i687, i687, i688, i793, matching1) -> f8995_0_findKthPrime_Load(EOS(STATIC_8995), i687, i687, i688, i793, 0) :|: TRUE && matching1 = 0
+f8995_0_findKthPrime_Load(EOS(STATIC_8995), i687, i687, i688, i793, matching1) -> f9000_0_findKthPrime_EQ(EOS(STATIC_9000), i687, i687, i688, i793, 0) :|: TRUE && matching1 = 0
+f9000_0_findKthPrime_EQ(EOS(STATIC_9000), i687, i687, i688, i793, matching1) -> f9044_0_findKthPrime_JMP(EOS(STATIC_9044), i687, i687, i688, i793) :|: TRUE && matching1 = 0
+f9044_0_findKthPrime_JMP(EOS(STATIC_9044), i687, i687, i688, i793) -> f9105_0_findKthPrime_Load(EOS(STATIC_9105), i687, i687, i688, i793) :|: TRUE
+f9105_0_findKthPrime_Load(EOS(STATIC_9105), i687, i687, i688, i793) -> f7815_0_findKthPrime_Load(EOS(STATIC_7815), i687, i687, i688, i793) :|: TRUE
+Combined rules. Obtained 7 IRulesP rules:
+f8540_0_checkPrime_GE(EOS(STATIC_8540), i687:0, i687:0, i688:0, i793:0, i793:0, i794:0, i794:0, i793:0) -> f8540_0_checkPrime_GE'(EOS(STATIC_8540), i687:0, i687:0, i688:0, i793:0, i793:0, i794:0, i794:0, i793:0) :|: i794:0 < i793:0 && i793:0 - i794:0 * div > 0
+f8540_0_checkPrime_GE'(EOS(STATIC_8540), i687:0, i687:0, i688:0, i793:0, i793:0, i794:0, i794:0, i793:0) -> f8540_0_checkPrime_GE(EOS(STATIC_8540), i687:0, i687:0, i688:0, i793:0, i793:0, i794:0 + 1, i794:0 + 1, i793:0) :|: i794:0 < i793:0 && i793:0 - i794:0 * div > 0 && i794:0 > i793:0 - i794:0 * div && i793:0 - i794:0 * div + i794:0 > 0
+f7820_0_findKthPrime_Load(EOS(STATIC_7820), i687:0, i687:0, i688:0, i689:0, i688:0) -> f8540_0_checkPrime_GE(EOS(STATIC_8540), i687:0, i687:0, i688:0, i689:0 + 1, i689:0 + 1, 2, 2, i689:0 + 1) :|: i688:0 < i687:0 && i689:0 > 0
+f8540_0_checkPrime_GE(EOS(STATIC_8540), i687:0, i687:0, i688:0, i793:0, i793:0, i794:0, i794:0, i793:0) -> f7820_0_findKthPrime_Load(EOS(STATIC_7820), i687:0, i687:0, i688:0 + 1, i793:0, i688:0 + 1) :|: i794:0 >= i793:0
+f7820_0_findKthPrime_Load(EOS(STATIC_7820), i687:0, i687:0, i688:0, i689:0, i688:0) -> f7820_0_findKthPrime_Load(EOS(STATIC_7820), i687:0, i687:0, i688:0, i689:0 + 1, i688:0) :|: i688:0 < i687:0 && i689:0 < 1
+f8540_0_checkPrime_GE(EOS(STATIC_8540), i687:0, i687:0, i688:0, i793:0, i793:0, i794:0, i794:0, i793:0) -> f8540_0_checkPrime_GE'(EOS(STATIC_8540), i687:0, i687:0, i688:0, i793:0, i793:0, i794:0, i794:0, i793:0) :|: i794:0 < i793:0 && i793:0 - i794:0 * div = 0
+f8540_0_checkPrime_GE'(EOS(STATIC_8540), i687:0, i687:0, i688:0, i793:0, i793:0, i794:0, i794:0, i793:0) -> f7820_0_findKthPrime_Load(EOS(STATIC_7820), i687:0, i687:0, i688:0, i793:0, i688:0) :|: i794:0 < i793:0 && i793:0 - i794:0 * div = 0 && i794:0 > i793:0 - i794:0 * div && i793:0 - i794:0 * div + i794:0 > 0
+Filtered constant ground arguments:
+   f8540_0_checkPrime_GE(x1, x2, x3, x4, x5, x6, x7, x8, x9) -> f8540_0_checkPrime_GE(x2, x3, x4, x5, x6, x7, x8, x9)
+   f8540_0_checkPrime_GE'(x1, x2, x3, x4, x5, x6, x7, x8, x9) -> f8540_0_checkPrime_GE'(x2, x3, x4, x5, x6, x7, x8, x9)
+   f7820_0_findKthPrime_Load(x1, x2, x3, x4, x5, x6) -> f7820_0_findKthPrime_Load(x2, x3, x4, x5, x6)
+Filtered duplicate arguments:
+   f8540_0_checkPrime_GE(x1, x2, x3, x4, x5, x6, x7, x8) -> f8540_0_checkPrime_GE(x2, x3, x7, x8)
+   f8540_0_checkPrime_GE'(x1, x2, x3, x4, x5, x6, x7, x8) -> f8540_0_checkPrime_GE'(x2, x3, x7, x8)
+   f7820_0_findKthPrime_Load(x1, x2, x3, x4, x5) -> f7820_0_findKthPrime_Load(x2, x4, x5)
+Finished conversion. Obtained 7 rules.P rules:
+f8540_0_checkPrime_GE(i687:0, i688:0, i794:0, i793:0) -> f8540_0_checkPrime_GE'(i687:0, i688:0, i794:0, i793:0) :|: i794:0 < i793:0 && i793:0 - i794:0 * div > 0
+f8540_0_checkPrime_GE'(i687:0, i688:0, i794:0, i793:0) -> f8540_0_checkPrime_GE(i687:0, i688:0, i794:0 + 1, i793:0) :|: i793:0 - i794:0 * div > 0 && i794:0 < i793:0 && i793:0 - i794:0 * div + i794:0 > 0 && i794:0 > i793:0 - i794:0 * div
+f7820_0_findKthPrime_Load(i687:0, i689:0, i688:0) -> f8540_0_checkPrime_GE(i687:0, i688:0, 2, i689:0 + 1) :|: i688:0 < i687:0 && i689:0 > 0
+f8540_0_checkPrime_GE(i687:0, i688:0, i794:0, i793:0) -> f7820_0_findKthPrime_Load(i687:0, i793:0, i688:0 + 1) :|: i794:0 >= i793:0
+f7820_0_findKthPrime_Load(i687:0, i689:0, i688:0) -> f7820_0_findKthPrime_Load(i687:0, i689:0 + 1, i688:0) :|: i688:0 < i687:0 && i689:0 < 1
+f8540_0_checkPrime_GE(i687:0, i688:0, i794:0, i793:0) -> f8540_0_checkPrime_GE'(i687:0, i688:0, i794:0, i793:0) :|: i794:0 < i793:0 && i793:0 - i794:0 * div = 0
+f8540_0_checkPrime_GE'(i687:0, i688:0, i794:0, i793:0) -> f7820_0_findKthPrime_Load(i687:0, i793:0, i688:0) :|: i793:0 - i794:0 * div = 0 && i794:0 < i793:0 && i793:0 - i794:0 * div + i794:0 > 0 && i794:0 > i793:0 - i794:0 * div
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f8540_0_checkPrime_GE(x, x1, x2, x3) -> f8540_0_checkPrime_GE'(x, x1, x2, x3) :|: x2 < x3 && x3 - x2 * x4 > 0
+f8540_0_checkPrime_GE'(x5, x6, x7, x8) -> f8540_0_checkPrime_GE(x5, x6, x7 + 1, x8) :|: x8 - x7 * x9 > 0 && x7 < x8 && x8 - x7 * x9 + x7 > 0 && x7 > x8 - x7 * x9
+f7820_0_findKthPrime_Load(i687:0, i689:0, i688:0) -> f8540_0_checkPrime_GE(i687:0, i688:0, 2, i689:0 + 1) :|: i688:0 < i687:0 && i689:0 > 0
+f8540_0_checkPrime_GE(x10, x11, x12, x13) -> f7820_0_findKthPrime_Load(x10, x13, x11 + 1) :|: x12 >= x13
+f7820_0_findKthPrime_Load(x14, x15, x16) -> f7820_0_findKthPrime_Load(x14, x15 + 1, x16) :|: x16 < x14 && x15 < 1
+f8540_0_checkPrime_GE(x17, x18, x19, x20) -> f8540_0_checkPrime_GE'(x17, x18, x19, x20) :|: x19 < x20 && x20 - x19 * x21 = 0
+f8540_0_checkPrime_GE'(x22, x23, x24, x25) -> f7820_0_findKthPrime_Load(x22, x25, x23) :|: x25 - x24 * x26 = 0 && x24 < x25 && x25 - x24 * x26 + x24 > 0 && x24 > x25 - x24 * x26
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f8540_0_checkPrime_GE(x, x1, x2, x3) -> f8540_0_checkPrime_GE'(x, x1, x2, x3) :|: x2 < x3 && x3 - x2 * x4 > 0
+f8540_0_checkPrime_GE'(x5, x6, x7, x8) -> f8540_0_checkPrime_GE(x5, x6, arith, x8) :|: x8 - x7 * x9 > 0 && x7 < x8 && x8 - x7 * x9 + x7 > 0 && x7 > x8 - x7 * x9 && arith = x7 + 1
+f7820_0_findKthPrime_Load(x27, x28, x29) -> f8540_0_checkPrime_GE(x27, x29, 2, x30) :|: x29 < x27 && x28 > 0 && x30 = x28 + 1
+f8540_0_checkPrime_GE(x31, x32, x33, x34) -> f7820_0_findKthPrime_Load(x31, x34, x35) :|: x33 >= x34 && x35 = x32 + 1
+f7820_0_findKthPrime_Load(x36, x37, x38) -> f7820_0_findKthPrime_Load(x36, x39, x38) :|: x38 < x36 && x37 < 1 && x39 = x37 + 1
+f8540_0_checkPrime_GE(x17, x18, x19, x20) -> f8540_0_checkPrime_GE'(x17, x18, x19, x20) :|: x19 < x20 && x20 - x19 * x21 = 0
+f8540_0_checkPrime_GE'(x22, x23, x24, x25) -> f7820_0_findKthPrime_Load(x22, x25, x23) :|: x25 - x24 * x26 = 0 && x24 < x25 && x25 - x24 * x26 + x24 > 0 && x24 > x25 - x24 * x26
+
+----------------------------------------
+
+(12) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(13)
+Obligation:
+Rules:
+f7820_0_findKthPrime_Load(x36:0, x37:0, x38:0) -> f7820_0_findKthPrime_Load(x36:0, x37:0 + 1, x38:0) :|: x38:0 < x36:0 && x37:0 < 1
+f8540_0_checkPrime_GE(x31:0, x32:0, x33:0, x34:0) -> f7820_0_findKthPrime_Load(x31:0, x34:0, x32:0 + 1) :|: x34:0 <= x33:0
+f8540_0_checkPrime_GE'(x22:0, x23:0, x24:0, x25:0) -> f7820_0_findKthPrime_Load(x22:0, x25:0, x23:0) :|: x25:0 - x24:0 * x26:0 + x24:0 > 0 && x25:0 - x24:0 * x26:0 < x24:0 && x25:0 > x24:0 && x25:0 - x24:0 * x26:0 = 0
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, x7:0 + 1, x8:0) :|: x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+f7820_0_findKthPrime_Load(x27:0, x28:0, x29:0) -> f8540_0_checkPrime_GE(x27:0, x29:0, 2, x28:0 + 1) :|: x29:0 < x27:0 && x28:0 > 0
+
+----------------------------------------
+
+(14) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f7820_0_findKthPrime_Load(VARIABLE, INTEGER, VARIABLE)
+f8540_0_checkPrime_GE(VARIABLE, VARIABLE, VARIABLE, INTEGER)
+f8540_0_checkPrime_GE'(VARIABLE, VARIABLE, INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.The following proof was generated: 
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Termination of the given IntTRS could not be shown:
+
+
+
+- IntTRS
+  - PolynomialOrderProcessor
+
+Rules:
+f7820_0_findKthPrime_Load(x36:0, x37:0, x38:0) -> f7820_0_findKthPrime_Load(x36:0, c, x38:0) :|: c = x37:0 + 1 && (x38:0 < x36:0 && x37:0 < 1)
+f8540_0_checkPrime_GE(x31:0, x32:0, x33:0, x34:0) -> f7820_0_findKthPrime_Load(x31:0, x34:0, c1) :|: c1 = x32:0 + 1 && x34:0 <= x33:0
+f8540_0_checkPrime_GE'(x22:0, x23:0, x24:0, x25:0) -> f7820_0_findKthPrime_Load(x22:0, x25:0, x23:0) :|: x25:0 - x24:0 * x26:0 + x24:0 > 0 && x25:0 - x24:0 * x26:0 < x24:0 && x25:0 > x24:0 && x25:0 - x24:0 * x26:0 = 0
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+f7820_0_findKthPrime_Load(x27:0, x28:0, x29:0) -> f8540_0_checkPrime_GE(x27:0, x29:0, c3, c4) :|: c4 = x28:0 + 1 && c3 = 2 && (x29:0 < x27:0 && x28:0 > 0)
+
+Found the following polynomial interpretation:
+[f7820_0_findKthPrime_Load(x, x1, x2)] = -1 + x - x2
+[f8540_0_checkPrime_GE(x3, x4, x5, x6)] = -1 + x3 - x4
+[f8540_0_checkPrime_GE'(x7, x8, x9, x10)] = -1 + x7 - x8
+
+The following rules are decreasing:
+f8540_0_checkPrime_GE(x31:0, x32:0, x33:0, x34:0) -> f7820_0_findKthPrime_Load(x31:0, x34:0, c1) :|: c1 = x32:0 + 1 && x34:0 <= x33:0
+The following rules are bounded:
+f7820_0_findKthPrime_Load(x36:0, x37:0, x38:0) -> f7820_0_findKthPrime_Load(x36:0, c, x38:0) :|: c = x37:0 + 1 && (x38:0 < x36:0 && x37:0 < 1)
+f7820_0_findKthPrime_Load(x27:0, x28:0, x29:0) -> f8540_0_checkPrime_GE(x27:0, x29:0, c3, c4) :|: c4 = x28:0 + 1 && c3 = 2 && (x29:0 < x27:0 && x28:0 > 0)
+
+
+
+- IntTRS
+  - PolynomialOrderProcessor
+    - AND
+      - IntTRS
+      - IntTRS
+        - RankingReductionPairProof
+      - IntTRS
+
+Rules:
+f7820_0_findKthPrime_Load(x36:0, x37:0, x38:0) -> f7820_0_findKthPrime_Load(x36:0, c, x38:0) :|: c = x37:0 + 1 && (x38:0 < x36:0 && x37:0 < 1)
+f8540_0_checkPrime_GE'(x22:0, x23:0, x24:0, x25:0) -> f7820_0_findKthPrime_Load(x22:0, x25:0, x23:0) :|: x25:0 - x24:0 * x26:0 + x24:0 > 0 && x25:0 - x24:0 * x26:0 < x24:0 && x25:0 > x24:0 && x25:0 - x24:0 * x26:0 = 0
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+f7820_0_findKthPrime_Load(x27:0, x28:0, x29:0) -> f8540_0_checkPrime_GE(x27:0, x29:0, c3, c4) :|: c4 = x28:0 + 1 && c3 = 2 && (x29:0 < x27:0 && x28:0 > 0)
+
+Interpretation:
+[ f7820_0_findKthPrime_Load ] = -2*f7820_0_findKthPrime_Load_3 + 2*f7820_0_findKthPrime_Load_1 + -4*f7820_0_findKthPrime_Load_2
+[ f8540_0_checkPrime_GE' ] = -4*f8540_0_checkPrime_GE'_4 + 2*f8540_0_checkPrime_GE'_1 + -2*f8540_0_checkPrime_GE'_2 + 1
+[ f8540_0_checkPrime_GE ] = -4*f8540_0_checkPrime_GE_4 + 2*f8540_0_checkPrime_GE_1 + -2*f8540_0_checkPrime_GE_2 + 1
+
+The following rules are decreasing:
+f7820_0_findKthPrime_Load(x36:0, x37:0, x38:0) -> f7820_0_findKthPrime_Load(x36:0, c, x38:0) :|: c = x37:0 + 1 && (x38:0 < x36:0 && x37:0 < 1)
+f8540_0_checkPrime_GE'(x22:0, x23:0, x24:0, x25:0) -> f7820_0_findKthPrime_Load(x22:0, x25:0, x23:0) :|: x25:0 - x24:0 * x26:0 + x24:0 > 0 && x25:0 - x24:0 * x26:0 < x24:0 && x25:0 > x24:0 && x25:0 - x24:0 * x26:0 = 0
+f7820_0_findKthPrime_Load(x27:0, x28:0, x29:0) -> f8540_0_checkPrime_GE(x27:0, x29:0, c3, c4) :|: c4 = x28:0 + 1 && c3 = 2 && (x29:0 < x27:0 && x28:0 > 0)
+
+The following rules are bounded:
+f7820_0_findKthPrime_Load(x36:0, x37:0, x38:0) -> f7820_0_findKthPrime_Load(x36:0, c, x38:0) :|: c = x37:0 + 1 && (x38:0 < x36:0 && x37:0 < 1)
+
+
+
+- IntTRS
+  - PolynomialOrderProcessor
+    - AND
+      - IntTRS
+      - IntTRS
+        - RankingReductionPairProof
+          - IntTRS
+      - IntTRS
+
+Rules:
+f8540_0_checkPrime_GE'(x22:0, x23:0, x24:0, x25:0) -> f7820_0_findKthPrime_Load(x22:0, x25:0, x23:0) :|: x25:0 - x24:0 * x26:0 + x24:0 > 0 && x25:0 - x24:0 * x26:0 < x24:0 && x25:0 > x24:0 && x25:0 - x24:0 * x26:0 = 0
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+f7820_0_findKthPrime_Load(x27:0, x28:0, x29:0) -> f8540_0_checkPrime_GE(x27:0, x29:0, c3, c4) :|: c4 = x28:0 + 1 && c3 = 2 && (x29:0 < x27:0 && x28:0 > 0)
+
+
+
+- IntTRS
+  - PolynomialOrderProcessor
+    - AND
+      - IntTRS
+      - IntTRS
+      - IntTRS
+        - RankingReductionPairProof
+
+Rules:
+f8540_0_checkPrime_GE(x31:0, x32:0, x33:0, x34:0) -> f7820_0_findKthPrime_Load(x31:0, x34:0, c1) :|: c1 = x32:0 + 1 && x34:0 <= x33:0
+f8540_0_checkPrime_GE'(x22:0, x23:0, x24:0, x25:0) -> f7820_0_findKthPrime_Load(x22:0, x25:0, x23:0) :|: x25:0 - x24:0 * x26:0 + x24:0 > 0 && x25:0 - x24:0 * x26:0 < x24:0 && x25:0 > x24:0 && x25:0 - x24:0 * x26:0 = 0
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+
+Interpretation:
+[ f8540_0_checkPrime_GE ] = 0
+[ f7820_0_findKthPrime_Load ] = -1
+[ f8540_0_checkPrime_GE' ] = 0
+
+The following rules are decreasing:
+f8540_0_checkPrime_GE(x31:0, x32:0, x33:0, x34:0) -> f7820_0_findKthPrime_Load(x31:0, x34:0, c1) :|: c1 = x32:0 + 1 && x34:0 <= x33:0
+f8540_0_checkPrime_GE'(x22:0, x23:0, x24:0, x25:0) -> f7820_0_findKthPrime_Load(x22:0, x25:0, x23:0) :|: x25:0 - x24:0 * x26:0 + x24:0 > 0 && x25:0 - x24:0 * x26:0 < x24:0 && x25:0 > x24:0 && x25:0 - x24:0 * x26:0 = 0
+
+The following rules are bounded:
+f8540_0_checkPrime_GE(x31:0, x32:0, x33:0, x34:0) -> f7820_0_findKthPrime_Load(x31:0, x34:0, c1) :|: c1 = x32:0 + 1 && x34:0 <= x33:0
+f8540_0_checkPrime_GE'(x22:0, x23:0, x24:0, x25:0) -> f7820_0_findKthPrime_Load(x22:0, x25:0, x23:0) :|: x25:0 - x24:0 * x26:0 + x24:0 > 0 && x25:0 - x24:0 * x26:0 < x24:0 && x25:0 > x24:0 && x25:0 - x24:0 * x26:0 = 0
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+
+
+
+- IntTRS
+  - PolynomialOrderProcessor
+    - AND
+      - IntTRS
+      - IntTRS
+      - IntTRS
+        - RankingReductionPairProof
+          - IntTRS
+            - PolynomialOrderProcessor
+
+Rules:
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+
+Found the following polynomial interpretation:
+[f8540_0_checkPrime_GE(x, x1, x2, x3)] = 1 - x2 + x3
+[f8540_0_checkPrime_GE'(x4, x5, x6, x7)] = -x6 + x7
+
+The following rules are decreasing:
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+The following rules are bounded:
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+
+
+- IntTRS
+  - PolynomialOrderProcessor
+    - AND
+      - IntTRS
+      - IntTRS
+      - IntTRS
+        - RankingReductionPairProof
+          - IntTRS
+            - PolynomialOrderProcessor
+              - IntTRS
+                - PolynomialOrderProcessor
+
+Rules:
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+
+Found the following polynomial interpretation:
+[f8540_0_checkPrime_GE'(x, x1, x2, x3)] = 0
+[f8540_0_checkPrime_GE(x4, x5, x6, x7)] = -1
+
+The following rules are decreasing:
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+The following rules are bounded:
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, c2, x8:0) :|: c2 = x7:0 + 1 && (x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0)
+
+
+
+----------------------------------------
+
+(15)
+Obligation:
+Rules:
+f8540_0_checkPrime_GE'(x22:0, x23:0, x24:0, x25:0) -> f7820_0_findKthPrime_Load(x22:0, x25:0, x23:0) :|: x25:0 - x24:0 * x26:0 + x24:0 > 0 && x25:0 - x24:0 * x26:0 < x24:0 && x25:0 > x24:0 && x25:0 - x24:0 * x26:0 = 0
+f8540_0_checkPrime_GE(x17:0, x18:0, x19:0, x20:0) -> f8540_0_checkPrime_GE'(x17:0, x18:0, x19:0, x20:0) :|: x20:0 > x19:0 && x20:0 - x19:0 * x21:0 = 0
+f8540_0_checkPrime_GE'(x5:0, x6:0, x7:0, x8:0) -> f8540_0_checkPrime_GE(x5:0, x6:0, x7:0 + 1, x8:0) :|: x8:0 - x7:0 * x9:0 + x7:0 > 0 && x8:0 - x7:0 * x9:0 < x7:0 && x8:0 > x7:0 && x8:0 - x7:0 * x9:0 > 0
+f8540_0_checkPrime_GE(x:0, x1:0, x2:0, x3:0) -> f8540_0_checkPrime_GE'(x:0, x1:0, x2:0, x3:0) :|: x3:0 > x2:0 && x3:0 - x2:0 * x4:0 > 0
+f7820_0_findKthPrime_Load(x27:0, x28:0, x29:0) -> f8540_0_checkPrime_GE(x27:0, x29:0, 2, x28:0 + 1) :|: x29:0 < x27:0 && x28:0 > 0
+
+----------------------------------------
+
+(16) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(17)
+Obligation:
+Rules:
+f8540_0_checkPrime_GE'(x22:0:0, x23:0:0, x24:0:0, x25:0:0) -> f8540_0_checkPrime_GE(x22:0:0, x23:0:0, 2, x25:0:0 + 1) :|: x23:0:0 < x22:0:0 && x25:0:0 - x24:0:0 * x26:0:0 = 0 && x25:0:0 > 0 && x25:0:0 > x24:0:0 && x25:0:0 - x24:0:0 * x26:0:0 < x24:0:0 && x25:0:0 - x24:0:0 * x26:0:0 + x24:0:0 > 0
+f8540_0_checkPrime_GE(x17:0:0, x18:0:0, x19:0:0, x20:0:0) -> f8540_0_checkPrime_GE'(x17:0:0, x18:0:0, x19:0:0, x20:0:0) :|: x20:0:0 > x19:0:0 && x20:0:0 - x19:0:0 * x21:0:0 = 0
+f8540_0_checkPrime_GE(x:0:0, x1:0:0, x2:0:0, x3:0:0) -> f8540_0_checkPrime_GE'(x:0:0, x1:0:0, x2:0:0, x3:0:0) :|: x3:0:0 > x2:0:0 && x3:0:0 - x2:0:0 * x4:0:0 > 0
+f8540_0_checkPrime_GE'(x5:0:0, x6:0:0, x7:0:0, x8:0:0) -> f8540_0_checkPrime_GE(x5:0:0, x6:0:0, x7:0:0 + 1, x8:0:0) :|: x8:0:0 > x7:0:0 && x8:0:0 - x7:0:0 * x9:0:0 > 0 && x8:0:0 - x7:0:0 * x9:0:0 < x7:0:0 && x8:0:0 - x7:0:0 * x9:0:0 + x7:0:0 > 0
+
+----------------------------------------
+
+(18)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: RandomHard.getNext()I
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(19) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 13 IRulesP rules:
+f9094_0_getPowerOfKInSource_Load(EOS(STATIC_9094), i866, i867, i867) -> f9109_0_getPowerOfKInSource_IntArithmetic(EOS(STATIC_9109), i866, i867, i867, i866) :|: TRUE
+f9109_0_getPowerOfKInSource_IntArithmetic(EOS(STATIC_9109), i884, i867, i867, i884) -> f9112_0_getPowerOfKInSource_IntArithmetic(EOS(STATIC_9112), i884, i867, i867, i884) :|: TRUE
+f9112_0_getPowerOfKInSource_IntArithmetic(EOS(STATIC_9112), i884, i867, i867, i884) -> f9224_0_getPowerOfKInSource_NE(EOS(STATIC_9224), i884, i867, i867 % i884) :|: TRUE
+f9224_0_getPowerOfKInSource_NE(EOS(STATIC_9224), i884, i867, matching1) -> f9261_0_getPowerOfKInSource_NE(EOS(STATIC_9261), i884, i867, 0) :|: TRUE && matching1 = 0
+f9261_0_getPowerOfKInSource_NE(EOS(STATIC_9261), i884, i867, matching1) -> f9269_0_getPowerOfKInSource_Load(EOS(STATIC_9269), i884, i867) :|: TRUE && matching1 = 0
+f9269_0_getPowerOfKInSource_Load(EOS(STATIC_9269), i884, i867) -> f9276_0_getPowerOfKInSource_Load(EOS(STATIC_9276), i884, i867) :|: TRUE
+f9276_0_getPowerOfKInSource_Load(EOS(STATIC_9276), i884, i867) -> f9281_0_getPowerOfKInSource_IntArithmetic(EOS(STATIC_9281), i884, i867, i884) :|: TRUE
+f9281_0_getPowerOfKInSource_IntArithmetic(EOS(STATIC_9281), i884, i867, i884) -> f9289_0_getPowerOfKInSource_Store(EOS(STATIC_9289), i884, i892) :|: i892 = i867 / i884
+f9289_0_getPowerOfKInSource_Store(EOS(STATIC_9289), i884, i892) -> f9296_0_getPowerOfKInSource_Inc(EOS(STATIC_9296), i884, i892) :|: TRUE
+f9296_0_getPowerOfKInSource_Inc(EOS(STATIC_9296), i884, i892) -> f9299_0_getPowerOfKInSource_JMP(EOS(STATIC_9299), i884, i892) :|: TRUE
+f9299_0_getPowerOfKInSource_JMP(EOS(STATIC_9299), i884, i892) -> f9428_0_getPowerOfKInSource_Load(EOS(STATIC_9428), i884, i892) :|: TRUE
+f9428_0_getPowerOfKInSource_Load(EOS(STATIC_9428), i884, i892) -> f9033_0_getPowerOfKInSource_Load(EOS(STATIC_9033), i884, i892) :|: TRUE
+f9033_0_getPowerOfKInSource_Load(EOS(STATIC_9033), i866, i867) -> f9094_0_getPowerOfKInSource_Load(EOS(STATIC_9094), i866, i867, i867) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f9094_0_getPowerOfKInSource_Load(EOS(STATIC_9094), i866:0, i867:0, i867:0) -> f9094_0_getPowerOfKInSource_Load'(EOS(STATIC_9094), i866:0, i867:0, i867:0) :|: i867:0 - i866:0 * div = 0
+f9094_0_getPowerOfKInSource_Load'(EOS(STATIC_9094), i866:0, i867:0, i867:0) -> f9094_0_getPowerOfKInSource_Load(EOS(STATIC_9094), i866:0, div1, div1) :|: i867:0 - i866:0 * div = 0 && i867:0 - i866:0 * div + i866:0 > 0 && i867:0 - i866:0 * div < i866:0 && i867:0 - i866:0 * div1 < i866:0 && i867:0 - i866:0 * div1 + i866:0 > 0
+Filtered constant ground arguments:
+   f9094_0_getPowerOfKInSource_Load(x1, x2, x3, x4) -> f9094_0_getPowerOfKInSource_Load(x2, x3, x4)
+   f9094_0_getPowerOfKInSource_Load'(x1, x2, x3, x4) -> f9094_0_getPowerOfKInSource_Load'(x2, x3, x4)
+   EOS(x1) -> EOS
+Filtered duplicate arguments:
+   f9094_0_getPowerOfKInSource_Load(x1, x2, x3) -> f9094_0_getPowerOfKInSource_Load(x1, x3)
+   f9094_0_getPowerOfKInSource_Load'(x1, x2, x3) -> f9094_0_getPowerOfKInSource_Load'(x1, x3)
+Finished conversion. Obtained 2 rules.P rules:
+f9094_0_getPowerOfKInSource_Load(i866:0, i867:0) -> f9094_0_getPowerOfKInSource_Load'(i866:0, i867:0) :|: i867:0 - i866:0 * div = 0
+f9094_0_getPowerOfKInSource_Load'(i866:0, i867:0) -> f9094_0_getPowerOfKInSource_Load(i866:0, div1) :|: i867:0 - i866:0 * div + i866:0 > 0 && i867:0 - i866:0 * div = 0 && i867:0 - i866:0 * div < i866:0 && i867:0 - i866:0 * div1 + i866:0 > 0 && i867:0 - i866:0 * div1 < i866:0
+
+----------------------------------------
+
+(20)
+Obligation:
+Rules:
+f9094_0_getPowerOfKInSource_Load(x, x1) -> f9094_0_getPowerOfKInSource_Load'(x, x1) :|: x1 - x * x2 = 0
+f9094_0_getPowerOfKInSource_Load'(x3, x4) -> f9094_0_getPowerOfKInSource_Load(x3, x5) :|: x4 - x3 * x6 + x3 > 0 && x4 - x3 * x6 = 0 && x4 - x3 * x6 < x3 && x4 - x3 * x5 + x3 > 0 && x4 - x3 * x5 < x3
+
+----------------------------------------
+
+(21) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f9094_0_getPowerOfKInSource_Load(x, x1) -> f9094_0_getPowerOfKInSource_Load'(x, x1) :|: x1 - x * x2 = 0
+f9094_0_getPowerOfKInSource_Load'(x3, x4) -> f9094_0_getPowerOfKInSource_Load(x3, x5) :|: x4 - x3 * x6 + x3 > 0 && x4 - x3 * x6 = 0 && x4 - x3 * x6 < x3 && x4 - x3 * x5 + x3 > 0 && x4 - x3 * x5 < x3
+
+----------------------------------------
+
+(23) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f9094_0_getPowerOfKInSource_Load(x, x1) -> f9094_0_getPowerOfKInSource_Load'(x, x1) :|: x1 - x * x2 = 0
+(2) f9094_0_getPowerOfKInSource_Load'(x3, x4) -> f9094_0_getPowerOfKInSource_Load(x3, x5) :|: x4 - x3 * x6 + x3 > 0 && x4 - x3 * x6 = 0 && x4 - x3 * x6 < x3 && x4 - x3 * x5 + x3 > 0 && x4 - x3 * x5 < x3
+
+Arcs:
+(1) -> (2)
+(2) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(24)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f9094_0_getPowerOfKInSource_Load(x, x1) -> f9094_0_getPowerOfKInSource_Load'(x, x1) :|: x1 - x * x2 = 0
+(2) f9094_0_getPowerOfKInSource_Load'(x3, x4) -> f9094_0_getPowerOfKInSource_Load(x3, x5) :|: x4 - x3 * x6 + x3 > 0 && x4 - x3 * x6 = 0 && x4 - x3 * x6 < x3 && x4 - x3 * x5 + x3 > 0 && x4 - x3 * x5 < x3
+
+Arcs:
+(1) -> (2)
+(2) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(25) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(26)
+Obligation:
+Rules:
+f9094_0_getPowerOfKInSource_Load(x:0, x1:0) -> f9094_0_getPowerOfKInSource_Load(x:0, x5:0) :|: x:0 > x1:0 - x:0 * x5:0 && x1:0 - x:0 * x2:0 = 0 && x1:0 - x:0 * x5:0 + x:0 > 0 && x:0 > x1:0 - x:0 * x6:0 && x1:0 - x:0 * x6:0 = 0 && x1:0 - x:0 * x6:0 + x:0 > 0
+
+----------------------------------------
+
+(27) FilterProof (EQUIVALENT)
+Used the following sort dictionary for filtering: 
+f9094_0_getPowerOfKInSource_Load(INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(28)
+Obligation:
+Rules:
+f9094_0_getPowerOfKInSource_Load(x:0, x1:0) -> f9094_0_getPowerOfKInSource_Load(x:0, x5:0) :|: x:0 > x1:0 - x:0 * x5:0 && x1:0 - x:0 * x2:0 = 0 && x1:0 - x:0 * x5:0 + x:0 > 0 && x:0 > x1:0 - x:0 * x6:0 && x1:0 - x:0 * x6:0 = 0 && x1:0 - x:0 * x6:0 + x:0 > 0
+
+----------------------------------------
+
+(29) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(30)
+Obligation:
+Rules:
+f9094_0_getPowerOfKInSource_Load(x:0:0, x1:0:0) -> f9094_0_getPowerOfKInSource_Load(x:0:0, x5:0:0) :|: x1:0:0 - x:0:0 * x6:0:0 = 0 && x1:0:0 - x:0:0 * x6:0:0 + x:0:0 > 0 && x:0:0 > x1:0:0 - x:0:0 * x6:0:0 && x1:0:0 - x:0:0 * x5:0:0 + x:0:0 > 0 && x1:0:0 - x:0:0 * x2:0:0 = 0 && x:0:0 > x1:0:0 - x:0:0 * x5:0:0
+
+----------------------------------------
+
+(31) IntTRSPeriodicNontermProof (COMPLETE)
+Normalized system to the following form:
+f(pc, x:0:0, x1:0:0) -> f(1, x:0:0, x5:0:0) :|: pc = 1 && (x1:0:0 - x:0:0 * x6:0:0 = 0 && x1:0:0 - x:0:0 * x6:0:0 + x:0:0 > 0 && x:0:0 > x1:0:0 - x:0:0 * x6:0:0 && x1:0:0 - x:0:0 * x5:0:0 + x:0:0 > 0 && x1:0:0 - x:0:0 * x2:0:0 = 0 && x:0:0 > x1:0:0 - x:0:0 * x5:0:0)
+Witness term starting non-terminating reduction: f(1, 4, 0)
+----------------------------------------
+
+(32)
+NO
+
+----------------------------------------
+
+(33)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: RandomHard.main([Ljava/lang/String;)V
+SCC calls the following helper methods: RandomHard.getNext()I, RandomHard.findKthPrime(I)I
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(34) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 15 IRulesP rules:
+f6465_0_main_Load(EOS(STATIC_6465), java.lang.Object(RandomHard(EOC)), i521, i522, i522) -> f6483_0_main_GE(EOS(STATIC_6483), java.lang.Object(RandomHard(EOC)), i521, i522, i522, i521) :|: TRUE
+f6483_0_main_GE(EOS(STATIC_6483), java.lang.Object(RandomHard(EOC)), i521, i522, i522, i521) -> f6530_0_main_GE(EOS(STATIC_6530), java.lang.Object(RandomHard(EOC)), i521, i522, i522, i521) :|: i522 < i521
+f6530_0_main_GE(EOS(STATIC_6530), java.lang.Object(RandomHard(EOC)), i521, i522, i522, i521) -> f6558_0_main_Load(EOS(STATIC_6558), java.lang.Object(RandomHard(EOC)), i521, i522) :|: i522 < i521
+f6558_0_main_Load(EOS(STATIC_6558), java.lang.Object(RandomHard(EOC)), i521, i522) -> f6574_0_main_InvokeMethod(EOS(STATIC_6574), java.lang.Object(RandomHard(EOC)), i521, i522, java.lang.Object(RandomHard(EOC))) :|: TRUE
+f6574_0_main_InvokeMethod(EOS(STATIC_6574), java.lang.Object(RandomHard(EOC)), i521, i522, java.lang.Object(RandomHard(EOC))) -> f6728_0_getNext_Load(EOS(STATIC_6728), java.lang.Object(RandomHard(EOC)), java.lang.Object(RandomHard(EOC))) :|: i521 >= 1 && i17 > 1 && i520 >= 1 && i522 < i521
+f6574_0_main_InvokeMethod(EOS(STATIC_6574), java.lang.Object(RandomHard(EOC)), i521, i522, java.lang.Object(RandomHard(EOC))) -> f6728_1_getNext_Load(EOS(STATIC_6728), java.lang.Object(RandomHard(EOC)), i521, i522, java.lang.Object(RandomHard(EOC))) :|: i521 >= 1 && i17 > 1 && i520 >= 1 && i522 < i521
+f6728_0_getNext_Load(EOS(STATIC_6728), java.lang.Object(RandomHard(EOC)), java.lang.Object(RandomHard(EOC))) -> f9875_0_getNext_Load(EOS(STATIC_9875), java.lang.Object(RandomHard(EOC)), java.lang.Object(RandomHard(EOC))) :|: TRUE
+f9515_0_getNext_Return(EOS(STATIC_9515), java.lang.Object(RandomHard(EOC)), i521, i522) -> f9516_0_getNext_Return(EOS(STATIC_9516), java.lang.Object(RandomHard(EOC)), i521, i522) :|: TRUE
+f9516_0_getNext_Return(EOS(STATIC_9516), java.lang.Object(RandomHard(EOC)), i521, i522) -> f9524_0_main_StackPop(EOS(STATIC_9524), java.lang.Object(RandomHard(EOC)), i521, i522) :|: TRUE
+f9524_0_main_StackPop(EOS(STATIC_9524), java.lang.Object(RandomHard(EOC)), i521, i522) -> f9530_0_main_Inc(EOS(STATIC_9530), java.lang.Object(RandomHard(EOC)), i521, i522) :|: TRUE
+f9530_0_main_Inc(EOS(STATIC_9530), java.lang.Object(RandomHard(EOC)), i521, i522) -> f9537_0_main_JMP(EOS(STATIC_9537), java.lang.Object(RandomHard(EOC)), i521, i522 + 1) :|: TRUE
+f9537_0_main_JMP(EOS(STATIC_9537), java.lang.Object(RandomHard(EOC)), i521, i928) -> f9571_0_main_Load(EOS(STATIC_9571), java.lang.Object(RandomHard(EOC)), i521, i928) :|: TRUE
+f9571_0_main_Load(EOS(STATIC_9571), java.lang.Object(RandomHard(EOC)), i521, i928) -> f6450_0_main_Load(EOS(STATIC_6450), java.lang.Object(RandomHard(EOC)), i521, i928) :|: TRUE
+f6450_0_main_Load(EOS(STATIC_6450), java.lang.Object(RandomHard(EOC)), i521, i522) -> f6465_0_main_Load(EOS(STATIC_6465), java.lang.Object(RandomHard(EOC)), i521, i522, i522) :|: TRUE
+f6728_1_getNext_Load(EOS(STATIC_6728), java.lang.Object(RandomHard(EOC)), i521, i522, java.lang.Object(RandomHard(EOC))) -> f9515_0_getNext_Return(EOS(STATIC_9515), java.lang.Object(RandomHard(EOC)), i521, i522) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f9515_0_getNext_Return(EOS(STATIC_9515), java.lang.Object(RandomHard(EOC)), i521:0, i522:0) -> f9515_0_getNext_Return(EOS(STATIC_9515), java.lang.Object(RandomHard(EOC)), i521:0, i522:0 + 1) :|: i17:0 > 1 && i521:0 > 0 && i522:0 + 1 < i521:0 && i520:0 > 0
+Removed following non-SCC rules:
+f9515_0_getNext_Return(EOS(STATIC_9515), java.lang.Object(RandomHard(EOC)), i521:0, i522:0) -> f9875_0_getNext_Load(EOS(STATIC_9875), java.lang.Object(RandomHard(EOC)), java.lang.Object(RandomHard(EOC))) :|: i17:0 > 1 && i521:0 > 0 && i522:0 + 1 < i521:0 && i520:0 > 0
+Filtered constant ground arguments:
+   f9515_0_getNext_Return(x1, x2, x3, x4) -> f9515_0_getNext_Return(x3, x4)
+   EOS(x1) -> EOS
+   java.lang.Object(x1) -> java.lang.Object
+   RandomHard(x1) -> RandomHard
+Finished conversion. Obtained 1 rules.P rules:
+f9515_0_getNext_Return(i521:0, i522:0) -> f9515_0_getNext_Return(i521:0, i522:0 + 1) :|: i521:0 > 0 && i17:0 > 1 && i520:0 > 0 && i522:0 + 1 < i521:0
+
+----------------------------------------
+
+(35)
+Obligation:
+Rules:
+f9515_0_getNext_Return(i521:0, i522:0) -> f9515_0_getNext_Return(i521:0, i522:0 + 1) :|: i521:0 > 0 && i17:0 > 1 && i520:0 > 0 && i522:0 + 1 < i521:0
+
+----------------------------------------
+
+(36) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(37)
+Obligation:
+Rules:
+f9515_0_getNext_Return(i521:0, i522:0) -> f9515_0_getNext_Return(i521:0, arith) :|: i521:0 > 0 && i17:0 > 1 && i520:0 > 0 && i522:0 + 1 < i521:0 && arith = i522:0 + 1
+
+----------------------------------------
+
+(38) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f9515_0_getNext_Return(i521:0, i522:0) -> f9515_0_getNext_Return(i521:0, arith) :|: i521:0 > 0 && i17:0 > 1 && i520:0 > 0 && i522:0 + 1 < i521:0 && arith = i522:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(39)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f9515_0_getNext_Return(i521:0, i522:0) -> f9515_0_getNext_Return(i521:0, arith) :|: i521:0 > 0 && i17:0 > 1 && i520:0 > 0 && i522:0 + 1 < i521:0 && arith = i522:0 + 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(40) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(41)
+Obligation:
+Rules:
+f9515_0_getNext_Return(i521:0:0, i522:0:0) -> f9515_0_getNext_Return(i521:0:0, i522:0:0 + 1) :|: i520:0:0 > 0 && i522:0:0 + 1 < i521:0:0 && i17:0:0 > 1 && i521:0:0 > 0
+
+----------------------------------------
+
+(42) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f9515_0_getNext_Return(INTEGER, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(43)
+Obligation:
+Rules:
+f9515_0_getNext_Return(i521:0:0, i522:0:0) -> f9515_0_getNext_Return(i521:0:0, c) :|: c = i522:0:0 + 1 && (i520:0:0 > 0 && i522:0:0 + 1 < i521:0:0 && i17:0:0 > 1 && i521:0:0 > 0)
+
+----------------------------------------
+
+(44) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f9515_0_getNext_Return(x, x1)] = x - x1
+
+The following rules are decreasing:
+f9515_0_getNext_Return(i521:0:0, i522:0:0) -> f9515_0_getNext_Return(i521:0:0, c) :|: c = i522:0:0 + 1 && (i520:0:0 > 0 && i522:0:0 + 1 < i521:0:0 && i17:0:0 > 1 && i521:0:0 > 0)
+The following rules are bounded:
+f9515_0_getNext_Return(i521:0:0, i522:0:0) -> f9515_0_getNext_Return(i521:0:0, c) :|: c = i522:0:0 + 1 && (i520:0:0 > 0 && i522:0:0 + 1 < i521:0:0 && i17:0:0 > 1 && i521:0:0 > 0)
+
+----------------------------------------
+
+(45)
+YES

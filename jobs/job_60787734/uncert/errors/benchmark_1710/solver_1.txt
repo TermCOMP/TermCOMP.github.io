@@ -1,0 +1,486 @@
+last 2908 length 20674
+CNF 2908 vars 20674 clauses
+last 5266 length 37232
+CNF 5266 vars 37232 clauses
+last 4524 length 27213
+CNF 4524 vars 27213 clauses
+Matrix {monotone = Weak, domain = Arctic, method = QPI, shape = Full, bits = 3, compress = True, remove = Any, constraint = And [], minimize = Nothing, encoding = Ersatz_Binary, dim = 3, solver = Stats (Kissatapi [Option "quiet" 1,Configuration "sat"]), verbose = False, tracing = False, briefing = False, log_level = 1, draw = False} vars: 2147, clauses: 7947
+last 2147 length 7947
+CNF 2147 vars 7947 clauses
+last 6476 length 38575
+CNF 6476 vars 38575 clauses
+last 6156 length 38402
+CNF 6156 vars 38402 clauses
+Matrix {monotone = Weak, domain = Arctic, method = QPI, shape = Full, bits = 3, compress = True, remove = Any, constraint = And [], minimize = Nothing, encoding = Ersatz_Binary, dim = 3, solver = Stats (Kissatapi [Option "quiet" 1,Configuration "sat"]), verbose = False, tracing = False, briefing = False, log_level = 1, draw = False} vars: 2147, clauses: 7947, status: Unsatisfied, time: 0.421484909s
+last 7744 length 49427
+Matrix {monotone = Weak, domain = ArcticBZ, method = Direct, shape = Cornered, bits = 4, compress = True, remove = Any, constraint = And [], minimize = Nothing, encoding = Ersatz_Unary, dim = 3, solver = Stats (Kissatapi [Option "quiet" 1,Configuration "sat"]), verbose = False, tracing = False, briefing = False, log_level = 1, draw = False} vars: 7098, clauses: 29699
+last 7098 length 29699
+CNF 7098 vars 29699 clauses
+CNF 7744 vars 49427 clauses
+Matrix {monotone = Weak, domain = Arctic, method = QPI, shape = Full, bits = 3, compress = True, remove = Any, constraint = And [], minimize = Nothing, encoding = Ersatz_Binary, dim = 3, solver = Stats (Kissatapi [Option "quiet" 1,Configuration "sat"]), verbose = False, tracing = False, briefing = False, log_level = 1, draw = False} vars: 2850, clauses: 10877
+Matrix {monotone = Weak, domain = Natural, method = Direct, shape = Cornered, bits = 3, compress = True, remove = Any, constraint = And [], minimize = Nothing, encoding = Ersatz_Binary, dim = 3, solver = Stats (Kissatapi [Option "quiet" 1,Configuration "sat"]), verbose = False, tracing = False, briefing = False, log_level = 1, draw = False} vars: 4233, clauses: 18099
+last 2850 length 10877
+last 4233 length 18099
+CNF 4233 vars 18099 clauses
+CNF 2850 vars 10877 clauses
+**************************************************
+summary
+**************************************************
+SRS with 1 rules on 2 letters       Drop
+SRS with 1 rules on 2 letters       Matchbound   { method = RFC, implementation = Exact, cpf_state_encoding = Encoding   { base = 10, order = MSB_First}, max_size = Just 10000, max_height = Just 5, initial = Paths, verbose = False, tracing = False, draw = False, cpf = False} matchbound 2 certified by automaton with 174 states
+
+**************************************************
+proof
+**************************************************
+property Termination
+has value Just True
+for SRS
+  [b, a, a, b, a, b, a, a, a, b] -> [ a , b , a , b , a , a , a , b , a , b , a , a , b ] {- Input 0 -}
+reason
+  Drop
+    property Termination
+    has value Just True
+    for SRS
+      [b, a, a, b, a, b, a, a, a] -> [ a , b , a , b , a , a , a , b , a , b , a , a ] {- Dropped 0 1 (Input 0) -}
+    reason
+      Matchbound
+        Matchbound   { method = RFC, implementation = Exact, cpf_state_encoding = Encoding   { base = 10, order = MSB_First}, max_size = Just 10000, max_height = Just 5, initial = Paths, verbose = False, tracing = False, draw = False, cpf = False} matchbound 2 certified by automaton with 174 states
+
+   property Termination
+has value Just True
+for SRS
+  [b, a, a, b, a, b, a, a, a] -> [ a , b , a , b , a , a , a , b , a , b , a , a ] {- Dropped 0 1 (Input 0) -}
+reason
+  Matchbound
+    Matchbound   { method = RFC, implementation = Exact, cpf_state_encoding = Encoding   { base = 10, order = MSB_First}, max_size = Just 10000, max_height = Just 5, initial = Paths, verbose = False, tracing = False, draw = False, cpf = False} matchbound 2 certified by automaton with 174 states
+
+**************************************************
+skeleton: \Drop{0}{1}(1,2)\Rfcmatchbound{2}[]
+**************************************************
+let {slowdown = 1.0}
+in let {verb ?= False;trac ?= False;cpf ?= False;slowdown = 3;uncertified = \ p -> Apply (Guard_Not cpf) p;uncertified_T = \ t -> And_Then (Guard_Not cpf) t;do = \ x -> x;dont = \ x -> Fail;done = Worker No_Strict_Rules;when_small = \ m -> And_Then (Worker (SizeAtmost 10000)) m;solver = Stats (Kissatapi [ Option "quiet" 1, Configuration "sat"]);mo = Pre (Or_Else Count GLPK);weight = Worker (Weight {modus = mo});wop = Or_Else weight Pass;weighted = \ m -> And_Then m wop;mirror = Worker Mirror;mirrored = \ m -> And_Then mirror m;cleaner = Or_Else (Worker (Cleaner {tracing = trac})) Pass;tiling = \ m w u -> weighted (Worker (Tiling {method = m,width = w,state_type = Best,map_type = Enum,unlabel = u,max_num_tiles = Just 10000,max_num_rules = Just 100000,cpf = cpf}));kbo = \ b -> weighted (Worker (KBO {direction = LR,bits = b,encoding = Ersatz_Bits,solver = solver}));okb = \ b -> weighted (Worker (KBO {direction = RL,bits = b,encoding = Ersatz_Bits,solver = solver}));kbom = \ b -> First_Of [ kbo b, okb b];qpi = \ dim bits -> weighted (Worker (QPI {tracing = trac,dim = dim,bits = bits,solver = solver,encoding = Ersatz_Binary}));matrix = \ mon dom dim bits enc -> weighted (Worker (Matrix {monotone = mon,domain = dom,dim = dim,bits = bits,shape = Cornered,encoding = enc,tracing = trac,verbose = verb,solver = solver}));ctx = Worker (Context {when = When_Empty,side = Right,close = Empty});simple = Seq [ weight, Timeout slowdown (when_small (kbom 1))];unlab = Worker (Unlabel {accept_null_strict = True,produce_null_strict = False});tileun = \ w -> And_Then (tiling All w Never) (Or_Else unlab (And_Then simple (Or_Else unlab (And_Then simple (Or_Else unlab (And_Then simple unlab))))));tileuns = Seq ([2..2] >>= (\ w -> [ tileun w]));preprocess = While_Fail_T (Worker No_Strict_Rules_T) tileuns;bin = Ersatz_Binary;una = Ersatz_Unary;tp = Worker (Transport {max_derivation_length = Just 2,max_tiers = Just 33,direction = Forward_Backward,tracing = False,cpf = cpf});nohs = let {noh = \ c w m -> Worker (Simple (Config {closure = c,max_closure_width = w,max_seen_size = m,max_inner_children = Just 8,max_outer_children = Just 2,intermediates = All,priority = Linear [ ( -7, Width_lhs), ( -1, Width_rhs), ( 7, Log2 Steps)],start_strict_only = True,print_sizes_finally = True}));f1w = 15;f1s = 1000000;nohs = [ tp, Seq [ noh Forward (Just f1w) (Just f1s), noh Forward Nothing Nothing], Seq [ noh Backward (Just f1w) (Just f1s), noh Backward Nothing Nothing]]}in nohs;relative = let {matrices = First_Of_Pool (Config {workers = 2,advice = Nothing,tracing = trac}) let {s = slowdown;matrix_strict_timeout = \ dom dim bits enc -> TimeoutSlowdown s dim (matrix Strict dom dim bits enc);kbobits = 1}in [ ] <> ([ Timeout s (kbo kbobits), Timeout s (okb kbobits)] <> ([ matrix_strict_timeout ArcticBZ 3 4 una, matrix_strict_timeout Natural 3 3 bin, matrix_strict_timeout ArcticBZ 4 4 una, matrix_strict_timeout Natural 4 3 bin] <> ([5..10] >>= (\ dim -> [ matrix_strict_timeout Arctic dim 3 una, matrix_strict_timeout Natural dim 2 bin]))));barr = \ h -> Worker (Matchbound {method = ROC,implementation = Approximate {at_bound = Merge},max_height = Just h});remove = Seq [ weight, First_Of [ when_small (weighted matrices), tileuns]];yeah = While_Fail done remove}in First_Of ([ ] <> ([ Apply ctx yeah, Apply preprocess (Apply ctx yeah)] <> (nohs <> [ do (Apply (tiling All 2 Never) yeah), dont (Apply (tiling All 3 Never) yeah), dont (Apply (tiling All 4 Never) yeah)])));standard = let {matrices = First_Of_Pool (Config {workers = 2,advice = Nothing,tracing = trac}) let {s = slowdown;matrix_weak_timeout = \ dom dim bits enc -> TimeoutSlowdown s dim (matrix Weak dom dim bits enc);kbobits = 1}in [ ] <> ([ Timeout s (kbo kbobits), Timeout s (okb kbobits)] <> ([ TimeoutSlowdown s 3 (qpi 3 3), matrix_weak_timeout ArcticBZ 3 4 una, matrix_weak_timeout Natural 3 3 bin, TimeoutSlowdown s 4 (qpi 4 3), matrix_weak_timeout Natural 4 3 bin] <> ([5..10] >>= (\ dim -> [ do (TimeoutSlowdown s dim (qpi dim 4)), do (matrix_weak_timeout Arctic dim 3 una), do (matrix_weak_timeout Natural dim 2 bin)]))));remove = Seq [ weight, when_small (weighted matrices)];dp = Apply ctx (Apply (Worker (DP {tracing = False})) (Apply wop (Branch (Worker (EDG {usable = True,tcap_inverse = True})) remove)));mbe = \ ms -> uncertified_T (Worker (Matchbound {method = RFC,implementation = Exact,max_size = ms}));mbeh = Apply (mbe (Just 100000)) done;mba = \ h -> uncertified_T (Worker (Matchbound {method = RFC,implementation = Approximate {at_bound = Merge},max_height = Just h}));mb_trans = Worker (Matchbound {method = RFC,max_size = Just 10000,max_height = Just 5});mb_proof = Apply mb_trans done;when_onerule = \ m -> Apply (Worker (Assert (Atmost 1 Rules))) m;dropped = \ y -> Or_Else (when_onerule (Dropped_Par (First_Of (nohs <> [ y])))) y;simple_yeah = Seq [ done, uncertified (Worker KKST01), uncertified (dropped (First_Of [ mb_proof, Apply (Worker Mirror) mb_proof]))];yeah = Seq [ done, simple_yeah, First_Of [ dp, Apply (Worker Mirror) dp]];preprocess = While_Fail_T (Worker No_Strict_Rules_T) (First_Of [ tileuns, Seq ([2..6] >>= (\ h -> [ mba h, And_Then (Worker Mirror) (mba h)]))])}in Apply wop (Or_Else done (First_Of ([ Apply preprocess yeah, yeah] <> (nohs <> [ do (Apply (tiling All 2 Never) yeah), dont (Apply (tiling All 3 Never) yeah), dont (Apply (tiling All 4 Never) yeah)]))));strictify = Worker (Strictify {});dropstrict = Worker (Dropstrict {})}
+  in Apply cleaner (Or_Else done (Apply wop (Or_Else done (Or_Else (Apply (When_True (Apply dropstrict (Apply strictify standard))) (Apply strictify standard)) relative))))**************************************************
+statistics on proof search (nodes types that (together) took more than 1.000000000000)
+**************************************************
+Fail : "KBO\n { direction = LR\n , bits = 1\n , solver = Stats (Kissatapi [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing = False\n , verbose = False}"
+  total number 3
+  max duration 0.929123758000
+  min duration 0.385002827000
+  total durat. 1.894040807000
+Fail : "KBO\n { direction = RL\n , bits = 1\n , solver = Stats (Kissatapi [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing = False\n , verbose = False}"
+  total number 3
+  max duration 0.772216378000
+  min duration 0.220649036000
+  total durat. 1.302615365000
+Except "AsyncCancelled" : "Simple (Config\n { tracing = False\n , verbose = False\n , closure = Backward\n , start_strict_only = True\n , max_closure_length = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n , max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n , string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally = True})"
+  total number 3
+  max duration 1.188343873000
+  min duration 0.607955999000
+  total durat. 2.781826989000
+  Info
+    { what = "Simple (Config\n  { tracing = False\n  , verbose = False\n  , closure = Backward\n  , start_strict_only = True\n  , max_closure_length = Nothing\n  , max_closure_width = Nothing\n  , max_closure_width_lhs = Nothing\n  , max_closure_width_rhs = Nothing\n  , max_inner_children = (Just 8)\n  , max_outer_children = (Just 2)\n  , intermediates = All\n  , priority = (Linear [ (-7.0, Width_lhs)\n                       , (-1.0, Width_rhs)\n                       , (7.0, Log2 Steps) ])\n  , string_implementation = (ByteString Plain)\n  , max_seen_size = Nothing\n  , max_todo_size = Nothing\n  , print_sizes = False\n  , print_sizes_finally = True})"
+    , input_size = Size
+      { num_rules = 1
+      , num_strict_rules = 1
+      , num_top_rules = 0
+      , num_weak_rules = 0
+      , alphabet_size = 2
+      , total_length = 21}
+    , self = 95
+    , parent = Nothing
+    , duration = 1.188343873000
+    , status = Except "AsyncCancelled"
+    , start = 2025-09-03 12:49:31.365472664 UTC
+    , finish = 2025-09-03 12:49:32.553816537 UTC
+    , thread_cap_info = ("ThreadId 113", 0, False)}
+Except "AsyncCancelled" : "Simple (Config\n { tracing = False\n , verbose = False\n , closure = Forward\n , start_strict_only = True\n , max_closure_length = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n , max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n , string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally = True})"
+  total number 5
+  max duration 1.388177624000
+  min duration 0.530330826000
+  total durat. 4.377118403000
+  Info
+    { what = "Simple (Config\n  { tracing = False\n  , verbose = False\n  , closure = Forward\n  , start_strict_only = True\n  , max_closure_length = Nothing\n  , max_closure_width = Nothing\n  , max_closure_width_lhs = Nothing\n  , max_closure_width_rhs = Nothing\n  , max_inner_children = (Just 8)\n  , max_outer_children = (Just 2)\n  , intermediates = All\n  , priority = (Linear [ (-7.0, Width_lhs)\n                       , (-1.0, Width_rhs)\n                       , (7.0, Log2 Steps) ])\n  , string_implementation = (ByteString Plain)\n  , max_seen_size = Nothing\n  , max_todo_size = Nothing\n  , print_sizes = False\n  , print_sizes_finally = True})"
+    , input_size = Size
+      { num_rules = 1
+      , num_strict_rules = 1
+      , num_top_rules = 0
+      , num_weak_rules = 0
+      , alphabet_size = 2
+      , total_length = 23}
+    , self = 99
+    , parent = Nothing
+    , duration = 1.388177624000
+    , status = Except "AsyncCancelled"
+    , start = 2025-09-03 12:49:31.175570477 UTC
+    , finish = 2025-09-03 12:49:32.563748101 UTC
+    , thread_cap_info = ("ThreadId 64", 3, False)}
+Fail : "Transport\n { mode = Standard\n , output_as = Transport_System\n , direction = Forward_Backward\n , max_derivation_length = Just 2\n , max_expansion_width = Nothing\n , max_tiers = Just 33\n , max_overlap_closures = Nothing\n , string_implementation = ByteString Plain\n , tracing = False\n , cpf = False}"
+  total number 2
+  max duration 0.648330072000
+  min duration 0.360356036000
+  total durat. 1.008686108000
+Except "AsyncCancelled" : "Transport\n { mode = Standard\n , output_as = Transport_System\n , direction = Forward_Backward\n , max_derivation_length = Just 2\n , max_expansion_width = Nothing\n , max_tiers = Just 33\n , max_overlap_closures = Nothing\n , string_implementation = ByteString Plain\n , tracing = False\n , cpf = False}"
+  total number 3
+  max duration 1.161760251000
+  min duration 0.740025927000
+  total durat. 3.008466363000
+  Info
+    { what = "Transport\n  { mode = Standard\n  , output_as = Transport_System\n  , direction = Forward_Backward\n  , max_derivation_length = Just 2\n  , max_expansion_width = Nothing\n  , max_tiers = Just 33\n  , max_overlap_closures = Nothing\n  , string_implementation = ByteString Plain\n  , tracing = False\n  , cpf = False}"
+    , input_size = Size
+      { num_rules = 1
+      , num_strict_rules = 1
+      , num_top_rules = 0
+      , num_weak_rules = 0
+      , alphabet_size = 2
+      , total_length = 23}
+    , self = 97
+    , parent = Nothing
+    , duration = 1.106680185000
+    , status = Except "AsyncCancelled"
+    , start = 2025-09-03 12:49:31.447142673 UTC
+    , finish = 2025-09-03 12:49:32.553822858 UTC
+    , thread_cap_info = ("ThreadId 125", 0, False)}
+  Info
+    { what = "Transport\n  { mode = Standard\n  , output_as = Transport_System\n  , direction = Forward_Backward\n  , max_derivation_length = Just 2\n  , max_expansion_width = Nothing\n  , max_tiers = Just 33\n  , max_overlap_closures = Nothing\n  , string_implementation = ByteString Plain\n  , tracing = False\n  , cpf = False}"
+    , input_size = Size
+      { num_rules = 1
+      , num_strict_rules = 1
+      , num_top_rules = 0
+      , num_weak_rules = 0
+      , alphabet_size = 2
+      , total_length = 19}
+    , self = 90
+    , parent = Nothing
+    , duration = 1.161760251000
+    , status = Except "AsyncCancelled"
+    , start = 2025-09-03 12:49:31.225479 UTC
+    , finish = 2025-09-03 12:49:32.387239251 UTC
+    , thread_cap_info = ("ThreadId 72", 0, False)}
+**************************************************
+F                                Info { what = "Transport\n { mode = Standard\n , output_as = Transport_System\n
+F                                , direction = Forward_Backward\n , max_derivation_length = Just 2\n , max_expansion_width
+F                                = Nothing\n , max_tiers = Just 33\n , max_overlap_closures = Nothing\n
+F                                , string_implementation = ByteString Plain\n , tracing = False\n , cpf
+F                                = False}" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+F                                num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+F                                = 23} , self = 56 , parent = Nothing , duration = 0.360356036000 , status
+F                                = Fail , start = 2025-09-03 12:49:31.173616552 UTC , finish = 2025-09-03
+F                                12:49:31.533972588 UTC , thread_cap_info = ("ThreadId 22", 2, False)}
+F                                
+| E                              Info { what = "Simple (Config\n { tracing = False\n , verbose = False\n
+| E                              , closure = Forward\n , start_strict_only = True\n , max_closure_length
+| E                              = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n
+| E                              , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n ,
+| E                              max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear
+| E                              [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n ,
+| E                              string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n
+| E                              , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally
+| E                              = True})" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| E                              num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| E                              = 23} , self = 99 , parent = Nothing , duration = 1.388177624000 , status
+| E                              = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.175570477 UTC ,
+| E                              finish = 2025-09-03 12:49:32.563748101 UTC , thread_cap_info = ("ThreadId
+| E                              64", 3, False)}
+| E                              
+| | F                            Info { what = "Transport\n { mode = Standard\n , output_as = Transport_System\n
+| | F                            , direction = Forward_Backward\n , max_derivation_length = Just 2\n , max_expansion_width
+| | F                            = Nothing\n , max_tiers = Just 33\n , max_overlap_closures = Nothing\n
+| | F                            , string_implementation = ByteString Plain\n , tracing = False\n , cpf
+| | F                            = False}" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | F                            num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | F                            = 21} , self = 81 , parent = Nothing , duration = 0.648330072000 , status
+| | F                            = Fail , start = 2025-09-03 12:49:31.175579825 UTC , finish = 2025-09-03
+| | F                            12:49:31.823909897 UTC , thread_cap_info = ("ThreadId 57", 0, False)}
+| | F                            
+| | | F                          Info { what = "KBO\n { direction = LR\n , bits = 1\n , solver = Stats (Kissatapi
+| | | F                          [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing
+| | | F                          = False\n , verbose = False}" , input_size = Size { num_rules = 2 , num_strict_rules
+| | | F                          = 2 , num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 4 , total_length
+| | | F                          = 50} , self = 71 , parent = Nothing , duration = 0.385002827000 , status
+| | | F                          = Fail , start = 2025-09-03 12:49:31.181176166 UTC , finish = 2025-09-03
+| | | F                          12:49:31.566178993 UTC , thread_cap_info = ("ThreadId 85", 1, False)}
+| | | F                          
+| | | | F                        Info { what = "KBO\n { direction = RL\n , bits = 1\n , solver = Stats (Kissatapi
+| | | | F                        [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing
+| | | | F                        = False\n , verbose = False}" , input_size = Size { num_rules = 2 , num_strict_rules
+| | | | F                        = 2 , num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 4 , total_length
+| | | | F                        = 50} , self = 54 , parent = Nothing , duration = 0.220649036000 , status
+| | | | F                        = Fail , start = 2025-09-03 12:49:31.185825183 UTC , finish = 2025-09-03
+| | | | F                        12:49:31.406474219 UTC , thread_cap_info = ("ThreadId 87", 1, False)}
+| | | | F                        
+| | | | | S                      Info { what = "Matchbound\n { method = RFC\n , implementation = Exact\n
+| | | | | S                      , cpf_state_encoding = Encoding { base = 10, order = MSB_First}\n , max_size
+| | | | | S                      = Just 10000\n , max_height = Just 5\n , initial = Paths\n , verbose =
+| | | | | S                      False\n , tracing = False\n , draw = False\n , cpf = False}" , input_size
+| | | | | S                      = Size { num_rules = 1 , num_strict_rules = 1 , num_top_rules = 0 , num_weak_rules
+| | | | | S                      = 0 , alphabet_size = 2 , total_length = 21} , self = 50 , parent = Nothing
+| | | | | S                      , duration = 0.178944938000 , status = Success , start = 2025-09-03 12:49:31.211716061
+| | | | | S                      UTC , finish = 2025-09-03 12:49:31.390660999 UTC , thread_cap_info = ("ThreadId
+| | | | | S                      70", 0, False)}
+| | | | | S                      
+| | | | | | E                    Info { what = "Transport\n { mode = Standard\n , output_as = Transport_System\n
+| | | | | | E                    , direction = Forward_Backward\n , max_derivation_length = Just 2\n , max_expansion_width
+| | | | | | E                    = Nothing\n , max_tiers = Just 33\n , max_overlap_closures = Nothing\n
+| | | | | | E                    , string_implementation = ByteString Plain\n , tracing = False\n , cpf
+| | | | | | E                    = False}" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | | | | | E                    num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | | | | | E                    = 19} , self = 90 , parent = Nothing , duration = 1.161760251000 , status
+| | | | | | E                    = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.225479 UTC , finish
+| | | | | | E                    = 2025-09-03 12:49:32.387239251 UTC , thread_cap_info = ("ThreadId 72",
+| | | | | | E                    0, False)}
+| | | | | | E                    
+| | | | | | | F                  Info { what = "Matchbound\n { method = RFC\n , implementation = Exact\n
+| | | | | | | F                  , cpf_state_encoding = Encoding { base = 10, order = MSB_First}\n , max_size
+| | | | | | | F                  = Just 10000\n , max_height = Just 5\n , initial = Paths\n , verbose =
+| | | | | | | F                  False\n , tracing = False\n , draw = False\n , cpf = False}" , input_size
+| | | | | | | F                  = Size { num_rules = 1 , num_strict_rules = 1 , num_top_rules = 0 , num_weak_rules
+| | | | | | | F                  = 0 , alphabet_size = 2 , total_length = 21} , self = 52 , parent = Nothing
+| | | | | | | F                  , duration = 0.131090380000 , status = Fail , start = 2025-09-03 12:49:31.266320421
+| | | | | | | F                  UTC , finish = 2025-09-03 12:49:31.397410801 UTC , thread_cap_info = ("ThreadId
+| | | | | | | F                  94", 0, False)}
+| | | | | | | F                  
+| | | | | | | | F                Info { what = "Matchbound\n { method = RFC\n , implementation = Exact\n
+| | | | | | | | F                , cpf_state_encoding = Encoding { base = 10, order = MSB_First}\n , max_size
+| | | | | | | | F                = Just 10000\n , max_height = Just 5\n , initial = Paths\n , verbose =
+| | | | | | | | F                False\n , tracing = False\n , draw = False\n , cpf = False}" , input_size
+| | | | | | | | F                = Size { num_rules = 2 , num_strict_rules = 2 , num_top_rules = 0 , num_weak_rules
+| | | | | | | | F                = 0 , alphabet_size = 4 , total_length = 50} , self = 57 , parent = Nothing
+| | | | | | | | F                , duration = 0.269376527000 , status = Fail , start = 2025-09-03 12:49:31.266330527
+| | | | | | | | F                UTC , finish = 2025-09-03 12:49:31.535707054 UTC , thread_cap_info = ("ThreadId
+| | | | | | | | F                108", 2, False)}
+| | | | | | | | F                
+| | | | | | | | | F              Info { what = "Matchbound\n { method = RFC\n , implementation = Exact\n
+| | | | | | | | | F              , cpf_state_encoding = Encoding { base = 10, order = MSB_First}\n , max_size
+| | | | | | | | | F              = Just 10000\n , max_height = Just 5\n , initial = Paths\n , verbose =
+| | | | | | | | | F              False\n , tracing = False\n , draw = False\n , cpf = False}" , input_size
+| | | | | | | | | F              = Size { num_rules = 2 , num_strict_rules = 2 , num_top_rules = 0 , num_weak_rules
+| | | | | | | | | F              = 0 , alphabet_size = 4 , total_length = 50} , self = 55 , parent = Nothing
+| | | | | | | | | F              , duration = 0.242086951000 , status = Fail , start = 2025-09-03 12:49:31.285475704
+| | | | | | | | | F              UTC , finish = 2025-09-03 12:49:31.527562655 UTC , thread_cap_info = ("ThreadId
+| | | | | | | | | F              111", 2, False)}
+| | | | | | | | | F              
+| | | | | | | | | | S            Info { what = "Matchbound\n { method = RFC\n , implementation = Exact\n
+| | | | | | | | | | S            , cpf_state_encoding = Encoding { base = 10, order = MSB_First}\n , max_size
+| | | | | | | | | | S            = Just 10000\n , max_height = Just 5\n , initial = Paths\n , verbose =
+| | | | | | | | | | S            False\n , tracing = False\n , draw = False\n , cpf = False}" , input_size
+| | | | | | | | | | S            = Size { num_rules = 1 , num_strict_rules = 1 , num_top_rules = 0 , num_weak_rules
+| | | | | | | | | | S            = 0 , alphabet_size = 2 , total_length = 19} , self = 72 , parent = Nothing
+| | | | | | | | | | S            , duration = 0.272202733000 , status = Success , start = 2025-09-03 12:49:31.317519126
+| | | | | | | | | | S            UTC , finish = 2025-09-03 12:49:31.589721859 UTC , thread_cap_info = ("ThreadId
+| | | | | | | | | | S            99", 0, False)}
+| | | | | | | | | | S            
+| | | | | | | | | | | E          Info { what = "Simple (Config\n { tracing = False\n , verbose = False\n
+| | | | | | | | | | | E          , closure = Forward\n , start_strict_only = True\n , max_closure_length
+| | | | | | | | | | | E          = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n
+| | | | | | | | | | | E          , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n ,
+| | | | | | | | | | | E          max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear
+| | | | | | | | | | | E          [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n ,
+| | | | | | | | | | | E          string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n
+| | | | | | | | | | | E          , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally
+| | | | | | | | | | | E          = True})" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | | | | | | | | | | E          num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | | | | | | | | | | E          = 21} , self = 87 , parent = Nothing , duration = 0.960584096000 , status
+| | | | | | | | | | | E          = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.345475234 UTC ,
+| | | | | | | | | | | E          finish = 2025-09-03 12:49:32.30605933 UTC , thread_cap_info = ("ThreadId
+| | | | | | | | | | | E          110", 0, False)}
+| | | | | | | | | | | E          
+| | | | | | | | | | | | E        Info { what = "Simple (Config\n { tracing = False\n , verbose = False\n
+| | | | | | | | | | | | E        , closure = Backward\n , start_strict_only = True\n , max_closure_length
+| | | | | | | | | | | | E        = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n
+| | | | | | | | | | | | E        , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n ,
+| | | | | | | | | | | | E        max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear
+| | | | | | | | | | | | E        [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n ,
+| | | | | | | | | | | | E        string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n
+| | | | | | | | | | | | E        , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally
+| | | | | | | | | | | | E        = True})" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | | | | | | | | | | | E        num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | | | | | | | | | | | E        = 21} , self = 95 , parent = Nothing , duration = 1.188343873000 , status
+| | | | | | | | | | | | E        = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.365472664 UTC ,
+| | | | | | | | | | | | E        finish = 2025-09-03 12:49:32.553816537 UTC , thread_cap_info = ("ThreadId
+| | | | | | | | | | | | E        113", 0, False)}
+| | | | | | | | | | | | E        
+| | | | | S | | | | | | |        
+| | | | |   | F | | | | |        
+| | | | | E |   | | | | |        Info { what = "Matchbound\n { method = RFC\n , implementation = Exact\n
+| | | | | E |   | | | | |        , cpf_state_encoding = Encoding { base = 10, order = MSB_First}\n , max_size
+| | | | | E |   | | | | |        = Just 10000\n , max_height = Just 5\n , initial = Paths\n , verbose =
+| | | | | E |   | | | | |        False\n , tracing = False\n , draw = False\n , cpf = False}" , input_size
+| | | | | E |   | | | | |        = Size { num_rules = 1 , num_strict_rules = 1 , num_top_rules = 0 , num_weak_rules
+| | | | | E |   | | | | |        = 0 , alphabet_size = 2 , total_length = 19} , self = 83 , parent = Nothing
+| | | | | E |   | | | | |        , duration = 0.530135082000 , status = Except "AsyncCancelled" , start
+| | | | | E |   | | | | |        = 2025-09-03 12:49:31.405517504 UTC , finish = 2025-09-03 12:49:31.935652586
+| | | | | E |   | | | | |        UTC , thread_cap_info = ("ThreadId 115", 0, False)}
+| | | | | E |   | | | | |        
+| | | | F | |   | | | | |        
+| | | | E | |   | | | | |        Info { what = "Transport\n { mode = Standard\n , output_as = Transport_System\n
+| | | | E | |   | | | | |        , direction = Forward_Backward\n , max_derivation_length = Just 2\n , max_expansion_width
+| | | | E | |   | | | | |        = Nothing\n , max_tiers = Just 33\n , max_overlap_closures = Nothing\n
+| | | | E | |   | | | | |        , string_implementation = ByteString Plain\n , tracing = False\n , cpf
+| | | | E | |   | | | | |        = False}" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | | | E | |   | | | | |        num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | | | E | |   | | | | |        = 17} , self = 86 , parent = Nothing , duration = 0.740025927000 , status
+| | | | E | |   | | | | |        = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.425475958 UTC ,
+| | | | E | |   | | | | |        finish = 2025-09-03 12:49:32.165501885 UTC , thread_cap_info = ("ThreadId
+| | | | E | |   | | | | |        117", 0, False)}
+| | | | E | |   | | | | |        
+| | | | | | | E | | | | |        Info { what = "Transport\n { mode = Standard\n , output_as = Transport_System\n
+| | | | | | | E | | | | |        , direction = Forward_Backward\n , max_derivation_length = Just 2\n , max_expansion_width
+| | | | | | | E | | | | |        = Nothing\n , max_tiers = Just 33\n , max_overlap_closures = Nothing\n
+| | | | | | | E | | | | |        , string_implementation = ByteString Plain\n , tracing = False\n , cpf
+| | | | | | | E | | | | |        = False}" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | | | | | | E | | | | |        num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | | | | | | E | | | | |        = 23} , self = 97 , parent = Nothing , duration = 1.106680185000 , status
+| | | | | | | E | | | | |        = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.447142673 UTC ,
+| | | | | | | E | | | | |        finish = 2025-09-03 12:49:32.553822858 UTC , thread_cap_info = ("ThreadId
+| | | | | | | E | | | | |        125", 0, False)}
+| | | | | | | E | | | | |        
+| | | | | | | | | F | | |        
+F | | | | | | | |   | | |        
+  | | | | | | | F   | | |        
+F | | | | | | |     | | |        Info { what = "KBO\n { direction = RL\n , bits = 1\n , solver = Stats (Kissatapi
+F | | | | | | |     | | |        [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing
+F | | | | | | |     | | |        = False\n , verbose = False}" , input_size = Size { num_rules = 3 , num_strict_rules
+F | | | | | | |     | | |        = 2 , num_top_rules = 2 , num_weak_rules = 1 , alphabet_size = 4 , total_length
+F | | | | | | |     | | |        = 59} , self = 82 , parent = Nothing , duration = 0.309749951000 , status
+F | | | | | | |     | | |        = Fail , start = 2025-09-03 12:49:31.536856377 UTC , finish = 2025-09-03
+F | | | | | | |     | | |        12:49:31.846606328 UTC , thread_cap_info = ("ThreadId 157", 1, False)}
+F | | | | | | |     | | |        
+| | | | | | | | F   | | |        Info { what = "KBO\n { direction = LR\n , bits = 1\n , solver = Stats (Kissatapi
+| | | | | | | | F   | | |        [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing
+| | | | | | | | F   | | |        = False\n , verbose = False}" , input_size = Size { num_rules = 4 , num_strict_rules
+| | | | | | | | F   | | |        = 2 , num_top_rules = 2 , num_weak_rules = 2 , alphabet_size = 5 , total_length
+| | | | | | | | F   | | |        = 84} , self = 91 , parent = Nothing , duration = 0.929123758000 , status
+| | | | | | | | F   | | |        = Fail , start = 2025-09-03 12:49:31.53685654 UTC , finish = 2025-09-03
+| | | | | | | | F   | | |        12:49:32.465980298 UTC , thread_cap_info = ("ThreadId 159", 2, False)}
+| | | | | | | | F   | | |        
+| | | | | | | | | F | | |        Info { what = "KBO\n { direction = LR\n , bits = 1\n , solver = Stats (Kissatapi
+| | | | | | | | | F | | |        [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing
+| | | | | | | | | F | | |        = False\n , verbose = False}" , input_size = Size { num_rules = 3 , num_strict_rules
+| | | | | | | | | F | | |        = 2 , num_top_rules = 2 , num_weak_rules = 1 , alphabet_size = 4 , total_length
+| | | | | | | | | F | | |        = 59} , self = 85 , parent = Nothing , duration = 0.579914222000 , status
+| | | | | | | | | F | | |        = Fail , start = 2025-09-03 12:49:31.545602033 UTC , finish = 2025-09-03
+| | | | | | | | | F | | |        12:49:32.125516255 UTC , thread_cap_info = ("ThreadId 156", 1, False)}
+| | | | | | | | | F | | |        
+| | | | | | | | | | | | | E      Info { what = "Simple (Config\n { tracing = False\n , verbose = False\n
+| | | | | | | | | | | | | E      , closure = Forward\n , start_strict_only = True\n , max_closure_length
+| | | | | | | | | | | | | E      = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n
+| | | | | | | | | | | | | E      , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n ,
+| | | | | | | | | | | | | E      max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear
+| | | | | | | | | | | | | E      [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n ,
+| | | | | | | | | | | | | E      string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n
+| | | | | | | | | | | | | E      , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally
+| | | | | | | | | | | | | E      = True})" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | | | | | | | | | | | | E      num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | | | | | | | | | | | | E      = 19} , self = 93 , parent = Nothing , duration = 0.920397746000 , status
+| | | | | | | | | | | | | E      = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.545607695 UTC ,
+| | | | | | | | | | | | | E      finish = 2025-09-03 12:49:32.466005441 UTC , thread_cap_info = ("ThreadId
+| | | | | | | | | | | | | E      134", 0, False)}
+| | | | | | | | | | | | | E      
+| | | | | | | | | | | | | | F    Info { what = "KBO\n { direction = RL\n , bits = 1\n , solver = Stats (Kissatapi
+| | | | | | | | | | | | | | F    [Option \"quiet\" 1, Configuration \"sat\"])\n , compress = True\n , tracing
+| | | | | | | | | | | | | | F    = False\n , verbose = False}" , input_size = Size { num_rules = 4 , num_strict_rules
+| | | | | | | | | | | | | | F    = 2 , num_top_rules = 2 , num_weak_rules = 2 , alphabet_size = 5 , total_length
+| | | | | | | | | | | | | | F    = 84} , self = 89 , parent = Nothing , duration = 0.772216378000 , status
+| | | | | | | | | | | | | | F    = Fail , start = 2025-09-03 12:49:31.545639311 UTC , finish = 2025-09-03
+| | | | | | | | | | | | | | F    12:49:32.317855689 UTC , thread_cap_info = ("ThreadId 160", 2, False)}
+| | | | | | | | | | | | | | F    
+| | | | | | | | | | | | | | | E  Info { what = "Simple (Config\n { tracing = False\n , verbose = False\n
+| | | | | | | | | | | | | | | E  , closure = Backward\n , start_strict_only = True\n , max_closure_length
+| | | | | | | | | | | | | | | E  = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n
+| | | | | | | | | | | | | | | E  , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n ,
+| | | | | | | | | | | | | | | E  max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear
+| | | | | | | | | | | | | | | E  [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n ,
+| | | | | | | | | | | | | | | E  string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n
+| | | | | | | | | | | | | | | E  , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally
+| | | | | | | | | | | | | | | E  = True})" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | | | | | | | | | | | | | | E  num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | | | | | | | | | | | | | | E  = 19} , self = 94 , parent = Nothing , duration = 0.985527117000 , status
+| | | | | | | | | | | | | | | E  = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.565478465 UTC ,
+| | | | | | | | | | | | | | | E  finish = 2025-09-03 12:49:32.551005582 UTC , thread_cap_info = ("ThreadId
+| | | | | | | | | | | | | | | E  135", 0, False)}
+| | | | | | | | | | | | | | | E  
+| | | F | | | | | | | | | | | |  
+| | |   | | | | | | S | | | | |  
+| | | F | | | | | |   | | | | |  Info { what = "Matchbound\n { method = RFC\n , implementation = Exact\n
+| | | F | | | | | |   | | | | |  , cpf_state_encoding = Encoding { base = 10, order = MSB_First}\n , max_size
+| | | F | | | | | |   | | | | |  = Just 10000\n , max_height = Just 5\n , initial = Paths\n , verbose =
+| | | F | | | | | |   | | | | |  False\n , tracing = False\n , draw = False\n , cpf = False}" , input_size
+| | | F | | | | | |   | | | | |  = Size { num_rules = 1 , num_strict_rules = 1 , num_top_rules = 0 , num_weak_rules
+| | | F | | | | | |   | | | | |  = 0 , alphabet_size = 2 , total_length = 23} , self = 84 , parent = Nothing
+| | | F | | | | | |   | | | | |  , duration = 0.291663016000 , status = Fail , start = 2025-09-03 12:49:31.765562918
+| | | F | | | | | |   | | | | |  UTC , finish = 2025-09-03 12:49:32.057225934 UTC , thread_cap_info = ("ThreadId
+| | | F | | | | | |   | | | | |  166", 0, False)}
+| | | F | | | | | |   | | | | |  
+| | F | | | | | | |   | | | | |  
+F |   | | | | | | |   | | | | |  
+F |   | | | | | | |   | | | | |  Info { what = "QPI\n { dim = 3\n , bits = 3\n , solver = Stats (Kissatapi
+F |   | | | | | | |   | | | | |  [Option \"quiet\" 1, Configuration \"sat\"])\n , encoding = Ersatz_Binary\n
+F |   | | | | | | |   | | | | |  , tracing = False\n , verbose = False}" , input_size = Size { num_rules
+F |   | | | | | | |   | | | | |  = 3 , num_strict_rules = 2 , num_top_rules = 2 , num_weak_rules = 1 , alphabet_size
+F |   | | | | | | |   | | | | |  = 4 , total_length = 59} , self = 88 , parent = Nothing , duration = 0.439500229000
+F |   | | | | | | |   | | | | |  , status = Fail , start = 2025-09-03 12:49:31.866754482 UTC , finish =
+F |   | | | | | | |   | | | | |  2025-09-03 12:49:32.306254711 UTC , thread_cap_info = ("ThreadId 177",
+F |   | | | | | | |   | | | | |  1, False)}
+F |   | | | | | | |   | | | | |  
+| |   | | E | | | |   | | | | |  
+| | E | |   | | | |   | | | | |  Info { what = "Simple (Config\n { tracing = False\n , verbose = False\n
+| | E | |   | | | |   | | | | |  , closure = Forward\n , start_strict_only = True\n , max_closure_length
+| | E | |   | | | |   | | | | |  = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n
+| | E | |   | | | |   | | | | |  , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n ,
+| | E | |   | | | |   | | | | |  max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear
+| | E | |   | | | |   | | | | |  [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n ,
+| | E | |   | | | |   | | | | |  string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n
+| | E | |   | | | |   | | | | |  , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally
+| | E | |   | | | |   | | | | |  = True})" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | E | |   | | | |   | | | | |  num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | E | |   | | | |   | | | | |  = 17} , self = 92 , parent = Nothing , duration = 0.530330826000 , status
+| | E | |   | | | |   | | | | |  = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.935667417 UTC ,
+| | E | |   | | | |   | | | | |  finish = 2025-09-03 12:49:32.465998243 UTC , thread_cap_info = ("ThreadId
+| | E | |   | | | |   | | | | |  171", 0, False)}
+| | E | |   | | | |   | | | | |  
+| | | | | E | | | |   | | | | |  Info { what = "Simple (Config\n { tracing = False\n , verbose = False\n
+| | | | | E | | | |   | | | | |  , closure = Backward\n , start_strict_only = True\n , max_closure_length
+| | | | | E | | | |   | | | | |  = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n
+| | | | | E | | | |   | | | | |  , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n ,
+| | | | | E | | | |   | | | | |  max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear
+| | | | | E | | | |   | | | | |  [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n ,
+| | | | | E | | | |   | | | | |  string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n
+| | | | | E | | | |   | | | | |  , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally
+| | | | | E | | | |   | | | | |  = True})" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | | | | E | | | |   | | | | |  num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | | | | E | | | |   | | | | |  = 17} , self = 96 , parent = Nothing , duration = 0.607955999000 , status
+| | | | | E | | | |   | | | | |  = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.94586532 UTC ,
+| | | | | E | | | |   | | | | |  finish = 2025-09-03 12:49:32.553821319 UTC , thread_cap_info = ("ThreadId
+| | | | | E | | | |   | | | | |  172", 0, False)}
+| | | | | E | | | |   | | | | |  
+| | | | | | | | | | E | | | | |  Info { what = "Simple (Config\n { tracing = False\n , verbose = False\n
+| | | | | | | | | | E | | | | |  , closure = Forward\n , start_strict_only = True\n , max_closure_length
+| | | | | | | | | | E | | | | |  = Nothing\n , max_closure_width = Nothing\n , max_closure_width_lhs = Nothing\n
+| | | | | | | | | | E | | | | |  , max_closure_width_rhs = Nothing\n , max_inner_children = (Just 8)\n ,
+| | | | | | | | | | E | | | | |  max_outer_children = (Just 2)\n , intermediates = All\n , priority = (Linear
+| | | | | | | | | | E | | | | |  [ (-7.0, Width_lhs)\n , (-1.0, Width_rhs)\n , (7.0, Log2 Steps) ])\n ,
+| | | | | | | | | | E | | | | |  string_implementation = (ByteString Plain)\n , max_seen_size = Nothing\n
+| | | | | | | | | | E | | | | |  , max_todo_size = Nothing\n , print_sizes = False\n , print_sizes_finally
+| | | | | | | | | | E | | | | |  = True})" , input_size = Size { num_rules = 1 , num_strict_rules = 1 ,
+| | | | | | | | | | E | | | | |  num_top_rules = 0 , num_weak_rules = 0 , alphabet_size = 2 , total_length
+| | | | | | | | | | E | | | | |  = 23} , self = 98 , parent = Nothing , duration = 0.577628111000 , status
+| | | | | | | | | | E | | | | |  = Except "AsyncCancelled" , start = 2025-09-03 12:49:31.985479585 UTC ,
+| | | | | | | | | | E | | | | |  finish = 2025-09-03 12:49:32.563107696 UTC , thread_cap_info = ("ThreadId
+| | | | | | | | | | E | | | | |  174", 0, False)}
+| | | | | | | | | | E | | | | |  
+| | | F | | | | | | | | | | | |  
+| | |   | | | | | F | | | | | |  
+| | |   E | | | |   | | | | | |  
+| | |     | | | |   | E | | | |  
+F | |     | | | |   |   | | | |  
+  | |     | | | |   |   | | F |  
+  | |     | E | |   |   | |   |  
+  | |     |   | F   |   | |   |  
+  | E     |   |     |   | |   |  
+  |       |   |     |   | E   |  
+  |       |   |     |   |     E  
+  |       |   |     |   E        
+  |       E   |     |            
+  |           E     |            
+  |                 E            
+  E                              

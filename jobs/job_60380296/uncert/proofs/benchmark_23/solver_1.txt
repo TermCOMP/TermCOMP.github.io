@@ -1,0 +1,660 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/ApNiN.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 36 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 239 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 185 ms]
+        (9) QDP
+        (10) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (11) YES
+    (12) JBCTerminationSCC
+        (13) SCCToIRSProof [SOUND, 28 ms]
+        (14) IRSwT
+        (15) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (16) IRSwT
+        (17) IRSwTTerminationDigraphProof [EQUIVALENT, 11 ms]
+        (18) IRSwT
+        (19) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (20) IRSwT
+        (21) TempFilterProof [SOUND, 13 ms]
+        (22) IntTRS
+        (23) PolynomialOrderProcessor [EQUIVALENT, 5 ms]
+        (24) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package DivTernary2;
+public class DivTernary2 {
+    // by Thomas Kolbe
+    public static Nats div(final Nats x, final Nats y, final Nats z) {
+        if (z.isZero()) {
+            return Nats.zero();
+        }
+        if (y.isZero()) {
+            return Nats.succ(div(x, z, z));
+        }
+        if (x.isZero()) {
+            return Nats.zero();
+        }
+        return div(x.pred, y.pred, z);
+    }
+
+    public static void main(final String[] args) {
+
+        final Nats x = new Nats(args[0].length());
+        final Nats y = new Nats(args[1].length());
+
+        div(x, y, y);
+    }
+}
+
+
+package DivTernary2;
+
+public class Nats {
+    Nats pred;
+
+    public Nats() {
+    }
+
+    public Nats(final int n) {
+        if (n <= 0) {
+            this.pred = null;
+        } else {
+            this.pred = new Nats(n - 1);
+        }
+    }
+
+    public int toInt() {
+        if (this.pred == null) {
+            return 0;
+        }
+        return this.pred.toInt() + 1;
+    }
+
+    @Override
+    public String toString() {
+        return (String.valueOf(toInt()));
+    }
+
+    public boolean isZero() {
+        return (this.pred == null);
+    }
+
+    public static Nats zero() {
+        return new Nats();
+    }
+
+    public static Nats succ(final Nats x) {
+        final Nats y = new Nats();
+        y.pred = x;
+        return y;
+    }
+
+    /**
+     * @return
+     */
+    public Nats copy() {
+        if (this.pred == null) {
+            return new Nats();
+        }
+        final Nats predCopy = this.pred.copy();
+        return succ(predCopy);
+    }
+
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package DivTernary2;
+public class DivTernary2 {
+    // by Thomas Kolbe
+    public static Nats div(final Nats x, final Nats y, final Nats z) {
+        if (z.isZero()) {
+            return Nats.zero();
+        }
+        if (y.isZero()) {
+            return Nats.succ(div(x, z, z));
+        }
+        if (x.isZero()) {
+            return Nats.zero();
+        }
+        return div(x.pred, y.pred, z);
+    }
+
+    public static void main(final String[] args) {
+
+        final Nats x = new Nats(args[0].length());
+        final Nats y = new Nats(args[1].length());
+
+        div(x, y, y);
+    }
+}
+
+
+package DivTernary2;
+
+public class Nats {
+    Nats pred;
+
+    public Nats() {
+    }
+
+    public Nats(final int n) {
+        if (n <= 0) {
+            this.pred = null;
+        } else {
+            this.pred = new Nats(n - 1);
+        }
+    }
+
+    public int toInt() {
+        if (this.pred == null) {
+            return 0;
+        }
+        return this.pred.toInt() + 1;
+    }
+
+    @Override
+    public String toString() {
+        return (String.valueOf(toInt()));
+    }
+
+    public boolean isZero() {
+        return (this.pred == null);
+    }
+
+    public static Nats zero() {
+        return new Nats();
+    }
+
+    public static Nats succ(final Nats x) {
+        final Nats y = new Nats();
+        y.pred = x;
+        return y;
+    }
+
+    /**
+     * @return
+     */
+    public Nats copy() {
+        if (this.pred == null) {
+            return new Nats();
+        }
+        final Nats predCopy = this.pred.copy();
+        return succ(predCopy);
+    }
+
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+DivTernary2.DivTernary2.main([Ljava/lang/String;)V: Graph of 158 nodes with 0 SCCs.
+
+
+
+DivTernary2.Nats.<init>(I)V: Graph of 28 nodes with 0 SCCs.
+
+
+
+DivTernary2.DivTernary2.div(LDivTernary2/Nats;LDivTernary2/Nats;LDivTernary2/Nats;)LDivTernary2/Nats;: Graph of 140 nodes with 0 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: DivTernary2.DivTernary2.div(LDivTernary2/Nats;LDivTernary2/Nats;LDivTernary2/Nats;)LDivTernary2/Nats;
+SCC calls the following helper methods: DivTernary2.DivTernary2.div(LDivTernary2/Nats;LDivTernary2/Nats;LDivTernary2/Nats;)LDivTernary2/Nats;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*DivTernary2.Nats: [pred]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 49 rules for P and 147 rules for R.P rules:
+f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) -> f7089_0_isZero_Load(EOS(STATIC_7089), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) :|: TRUE
+f7089_0_isZero_Load(EOS(STATIC_7089), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) -> f7091_0_isZero_FieldAccess(EOS(STATIC_7091), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) :|: TRUE
+f7091_0_isZero_FieldAccess(EOS(STATIC_7091), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) -> f7092_0_isZero_NONNULL(EOS(STATIC_7092), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), o423) :|: TRUE
+f7092_0_isZero_NONNULL(EOS(STATIC_7092), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o424sub)) -> f7096_0_isZero_NONNULL(EOS(STATIC_7096), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o424sub)) :|: TRUE
+f7096_0_isZero_NONNULL(EOS(STATIC_7096), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o424sub)) -> f7099_0_isZero_ConstantStackPush(EOS(STATIC_7099), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7099_0_isZero_ConstantStackPush(EOS(STATIC_7099), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7104_0_isZero_Return(EOS(STATIC_7104), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE
+f7104_0_isZero_Return(EOS(STATIC_7104), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7107_0_div_EQ(EOS(STATIC_7107), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE && matching1 = 0
+f7107_0_div_EQ(EOS(STATIC_7107), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7112_0_div_Load(EOS(STATIC_7112), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE && matching1 = 0
+f7112_0_div_Load(EOS(STATIC_7112), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7120_0_div_InvokeMethod(EOS(STATIC_7120), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) :|: TRUE
+f7120_0_div_InvokeMethod(EOS(STATIC_7120), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) -> f7122_0_isZero_Load(EOS(STATIC_7122), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) :|: TRUE
+f7122_0_isZero_Load(EOS(STATIC_7122), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) -> f7133_0_isZero_FieldAccess(EOS(STATIC_7133), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) :|: TRUE
+f7133_0_isZero_FieldAccess(EOS(STATIC_7133), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, o435)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o435))) -> f7136_0_isZero_FieldAccess(EOS(STATIC_7136), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, o435)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o435))) :|: TRUE
+f7136_0_isZero_FieldAccess(EOS(STATIC_7136), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, o435)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o435))) -> f7145_0_isZero_NONNULL(EOS(STATIC_7145), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, o435)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), o435) :|: TRUE
+f7145_0_isZero_NONNULL(EOS(STATIC_7145), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o440sub)) -> f7148_0_isZero_NONNULL(EOS(STATIC_7148), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o440sub)) :|: TRUE
+f7145_0_isZero_NONNULL(EOS(STATIC_7145), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), NULL) -> f7149_0_isZero_NONNULL(EOS(STATIC_7149), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), NULL) :|: TRUE
+f7148_0_isZero_NONNULL(EOS(STATIC_7148), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o440sub)) -> f7151_0_isZero_ConstantStackPush(EOS(STATIC_7151), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7151_0_isZero_ConstantStackPush(EOS(STATIC_7151), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7158_0_isZero_Return(EOS(STATIC_7158), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE
+f7158_0_isZero_Return(EOS(STATIC_7158), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7165_0_div_EQ(EOS(STATIC_7165), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE && matching1 = 0
+f7165_0_div_EQ(EOS(STATIC_7165), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7263_0_div_Load(EOS(STATIC_7263), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE && matching1 = 0
+f7263_0_div_Load(EOS(STATIC_7263), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7268_0_div_InvokeMethod(EOS(STATIC_7268), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) :|: TRUE
+f7268_0_div_InvokeMethod(EOS(STATIC_7268), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) -> f7273_0_isZero_Load(EOS(STATIC_7273), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) :|: TRUE
+f7273_0_isZero_Load(EOS(STATIC_7273), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) -> f7305_0_isZero_FieldAccess(EOS(STATIC_7305), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) :|: TRUE
+f7305_0_isZero_FieldAccess(EOS(STATIC_7305), java.lang.Object(DivTernary2.Nats(EOC, o456)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o456))) -> f7309_0_isZero_FieldAccess(EOS(STATIC_7309), java.lang.Object(DivTernary2.Nats(EOC, o456)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o456))) :|: TRUE
+f7309_0_isZero_FieldAccess(EOS(STATIC_7309), java.lang.Object(DivTernary2.Nats(EOC, o456)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o456))) -> f7316_0_isZero_NONNULL(EOS(STATIC_7316), java.lang.Object(DivTernary2.Nats(EOC, o456)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), o456) :|: TRUE
+f7316_0_isZero_NONNULL(EOS(STATIC_7316), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) -> f7322_0_isZero_NONNULL(EOS(STATIC_7322), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) :|: TRUE
+f7322_0_isZero_NONNULL(EOS(STATIC_7322), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) -> f7325_0_isZero_ConstantStackPush(EOS(STATIC_7325), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7325_0_isZero_ConstantStackPush(EOS(STATIC_7325), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7333_0_isZero_Return(EOS(STATIC_7333), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE
+f7333_0_isZero_Return(EOS(STATIC_7333), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7387_0_div_EQ(EOS(STATIC_7387), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE && matching1 = 0
+f7387_0_div_EQ(EOS(STATIC_7387), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f8365_0_div_Load(EOS(STATIC_8365), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE && matching1 = 0
+f8365_0_div_Load(EOS(STATIC_8365), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f8375_0_div_FieldAccess(EOS(STATIC_8375), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub)))) :|: TRUE
+f8375_0_div_FieldAccess(EOS(STATIC_8375), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub)))) -> f8378_0_div_Load(EOS(STATIC_8378), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) :|: TRUE
+f8378_0_div_Load(EOS(STATIC_8378), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) -> f8382_0_div_FieldAccess(EOS(STATIC_8382), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub)))) :|: TRUE
+f8382_0_div_FieldAccess(EOS(STATIC_8382), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub)))) -> f8388_0_div_Load(EOS(STATIC_8388), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub), java.lang.Object(o440sub)) :|: TRUE
+f8388_0_div_Load(EOS(STATIC_8388), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub), java.lang.Object(o440sub)) -> f8393_0_div_InvokeMethod(EOS(STATIC_8393), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f8393_0_div_InvokeMethod(EOS(STATIC_8393), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f8398_1_div_InvokeMethod(f8398_0_div_Load(EOS(STATIC_8398), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))))) :|: TRUE
+f8398_0_div_Load(EOS(STATIC_8398), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f8403_0_div_Load(EOS(STATIC_8403), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f8403_0_div_Load(EOS(STATIC_8403), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7048_0_div_Load(EOS(STATIC_7048), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7048_0_div_Load(EOS(STATIC_7048), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423))) -> f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) :|: TRUE
+f7149_0_isZero_NONNULL(EOS(STATIC_7149), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), NULL) -> f7155_0_isZero_ConstantStackPush(EOS(STATIC_7155), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7155_0_isZero_ConstantStackPush(EOS(STATIC_7155), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7163_0_isZero_JMP(EOS(STATIC_7163), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 1) :|: TRUE
+f7163_0_isZero_JMP(EOS(STATIC_7163), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7258_0_isZero_Return(EOS(STATIC_7258), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 1) :|: TRUE && matching1 = 1
+f7258_0_isZero_Return(EOS(STATIC_7258), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7266_0_div_EQ(EOS(STATIC_7266), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 1) :|: TRUE && matching1 = 1
+f7266_0_div_EQ(EOS(STATIC_7266), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7269_0_div_Load(EOS(STATIC_7269), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: 1 > 0 && matching1 = 1
+f7269_0_div_Load(EOS(STATIC_7269), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7275_0_div_Load(EOS(STATIC_7275), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) :|: TRUE
+f7275_0_div_Load(EOS(STATIC_7275), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) -> f7284_0_div_Load(EOS(STATIC_7284), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7284_0_div_Load(EOS(STATIC_7284), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7308_0_div_InvokeMethod(EOS(STATIC_7308), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7308_0_div_InvokeMethod(EOS(STATIC_7308), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7310_1_div_InvokeMethod(f7310_0_div_Load(EOS(STATIC_7310), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))))) :|: TRUE
+f7310_0_div_Load(EOS(STATIC_7310), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7321_0_div_Load(EOS(STATIC_7321), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7321_0_div_Load(EOS(STATIC_7321), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7048_0_div_Load(EOS(STATIC_7048), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+R rules:
+f7048_0_div_Load(EOS(STATIC_7048), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423))) -> f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) :|: TRUE
+f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) -> f7089_0_isZero_Load(EOS(STATIC_7089), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) :|: TRUE
+f7089_0_isZero_Load(EOS(STATIC_7089), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) -> f7091_0_isZero_FieldAccess(EOS(STATIC_7091), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) :|: TRUE
+f7091_0_isZero_FieldAccess(EOS(STATIC_7091), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), java.lang.Object(DivTernary2.Nats(EOC, o423))) -> f7092_0_isZero_NONNULL(EOS(STATIC_7092), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, o423)), o423) :|: TRUE
+f7092_0_isZero_NONNULL(EOS(STATIC_7092), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o424sub)) -> f7096_0_isZero_NONNULL(EOS(STATIC_7096), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o424sub)) :|: TRUE
+f7092_0_isZero_NONNULL(EOS(STATIC_7092), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), NULL) -> f7097_0_isZero_NONNULL(EOS(STATIC_7097), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), NULL) :|: TRUE
+f7096_0_isZero_NONNULL(EOS(STATIC_7096), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o424sub)) -> f7099_0_isZero_ConstantStackPush(EOS(STATIC_7099), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7097_0_isZero_NONNULL(EOS(STATIC_7097), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), NULL) -> f7101_0_isZero_ConstantStackPush(EOS(STATIC_7101), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL))) :|: TRUE
+f7099_0_isZero_ConstantStackPush(EOS(STATIC_7099), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7104_0_isZero_Return(EOS(STATIC_7104), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE
+f7101_0_isZero_ConstantStackPush(EOS(STATIC_7101), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL))) -> f7106_0_isZero_JMP(EOS(STATIC_7106), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), 1) :|: TRUE
+f7104_0_isZero_Return(EOS(STATIC_7104), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7107_0_div_EQ(EOS(STATIC_7107), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE && matching1 = 0
+f7106_0_isZero_JMP(EOS(STATIC_7106), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), matching1) -> f7110_0_isZero_Return(EOS(STATIC_7110), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), 1) :|: TRUE && matching1 = 1
+f7107_0_div_EQ(EOS(STATIC_7107), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7112_0_div_Load(EOS(STATIC_7112), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE && matching1 = 0
+f7110_0_isZero_Return(EOS(STATIC_7110), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), matching1) -> f7118_0_div_EQ(EOS(STATIC_7118), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), 1) :|: TRUE && matching1 = 1
+f7112_0_div_Load(EOS(STATIC_7112), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7120_0_div_InvokeMethod(EOS(STATIC_7120), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) :|: TRUE
+f7118_0_div_EQ(EOS(STATIC_7118), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), matching1) -> f7121_0_div_InvokeMethod(EOS(STATIC_7121)) :|: 1 > 0 && matching1 = 1
+f7120_0_div_InvokeMethod(EOS(STATIC_7120), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) -> f7122_0_isZero_Load(EOS(STATIC_7122), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) :|: TRUE
+f7121_0_div_InvokeMethod(EOS(STATIC_7121)) -> f7123_0_zero_New(EOS(STATIC_7123)) :|: TRUE
+f7122_0_isZero_Load(EOS(STATIC_7122), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) -> f7133_0_isZero_FieldAccess(EOS(STATIC_7133), java.lang.Object(o420sub), java.lang.Object(o421sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o421sub)) :|: TRUE
+f7123_0_zero_New(EOS(STATIC_7123)) -> f7134_0_zero_Duplicate(EOS(STATIC_7134)) :|: TRUE
+f7133_0_isZero_FieldAccess(EOS(STATIC_7133), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, o435)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o435))) -> f7136_0_isZero_FieldAccess(EOS(STATIC_7136), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, o435)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o435))) :|: TRUE
+f7134_0_zero_Duplicate(EOS(STATIC_7134)) -> f7139_0_zero_InvokeMethod(EOS(STATIC_7139)) :|: TRUE
+f7136_0_isZero_FieldAccess(EOS(STATIC_7136), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, o435)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o435))) -> f7145_0_isZero_NONNULL(EOS(STATIC_7145), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, o435)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), o435) :|: TRUE
+f7139_0_zero_InvokeMethod(EOS(STATIC_7139)) -> f7146_0__init__Load(EOS(STATIC_7146)) :|: TRUE
+f7145_0_isZero_NONNULL(EOS(STATIC_7145), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o440sub)) -> f7148_0_isZero_NONNULL(EOS(STATIC_7148), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o440sub)) :|: TRUE
+f7145_0_isZero_NONNULL(EOS(STATIC_7145), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), NULL) -> f7149_0_isZero_NONNULL(EOS(STATIC_7149), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), NULL) :|: TRUE
+f7146_0__init__Load(EOS(STATIC_7146)) -> f7157_0__init__InvokeMethod(EOS(STATIC_7157)) :|: TRUE
+f7148_0_isZero_NONNULL(EOS(STATIC_7148), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o440sub)) -> f7151_0_isZero_ConstantStackPush(EOS(STATIC_7151), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7149_0_isZero_NONNULL(EOS(STATIC_7149), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), NULL) -> f7155_0_isZero_ConstantStackPush(EOS(STATIC_7155), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7151_0_isZero_ConstantStackPush(EOS(STATIC_7151), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7158_0_isZero_Return(EOS(STATIC_7158), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE
+f7155_0_isZero_ConstantStackPush(EOS(STATIC_7155), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7163_0_isZero_JMP(EOS(STATIC_7163), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 1) :|: TRUE
+f7157_0__init__InvokeMethod(EOS(STATIC_7157)) -> f7164_0__init__Return(EOS(STATIC_7164)) :|: TRUE
+f7158_0_isZero_Return(EOS(STATIC_7158), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7165_0_div_EQ(EOS(STATIC_7165), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE && matching1 = 0
+f7163_0_isZero_JMP(EOS(STATIC_7163), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7258_0_isZero_Return(EOS(STATIC_7258), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 1) :|: TRUE && matching1 = 1
+f7164_0__init__Return(EOS(STATIC_7164)) -> f7261_0_zero_Return(EOS(STATIC_7261)) :|: TRUE
+f7165_0_div_EQ(EOS(STATIC_7165), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7263_0_div_Load(EOS(STATIC_7263), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE && matching1 = 0
+f7258_0_isZero_Return(EOS(STATIC_7258), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7266_0_div_EQ(EOS(STATIC_7266), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 1) :|: TRUE && matching1 = 1
+f7261_0_zero_Return(EOS(STATIC_7261)) -> f7267_0_div_Return(EOS(STATIC_7267)) :|: TRUE
+f7263_0_div_Load(EOS(STATIC_7263), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7268_0_div_InvokeMethod(EOS(STATIC_7268), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) :|: TRUE
+f7266_0_div_EQ(EOS(STATIC_7266), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7269_0_div_Load(EOS(STATIC_7269), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: 1 > 0 && matching1 = 1
+f7268_0_div_InvokeMethod(EOS(STATIC_7268), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) -> f7273_0_isZero_Load(EOS(STATIC_7273), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) :|: TRUE
+f7269_0_div_Load(EOS(STATIC_7269), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7275_0_div_Load(EOS(STATIC_7275), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) :|: TRUE
+f7273_0_isZero_Load(EOS(STATIC_7273), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) -> f7305_0_isZero_FieldAccess(EOS(STATIC_7305), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) :|: TRUE
+f7275_0_div_Load(EOS(STATIC_7275), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub)) -> f7284_0_div_Load(EOS(STATIC_7284), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7284_0_div_Load(EOS(STATIC_7284), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7308_0_div_InvokeMethod(EOS(STATIC_7308), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7305_0_isZero_FieldAccess(EOS(STATIC_7305), java.lang.Object(DivTernary2.Nats(EOC, o456)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o456))) -> f7309_0_isZero_FieldAccess(EOS(STATIC_7309), java.lang.Object(DivTernary2.Nats(EOC, o456)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o456))) :|: TRUE
+f7308_0_div_InvokeMethod(EOS(STATIC_7308), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7310_1_div_InvokeMethod(f7310_0_div_Load(EOS(STATIC_7310), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))))) :|: TRUE
+f7309_0_isZero_FieldAccess(EOS(STATIC_7309), java.lang.Object(DivTernary2.Nats(EOC, o456)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, o456))) -> f7316_0_isZero_NONNULL(EOS(STATIC_7316), java.lang.Object(DivTernary2.Nats(EOC, o456)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), o456) :|: TRUE
+f7310_0_div_Load(EOS(STATIC_7310), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7321_0_div_Load(EOS(STATIC_7321), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7316_0_isZero_NONNULL(EOS(STATIC_7316), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) -> f7322_0_isZero_NONNULL(EOS(STATIC_7322), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) :|: TRUE
+f7316_0_isZero_NONNULL(EOS(STATIC_7316), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), NULL) -> f7323_0_isZero_NONNULL(EOS(STATIC_7323), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), NULL) :|: TRUE
+f7322_0_isZero_NONNULL(EOS(STATIC_7322), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) -> f7325_0_isZero_ConstantStackPush(EOS(STATIC_7325), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7323_0_isZero_NONNULL(EOS(STATIC_7323), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), NULL) -> f7329_0_isZero_ConstantStackPush(EOS(STATIC_7329), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7325_0_isZero_ConstantStackPush(EOS(STATIC_7325), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7333_0_isZero_Return(EOS(STATIC_7333), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE
+f7329_0_isZero_ConstantStackPush(EOS(STATIC_7329), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7338_0_isZero_JMP(EOS(STATIC_7338), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 1) :|: TRUE
+f7333_0_isZero_Return(EOS(STATIC_7333), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7387_0_div_EQ(EOS(STATIC_7387), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 0) :|: TRUE && matching1 = 0
+f7338_0_isZero_JMP(EOS(STATIC_7338), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f7397_0_isZero_Return(EOS(STATIC_7397), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 1) :|: TRUE && matching1 = 1
+f7387_0_div_EQ(EOS(STATIC_7387), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f8365_0_div_Load(EOS(STATIC_8365), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE && matching1 = 0
+f7397_0_isZero_Return(EOS(STATIC_7397), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f8371_0_div_EQ(EOS(STATIC_8371), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), 1) :|: TRUE && matching1 = 1
+f8363_0_div_Return(EOS(STATIC_8363)) -> f8374_0_div_InvokeMethod(EOS(STATIC_8374)) :|: TRUE
+f8365_0_div_Load(EOS(STATIC_8365), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f8375_0_div_FieldAccess(EOS(STATIC_8375), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub)))) :|: TRUE
+f8371_0_div_EQ(EOS(STATIC_8371), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), matching1) -> f8376_0_div_InvokeMethod(EOS(STATIC_8376)) :|: 1 > 0 && matching1 = 1
+f8374_0_div_InvokeMethod(EOS(STATIC_8374)) -> f10050_0_div_InvokeMethod(EOS(STATIC_10050)) :|: TRUE
+f8375_0_div_FieldAccess(EOS(STATIC_8375), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub)))) -> f8378_0_div_Load(EOS(STATIC_8378), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) :|: TRUE
+f8376_0_div_InvokeMethod(EOS(STATIC_8376)) -> f8379_0_zero_New(EOS(STATIC_8379)) :|: TRUE
+f8378_0_div_Load(EOS(STATIC_8378), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub)) -> f8382_0_div_FieldAccess(EOS(STATIC_8382), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub)))) :|: TRUE
+f8379_0_zero_New(EOS(STATIC_8379)) -> f8389_0_zero_Duplicate(EOS(STATIC_8389)) :|: TRUE
+f8382_0_div_FieldAccess(EOS(STATIC_8382), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub)))) -> f8388_0_div_Load(EOS(STATIC_8388), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub), java.lang.Object(o440sub)) :|: TRUE
+f8388_0_div_Load(EOS(STATIC_8388), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(o464sub), java.lang.Object(o440sub)) -> f8393_0_div_InvokeMethod(EOS(STATIC_8393), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f8389_0_zero_Duplicate(EOS(STATIC_8389)) -> f8396_0_zero_InvokeMethod(EOS(STATIC_8396)) :|: TRUE
+f8393_0_div_InvokeMethod(EOS(STATIC_8393), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f8398_1_div_InvokeMethod(f8398_0_div_Load(EOS(STATIC_8398), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))))) :|: TRUE
+f8396_0_zero_InvokeMethod(EOS(STATIC_8396)) -> f8399_0__init__Load(EOS(STATIC_8399)) :|: TRUE
+f8398_0_div_Load(EOS(STATIC_8398), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f8403_0_div_Load(EOS(STATIC_8403), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f8399_0__init__Load(EOS(STATIC_8399)) -> f8413_0__init__InvokeMethod(EOS(STATIC_8413)) :|: TRUE
+f8413_0__init__InvokeMethod(EOS(STATIC_8413)) -> f8421_0__init__Return(EOS(STATIC_8421)) :|: TRUE
+f8421_0__init__Return(EOS(STATIC_8421)) -> f8439_0_zero_Return(EOS(STATIC_8439)) :|: TRUE
+f8439_0_zero_Return(EOS(STATIC_8439)) -> f9586_0_div_Return(EOS(STATIC_9586)) :|: TRUE
+f9582_0_div_Return(EOS(STATIC_9582)) -> f9591_0_div_Return(EOS(STATIC_9591)) :|: TRUE
+f9591_0_div_Return(EOS(STATIC_9591)) -> f10078_0_div_Return(EOS(STATIC_10078)) :|: TRUE
+f9653_0_div_Return(EOS(STATIC_9653)) -> f9669_0_div_InvokeMethod(EOS(STATIC_9669)) :|: TRUE
+f9654_0_div_Return(EOS(STATIC_9654)) -> f9671_0_div_Return(EOS(STATIC_9671)) :|: TRUE
+f9658_0_div_Return(EOS(STATIC_9658)) -> f9929_0_div_Return(EOS(STATIC_9929)) :|: TRUE
+f9660_0_div_Return(EOS(STATIC_9660)) -> f9949_0_div_Return(EOS(STATIC_9949)) :|: TRUE
+f9669_0_div_InvokeMethod(EOS(STATIC_9669)) -> f8374_0_div_InvokeMethod(EOS(STATIC_8374)) :|: TRUE
+f9671_0_div_Return(EOS(STATIC_9671)) -> f9591_0_div_Return(EOS(STATIC_9591)) :|: TRUE
+f9929_0_div_Return(EOS(STATIC_9929)) -> f10643_0_div_Return(EOS(STATIC_10643)) :|: TRUE
+f9949_0_div_Return(EOS(STATIC_9949)) -> f10682_0_div_Return(EOS(STATIC_10682)) :|: TRUE
+f10050_0_div_InvokeMethod(EOS(STATIC_10050)) -> f10746_0_div_InvokeMethod(EOS(STATIC_10746)) :|: TRUE
+f10078_0_div_Return(EOS(STATIC_10078)) -> f10773_0_div_Return(EOS(STATIC_10773)) :|: TRUE
+f10203_0_div_Return(EOS(STATIC_10203)) -> f9929_0_div_Return(EOS(STATIC_9929)) :|: TRUE
+f10210_0_div_Return(EOS(STATIC_10210)) -> f9949_0_div_Return(EOS(STATIC_9949)) :|: TRUE
+f10643_0_div_Return(EOS(STATIC_10643)) -> f10746_0_div_InvokeMethod(EOS(STATIC_10746)) :|: TRUE
+f10682_0_div_Return(EOS(STATIC_10682)) -> f10773_0_div_Return(EOS(STATIC_10773)) :|: TRUE
+f10746_0_div_InvokeMethod(EOS(STATIC_10746)) -> f10840_0_succ_New(EOS(STATIC_10840)) :|: TRUE
+f10840_0_succ_New(EOS(STATIC_10840)) -> f10894_0_succ_Duplicate(EOS(STATIC_10894)) :|: TRUE
+f10894_0_succ_Duplicate(EOS(STATIC_10894)) -> f10899_0_succ_InvokeMethod(EOS(STATIC_10899)) :|: TRUE
+f10897_0_div_Return(EOS(STATIC_10897)) -> f10643_0_div_Return(EOS(STATIC_10643)) :|: TRUE
+f10898_0_div_Return(EOS(STATIC_10898)) -> f10682_0_div_Return(EOS(STATIC_10682)) :|: TRUE
+f10899_0_succ_InvokeMethod(EOS(STATIC_10899)) -> f10900_0__init__Load(EOS(STATIC_10900)) :|: TRUE
+f10900_0__init__Load(EOS(STATIC_10900)) -> f10901_0__init__InvokeMethod(EOS(STATIC_10901)) :|: TRUE
+f10901_0__init__InvokeMethod(EOS(STATIC_10901)) -> f10902_0__init__Return(EOS(STATIC_10902)) :|: TRUE
+f10902_0__init__Return(EOS(STATIC_10902)) -> f10904_0_succ_Store(EOS(STATIC_10904)) :|: TRUE
+f10904_0_succ_Store(EOS(STATIC_10904)) -> f10905_0_succ_Load(EOS(STATIC_10905)) :|: TRUE
+f10905_0_succ_Load(EOS(STATIC_10905)) -> f10906_0_succ_Load(EOS(STATIC_10906)) :|: TRUE
+f10906_0_succ_Load(EOS(STATIC_10906)) -> f10907_0_succ_FieldAccess(EOS(STATIC_10907)) :|: TRUE
+f10907_0_succ_FieldAccess(EOS(STATIC_10907)) -> f10908_0_succ_Load(EOS(STATIC_10908)) :|: TRUE
+f10908_0_succ_Load(EOS(STATIC_10908)) -> f10909_0_succ_Return(EOS(STATIC_10909)) :|: TRUE
+f10909_0_succ_Return(EOS(STATIC_10909)) -> f10910_0_div_Return(EOS(STATIC_10910)) :|: TRUE
+f10926_0_div_Return(EOS(STATIC_10926)) -> f10927_0_div_Return(EOS(STATIC_10927)) :|: TRUE
+f10927_0_div_Return(EOS(STATIC_10927)) -> f10938_0_div_InvokeMethod(EOS(STATIC_10938)) :|: TRUE
+f10935_0_div_Return(EOS(STATIC_10935)) -> f10936_0_div_Return(EOS(STATIC_10936)) :|: TRUE
+f10936_0_div_Return(EOS(STATIC_10936)) -> f10939_0_div_Return(EOS(STATIC_10939)) :|: TRUE
+f10938_0_div_InvokeMethod(EOS(STATIC_10938)) -> f10941_0_succ_New(EOS(STATIC_10941)) :|: TRUE
+f10941_0_succ_New(EOS(STATIC_10941)) -> f10948_0_succ_Duplicate(EOS(STATIC_10948)) :|: TRUE
+f10948_0_succ_Duplicate(EOS(STATIC_10948)) -> f10969_0_succ_InvokeMethod(EOS(STATIC_10969)) :|: TRUE
+f10961_0_div_Return(EOS(STATIC_10961)) -> f10643_0_div_Return(EOS(STATIC_10643)) :|: TRUE
+f10965_0_div_Return(EOS(STATIC_10965)) -> f10682_0_div_Return(EOS(STATIC_10682)) :|: TRUE
+f10969_0_succ_InvokeMethod(EOS(STATIC_10969)) -> f10971_0__init__Load(EOS(STATIC_10971)) :|: TRUE
+f10971_0__init__Load(EOS(STATIC_10971)) -> f10974_0__init__InvokeMethod(EOS(STATIC_10974)) :|: TRUE
+f10974_0__init__InvokeMethod(EOS(STATIC_10974)) -> f10976_0__init__Return(EOS(STATIC_10976)) :|: TRUE
+f10976_0__init__Return(EOS(STATIC_10976)) -> f10977_0_succ_Store(EOS(STATIC_10977)) :|: TRUE
+f10977_0_succ_Store(EOS(STATIC_10977)) -> f10978_0_succ_Load(EOS(STATIC_10978)) :|: TRUE
+f10978_0_succ_Load(EOS(STATIC_10978)) -> f10983_0_succ_Load(EOS(STATIC_10983)) :|: TRUE
+f10983_0_succ_Load(EOS(STATIC_10983)) -> f10984_0_succ_FieldAccess(EOS(STATIC_10984)) :|: TRUE
+f10984_0_succ_FieldAccess(EOS(STATIC_10984)) -> f10986_0_succ_Load(EOS(STATIC_10986)) :|: TRUE
+f10986_0_succ_Load(EOS(STATIC_10986)) -> f10987_0_succ_Return(EOS(STATIC_10987)) :|: TRUE
+f10987_0_succ_Return(EOS(STATIC_10987)) -> f10988_0_div_Return(EOS(STATIC_10988)) :|: TRUE
+f10995_0_div_Return(EOS(STATIC_10995)) -> f10927_0_div_Return(EOS(STATIC_10927)) :|: TRUE
+f10998_0_div_Return(EOS(STATIC_10998)) -> f10936_0_div_Return(EOS(STATIC_10936)) :|: TRUE
+f7321_0_div_Load(EOS(STATIC_7321), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7048_0_div_Load(EOS(STATIC_7048), java.lang.Object(o420sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f8403_0_div_Load(EOS(STATIC_8403), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) -> f7048_0_div_Load(EOS(STATIC_7048), java.lang.Object(o464sub), java.lang.Object(o440sub), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub)))) :|: TRUE
+f7310_1_div_InvokeMethod(f7267_0_div_Return(EOS(STATIC_7267))) -> f8363_0_div_Return(EOS(STATIC_8363)) :|: TRUE
+f7310_1_div_InvokeMethod(f9586_0_div_Return(EOS(STATIC_9586))) -> f9653_0_div_Return(EOS(STATIC_9653)) :|: TRUE
+f7310_1_div_InvokeMethod(f9591_0_div_Return(EOS(STATIC_9591))) -> f9658_0_div_Return(EOS(STATIC_9658)) :|: TRUE
+f7310_1_div_InvokeMethod(f10078_0_div_Return(EOS(STATIC_10078))) -> f10203_0_div_Return(EOS(STATIC_10203)) :|: TRUE
+f7310_1_div_InvokeMethod(f10773_0_div_Return(EOS(STATIC_10773))) -> f10897_0_div_Return(EOS(STATIC_10897)) :|: TRUE
+f7310_1_div_InvokeMethod(f10910_0_div_Return(EOS(STATIC_10910))) -> f10926_0_div_Return(EOS(STATIC_10926)) :|: TRUE
+f7310_1_div_InvokeMethod(f10939_0_div_Return(EOS(STATIC_10939))) -> f10961_0_div_Return(EOS(STATIC_10961)) :|: TRUE
+f7310_1_div_InvokeMethod(f10988_0_div_Return(EOS(STATIC_10988))) -> f10995_0_div_Return(EOS(STATIC_10995)) :|: TRUE
+f8398_1_div_InvokeMethod(f7267_0_div_Return(EOS(STATIC_7267))) -> f9582_0_div_Return(EOS(STATIC_9582)) :|: TRUE
+f8398_1_div_InvokeMethod(f9586_0_div_Return(EOS(STATIC_9586))) -> f9654_0_div_Return(EOS(STATIC_9654)) :|: TRUE
+f8398_1_div_InvokeMethod(f9591_0_div_Return(EOS(STATIC_9591))) -> f9660_0_div_Return(EOS(STATIC_9660)) :|: TRUE
+f8398_1_div_InvokeMethod(f10078_0_div_Return(EOS(STATIC_10078))) -> f10210_0_div_Return(EOS(STATIC_10210)) :|: TRUE
+f8398_1_div_InvokeMethod(f10773_0_div_Return(EOS(STATIC_10773))) -> f10898_0_div_Return(EOS(STATIC_10898)) :|: TRUE
+f8398_1_div_InvokeMethod(f10910_0_div_Return(EOS(STATIC_10910))) -> f10935_0_div_Return(EOS(STATIC_10935)) :|: TRUE
+f8398_1_div_InvokeMethod(f10939_0_div_Return(EOS(STATIC_10939))) -> f10965_0_div_Return(EOS(STATIC_10965)) :|: TRUE
+f8398_1_div_InvokeMethod(f10988_0_div_Return(EOS(STATIC_10988))) -> f10998_0_div_Return(EOS(STATIC_10998)) :|: TRUE
+Combined rules. Obtained 2 conditional rules for P and 20 conditional rules for R.P rules:
+f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0)))) -> f8398_1_div_InvokeMethod(f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o464sub:0), java.lang.Object(o440sub:0), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))))) :|: TRUE
+f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o420sub:0), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0)))) -> f7310_1_div_InvokeMethod(f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o420sub:0), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))))) :|: TRUE
+R rules:
+f8398_1_div_InvokeMethod(f10988_0_div_Return(EOS(STATIC_10988))) -> f10939_0_div_Return(EOS(STATIC_10939)) :|: TRUE
+f7310_1_div_InvokeMethod(f10078_0_div_Return(EOS(STATIC_10078))) -> f10910_0_div_Return(EOS(STATIC_10910)) :|: TRUE
+f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0)))) -> f9586_0_div_Return(EOS(STATIC_9586)) :|: TRUE
+f8398_1_div_InvokeMethod(f10939_0_div_Return(EOS(STATIC_10939))) -> f10773_0_div_Return(EOS(STATIC_10773)) :|: TRUE
+f7310_1_div_InvokeMethod(f10988_0_div_Return(EOS(STATIC_10988))) -> f10988_0_div_Return(EOS(STATIC_10988)) :|: TRUE
+f7310_1_div_InvokeMethod(f10773_0_div_Return(EOS(STATIC_10773))) -> f10910_0_div_Return(EOS(STATIC_10910)) :|: TRUE
+f7310_1_div_InvokeMethod(f7267_0_div_Return(EOS(STATIC_7267))) -> f10910_0_div_Return(EOS(STATIC_10910)) :|: TRUE
+f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o420sub:0), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0)))) -> f7310_1_div_InvokeMethod(f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o420sub:0), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))))) :|: TRUE
+f8398_1_div_InvokeMethod(f9586_0_div_Return(EOS(STATIC_9586))) -> f10773_0_div_Return(EOS(STATIC_10773)) :|: TRUE
+f8398_1_div_InvokeMethod(f10773_0_div_Return(EOS(STATIC_10773))) -> f10773_0_div_Return(EOS(STATIC_10773)) :|: TRUE
+f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o420sub:0), java.lang.Object(o421sub:0), java.lang.Object(DivTernary2.Nats(EOC, NULL)), java.lang.Object(DivTernary2.Nats(EOC, NULL))) -> f7267_0_div_Return(EOS(STATIC_7267)) :|: TRUE
+f8398_1_div_InvokeMethod(f10078_0_div_Return(EOS(STATIC_10078))) -> f10773_0_div_Return(EOS(STATIC_10773)) :|: TRUE
+f7310_1_div_InvokeMethod(f9586_0_div_Return(EOS(STATIC_9586))) -> f10910_0_div_Return(EOS(STATIC_10910)) :|: TRUE
+f7310_1_div_InvokeMethod(f10910_0_div_Return(EOS(STATIC_10910))) -> f10988_0_div_Return(EOS(STATIC_10988)) :|: TRUE
+f7310_1_div_InvokeMethod(f10939_0_div_Return(EOS(STATIC_10939))) -> f10910_0_div_Return(EOS(STATIC_10910)) :|: TRUE
+f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o464sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o440sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0)))) -> f8398_1_div_InvokeMethod(f7087_0_div_InvokeMethod(EOS(STATIC_7087), java.lang.Object(o464sub:0), java.lang.Object(o440sub:0), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))), java.lang.Object(DivTernary2.Nats(EOC, java.lang.Object(o424sub:0))))) :|: TRUE
+f7310_1_div_InvokeMethod(f9591_0_div_Return(EOS(STATIC_9591))) -> f10910_0_div_Return(EOS(STATIC_10910)) :|: TRUE
+f8398_1_div_InvokeMethod(f10910_0_div_Return(EOS(STATIC_10910))) -> f10939_0_div_Return(EOS(STATIC_10939)) :|: TRUE
+f8398_1_div_InvokeMethod(f7267_0_div_Return(EOS(STATIC_7267))) -> f10773_0_div_Return(EOS(STATIC_10773)) :|: TRUE
+f8398_1_div_InvokeMethod(f9591_0_div_Return(EOS(STATIC_9591))) -> f10773_0_div_Return(EOS(STATIC_10773)) :|: TRUE
+Filtered ground terms:
+   f7087_0_div_InvokeMethod(x1, x2, x3, x4, x5) -> f7087_0_div_InvokeMethod(x2, x3, x4, x5)
+   DivTernary2.Nats(x1, x2) -> DivTernary2.Nats(x2)
+   f10939_0_div_Return(x1) -> f10939_0_div_Return
+   f10910_0_div_Return(x1) -> f10910_0_div_Return
+   f9586_0_div_Return(x1) -> f9586_0_div_Return
+   f10773_0_div_Return(x1) -> f10773_0_div_Return
+   f10988_0_div_Return(x1) -> f10988_0_div_Return
+   f7267_0_div_Return(x1) -> f7267_0_div_Return
+   f10078_0_div_Return(x1) -> f10078_0_div_Return
+   f9591_0_div_Return(x1) -> f9591_0_div_Return
+Filtered duplicate args:
+   f7087_0_div_InvokeMethod(x1, x2, x3, x4) -> f7087_0_div_InvokeMethod(x1, x2, x4)
+Combined rules. Obtained 2 conditional rules for P and 0 conditional rules for R.P rules:
+F7087_0_DIV_INVOKEMETHOD(java.lang.Object(o420sub:0:0), java.lang.Object(DivTernary2.Nats(NULL)), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0)))) -> F7087_0_DIV_INVOKEMETHOD(java.lang.Object(o420sub:0:0), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0))), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0)))) :|: TRUE
+F7087_0_DIV_INVOKEMETHOD(java.lang.Object(DivTernary2.Nats(java.lang.Object(o464sub:0:0))), java.lang.Object(DivTernary2.Nats(java.lang.Object(o440sub:0:0))), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0)))) -> F7087_0_DIV_INVOKEMETHOD(java.lang.Object(o464sub:0:0), java.lang.Object(o440sub:0:0), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0)))) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F7087_0_DIV_INVOKEMETHOD(java.lang.Object(o420sub:0:0), java.lang.Object(DivTernary2.Nats(NULL)), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0)))) -> F7087_0_DIV_INVOKEMETHOD(java.lang.Object(o420sub:0:0), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0))), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0))))
+   F7087_0_DIV_INVOKEMETHOD(java.lang.Object(DivTernary2.Nats(java.lang.Object(o464sub:0:0))), java.lang.Object(DivTernary2.Nats(java.lang.Object(o440sub:0:0))), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0)))) -> F7087_0_DIV_INVOKEMETHOD(java.lang.Object(o464sub:0:0), java.lang.Object(o440sub:0:0), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0))))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F7087_0_DIV_INVOKEMETHOD(java.lang.Object(DivTernary2.Nats(java.lang.Object(o464sub:0:0))), java.lang.Object(DivTernary2.Nats(java.lang.Object(o440sub:0:0))), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0)))) -> F7087_0_DIV_INVOKEMETHOD(java.lang.Object(o464sub:0:0), java.lang.Object(o440sub:0:0), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0))))
+The graph contains the following edges 1 > 1, 2 > 2, 3 >= 3
+
+
+*F7087_0_DIV_INVOKEMETHOD(java.lang.Object(o420sub:0:0), java.lang.Object(DivTernary2.Nats(NULL)), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0)))) -> F7087_0_DIV_INVOKEMETHOD(java.lang.Object(o420sub:0:0), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0))), java.lang.Object(DivTernary2.Nats(java.lang.Object(o424sub:0:0))))
+The graph contains the following edges 1 >= 1, 3 >= 2, 3 >= 3
+
+
+----------------------------------------
+
+(11)
+YES
+
+----------------------------------------
+
+(12)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: DivTernary2.Nats.<init>(I)V
+SCC calls the following helper methods: DivTernary2.Nats.<init>(I)V
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(13) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 15 IRulesP rules:
+f92_0__init__InvokeMethod(EOS(STATIC_92), i12, i12) -> f95_0__init__Load(EOS(STATIC_95), i12, i12) :|: TRUE
+f95_0__init__Load(EOS(STATIC_95), i12, i12) -> f98_0__init__GT(EOS(STATIC_98), i12, i12, i12) :|: TRUE
+f98_0__init__GT(EOS(STATIC_98), i16, i16, i16) -> f102_0__init__GT(EOS(STATIC_102), i16, i16, i16) :|: TRUE
+f102_0__init__GT(EOS(STATIC_102), i16, i16, i16) -> f121_0__init__Load(EOS(STATIC_121), i16, i16) :|: i16 > 0
+f121_0__init__Load(EOS(STATIC_121), i16, i16) -> f125_0__init__New(EOS(STATIC_125), i16, i16) :|: TRUE
+f125_0__init__New(EOS(STATIC_125), i16, i16) -> f130_0__init__Duplicate(EOS(STATIC_130), i16, i16) :|: TRUE
+f130_0__init__Duplicate(EOS(STATIC_130), i16, i16) -> f139_0__init__Load(EOS(STATIC_139), i16, i16) :|: TRUE
+f139_0__init__Load(EOS(STATIC_139), i16, i16) -> f148_0__init__ConstantStackPush(EOS(STATIC_148), i16, i16) :|: TRUE
+f148_0__init__ConstantStackPush(EOS(STATIC_148), i16, i16) -> f158_0__init__IntArithmetic(EOS(STATIC_158), i16, i16, 1) :|: TRUE
+f158_0__init__IntArithmetic(EOS(STATIC_158), i16, i16, matching1) -> f206_0__init__InvokeMethod(EOS(STATIC_206), i16, i16 - 1) :|: i16 > 0 && matching1 = 1
+f206_0__init__InvokeMethod(EOS(STATIC_206), i16, i26) -> f214_0__init__Load(EOS(STATIC_214), i26, i26) :|: i16 >= 1 && i26 < i16
+f206_0__init__InvokeMethod(EOS(STATIC_206), i16, i26) -> f214_1__init__Load(EOS(STATIC_214), i16, i26) :|: i16 >= 1 && i26 < i16
+f214_0__init__Load(EOS(STATIC_214), i26, i26) -> f223_0__init__Load(EOS(STATIC_223), i26, i26) :|: TRUE
+f223_0__init__Load(EOS(STATIC_223), i26, i26) -> f84_0__init__Load(EOS(STATIC_84), i26, i26) :|: TRUE
+f84_0__init__Load(EOS(STATIC_84), i12, i12) -> f92_0__init__InvokeMethod(EOS(STATIC_92), i12, i12) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f92_0__init__InvokeMethod(EOS(STATIC_92), i12:0, i12:0) -> f92_0__init__InvokeMethod(EOS(STATIC_92), i12:0 - 1, i12:0 - 1) :|: i12:0 > 0 && i12:0 - 1 < i12:0
+Removed following non-SCC rules:
+f92_0__init__InvokeMethod(EOS(STATIC_92), i12:0, i12:0) -> f214_1__init__Load(EOS(STATIC_214), i12:0, i12:0 - 1) :|: i12:0 > 0 && i12:0 - 1 < i12:0
+Filtered constant ground arguments:
+   f92_0__init__InvokeMethod(x1, x2, x3) -> f92_0__init__InvokeMethod(x2, x3)
+   EOS(x1) -> EOS
+Filtered duplicate arguments:
+   f92_0__init__InvokeMethod(x1, x2) -> f92_0__init__InvokeMethod(x2)
+Finished conversion. Obtained 1 rules.P rules:
+f92_0__init__InvokeMethod(i12:0) -> f92_0__init__InvokeMethod(i12:0 - 1) :|: i12:0 > 0 && i12:0 - 1 < i12:0
+
+----------------------------------------
+
+(14)
+Obligation:
+Rules:
+f92_0__init__InvokeMethod(i12:0) -> f92_0__init__InvokeMethod(i12:0 - 1) :|: i12:0 > 0 && i12:0 - 1 < i12:0
+
+----------------------------------------
+
+(15) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(16)
+Obligation:
+Rules:
+f92_0__init__InvokeMethod(i12:0) -> f92_0__init__InvokeMethod(arith) :|: i12:0 > 0 && i12:0 - 1 < i12:0 && arith = i12:0 - 1
+
+----------------------------------------
+
+(17) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f92_0__init__InvokeMethod(i12:0) -> f92_0__init__InvokeMethod(arith) :|: i12:0 > 0 && i12:0 - 1 < i12:0 && arith = i12:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(18)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f92_0__init__InvokeMethod(i12:0) -> f92_0__init__InvokeMethod(arith) :|: i12:0 > 0 && i12:0 - 1 < i12:0 && arith = i12:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(19) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(20)
+Obligation:
+Rules:
+f92_0__init__InvokeMethod(i12:0:0) -> f92_0__init__InvokeMethod(i12:0:0 - 1) :|: i12:0:0 > 0 && i12:0:0 - 1 < i12:0:0
+
+----------------------------------------
+
+(21) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f92_0__init__InvokeMethod(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f92_0__init__InvokeMethod(i12:0:0) -> f92_0__init__InvokeMethod(c) :|: c = i12:0:0 - 1 && (i12:0:0 > 0 && i12:0:0 - 1 < i12:0:0)
+
+----------------------------------------
+
+(23) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f92_0__init__InvokeMethod(x)] = x
+
+The following rules are decreasing:
+f92_0__init__InvokeMethod(i12:0:0) -> f92_0__init__InvokeMethod(c) :|: c = i12:0:0 - 1 && (i12:0:0 > 0 && i12:0:0 - 1 < i12:0:0)
+The following rules are bounded:
+f92_0__init__InvokeMethod(i12:0:0) -> f92_0__init__InvokeMethod(c) :|: c = i12:0:0 - 1 && (i12:0:0 > 0 && i12:0:0 - 1 < i12:0:0)
+
+----------------------------------------
+
+(24)
+YES

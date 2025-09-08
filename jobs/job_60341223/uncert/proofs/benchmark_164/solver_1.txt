@@ -1,0 +1,80 @@
+YES
+We consider the system 9ssM3.
+
+  Alphabet:
+
+    comp : [a -> a * a -> a] --> a -> a 
+    twice : [a -> a] --> a -> a 
+
+  Rules:
+
+    comp(F, G) X => F (G X) 
+    twice(F) => comp(F, F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  comp(F, G) X >? F (G X) 
+  twice(F) >? comp(F, F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o}, comp, twice}, and the following precedence: twice > comp > @_{o -> o}
+
+With these choices, we have:
+
+  1] @_{o -> o}(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [2], by (Star) 
+  2] @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [3], by (Select) 
+  3] comp(F, G) @_{o -> o}*(comp(F, G), X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because [4] 
+  4] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(F, @_{o -> o}(G, X))  because comp > @_{o -> o}, [5] and [7], by (Copy) 
+  5] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= F  because [6], by (Select) 
+  6] F >= F  by (Meta) 
+  7] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= @_{o -> o}(G, X)  because comp > @_{o -> o}, [8] and [10], by (Copy) 
+  8] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= G  because [9], by (Select) 
+  9] G >= G  by (Meta) 
+  10] comp*(F, G, @_{o -> o}*(comp(F, G), X)) >= X  because [11], by (Select) 
+  11] @_{o -> o}*(comp(F, G), X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+
+  13] twice(F) > comp(F, F)  because [14], by definition 
+  14] twice*(F) >= comp(F, F)  because twice > comp, [15] and [15], by (Copy) 
+  15] twice*(F) >= F  because [16], by (Select) 
+  16] F >= F  by (Meta) 
+
+We can thus remove the following rules:
+
+  twice(F) => comp(F, F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  comp(F, G, X) >? F (G X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o}, comp}, and the following precedence: comp > @_{o -> o}
+
+With these choices, we have:
+
+  1] comp(F, G, X) > @_{o -> o}(F, @_{o -> o}(G, X))  because [2], by definition 
+  2] comp*(F, G, X) >= @_{o -> o}(F, @_{o -> o}(G, X))  because comp > @_{o -> o}, [3] and [5], by (Copy) 
+  3] comp*(F, G, X) >= F  because [4], by (Select) 
+  4] F >= F  by (Meta) 
+  5] comp*(F, G, X) >= @_{o -> o}(G, X)  because comp > @_{o -> o}, [6] and [8], by (Copy) 
+  6] comp*(F, G, X) >= G  because [7], by (Select) 
+  7] G >= G  by (Meta) 
+  8] comp*(F, G, X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  comp(F, G, X) => F (G X) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

@@ -1,0 +1,26 @@
+MAYBE
+We consider the system wRuoa.
+
+  Alphabet:
+
+    get : [N -> ArrNN] --> ArrNN 
+    handler : [N -> ArrNN * ArrNArrNN -> ArrNN * N -> ArrNN -> ArrNN * ArrNN] --> ArrNN 
+    lam : [N -> ArrNN] --> ArrNArrNN 
+    put : [N * ArrNN] --> ArrNN 
+    return : [N] --> ArrNN 
+    sub : [N -> ArrNN * N] --> ArrNN 
+
+  Rules:
+
+    get(/\x.put(x, X)) => X 
+    get(/\x.get(/\y.X[y, x])) => get(/\z.X[z, z]) 
+    put(X, put(Y, Z)) => put(Y, Z) 
+    put(X, get(F)) => put(X, sub(F, X)) 
+    sub(/\x.return(x), X) => return(X) 
+    sub(/\x.X, Y) => X 
+    sub(/\x.get(/\y.X[y, x]), Y) => get(/\z.sub(/\u.X[z, u], Y)) 
+    sub(/\x.put(X, Y[x]), Z) => put(X, sub(/\y.Y[y], Z)) 
+    handler(F, G, H, get(I)) => G lam(/\x.handler(F, G, H, I x)) 
+    handler(F, G, H, return(X)) => F X 
+    handler(F, G, H, put(X, Y)) => H X handler(F, G, H, Y) 
+

@@ -1,0 +1,112 @@
+YES
+We consider the system zNDN8.
+
+  Alphabet:
+
+    O : [] --> nat 
+    rec : [nat * a * nat -> a -> a] --> a 
+    s : [nat] --> nat 
+    xap : [nat -> a -> a * nat] --> a -> a 
+    yap : [a -> a * a] --> a 
+
+  Rules:
+
+    rec(O, X, /\x./\y.yap(xap(F, x), y)) => X 
+    rec(s(X), Y, /\x./\y.yap(xap(F, x), y)) => yap(xap(F, X), rec(X, Y, /\z./\u.yap(xap(F, z), u))) 
+    xap(F, X) => F X 
+    yap(F, X) => F X 
+
+Symbol xap is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    O : [] --> nat 
+    rec : [nat * a * nat -> a -> a] --> a 
+    s : [nat] --> nat 
+    yap : [a -> a * a] --> a 
+
+  Rules:
+
+    rec(O, X, /\x./\y.yap(F[x], y)) => X 
+    rec(s(X), Y, /\x./\y.yap(F[x], y)) => yap(F[X], rec(X, Y, /\z./\u.yap(F[z], u))) 
+    yap(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(O, X, /\x./\y.yap(F[x], y)) >? X 
+  rec(s(X), Y, /\x./\y.yap(F[x], y)) >? yap(F[X], rec(X, Y, /\z./\u.yap(F[z], u))) 
+  yap(F, X) >? F X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o}, O, rec, s, yap}, and the following precedence: O > rec > s > yap > @_{o -> o}
+
+With these choices, we have:
+
+  1] rec(O, X, /\x./\y.yap(F[x], y)) > X  because [2], by definition 
+  2] rec*(O, X, /\x./\y.yap(F[x], y)) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] rec(s(X), Y, /\x./\y.yap(F[x], y)) >= yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y)))  because [5], by (Star) 
+  5] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= yap(F[X], rec(X, Y, /\x./\y.yap(F[x], y)))  because rec > yap, [6] and [13], by (Copy) 
+  6] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= F[X]  because [7], by (Select) 
+  7] /\x.yap(F[rec*(s(X), Y, /\y./\z.yap(F[y], z))], x) >= F[X]  because [8], by (Eta)[Kop13:2] 
+  8] F[rec*(s(X), Y, /\x./\y.yap(F[x], y))] >= F[X]  because [9], by (Meta) 
+  9] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= X  because [10], by (Select) 
+  10] s(X) >= X  because [11], by (Star) 
+  11] s*(X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+  13] rec*(s(X), Y, /\x./\y.yap(F[x], y)) >= rec(X, Y, /\x./\y.yap(F[x], y))  because rec in Mul, [14], [16] and [17], by (Stat) 
+  14] s(X) > X  because [15], by definition 
+  15] s*(X) >= X  because [12], by (Select) 
+  16] Y >= Y  by (Meta) 
+  17] /\x./\z.yap(F[x], z) >= /\x./\z.yap(F[x], z)  because [18], by (Abs) 
+  18] /\z.yap(F[y], z) >= /\z.yap(F[y], z)  because [19], by (Abs) 
+  19] yap(F[y], x) >= yap(F[y], x)  because yap in Mul, [20] and [22], by (Fun) 
+  20] F[y] >= F[y]  because [21], by (Meta) 
+  21] y >= y  by (Var) 
+  22] x >= x  by (Var) 
+
+  23] yap(F, X) > @_{o -> o}(F, X)  because [24], by definition 
+  24] yap*(F, X) >= @_{o -> o}(F, X)  because yap > @_{o -> o}, [25] and [27], by (Copy) 
+  25] yap*(F, X) >= F  because [26], by (Select) 
+  26] F >= F  by (Meta) 
+  27] yap*(F, X) >= X  because [28], by (Select) 
+  28] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  rec(O, X, /\x./\y.yap(F[x], y)) => X 
+  yap(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(s(X), Y, /\x./\y.yap(F[x], y)) >? yap(F[X], rec(X, Y, /\z./\u.yap(F[z], u))) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  rec = Lam[y0;y1;G2].1 + y0 + y1 + 2*G2(y0,y1) + y0*y0*G2(y0,y0) 
+  s = Lam[y0].3 + 3*y0 
+  yap = Lam[G0;y1].y1 + 2*G0(0) 
+
+Using this interpretation, the requirements translate to:
+
+  [[rec(s(_x0), _x1, /\x./\y.yap(_F2[x], y))]] = 4 + 3*3*3 + 3*x0 + 3*x1 + 3*3*3*x0 + 3*3*x0*3 + 3*3*x0*3*x0 + 3*x0*3*3 + 3*x0*3*3*x0 + 3*x0*3*x0*3 + 3*x0*3*x0*3*x0 + 4*F2(3 + 3*x0,0) + 3*3*2*F2(3 + 3*x0,0) + 3*3*x0*2*F2(3 + 3*x0,0) + 3*x0*3*2*F2(3 + 3*x0,0) + 3*x0*3*x0*2*F2(3 + 3*x0,0) > 1 + x0 + 3*x1 + x0*x0*x0 + 2*x0*x0*F2(x0,0) + 6*F2(x0,0) = [[yap(_F2[_x0], rec(_x0, _x1, /\x./\y.yap(_F2[x], y)))]] 
+
+We can thus remove the following rules:
+
+  rec(s(X), Y, /\x./\y.yap(F[x], y)) => yap(F[X], rec(X, Y, /\z./\u.yap(F[z], u))) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[Kop13:2]  C. Kop.  StarHorpo with an Eta-Rule.  Unpublished manuscript, http://cl-informatik.uibk.ac.at/users/kop/etahorpo.pdf, 2013.

@@ -1,0 +1,119 @@
+YES
+We consider the system NVsBy.
+
+  Alphabet:
+
+    add : [] --> c -> a -> c 
+    cons : [a * b] --> b 
+    fold : [c -> a -> c * b * c] --> c 
+    mul : [] --> c -> a -> c 
+    nil : [] --> b 
+    one : [] --> c 
+    prod : [b] --> c 
+    sum : [b] --> c 
+    zero : [] --> c 
+
+  Rules:
+
+    fold(F, nil, X) => X 
+    fold(F, cons(X, Y), Z) => fold(F, Y, F Z X) 
+    sum(X) => fold(add, X, zero) 
+    fold(mul, X, one) => prod(X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  fold(F, nil, X) >? X 
+  fold(F, cons(X, Y), Z) >? fold(F, Y, F Z X) 
+  sum(X) >? fold(add, X, zero) 
+  fold(mul, X, one) >? prod(X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[add]] = _|_ 
+  [[fold(x_1, x_2, x_3)]] = fold(x_2, x_1, x_3) 
+  [[zero]] = _|_ 
+
+We choose Lex = {fold} and Mul = {@_{o -> o -> o}, @_{o -> o}, cons, mul, nil, one, prod, sum}, and the following precedence: cons > mul > nil > sum > fold > @_{o -> o -> o} > one > @_{o -> o} > prod
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  fold(F, nil, X) > X 
+  fold(F, cons(X, Y), Z) > fold(F, Y, @_{o -> o}(@_{o -> o -> o}(F, Z), X)) 
+  sum(X) >= fold(_|_, X, _|_) 
+  fold(mul, X, one) > prod(X) 
+
+With these choices, we have:
+
+  1] fold(F, nil, X) > X  because [2], by definition 
+  2] fold*(F, nil, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] fold(F, cons(X, Y), Z) > fold(F, Y, @_{o -> o}(@_{o -> o -> o}(F, Z), X))  because [5], by definition 
+  5] fold*(F, cons(X, Y), Z) >= fold(F, Y, @_{o -> o}(@_{o -> o -> o}(F, Z), X))  because fold in Lex, [6], [9], [11] and [13], by (Stat) 
+  6] cons(X, Y) > Y  because [7], by definition 
+  7] cons*(X, Y) >= Y  because [8], by (Select) 
+  8] Y >= Y  by (Meta) 
+  9] fold*(F, cons(X, Y), Z) >= F  because [10], by (Select) 
+  10] F >= F  by (Meta) 
+  11] fold*(F, cons(X, Y), Z) >= Y  because [12], by (Select) 
+  12] cons(X, Y) >= Y  because [7], by (Star) 
+  13] fold*(F, cons(X, Y), Z) >= @_{o -> o}(@_{o -> o -> o}(F, Z), X)  because fold > @_{o -> o}, [14] and [17], by (Copy) 
+  14] fold*(F, cons(X, Y), Z) >= @_{o -> o -> o}(F, Z)  because fold > @_{o -> o -> o}, [9] and [15], by (Copy) 
+  15] fold*(F, cons(X, Y), Z) >= Z  because [16], by (Select) 
+  16] Z >= Z  by (Meta) 
+  17] fold*(F, cons(X, Y), Z) >= X  because [18], by (Select) 
+  18] cons(X, Y) >= X  because [19], by (Star) 
+  19] cons*(X, Y) >= X  because [20], by (Select) 
+  20] X >= X  by (Meta) 
+
+  21] sum(X) >= fold(_|_, X, _|_)  because [22], by (Star) 
+  22] sum*(X) >= fold(_|_, X, _|_)  because sum > fold, [23], [24] and [26], by (Copy) 
+  23] sum*(X) >= _|_  by (Bot) 
+  24] sum*(X) >= X  because [25], by (Select) 
+  25] X >= X  by (Meta) 
+  26] sum*(X) >= _|_  by (Bot) 
+
+  27] fold(mul, X, one) > prod(X)  because [28], by definition 
+  28] fold*(mul, X, one) >= prod(X)  because fold > prod and [29], by (Copy) 
+  29] fold*(mul, X, one) >= X  because [30], by (Select) 
+  30] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  fold(F, nil, X) => X 
+  fold(F, cons(X, Y), Z) => fold(F, Y, F Z X) 
+  fold(mul, X, one) => prod(X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  sum(X) >? fold(add, X, zero) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  add = Lam[y0;y1].0 
+  fold = Lam[G0;y1;y2].y1 + y2 + G0(0,0) 
+  sum = Lam[y0].3 + 3*y0 
+  zero = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[sum(_x0)]] = 3 + 3*x0 > x0 = [[fold(add, _x0, zero)]] 
+
+We can thus remove the following rules:
+
+  sum(X) => fold(add, X, zero) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

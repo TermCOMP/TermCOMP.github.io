@@ -1,0 +1,201 @@
+YES
+We consider the system IirdL.
+
+  Alphabet:
+
+    cons : [d * e] --> e 
+    g : [] --> b 
+    map!62201 : [d -> d * e] --> e 
+    map!62202 : [d -> a -> d * a * e] --> e 
+    map!62203 : [b -> d -> c -> d * b * c * e] --> e 
+
+  Rules:
+
+    map!62201(F, cons(X, Y)) => cons(F X, map!62201(F, Y)) 
+    map!62202(F, X, cons(Y, Z)) => cons(F Y X, map!62202(F, X, Z)) 
+    map!62203(F, g, X, cons(Y, Z)) => cons(F g Y X, map!62203(F, g, X, Z)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map!62201(F, cons(X, Y)) >? cons(F X, map!62201(F, Y)) 
+  map!62202(F, X, cons(Y, Z)) >? cons(F Y X, map!62202(F, X, Z)) 
+  map!62203(F, g, X, cons(Y, Z)) >? cons(F g Y X, map!62203(F, g, X, Z)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[g]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o -> o}, @_{o -> o -> o}, @_{o -> o}, cons, map!62201, map!62202, map!62203}, and the following precedence: map!62201 > map!62203 > @_{o -> o -> o} = map!62202 > @_{o -> o} > cons > @_{o -> o -> o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  map!62201(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map!62201(F, Y)) 
+  map!62202(F, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Y), X), map!62202(F, X, Z)) 
+  map!62203(F, _|_, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y), X), map!62203(F, _|_, X, Z)) 
+
+With these choices, we have:
+
+  1] map!62201(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map!62201(F, Y))  because [2], by definition 
+  2] map!62201*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map!62201(F, Y))  because map!62201 > cons, [3] and [10], by (Copy) 
+  3] map!62201*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because map!62201 > @_{o -> o}, [4] and [6], by (Copy) 
+  4] map!62201*(F, cons(X, Y)) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] map!62201*(F, cons(X, Y)) >= X  because [7], by (Select) 
+  7] cons(X, Y) >= X  because [8], by (Star) 
+  8] cons*(X, Y) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] map!62201*(F, cons(X, Y)) >= map!62201(F, Y)  because map!62201 in Mul, [11] and [12], by (Stat) 
+  11] F >= F  by (Meta) 
+  12] cons(X, Y) > Y  because [13], by definition 
+  13] cons*(X, Y) >= Y  because [14], by (Select) 
+  14] Y >= Y  by (Meta) 
+
+  15] map!62202(F, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Y), X), map!62202(F, X, Z))  because [16], by (Star) 
+  16] map!62202*(F, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Y), X), map!62202(F, X, Z))  because map!62202 > cons, [17] and [25], by (Copy) 
+  17] map!62202*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), X)  because map!62202 > @_{o -> o}, [18] and [23], by (Copy) 
+  18] map!62202*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, Y)  because map!62202 = @_{o -> o -> o}, map!62202 in Mul, [19] and [20], by (Stat) 
+  19] F >= F  by (Meta) 
+  20] cons(Y, Z) > Y  because [21], by definition 
+  21] cons*(Y, Z) >= Y  because [22], by (Select) 
+  22] Y >= Y  by (Meta) 
+  23] map!62202*(F, X, cons(Y, Z)) >= X  because [24], by (Select) 
+  24] X >= X  by (Meta) 
+  25] map!62202*(F, X, cons(Y, Z)) >= map!62202(F, X, Z)  because map!62202 in Mul, [19], [26] and [27], by (Stat) 
+  26] X >= X  by (Meta) 
+  27] cons(Y, Z) > Z  because [28], by definition 
+  28] cons*(Y, Z) >= Z  because [29], by (Select) 
+  29] Z >= Z  by (Meta) 
+
+  30] map!62203(F, _|_, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y), X), map!62203(F, _|_, X, Z))  because [31], by (Star) 
+  31] map!62203*(F, _|_, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y), X), map!62203(F, _|_, X, Z))  because map!62203 > cons, [32] and [44], by (Copy) 
+  32] map!62203*(F, _|_, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y), X)  because map!62203 > @_{o -> o}, [33] and [42], by (Copy) 
+  33] map!62203*(F, _|_, X, cons(Y, Z)) >= @_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y)  because map!62203 > @_{o -> o -> o}, [34] and [38], by (Copy) 
+  34] map!62203*(F, _|_, X, cons(Y, Z)) >= @_{o -> o -> o -> o}(F, _|_)  because map!62203 > @_{o -> o -> o -> o}, [35] and [37], by (Copy) 
+  35] map!62203*(F, _|_, X, cons(Y, Z)) >= F  because [36], by (Select) 
+  36] F >= F  by (Meta) 
+  37] map!62203*(F, _|_, X, cons(Y, Z)) >= _|_  by (Bot) 
+  38] map!62203*(F, _|_, X, cons(Y, Z)) >= Y  because [39], by (Select) 
+  39] cons(Y, Z) >= Y  because [40], by (Star) 
+  40] cons*(Y, Z) >= Y  because [41], by (Select) 
+  41] Y >= Y  by (Meta) 
+  42] map!62203*(F, _|_, X, cons(Y, Z)) >= X  because [43], by (Select) 
+  43] X >= X  by (Meta) 
+  44] map!62203*(F, _|_, X, cons(Y, Z)) >= map!62203(F, _|_, X, Z)  because map!62203 in Mul, [45], [46], [47] and [48], by (Stat) 
+  45] F >= F  by (Meta) 
+  46] _|_ >= _|_  by (Bot) 
+  47] X >= X  by (Meta) 
+  48] cons(Y, Z) > Z  because [49], by definition 
+  49] cons*(Y, Z) >= Z  because [50], by (Select) 
+  50] Z >= Z  by (Meta) 
+
+We can thus remove the following rules:
+
+  map!62201(F, cons(X, Y)) => cons(F X, map!62201(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map!62202(F, X, cons(Y, Z)) >? cons(F Y X, map!62202(F, X, Z)) 
+  map!62203(F, g, X, cons(Y, Z)) >? cons(F g Y X, map!62203(F, g, X, Z)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[g]] = _|_ 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o -> o}, @_{o -> o -> o}, @_{o -> o}, cons, map!62202, map!62203}, and the following precedence: map!62202 > @_{o -> o -> o -> o} = map!62203 > @_{o -> o -> o} > @_{o -> o} > cons
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  map!62202(F, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Y), X), map!62202(F, X, Z)) 
+  map!62203(F, _|_, X, cons(Y, Z)) > cons(@_{o -> o}(@_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y), X), map!62203(F, _|_, X, Z)) 
+
+With these choices, we have:
+
+  1] map!62202(F, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Y), X), map!62202(F, X, Z))  because [2], by (Star) 
+  2] map!62202*(F, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Y), X), map!62202(F, X, Z))  because map!62202 > cons, [3] and [13], by (Copy) 
+  3] map!62202*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), X)  because map!62202 > @_{o -> o}, [4] and [11], by (Copy) 
+  4] map!62202*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, Y)  because map!62202 > @_{o -> o -> o}, [5] and [7], by (Copy) 
+  5] map!62202*(F, X, cons(Y, Z)) >= F  because [6], by (Select) 
+  6] F >= F  by (Meta) 
+  7] map!62202*(F, X, cons(Y, Z)) >= Y  because [8], by (Select) 
+  8] cons(Y, Z) >= Y  because [9], by (Star) 
+  9] cons*(Y, Z) >= Y  because [10], by (Select) 
+  10] Y >= Y  by (Meta) 
+  11] map!62202*(F, X, cons(Y, Z)) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+  13] map!62202*(F, X, cons(Y, Z)) >= map!62202(F, X, Z)  because map!62202 in Mul, [14], [15] and [16], by (Stat) 
+  14] F >= F  by (Meta) 
+  15] X >= X  by (Meta) 
+  16] cons(Y, Z) > Z  because [17], by definition 
+  17] cons*(Y, Z) >= Z  because [18], by (Select) 
+  18] Z >= Z  by (Meta) 
+
+  19] map!62203(F, _|_, X, cons(Y, Z)) > cons(@_{o -> o}(@_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y), X), map!62203(F, _|_, X, Z))  because [20], by definition 
+  20] map!62203*(F, _|_, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y), X), map!62203(F, _|_, X, Z))  because map!62203 > cons, [21] and [32], by (Copy) 
+  21] map!62203*(F, _|_, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y), X)  because map!62203 > @_{o -> o}, [22] and [30], by (Copy) 
+  22] map!62203*(F, _|_, X, cons(Y, Z)) >= @_{o -> o -> o}(@_{o -> o -> o -> o}(F, _|_), Y)  because map!62203 > @_{o -> o -> o}, [23] and [26], by (Copy) 
+  23] map!62203*(F, _|_, X, cons(Y, Z)) >= @_{o -> o -> o -> o}(F, _|_)  because map!62203 = @_{o -> o -> o -> o}, map!62203 in Mul, [24] and [25], by (Stat) 
+  24] F >= F  by (Meta) 
+  25] X >= _|_  by (Bot) 
+  26] map!62203*(F, _|_, X, cons(Y, Z)) >= Y  because [27], by (Select) 
+  27] cons(Y, Z) >= Y  because [28], by (Star) 
+  28] cons*(Y, Z) >= Y  because [29], by (Select) 
+  29] Y >= Y  by (Meta) 
+  30] map!62203*(F, _|_, X, cons(Y, Z)) >= X  because [31], by (Select) 
+  31] X >= X  by (Meta) 
+  32] map!62203*(F, _|_, X, cons(Y, Z)) >= map!62203(F, _|_, X, Z)  because map!62203 in Mul, [24], [33], [34] and [35], by (Stat) 
+  33] _|_ >= _|_  by (Bot) 
+  34] X >= X  by (Meta) 
+  35] cons(Y, Z) > Z  because [36], by definition 
+  36] cons*(Y, Z) >= Z  because [37], by (Select) 
+  37] Z >= Z  by (Meta) 
+
+We can thus remove the following rules:
+
+  map!62203(F, g, X, cons(Y, Z)) => cons(F g Y X, map!62203(F, g, X, Z)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map!62202(F, X, cons(Y, Z)) >? cons(F Y X, map!62202(F, X, Z)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, cons, map!62202}, and the following precedence: @_{o -> o -> o} = map!62202 > @_{o -> o} > cons
+
+With these choices, we have:
+
+  1] map!62202(F, X, cons(Y, Z)) > cons(@_{o -> o}(@_{o -> o -> o}(F, Y), X), map!62202(F, X, Z))  because [2], by definition 
+  2] map!62202*(F, X, cons(Y, Z)) >= cons(@_{o -> o}(@_{o -> o -> o}(F, Y), X), map!62202(F, X, Z))  because map!62202 > cons, [3] and [11], by (Copy) 
+  3] map!62202*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), X)  because map!62202 > @_{o -> o}, [4] and [9], by (Copy) 
+  4] map!62202*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, Y)  because map!62202 = @_{o -> o -> o}, map!62202 in Mul, [5] and [6], by (Stat) 
+  5] F >= F  by (Meta) 
+  6] cons(Y, Z) > Y  because [7], by definition 
+  7] cons*(Y, Z) >= Y  because [8], by (Select) 
+  8] Y >= Y  by (Meta) 
+  9] map!62202*(F, X, cons(Y, Z)) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+  11] map!62202*(F, X, cons(Y, Z)) >= map!62202(F, X, Z)  because map!62202 in Mul, [5], [12] and [13], by (Stat) 
+  12] X >= X  by (Meta) 
+  13] cons(Y, Z) > Z  because [14], by definition 
+  14] cons*(Y, Z) >= Z  because [15], by (Select) 
+  15] Z >= Z  by (Meta) 
+
+We can thus remove the following rules:
+
+  map!62202(F, X, cons(Y, Z)) => cons(F Y X, map!62202(F, X, Z)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

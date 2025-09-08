@@ -1,0 +1,592 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/fRyjJ.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 63 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 725 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 145 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 23 ms]
+        (13) IRSwT
+        (14) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (15) IRSwT
+        (16) TempFilterProof [SOUND, 41 ms]
+        (17) IntTRS
+        (18) PolynomialOrderProcessor [EQUIVALENT, 11 ms]
+        (19) IntTRS
+        (20) RankingReductionPairProof [EQUIVALENT, 0 ms]
+        (21) YES
+    (22) JBCTerminationSCC
+        (23) SCCToQDPProof [SOUND, 203 ms]
+        (24) QDP
+        (25) UsableRulesReductionPairsProof [EQUIVALENT, 0 ms]
+        (26) QDP
+        (27) MRRProof [EQUIVALENT, 0 ms]
+        (28) QDP
+        (29) PisEmptyProof [EQUIVALENT, 0 ms]
+        (30) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+public class CountMetaList {
+	public static void main(String[] args) {
+		Random.args = args;
+		List l = createMetaList();
+
+		int count = countMetaList(l);
+	}
+
+	public static int countMetaList(List cur) {
+		int res = 0;
+		while (cur != null) {
+			if (cur.value instanceof List) {
+				List inner = (List) cur.value;
+				cur.value = inner.next;
+				cur = new List(inner.value, cur);
+			}
+			cur = cur.next;
+			res++;
+		}
+
+		return res;
+	}
+
+	public static List createMetaList() {
+		int count = Random.random();
+		List cur = null;
+		for (int i = 0; i < count; i++) {
+			int innerCount = Random.random();
+			List innerList = null;
+			for (int j = innerCount; j > 0; j--) {
+				innerList = new List(null, innerList);
+			}
+			cur = new List(innerList, cur);
+		}
+
+		return cur;
+	}
+}
+
+class List {
+	Object value;
+	List next;
+
+	public List(Object v, List n) {
+		this.value = v;
+		this.next = n;
+	}
+}
+
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+public class CountMetaList {
+	public static void main(String[] args) {
+		Random.args = args;
+		List l = createMetaList();
+
+		int count = countMetaList(l);
+	}
+
+	public static int countMetaList(List cur) {
+		int res = 0;
+		while (cur != null) {
+			if (cur.value instanceof List) {
+				List inner = (List) cur.value;
+				cur.value = inner.next;
+				cur = new List(inner.value, cur);
+			}
+			cur = cur.next;
+			res++;
+		}
+
+		return res;
+	}
+
+	public static List createMetaList() {
+		int count = Random.random();
+		List cur = null;
+		for (int i = 0; i < count; i++) {
+			int innerCount = Random.random();
+			List innerList = null;
+			for (int j = innerCount; j > 0; j--) {
+				innerList = new List(null, innerList);
+			}
+			cur = new List(innerList, cur);
+		}
+
+		return cur;
+	}
+}
+
+class List {
+	Object value;
+	List next;
+
+	public List(Object v, List n) {
+		this.value = v;
+		this.next = n;
+	}
+}
+
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+CountMetaList.main([Ljava/lang/String;)V: Graph of 90 nodes with 1 SCC.
+
+
+
+CountMetaList.createMetaList()LList;: Graph of 247 nodes with 1 SCC.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: CountMetaList.createMetaList()LList;
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 71 IRulesP rules:
+f6119_0_createMetaList_Load(EOS(STATIC_6119(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1102) -> f6121_0_createMetaList_GE(EOS(STATIC_6121(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1102, i1101) :|: TRUE
+f6121_0_createMetaList_GE(EOS(STATIC_6121(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1102, i1101) -> f6149_0_createMetaList_GE(EOS(STATIC_6149(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1102, i1101) :|: i1102 < i1101
+f6149_0_createMetaList_GE(EOS(STATIC_6149(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1102, i1101) -> f6205_0_createMetaList_InvokeMethod(EOS(STATIC_6205(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: i1102 < i1101
+f6205_0_createMetaList_InvokeMethod(EOS(STATIC_6205(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f6211_0_random_FieldAccess(EOS(STATIC_6211(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f6211_0_random_FieldAccess(EOS(STATIC_6211(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f6218_0_random_FieldAccess(EOS(STATIC_6218(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(ARRAY(i6))) :|: TRUE
+f6218_0_random_FieldAccess(EOS(STATIC_6218(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(ARRAY(i6))) -> f6237_0_random_ArrayAccess(EOS(STATIC_6237(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(ARRAY(i6))) :|: TRUE
+f6237_0_random_ArrayAccess(EOS(STATIC_6237(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(ARRAY(i6))) -> f6241_0_random_ArrayAccess(EOS(STATIC_6241(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(ARRAY(i6))) :|: TRUE
+f6241_0_random_ArrayAccess(EOS(STATIC_6241(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(ARRAY(i6))) -> f6249_0_random_ArrayAccess(EOS(STATIC_6249(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(ARRAY(i6))) :|: TRUE
+f6249_0_random_ArrayAccess(EOS(STATIC_6249(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(ARRAY(i6))) -> f6258_0_random_Store(EOS(STATIC_6258(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) :|: TRUE
+f6258_0_random_Store(EOS(STATIC_6258(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) -> f6270_0_random_FieldAccess(EOS(STATIC_6270(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) :|: TRUE
+f6270_0_random_FieldAccess(EOS(STATIC_6270(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) -> f6275_0_random_ConstantStackPush(EOS(STATIC_6275(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) :|: TRUE
+f6275_0_random_ConstantStackPush(EOS(STATIC_6275(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) -> f6281_0_random_IntArithmetic(EOS(STATIC_6281(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) :|: TRUE
+f6281_0_random_IntArithmetic(EOS(STATIC_6281(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) -> f6288_0_random_FieldAccess(EOS(STATIC_6288(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) :|: TRUE
+f6288_0_random_FieldAccess(EOS(STATIC_6288(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) -> f6297_0_random_Load(EOS(STATIC_6297(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) :|: TRUE
+f6297_0_random_Load(EOS(STATIC_6297(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) -> f6313_0_random_InvokeMethod(EOS(STATIC_6313(java.lang.Object(ARRAY(i6)))), i1101, i1102, o1631) :|: TRUE
+f6313_0_random_InvokeMethod(EOS(STATIC_6313(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(o1646sub)) -> f6330_0_random_InvokeMethod(EOS(STATIC_6330(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(o1646sub)) :|: TRUE
+f6330_0_random_InvokeMethod(EOS(STATIC_6330(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(o1647sub)) -> f6342_0_random_InvokeMethod(EOS(STATIC_6342(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(o1647sub)) :|: TRUE
+f6342_0_random_InvokeMethod(EOS(STATIC_6342(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(o1647sub)) -> f6365_0_length_Load(EOS(STATIC_6365(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(o1647sub)) :|: TRUE
+f6365_0_length_Load(EOS(STATIC_6365(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(o1647sub)) -> f6384_0_length_FieldAccess(EOS(STATIC_6384(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(o1647sub)) :|: TRUE
+f6384_0_length_FieldAccess(EOS(STATIC_6384(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(java.lang.String(EOC, i1164))) -> f6392_0_length_FieldAccess(EOS(STATIC_6392(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(java.lang.String(EOC, i1164))) :|: i1164 >= 0
+f6392_0_length_FieldAccess(EOS(STATIC_6392(java.lang.Object(ARRAY(i6)))), i1101, i1102, java.lang.Object(java.lang.String(EOC, i1164))) -> f6414_0_length_Return(EOS(STATIC_6414(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) :|: TRUE
+f6414_0_length_Return(EOS(STATIC_6414(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) -> f6420_0_random_Return(EOS(STATIC_6420(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) :|: TRUE
+f6420_0_random_Return(EOS(STATIC_6420(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) -> f6427_0_createMetaList_Store(EOS(STATIC_6427(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) :|: TRUE
+f6427_0_createMetaList_Store(EOS(STATIC_6427(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) -> f6433_0_createMetaList_ConstantStackPush(EOS(STATIC_6433(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) :|: TRUE
+f6433_0_createMetaList_ConstantStackPush(EOS(STATIC_6433(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) -> f6439_0_createMetaList_Store(EOS(STATIC_6439(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) :|: TRUE
+f6439_0_createMetaList_Store(EOS(STATIC_6439(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) -> f6446_0_createMetaList_Load(EOS(STATIC_6446(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) :|: TRUE
+f6446_0_createMetaList_Load(EOS(STATIC_6446(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) -> f6460_0_createMetaList_Store(EOS(STATIC_6460(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) :|: TRUE
+f6460_0_createMetaList_Store(EOS(STATIC_6460(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) -> f6474_0_createMetaList_Load(EOS(STATIC_6474(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) :|: TRUE
+f6474_0_createMetaList_Load(EOS(STATIC_6474(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) -> f7876_0_createMetaList_Load(EOS(STATIC_7876(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1164) :|: TRUE
+f7876_0_createMetaList_Load(EOS(STATIC_7876(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1315) -> f7902_0_createMetaList_LE(EOS(STATIC_7902(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1315, i1315) :|: TRUE
+f7902_0_createMetaList_LE(EOS(STATIC_7902(java.lang.Object(ARRAY(i6)))), i1101, i1102, matching1, matching2) -> f7905_0_createMetaList_LE(EOS(STATIC_7905(java.lang.Object(ARRAY(i6)))), i1101, i1102, 0, 0) :|: TRUE && matching1 = 0 && matching2 = 0
+f7902_0_createMetaList_LE(EOS(STATIC_7902(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371, i1371) -> f7906_0_createMetaList_LE(EOS(STATIC_7906(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371, i1371) :|: TRUE
+f7905_0_createMetaList_LE(EOS(STATIC_7905(java.lang.Object(ARRAY(i6)))), i1101, i1102, matching1, matching2) -> f7912_0_createMetaList_New(EOS(STATIC_7912(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: 0 <= 0 && matching1 = 0 && matching2 = 0
+f7912_0_createMetaList_New(EOS(STATIC_7912(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7917_0_createMetaList_Duplicate(EOS(STATIC_7917(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7917_0_createMetaList_Duplicate(EOS(STATIC_7917(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7923_0_createMetaList_Load(EOS(STATIC_7923(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7923_0_createMetaList_Load(EOS(STATIC_7923(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7927_0_createMetaList_Load(EOS(STATIC_7927(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7927_0_createMetaList_Load(EOS(STATIC_7927(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7933_0_createMetaList_InvokeMethod(EOS(STATIC_7933(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7933_0_createMetaList_InvokeMethod(EOS(STATIC_7933(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7937_0__init__Load(EOS(STATIC_7937(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7937_0__init__Load(EOS(STATIC_7937(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7947_0__init__InvokeMethod(EOS(STATIC_7947(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7947_0__init__InvokeMethod(EOS(STATIC_7947(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7953_0__init__Load(EOS(STATIC_7953(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7953_0__init__Load(EOS(STATIC_7953(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7956_0__init__Load(EOS(STATIC_7956(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7956_0__init__Load(EOS(STATIC_7956(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7959_0__init__FieldAccess(EOS(STATIC_7959(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7959_0__init__FieldAccess(EOS(STATIC_7959(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7962_0__init__Load(EOS(STATIC_7962(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7962_0__init__Load(EOS(STATIC_7962(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7972_0__init__Load(EOS(STATIC_7972(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7972_0__init__Load(EOS(STATIC_7972(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7979_0__init__FieldAccess(EOS(STATIC_7979(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7979_0__init__FieldAccess(EOS(STATIC_7979(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7982_0__init__Return(EOS(STATIC_7982(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7982_0__init__Return(EOS(STATIC_7982(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7992_0_createMetaList_Store(EOS(STATIC_7992(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7992_0_createMetaList_Store(EOS(STATIC_7992(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f7997_0_createMetaList_Inc(EOS(STATIC_7997(java.lang.Object(ARRAY(i6)))), i1101, i1102) :|: TRUE
+f7997_0_createMetaList_Inc(EOS(STATIC_7997(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f8000_0_createMetaList_JMP(EOS(STATIC_8000(java.lang.Object(ARRAY(i6)))), i1101, i1102 + 1) :|: TRUE
+f8000_0_createMetaList_JMP(EOS(STATIC_8000(java.lang.Object(ARRAY(i6)))), i1101, i1375) -> f8028_0_createMetaList_Load(EOS(STATIC_8028(java.lang.Object(ARRAY(i6)))), i1101, i1375) :|: TRUE
+f8028_0_createMetaList_Load(EOS(STATIC_8028(java.lang.Object(ARRAY(i6)))), i1101, i1375) -> f6109_0_createMetaList_Load(EOS(STATIC_6109(java.lang.Object(ARRAY(i6)))), i1101, i1375) :|: TRUE
+f6109_0_createMetaList_Load(EOS(STATIC_6109(java.lang.Object(ARRAY(i6)))), i1101, i1102) -> f6119_0_createMetaList_Load(EOS(STATIC_6119(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1102) :|: TRUE
+f7906_0_createMetaList_LE(EOS(STATIC_7906(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371, i1371) -> f7913_0_createMetaList_New(EOS(STATIC_7913(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: i1371 > 0
+f7913_0_createMetaList_New(EOS(STATIC_7913(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7919_0_createMetaList_Duplicate(EOS(STATIC_7919(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7919_0_createMetaList_Duplicate(EOS(STATIC_7919(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7924_0_createMetaList_ConstantStackPush(EOS(STATIC_7924(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7924_0_createMetaList_ConstantStackPush(EOS(STATIC_7924(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7929_0_createMetaList_Load(EOS(STATIC_7929(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7929_0_createMetaList_Load(EOS(STATIC_7929(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7934_0_createMetaList_InvokeMethod(EOS(STATIC_7934(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7934_0_createMetaList_InvokeMethod(EOS(STATIC_7934(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7940_0__init__Load(EOS(STATIC_7940(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7940_0__init__Load(EOS(STATIC_7940(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7951_0__init__InvokeMethod(EOS(STATIC_7951(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7951_0__init__InvokeMethod(EOS(STATIC_7951(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7954_0__init__Load(EOS(STATIC_7954(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7954_0__init__Load(EOS(STATIC_7954(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7957_0__init__Load(EOS(STATIC_7957(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7957_0__init__Load(EOS(STATIC_7957(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7960_0__init__FieldAccess(EOS(STATIC_7960(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7960_0__init__FieldAccess(EOS(STATIC_7960(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7963_0__init__Load(EOS(STATIC_7963(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7963_0__init__Load(EOS(STATIC_7963(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7975_0__init__Load(EOS(STATIC_7975(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7975_0__init__Load(EOS(STATIC_7975(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7980_0__init__FieldAccess(EOS(STATIC_7980(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7980_0__init__FieldAccess(EOS(STATIC_7980(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7983_0__init__Return(EOS(STATIC_7983(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7983_0__init__Return(EOS(STATIC_7983(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7994_0_createMetaList_Store(EOS(STATIC_7994(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7994_0_createMetaList_Store(EOS(STATIC_7994(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f7998_0_createMetaList_Inc(EOS(STATIC_7998(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) :|: TRUE
+f7998_0_createMetaList_Inc(EOS(STATIC_7998(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371) -> f8001_0_createMetaList_JMP(EOS(STATIC_8001(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1371 + -1) :|: TRUE
+f8001_0_createMetaList_JMP(EOS(STATIC_8001(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1376) -> f8043_0_createMetaList_Load(EOS(STATIC_8043(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1376) :|: TRUE
+f8043_0_createMetaList_Load(EOS(STATIC_8043(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1376) -> f7876_0_createMetaList_Load(EOS(STATIC_7876(java.lang.Object(ARRAY(i6)))), i1101, i1102, i1376) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f7902_0_createMetaList_LE(EOS(STATIC_7902(java.lang.Object(ARRAY(i6:0)))), i1101:0, i1102:0, i1371:0, i1371:0) -> f7902_0_createMetaList_LE(EOS(STATIC_7902(java.lang.Object(ARRAY(i6:0)))), i1101:0, i1102:0, i1371:0 - 1, i1371:0 - 1) :|: i1371:0 > 0
+f7902_0_createMetaList_LE(EOS(STATIC_7902(java.lang.Object(ARRAY(i6:0)))), i1101:0, i1102:0, 0, 0) -> f7902_0_createMetaList_LE(EOS(STATIC_7902(java.lang.Object(ARRAY(i6:0)))), i1101:0, i1102:0 + 1, i1164:0, i1164:0) :|: i1102:0 + 1 < i1101:0 && i1164:0 > -1
+Filtered duplicate arguments:
+   f7902_0_createMetaList_LE(x1, x2, x3, x4, x5) -> f7902_0_createMetaList_LE(x1, x2, x3, x5)
+Filtered unneeded arguments:
+   f7902_0_createMetaList_LE(x1, x2, x3, x4) -> f7902_0_createMetaList_LE(x2, x3, x4)
+Finished conversion. Obtained 2 rules.P rules:
+f7902_0_createMetaList_LE(i1101:0, i1102:0, i1371:0) -> f7902_0_createMetaList_LE(i1101:0, i1102:0, i1371:0 - 1) :|: i1371:0 > 0
+f7902_0_createMetaList_LE(i1101:0, i1102:0, cons_0) -> f7902_0_createMetaList_LE(i1101:0, i1102:0 + 1, i1164:0) :|: i1102:0 + 1 < i1101:0 && i1164:0 > -1 && cons_0 = 0
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f7902_0_createMetaList_LE(i1101:0, i1102:0, i1371:0) -> f7902_0_createMetaList_LE(i1101:0, i1102:0, i1371:0 - 1) :|: i1371:0 > 0
+f7902_0_createMetaList_LE(x, x1, x2) -> f7902_0_createMetaList_LE(x, x1 + 1, x3) :|: x1 + 1 < x && x3 > -1 && x2 = 0
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f7902_0_createMetaList_LE(i1101:0, i1102:0, i1371:0) -> f7902_0_createMetaList_LE(i1101:0, i1102:0, arith) :|: i1371:0 > 0 && arith = i1371:0 - 1
+f7902_0_createMetaList_LE(x4, x5, x6) -> f7902_0_createMetaList_LE(x4, x7, x8) :|: x5 + 1 < x4 && x8 > -1 && x6 = 0 && x7 = x5 + 1
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f7902_0_createMetaList_LE(i1101:0, i1102:0, i1371:0) -> f7902_0_createMetaList_LE(i1101:0, i1102:0, arith) :|: i1371:0 > 0 && arith = i1371:0 - 1
+(2) f7902_0_createMetaList_LE(x4, x5, x6) -> f7902_0_createMetaList_LE(x4, x7, x8) :|: x5 + 1 < x4 && x8 > -1 && x6 = 0 && x7 = x5 + 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f7902_0_createMetaList_LE(i1101:0, i1102:0, i1371:0) -> f7902_0_createMetaList_LE(i1101:0, i1102:0, arith) :|: i1371:0 > 0 && arith = i1371:0 - 1
+(2) f7902_0_createMetaList_LE(x4, x5, x6) -> f7902_0_createMetaList_LE(x4, x7, x8) :|: x5 + 1 < x4 && x8 > -1 && x6 = 0 && x7 = x5 + 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(14) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(15)
+Obligation:
+Rules:
+f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, i1371:0:0) -> f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, i1371:0:0 - 1) :|: i1371:0:0 > 0
+f7902_0_createMetaList_LE(x4:0, x5:0, cons_0) -> f7902_0_createMetaList_LE(x4:0, x5:0 + 1, x8:0) :|: x5:0 + 1 < x4:0 && x8:0 > -1 && cons_0 = 0
+
+----------------------------------------
+
+(16) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f7902_0_createMetaList_LE(VARIABLE, VARIABLE, INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(17)
+Obligation:
+Rules:
+f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, i1371:0:0) -> f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, c) :|: c = i1371:0:0 - 1 && i1371:0:0 > 0
+f7902_0_createMetaList_LE(x4:0, x5:0, c1) -> f7902_0_createMetaList_LE(x4:0, c2, x8:0) :|: c2 = x5:0 + 1 && c1 = 0 && (x5:0 + 1 < x4:0 && x8:0 > -1 && cons_0 = 0)
+
+----------------------------------------
+
+(18) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f7902_0_createMetaList_LE(x, x1, x2)] = -1 + x - x1
+
+The following rules are decreasing:
+f7902_0_createMetaList_LE(x4:0, x5:0, c1) -> f7902_0_createMetaList_LE(x4:0, c2, x8:0) :|: c2 = x5:0 + 1 && c1 = 0 && (x5:0 + 1 < x4:0 && x8:0 > -1 && cons_0 = 0)
+The following rules are bounded:
+f7902_0_createMetaList_LE(x4:0, x5:0, c1) -> f7902_0_createMetaList_LE(x4:0, c2, x8:0) :|: c2 = x5:0 + 1 && c1 = 0 && (x5:0 + 1 < x4:0 && x8:0 > -1 && cons_0 = 0)
+
+----------------------------------------
+
+(19)
+Obligation:
+Rules:
+f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, i1371:0:0) -> f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, c) :|: c = i1371:0:0 - 1 && i1371:0:0 > 0
+
+----------------------------------------
+
+(20) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f7902_0_createMetaList_LE ] = f7902_0_createMetaList_LE_3
+
+The following rules are decreasing:
+f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, i1371:0:0) -> f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, c) :|: c = i1371:0:0 - 1 && i1371:0:0 > 0
+
+The following rules are bounded:
+f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, i1371:0:0) -> f7902_0_createMetaList_LE(i1101:0:0, i1102:0:0, c) :|: c = i1371:0:0 - 1 && i1371:0:0 > 0
+
+
+----------------------------------------
+
+(21)
+YES
+
+----------------------------------------
+
+(22)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: CountMetaList.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*List: [value, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(23) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 56 rules for P and 0 rules for R.P rules:
+f7168_0_countMetaList_NULL(EOS(STATIC_7168), java.lang.Object(o1855sub), java.lang.Object(o1855sub)) -> f7175_0_countMetaList_NULL(EOS(STATIC_7175), java.lang.Object(o1855sub), java.lang.Object(o1855sub)) :|: TRUE
+f7175_0_countMetaList_NULL(EOS(STATIC_7175), java.lang.Object(o1855sub), java.lang.Object(o1855sub)) -> f7183_0_countMetaList_Load(EOS(STATIC_7183), java.lang.Object(o1855sub)) :|: TRUE
+f7183_0_countMetaList_Load(EOS(STATIC_7183), java.lang.Object(o1855sub)) -> f7190_0_countMetaList_FieldAccess(EOS(STATIC_7190), java.lang.Object(o1855sub), java.lang.Object(o1855sub)) :|: TRUE
+f7190_0_countMetaList_FieldAccess(EOS(STATIC_7190), java.lang.Object(List(EOC, o1858, o1859)), java.lang.Object(List(EOC, o1858, o1859))) -> f7197_0_countMetaList_FieldAccess(EOS(STATIC_7197), java.lang.Object(List(EOC, o1858, o1859)), java.lang.Object(List(EOC, o1858, o1859))) :|: TRUE
+f7197_0_countMetaList_FieldAccess(EOS(STATIC_7197), java.lang.Object(List(EOC, o1858, o1859)), java.lang.Object(List(EOC, o1858, o1859))) -> f7209_0_countMetaList_CheckCast(EOS(STATIC_7209), java.lang.Object(List(EOC, o1858, o1859)), o1858) :|: TRUE
+f7209_0_countMetaList_CheckCast(EOS(STATIC_7209), java.lang.Object(List(EOC, java.lang.Object(o1884sub), o1859)), java.lang.Object(o1884sub)) -> f7219_0_countMetaList_CheckCast(EOS(STATIC_7219), java.lang.Object(List(EOC, java.lang.Object(o1884sub), o1859)), java.lang.Object(o1884sub)) :|: TRUE
+f7209_0_countMetaList_CheckCast(EOS(STATIC_7209), java.lang.Object(List(EOC, NULL, o1859)), NULL) -> f7221_0_countMetaList_CheckCast(EOS(STATIC_7221), java.lang.Object(List(EOC, NULL, o1859)), NULL) :|: TRUE
+f7219_0_countMetaList_CheckCast(EOS(STATIC_7219), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) -> f7234_0_countMetaList_CheckCast(EOS(STATIC_7234), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) :|: TRUE
+f7219_0_countMetaList_CheckCast(EOS(STATIC_7219), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859)), java.lang.Object(EOC)) -> f7235_0_countMetaList_CheckCast(EOS(STATIC_7235), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859)), java.lang.Object(EOC)) :|: TRUE
+f7234_0_countMetaList_CheckCast(EOS(STATIC_7234), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) -> f7251_0_countMetaList_EQ(EOS(STATIC_7251), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), 1) :|: TRUE
+f7251_0_countMetaList_EQ(EOS(STATIC_7251), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), matching1) -> f7276_0_countMetaList_Load(EOS(STATIC_7276), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859))) :|: 1 > 0 && matching1 = 1
+f7276_0_countMetaList_Load(EOS(STATIC_7276), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859))) -> f7289_0_countMetaList_FieldAccess(EOS(STATIC_7289), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859))) :|: TRUE
+f7289_0_countMetaList_FieldAccess(EOS(STATIC_7289), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859))) -> f7302_0_countMetaList_CheckCast(EOS(STATIC_7302), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) :|: TRUE
+f7302_0_countMetaList_CheckCast(EOS(STATIC_7302), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) -> f7324_0_countMetaList_Store(EOS(STATIC_7324), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) :|: TRUE
+f7324_0_countMetaList_Store(EOS(STATIC_7324), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) -> f7380_0_countMetaList_Load(EOS(STATIC_7380), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) :|: TRUE
+f7380_0_countMetaList_Load(EOS(STATIC_7380), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) -> f7454_0_countMetaList_Load(EOS(STATIC_7454), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859))) :|: TRUE
+f7454_0_countMetaList_Load(EOS(STATIC_7454), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859))) -> f7457_0_countMetaList_FieldAccess(EOS(STATIC_7457), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub), java.lang.Object(List(EOC, java.lang.Object(o1896sub), o1859)), java.lang.Object(o1896sub)) :|: TRUE
+f7457_0_countMetaList_FieldAccess(EOS(STATIC_7457), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), java.lang.Object(List(EOC, o2006, o2007)), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), java.lang.Object(List(EOC, o2006, o2007))) -> f7901_0_countMetaList_FieldAccess(EOS(STATIC_7901), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), java.lang.Object(List(EOC, o2006, o2007)), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), java.lang.Object(List(EOC, o2006, o2007))) :|: TRUE
+f7901_0_countMetaList_FieldAccess(EOS(STATIC_7901), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), java.lang.Object(List(EOC, o2006, o2007)), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), java.lang.Object(List(EOC, o2006, o2007))) -> f7903_0_countMetaList_FieldAccess(EOS(STATIC_7903), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), java.lang.Object(List(EOC, o2006, o2007)), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), o2007) :|: TRUE
+f7903_0_countMetaList_FieldAccess(EOS(STATIC_7903), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), java.lang.Object(List(EOC, o2006, o2007)), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006, o2007)), o1859)), o2007) -> f7911_0_countMetaList_New(EOS(STATIC_7911), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, o2006, o2007))) :|: TRUE
+f7911_0_countMetaList_New(EOS(STATIC_7911), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, o2006, o2007))) -> f7915_0_countMetaList_Duplicate(EOS(STATIC_7915), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, o2006, o2007)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f7915_0_countMetaList_Duplicate(EOS(STATIC_7915), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, o2006, o2007)), java.lang.Object(List(EOC, NULL, NULL))) -> f7921_0_countMetaList_Load(EOS(STATIC_7921), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, o2006, o2007)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f7921_0_countMetaList_Load(EOS(STATIC_7921), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, o2006, o2007)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL))) -> f7926_0_countMetaList_FieldAccess(EOS(STATIC_7926), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, o2006, o2007))) :|: TRUE
+f7926_0_countMetaList_FieldAccess(EOS(STATIC_7926), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, o2006, o2007))) -> f7931_0_countMetaList_Load(EOS(STATIC_7931), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006) :|: TRUE
+f7931_0_countMetaList_Load(EOS(STATIC_7931), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006) -> f7935_0_countMetaList_InvokeMethod(EOS(STATIC_7935), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f7935_0_countMetaList_InvokeMethod(EOS(STATIC_7935), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859))) -> f7942_0__init__Load(EOS(STATIC_7942), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f7942_0__init__Load(EOS(STATIC_7942), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859))) -> f7952_0__init__InvokeMethod(EOS(STATIC_7952), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f7952_0__init__InvokeMethod(EOS(STATIC_7952), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL))) -> f7955_0__init__Load(EOS(STATIC_7955), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f7955_0__init__Load(EOS(STATIC_7955), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859))) -> f7958_0__init__Load(EOS(STATIC_7958), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL))) :|: TRUE
+f7958_0__init__Load(EOS(STATIC_7958), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), o2006, java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL))) -> f7961_0__init__FieldAccess(EOS(STATIC_7961), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL)), o2006) :|: TRUE
+f7961_0__init__FieldAccess(EOS(STATIC_7961), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, NULL, NULL)), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, NULL, NULL)), o2006) -> f7969_0__init__Load(EOS(STATIC_7969), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f7969_0__init__Load(EOS(STATIC_7969), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2007, o1859))) -> f7977_0__init__Load(EOS(STATIC_7977), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, o2006, NULL))) :|: TRUE
+f7977_0__init__Load(EOS(STATIC_7977), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2007, o1859)), java.lang.Object(List(EOC, o2006, NULL))) -> f7981_0__init__FieldAccess(EOS(STATIC_7981), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f7981_0__init__FieldAccess(EOS(STATIC_7981), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2006, NULL)), java.lang.Object(List(EOC, o2007, o1859))) -> f7989_0__init__Return(EOS(STATIC_7989), java.lang.Object(List(EOC, o2006, java.lang.Object(List(EOC, o2007, o1859))))) :|: TRUE
+f7989_0__init__Return(EOS(STATIC_7989), java.lang.Object(List(EOC, o2006, java.lang.Object(List(EOC, o2007, o1859))))) -> f7995_0_countMetaList_Store(EOS(STATIC_7995), java.lang.Object(List(EOC, o2006, java.lang.Object(List(EOC, o2007, o1859))))) :|: TRUE
+f7995_0_countMetaList_Store(EOS(STATIC_7995), java.lang.Object(List(EOC, o2006, java.lang.Object(List(EOC, o2007, o1859))))) -> f7999_0_countMetaList_Load(EOS(STATIC_7999), java.lang.Object(List(EOC, o2006, java.lang.Object(List(EOC, o2007, o1859))))) :|: TRUE
+f7999_0_countMetaList_Load(EOS(STATIC_7999), java.lang.Object(List(EOC, o2006, java.lang.Object(List(EOC, o2007, o1859))))) -> f8002_0_countMetaList_FieldAccess(EOS(STATIC_8002), java.lang.Object(List(EOC, o2006, java.lang.Object(List(EOC, o2007, o1859))))) :|: TRUE
+f8002_0_countMetaList_FieldAccess(EOS(STATIC_8002), java.lang.Object(List(EOC, o2006, java.lang.Object(List(EOC, o2007, o1859))))) -> f8049_0_countMetaList_Store(EOS(STATIC_8049), java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f8049_0_countMetaList_Store(EOS(STATIC_8049), java.lang.Object(List(EOC, o2007, o1859))) -> f8051_0_countMetaList_Inc(EOS(STATIC_8051), java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f8051_0_countMetaList_Inc(EOS(STATIC_8051), java.lang.Object(List(EOC, o2007, o1859))) -> f8052_0_countMetaList_JMP(EOS(STATIC_8052), java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f8052_0_countMetaList_JMP(EOS(STATIC_8052), java.lang.Object(List(EOC, o2007, o1859))) -> f8065_0_countMetaList_Load(EOS(STATIC_8065), java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f8065_0_countMetaList_Load(EOS(STATIC_8065), java.lang.Object(List(EOC, o2007, o1859))) -> f7073_0_countMetaList_Load(EOS(STATIC_7073), java.lang.Object(List(EOC, o2007, o1859))) :|: TRUE
+f7073_0_countMetaList_Load(EOS(STATIC_7073), o1843) -> f7168_0_countMetaList_NULL(EOS(STATIC_7168), o1843, o1843) :|: TRUE
+f7235_0_countMetaList_CheckCast(EOS(STATIC_7235), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859)), java.lang.Object(EOC)) -> f7256_0_countMetaList_EQ(EOS(STATIC_7256), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859)), 0) :|: TRUE
+f7256_0_countMetaList_EQ(EOS(STATIC_7256), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859)), matching1) -> f7279_0_countMetaList_Load(EOS(STATIC_7279), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859))) :|: TRUE && matching1 = 0
+f7279_0_countMetaList_Load(EOS(STATIC_7279), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859))) -> f7292_0_countMetaList_FieldAccess(EOS(STATIC_7292), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859))) :|: TRUE
+f7292_0_countMetaList_FieldAccess(EOS(STATIC_7292), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859))) -> f7307_0_countMetaList_Store(EOS(STATIC_7307), o1859) :|: TRUE
+f7307_0_countMetaList_Store(EOS(STATIC_7307), o1859) -> f7294_0_countMetaList_Store(EOS(STATIC_7294), o1859) :|: TRUE
+f7294_0_countMetaList_Store(EOS(STATIC_7294), o1859) -> f7309_0_countMetaList_Inc(EOS(STATIC_7309), o1859) :|: TRUE
+f7309_0_countMetaList_Inc(EOS(STATIC_7309), o1859) -> f7328_0_countMetaList_JMP(EOS(STATIC_7328), o1859) :|: TRUE
+f7328_0_countMetaList_JMP(EOS(STATIC_7328), o1859) -> f7416_0_countMetaList_Load(EOS(STATIC_7416), o1859) :|: TRUE
+f7416_0_countMetaList_Load(EOS(STATIC_7416), o1859) -> f7073_0_countMetaList_Load(EOS(STATIC_7073), o1859) :|: TRUE
+f7221_0_countMetaList_CheckCast(EOS(STATIC_7221), java.lang.Object(List(EOC, NULL, o1859)), NULL) -> f7238_0_countMetaList_EQ(EOS(STATIC_7238), java.lang.Object(List(EOC, NULL, o1859)), 0) :|: TRUE
+f7238_0_countMetaList_EQ(EOS(STATIC_7238), java.lang.Object(List(EOC, NULL, o1859)), matching1) -> f7258_0_countMetaList_Load(EOS(STATIC_7258), java.lang.Object(List(EOC, NULL, o1859))) :|: TRUE && matching1 = 0
+f7258_0_countMetaList_Load(EOS(STATIC_7258), java.lang.Object(List(EOC, NULL, o1859))) -> f7281_0_countMetaList_FieldAccess(EOS(STATIC_7281), java.lang.Object(List(EOC, NULL, o1859))) :|: TRUE
+f7281_0_countMetaList_FieldAccess(EOS(STATIC_7281), java.lang.Object(List(EOC, NULL, o1859))) -> f7294_0_countMetaList_Store(EOS(STATIC_7294), o1859) :|: TRUE
+R rules:
+Combined rules. Obtained 3 conditional rules for P and 0 conditional rules for R.P rules:
+f7168_0_countMetaList_NULL(EOS(STATIC_7168), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859:0)), java.lang.Object(List(EOC, java.lang.Object(EOC), o1859:0))) -> f7168_0_countMetaList_NULL(EOS(STATIC_7168), o1859:0, o1859:0) :|: TRUE
+f7168_0_countMetaList_NULL(EOS(STATIC_7168), java.lang.Object(List(EOC, NULL, o1859:0)), java.lang.Object(List(EOC, NULL, o1859:0))) -> f7168_0_countMetaList_NULL(EOS(STATIC_7168), o1859:0, o1859:0) :|: TRUE
+f7168_0_countMetaList_NULL(EOS(STATIC_7168), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006:0, o2007:0)), o1859:0)), java.lang.Object(List(EOC, java.lang.Object(List(EOC, o2006:0, o2007:0)), o1859:0))) -> f7168_0_countMetaList_NULL(EOS(STATIC_7168), java.lang.Object(List(EOC, o2007:0, o1859:0)), java.lang.Object(List(EOC, o2007:0, o1859:0))) :|: TRUE
+R rules:
+Filtered ground terms:
+   f7168_0_countMetaList_NULL(x1, x2, x3) -> f7168_0_countMetaList_NULL(x2, x3)
+   EOS(x1) -> EOS
+   List(x1, x2, x3) -> List(x2, x3)
+Filtered duplicate args:
+   f7168_0_countMetaList_NULL(x1, x2) -> f7168_0_countMetaList_NULL(x2)
+Combined rules. Obtained 3 conditional rules for P and 0 conditional rules for R.P rules:
+F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(java.lang.Object(List(o2006:0:0, o2007:0:0)), o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(o2007:0:0, o1859:0:0))) :|: TRUE
+F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(java.lang.Object(EOC), o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(o1859:0:0) :|: TRUE
+F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(NULL, o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(o1859:0:0) :|: TRUE
+R rules:
+
+----------------------------------------
+
+(24)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(java.lang.Object(List(o2006:0:0, o2007:0:0)), o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(o2007:0:0, o1859:0:0)))
+   F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(java.lang.Object(EOC), o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(o1859:0:0)
+   F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(NULL, o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(o1859:0:0)
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(25) UsableRulesReductionPairsProof (EQUIVALENT)
+By using the usable rules with reduction pair processor [LPAR04] with a polynomial ordering [POLO], all dependency pairs and the corresponding usable rules [FROCOS05] can be oriented non-strictly. All non-usable rules are removed, and those dependency pairs and usable rules that have been oriented strictly or contain non-usable symbols in their left-hand side are removed as well.
+
+The following dependency pairs can be deleted:
+
+   F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(java.lang.Object(EOC), o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(o1859:0:0)
+   F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(NULL, o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(o1859:0:0)
+No rules are removed from R.
+
+Used ordering: POLO with Polynomial interpretation [POLO]:
+
+   POL(EOC) = 0
+   POL(F7168_0_COUNTMETALIST_NULL(x_1)) = 2*x_1
+   POL(List(x_1, x_2)) = 2*x_1 + x_2
+   POL(NULL) = 0
+   POL(java.lang.Object(x_1)) = x_1
+
+
+----------------------------------------
+
+(26)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(java.lang.Object(List(o2006:0:0, o2007:0:0)), o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(o2007:0:0, o1859:0:0)))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(27) MRRProof (EQUIVALENT)
+By using the rule removal processor [LPAR04] with the following ordering, at least one Dependency Pair or term rewrite system rule of this QDP problem can be strictly oriented.
+
+Strictly oriented dependency pairs:
+
+   F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(java.lang.Object(List(o2006:0:0, o2007:0:0)), o1859:0:0))) -> F7168_0_COUNTMETALIST_NULL(java.lang.Object(List(o2007:0:0, o1859:0:0)))
+
+
+Used ordering: Knuth-Bendix order [KBO] with precedence:List_2 > java.lang.Object_1 > F7168_0_COUNTMETALIST_NULL_1
+
+and weight map:
+
+   F7168_0_COUNTMETALIST_NULL_1=1
+   java.lang.Object_1=1
+   List_2=0
+
+The variable weight is 1
+
+----------------------------------------
+
+(28)
+Obligation:
+Q DP problem:
+P is empty.
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(29) PisEmptyProof (EQUIVALENT)
+The TRS P is empty. Hence, there is no (P,Q,R) chain.
+----------------------------------------
+
+(30)
+YES

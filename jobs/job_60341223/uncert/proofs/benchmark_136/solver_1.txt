@@ -1,0 +1,271 @@
+YES
+We consider the system LVgcz.
+
+  Alphabet:
+
+    app : [list * list] --> list 
+    cons : [nat * list] --> list 
+    foldl : [list -> nat -> list * list * list] --> list 
+    iconsc : [] --> list -> nat -> list 
+    nil : [] --> list 
+    reverse : [list] --> list 
+    reverse1 : [list] --> list 
+
+  Rules:
+
+    app(nil, X) => X 
+    app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+    foldl(F, X, nil) => X 
+    foldl(F, X, cons(Y, Z)) => foldl(F, F X Y, Z) 
+    iconsc => /\x./\y.cons(y, x) 
+    reverse(X) => foldl(iconsc, nil, X) 
+    reverse1(X) => foldl(/\x./\y.app(cons(y, nil), x), nil, X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  app(nil, X) >? X 
+  app(cons(X, Y), Z) >? cons(X, app(Y, Z)) 
+  foldl(F, X, nil) >? X 
+  foldl(F, X, cons(Y, Z)) >? foldl(F, F X Y, Z) 
+  iconsc >? /\x./\y.cons(y, x) 
+  reverse(X) >? foldl(iconsc, nil, X) 
+  reverse1(X) >? foldl(/\x./\y.app(cons(y, nil), x), nil, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[foldl(x_1, x_2, x_3)]] = foldl(x_3, x_1, x_2) 
+  [[nil]] = _|_ 
+
+We choose Lex = {foldl} and Mul = {@_{o -> o -> o}, @_{o -> o}, app, cons, iconsc, reverse, reverse1}, and the following precedence: reverse > iconsc > reverse1 > app > cons > foldl > @_{o -> o} > @_{o -> o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  app(_|_, X) >= X 
+  app(cons(X, Y), Z) > cons(X, app(Y, Z)) 
+  foldl(F, X, _|_) >= X 
+  foldl(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z) 
+  iconsc > /\x./\y.cons(y, x) 
+  reverse(X) >= foldl(iconsc, _|_, X) 
+  reverse1(X) >= foldl(/\x./\y.app(cons(y, _|_), x), _|_, X) 
+
+With these choices, we have:
+
+  1] app(_|_, X) >= X  because [2], by (Star) 
+  2] app*(_|_, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] app(cons(X, Y), Z) > cons(X, app(Y, Z))  because [5], by definition 
+  5] app*(cons(X, Y), Z) >= cons(X, app(Y, Z))  because app > cons, [6] and [10], by (Copy) 
+  6] app*(cons(X, Y), Z) >= X  because [7], by (Select) 
+  7] cons(X, Y) >= X  because [8], by (Star) 
+  8] cons*(X, Y) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] app*(cons(X, Y), Z) >= app(Y, Z)  because app in Mul, [11] and [14], by (Stat) 
+  11] cons(X, Y) > Y  because [12], by definition 
+  12] cons*(X, Y) >= Y  because [13], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] Z >= Z  by (Meta) 
+
+  15] foldl(F, X, _|_) >= X  because [16], by (Star) 
+  16] foldl*(F, X, _|_) >= X  because [17], by (Select) 
+  17] X >= X  by (Meta) 
+
+  18] foldl(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because [19], by (Star) 
+  19] foldl*(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because foldl in Lex, [20], [23], [25] and [33], by (Stat) 
+  20] cons(Y, Z) > Z  because [21], by definition 
+  21] cons*(Y, Z) >= Z  because [22], by (Select) 
+  22] Z >= Z  by (Meta) 
+  23] foldl*(F, X, cons(Y, Z)) >= F  because [24], by (Select) 
+  24] F >= F  by (Meta) 
+  25] foldl*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, X), Y)  because foldl > @_{o -> o}, [26] and [29], by (Copy) 
+  26] foldl*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, X)  because foldl > @_{o -> o -> o}, [23] and [27], by (Copy) 
+  27] foldl*(F, X, cons(Y, Z)) >= X  because [28], by (Select) 
+  28] X >= X  by (Meta) 
+  29] foldl*(F, X, cons(Y, Z)) >= Y  because [30], by (Select) 
+  30] cons(Y, Z) >= Y  because [31], by (Star) 
+  31] cons*(Y, Z) >= Y  because [32], by (Select) 
+  32] Y >= Y  by (Meta) 
+  33] foldl*(F, X, cons(Y, Z)) >= Z  because [34], by (Select) 
+  34] cons(Y, Z) >= Z  because [21], by (Star) 
+
+  35] iconsc > /\x./\y.cons(y, x)  because [36], by definition 
+  36] iconsc* >= /\y./\z.cons(z, y)  because [37], by (F-Abs) 
+  37] iconsc*(x) >= /\z.cons(z, x)  because [38], by (F-Abs) 
+  38] iconsc*(x, y) >= cons(y, x)  because iconsc > cons, [39] and [41], by (Copy) 
+  39] iconsc*(x, y) >= y  because [40], by (Select) 
+  40] y >= y  by (Var) 
+  41] iconsc*(x, y) >= x  because [42], by (Select) 
+  42] x >= x  by (Var) 
+
+  43] reverse(X) >= foldl(iconsc, _|_, X)  because [44], by (Star) 
+  44] reverse*(X) >= foldl(iconsc, _|_, X)  because reverse > foldl, [45], [46] and [47], by (Copy) 
+  45] reverse*(X) >= iconsc  because reverse > iconsc, by (Copy) 
+  46] reverse*(X) >= _|_  by (Bot) 
+  47] reverse*(X) >= X  because [48], by (Select) 
+  48] X >= X  by (Meta) 
+
+  49] reverse1(X) >= foldl(/\x./\y.app(cons(y, _|_), x), _|_, X)  because [50], by (Star) 
+  50] reverse1*(X) >= foldl(/\x./\y.app(cons(y, _|_), x), _|_, X)  because reverse1 > foldl, [51], [60] and [61], by (Copy) 
+  51] reverse1*(X) >= /\y./\z.app(cons(z, _|_), y)  because [52], by (F-Abs) 
+  52] reverse1*(X, x) >= /\z.app(cons(z, _|_), x)  because [53], by (F-Abs) 
+  53] reverse1*(X, x, y) >= app(cons(y, _|_), x)  because reverse1 > app, [54] and [58], by (Copy) 
+  54] reverse1*(X, x, y) >= cons(y, _|_)  because reverse1 > cons, [55] and [57], by (Copy) 
+  55] reverse1*(X, x, y) >= y  because [56], by (Select) 
+  56] y >= y  by (Var) 
+  57] reverse1*(X, x, y) >= _|_  by (Bot) 
+  58] reverse1*(X, x, y) >= x  because [59], by (Select) 
+  59] x >= x  by (Var) 
+  60] reverse1*(X) >= _|_  by (Bot) 
+  61] reverse1*(X) >= X  because [62], by (Select) 
+  62] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+  iconsc => /\x./\y.cons(y, x) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  app(nil, X) >? X 
+  foldl(F, X, nil) >? X 
+  foldl(F, X, cons(Y, Z)) >? foldl(F, F X Y, Z) 
+  reverse(X) >? foldl(iconsc, nil, X) 
+  reverse1(X) >? foldl(/\x./\y.app(cons(y, nil), x), nil, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[foldl(x_1, x_2, x_3)]] = foldl(x_1, x_3, x_2) 
+  [[iconsc]] = _|_ 
+  [[nil]] = _|_ 
+
+We choose Lex = {foldl} and Mul = {@_{o -> o -> o}, @_{o -> o}, app, cons, reverse, reverse1}, and the following precedence: reverse > reverse1 > app > cons > foldl > @_{o -> o -> o} > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  app(_|_, X) >= X 
+  foldl(F, X, _|_) > X 
+  foldl(F, X, cons(Y, Z)) > foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z) 
+  reverse(X) >= foldl(_|_, _|_, X) 
+  reverse1(X) >= foldl(/\x./\y.app(cons(y, _|_), x), _|_, X) 
+
+With these choices, we have:
+
+  1] app(_|_, X) >= X  because [2], by (Star) 
+  2] app*(_|_, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] foldl(F, X, _|_) > X  because [5], by definition 
+  5] foldl*(F, X, _|_) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+
+  7] foldl(F, X, cons(Y, Z)) > foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because [8], by definition 
+  8] foldl*(F, X, cons(Y, Z)) >= foldl(F, @_{o -> o}(@_{o -> o -> o}(F, X), Y), Z)  because foldl in Lex, [9], [10], [13], [14] and [22], by (Stat) 
+  9] F >= F  by (Meta) 
+  10] cons(Y, Z) > Z  because [11], by definition 
+  11] cons*(Y, Z) >= Z  because [12], by (Select) 
+  12] Z >= Z  by (Meta) 
+  13] foldl*(F, X, cons(Y, Z)) >= F  because [9], by (Select) 
+  14] foldl*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, X), Y)  because foldl > @_{o -> o}, [15] and [18], by (Copy) 
+  15] foldl*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, X)  because foldl > @_{o -> o -> o}, [13] and [16], by (Copy) 
+  16] foldl*(F, X, cons(Y, Z)) >= X  because [17], by (Select) 
+  17] X >= X  by (Meta) 
+  18] foldl*(F, X, cons(Y, Z)) >= Y  because [19], by (Select) 
+  19] cons(Y, Z) >= Y  because [20], by (Star) 
+  20] cons*(Y, Z) >= Y  because [21], by (Select) 
+  21] Y >= Y  by (Meta) 
+  22] foldl*(F, X, cons(Y, Z)) >= Z  because [23], by (Select) 
+  23] cons(Y, Z) >= Z  because [11], by (Star) 
+
+  24] reverse(X) >= foldl(_|_, _|_, X)  because [25], by (Star) 
+  25] reverse*(X) >= foldl(_|_, _|_, X)  because reverse > foldl, [26], [27] and [28], by (Copy) 
+  26] reverse*(X) >= _|_  by (Bot) 
+  27] reverse*(X) >= _|_  by (Bot) 
+  28] reverse*(X) >= X  because [29], by (Select) 
+  29] X >= X  by (Meta) 
+
+  30] reverse1(X) >= foldl(/\x./\y.app(cons(y, _|_), x), _|_, X)  because [31], by (Star) 
+  31] reverse1*(X) >= foldl(/\x./\y.app(cons(y, _|_), x), _|_, X)  because reverse1 > foldl, [32], [41] and [42], by (Copy) 
+  32] reverse1*(X) >= /\y./\z.app(cons(z, _|_), y)  because [33], by (F-Abs) 
+  33] reverse1*(X, x) >= /\z.app(cons(z, _|_), x)  because [34], by (F-Abs) 
+  34] reverse1*(X, x, y) >= app(cons(y, _|_), x)  because reverse1 > app, [35] and [39], by (Copy) 
+  35] reverse1*(X, x, y) >= cons(y, _|_)  because reverse1 > cons, [36] and [38], by (Copy) 
+  36] reverse1*(X, x, y) >= y  because [37], by (Select) 
+  37] y >= y  by (Var) 
+  38] reverse1*(X, x, y) >= _|_  by (Bot) 
+  39] reverse1*(X, x, y) >= x  because [40], by (Select) 
+  40] x >= x  by (Var) 
+  41] reverse1*(X) >= _|_  by (Bot) 
+  42] reverse1*(X) >= X  because [43], by (Select) 
+  43] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  foldl(F, X, nil) => X 
+  foldl(F, X, cons(Y, Z)) => foldl(F, F X Y, Z) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  app(nil, X) >? X 
+  reverse(X) >? foldl(iconsc, nil, X) 
+  reverse1(X) >? foldl(/\x./\y.app(cons(y, nil), x), nil, X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  app = Lam[y0;y1].y0 + y1 
+  cons = Lam[y0;y1].y0 + y1 
+  foldl = Lam[G0;y1;y2].y1 + y2 + G0(0,0) 
+  iconsc = Lam[y0;y1].0 
+  nil = 0 
+  reverse = Lam[y0].3 + 3*y0 
+  reverse1 = Lam[y0].3 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[app(nil, _x0)]] = x0 >= x0 = [[_x0]] 
+  [[reverse(_x0)]] = 3 + 3*x0 > x0 = [[foldl(iconsc, nil, _x0)]] 
+  [[reverse1(_x0)]] = 3 + 3*x0 > x0 = [[foldl(/\x./\y.app(cons(y, nil), x), nil, _x0)]] 
+
+We can thus remove the following rules:
+
+  reverse(X) => foldl(iconsc, nil, X) 
+  reverse1(X) => foldl(/\x./\y.app(cons(y, nil), x), nil, X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  app(nil, X) >? X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  app = Lam[y0;y1].3 + y0 + y1 
+  nil = 3 
+
+Using this interpretation, the requirements translate to:
+
+  [[app(nil, _x0)]] = 6 + x0 > x0 = [[_x0]] 
+
+We can thus remove the following rules:
+
+  app(nil, X) => X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

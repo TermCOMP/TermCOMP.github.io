@@ -1,0 +1,838 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/AMtm2.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+mmultiply(g,g,a)
+
+w.r.t. the given Prolog program could successfully be proven:
+
+(0) Prolog
+(1) UndefinedPredicateHandlerProof [SOUND, 0 ms]
+(2) Prolog
+(3) PrologToPiTRSProof [SOUND, 0 ms]
+(4) PiTRS
+(5) DependencyPairsProof [EQUIVALENT, 0 ms]
+(6) PiDP
+(7) DependencyGraphProof [EQUIVALENT, 0 ms]
+(8) AND
+    (9) PiDP
+        (10) UsableRulesProof [EQUIVALENT, 0 ms]
+        (11) PiDP
+        (12) PiDPToQDPProof [SOUND, 0 ms]
+        (13) QDP
+        (14) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (15) YES
+    (16) PiDP
+        (17) UsableRulesProof [EQUIVALENT, 0 ms]
+        (18) PiDP
+        (19) PiDPToQDPProof [SOUND, 0 ms]
+        (20) QDP
+        (21) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (22) YES
+    (23) PiDP
+        (24) UsableRulesProof [EQUIVALENT, 0 ms]
+        (25) PiDP
+        (26) PiDPToQDPProof [SOUND, 0 ms]
+        (27) QDP
+        (28) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (29) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+mmultiply([], X1, []).
+mmultiply(.(V0, Rest), V1, .(Result, Others)) :- ','(mmultiply(Rest, V1, Others), multiply(V1, V0, Result)).
+multiply([], X2, []).
+multiply(.(V0, Rest), V1, .(Result, Others)) :- ','(multiply(Rest, V1, Others), vmul(V0, V1, Result)).
+vmul([], [], 0).
+vmul(.(H1, T1), .(H2, T2), Result) :- ','(vmul(T1, T2, Newresult), ','(is(Product, *(H1, H2)), is(Result, +(Product, Newresult)))).
+trans_m(.([], X3), []).
+trans_m(M, .(C1, Cn)) :- ','(trans_v(M, C1, R), trans_m(R, Cn)).
+trans_v([], [], []).
+trans_v(.(.(C11, C1n), C), .(C11, X), .(C1n, Y)) :- trans_v(C, X, Y).
+makematrix(N, Matrix) :- ','(makevector(N, Vec), makematrix(N, Vec, Matrix)).
+makematrix(0, X4, []).
+makematrix(Rows, Vector, .(Vector, T)) :- ','(>(Rows, 0), ','(is(Nextrow, -(Rows, 1)), makematrix(Nextrow, Vector, T))).
+makevector(0, []).
+makevector(Cols, .(Cols, T)) :- ','(>(Cols, 0), ','(is(Nextcol, -(Cols, 1)), makevector(Nextcol, T))).
+
+
+Query: mmultiply(g,g,a)
+----------------------------------------
+
+(1) UndefinedPredicateHandlerProof (SOUND)
+Added facts for all undefined predicates [PROLOG].
+----------------------------------------
+
+(2)
+Obligation:
+Clauses:
+
+mmultiply([], X1, []).
+mmultiply(.(V0, Rest), V1, .(Result, Others)) :- ','(mmultiply(Rest, V1, Others), multiply(V1, V0, Result)).
+multiply([], X2, []).
+multiply(.(V0, Rest), V1, .(Result, Others)) :- ','(multiply(Rest, V1, Others), vmul(V0, V1, Result)).
+vmul([], [], 0).
+vmul(.(H1, T1), .(H2, T2), Result) :- ','(vmul(T1, T2, Newresult), ','(is(Product, *(H1, H2)), is(Result, +(Product, Newresult)))).
+trans_m(.([], X3), []).
+trans_m(M, .(C1, Cn)) :- ','(trans_v(M, C1, R), trans_m(R, Cn)).
+trans_v([], [], []).
+trans_v(.(.(C11, C1n), C), .(C11, X), .(C1n, Y)) :- trans_v(C, X, Y).
+makematrix(N, Matrix) :- ','(makevector(N, Vec), makematrix(N, Vec, Matrix)).
+makematrix(0, X4, []).
+makematrix(Rows, Vector, .(Vector, T)) :- ','(>(Rows, 0), ','(is(Nextrow, -(Rows, 1)), makematrix(Nextrow, Vector, T))).
+makevector(0, []).
+makevector(Cols, .(Cols, T)) :- ','(>(Cols, 0), ','(is(Nextcol, -(Cols, 1)), makevector(Nextcol, T))).
+is(X0, X1).
+>(X0, X1).
+
+
+Query: mmultiply(g,g,a)
+----------------------------------------
+
+(3) PrologToPiTRSProof (SOUND)
+We use the technique of [TOCL09]. With regard to the inferred argument filtering the predicates were used in the following modes:
+
+mmultiply_in_3: (b,b,f)
+
+multiply_in_3: (b,b,f)
+
+vmul_in_3: (b,b,f)
+
+Transforming Prolog into the following Term Rewriting System:
+
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   mmultiply_in_gga([], X1, []) -> mmultiply_out_gga([], X1, [])
+   mmultiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U1_gga(V0, Rest, V1, Result, Others, mmultiply_in_gga(Rest, V1, Others))
+   U1_gga(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> U2_gga(V0, Rest, V1, Result, Others, multiply_in_gga(V1, V0, Result))
+   multiply_in_gga([], X2, []) -> multiply_out_gga([], X2, [])
+   multiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U3_gga(V0, Rest, V1, Result, Others, multiply_in_gga(Rest, V1, Others))
+   U3_gga(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> U4_gga(V0, Rest, V1, Result, Others, vmul_in_gga(V0, V1, Result))
+   vmul_in_gga([], [], 0) -> vmul_out_gga([], [], 0)
+   vmul_in_gga(.(H1, T1), .(H2, T2), Result) -> U5_gga(H1, T1, H2, T2, Result, vmul_in_gga(T1, T2, Newresult))
+   U5_gga(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> U6_gga(H1, T1, H2, T2, Result, Newresult, is_in_ag(Product, *(H1, H2)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U6_gga(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> U7_gga(H1, T1, H2, T2, Result, is_in_aa(Result, +(Product, Newresult)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U7_gga(H1, T1, H2, T2, Result, is_out_aa(Result, +(Product, Newresult))) -> vmul_out_gga(.(H1, T1), .(H2, T2), Result)
+   U4_gga(V0, Rest, V1, Result, Others, vmul_out_gga(V0, V1, Result)) -> multiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+   U2_gga(V0, Rest, V1, Result, Others, multiply_out_gga(V1, V0, Result)) -> mmultiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+
+The argument filtering Pi contains the following mapping:
+mmultiply_in_gga(x1, x2, x3)  =  mmultiply_in_gga(x1, x2)
+
+[]  =  []
+
+mmultiply_out_gga(x1, x2, x3)  =  mmultiply_out_gga(x1, x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x6)
+
+multiply_in_gga(x1, x2, x3)  =  multiply_in_gga(x1, x2)
+
+multiply_out_gga(x1, x2, x3)  =  multiply_out_gga(x1, x2)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x6)
+
+vmul_in_gga(x1, x2, x3)  =  vmul_in_gga(x1, x2)
+
+vmul_out_gga(x1, x2, x3)  =  vmul_out_gga(x1, x2)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+U6_gga(x1, x2, x3, x4, x5, x6, x7)  =  U6_gga(x1, x2, x3, x4, x7)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag(x2)
+
+*(x1, x2)  =  *(x1, x2)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+
+
+
+
+Infinitary Constructor Rewriting Termination of PiTRS implies Termination of Prolog
+
+
+
+----------------------------------------
+
+(4)
+Obligation:
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   mmultiply_in_gga([], X1, []) -> mmultiply_out_gga([], X1, [])
+   mmultiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U1_gga(V0, Rest, V1, Result, Others, mmultiply_in_gga(Rest, V1, Others))
+   U1_gga(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> U2_gga(V0, Rest, V1, Result, Others, multiply_in_gga(V1, V0, Result))
+   multiply_in_gga([], X2, []) -> multiply_out_gga([], X2, [])
+   multiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U3_gga(V0, Rest, V1, Result, Others, multiply_in_gga(Rest, V1, Others))
+   U3_gga(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> U4_gga(V0, Rest, V1, Result, Others, vmul_in_gga(V0, V1, Result))
+   vmul_in_gga([], [], 0) -> vmul_out_gga([], [], 0)
+   vmul_in_gga(.(H1, T1), .(H2, T2), Result) -> U5_gga(H1, T1, H2, T2, Result, vmul_in_gga(T1, T2, Newresult))
+   U5_gga(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> U6_gga(H1, T1, H2, T2, Result, Newresult, is_in_ag(Product, *(H1, H2)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U6_gga(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> U7_gga(H1, T1, H2, T2, Result, is_in_aa(Result, +(Product, Newresult)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U7_gga(H1, T1, H2, T2, Result, is_out_aa(Result, +(Product, Newresult))) -> vmul_out_gga(.(H1, T1), .(H2, T2), Result)
+   U4_gga(V0, Rest, V1, Result, Others, vmul_out_gga(V0, V1, Result)) -> multiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+   U2_gga(V0, Rest, V1, Result, Others, multiply_out_gga(V1, V0, Result)) -> mmultiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+
+The argument filtering Pi contains the following mapping:
+mmultiply_in_gga(x1, x2, x3)  =  mmultiply_in_gga(x1, x2)
+
+[]  =  []
+
+mmultiply_out_gga(x1, x2, x3)  =  mmultiply_out_gga(x1, x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x6)
+
+multiply_in_gga(x1, x2, x3)  =  multiply_in_gga(x1, x2)
+
+multiply_out_gga(x1, x2, x3)  =  multiply_out_gga(x1, x2)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x6)
+
+vmul_in_gga(x1, x2, x3)  =  vmul_in_gga(x1, x2)
+
+vmul_out_gga(x1, x2, x3)  =  vmul_out_gga(x1, x2)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+U6_gga(x1, x2, x3, x4, x5, x6, x7)  =  U6_gga(x1, x2, x3, x4, x7)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag(x2)
+
+*(x1, x2)  =  *(x1, x2)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+
+
+----------------------------------------
+
+(5) DependencyPairsProof (EQUIVALENT)
+Using Dependency Pairs [AG00,LOPSTR] we result in the following initial DP problem:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   MMULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> U1_GGA(V0, Rest, V1, Result, Others, mmultiply_in_gga(Rest, V1, Others))
+   MMULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> MMULTIPLY_IN_GGA(Rest, V1, Others)
+   U1_GGA(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> U2_GGA(V0, Rest, V1, Result, Others, multiply_in_gga(V1, V0, Result))
+   U1_GGA(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> MULTIPLY_IN_GGA(V1, V0, Result)
+   MULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> U3_GGA(V0, Rest, V1, Result, Others, multiply_in_gga(Rest, V1, Others))
+   MULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> MULTIPLY_IN_GGA(Rest, V1, Others)
+   U3_GGA(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> U4_GGA(V0, Rest, V1, Result, Others, vmul_in_gga(V0, V1, Result))
+   U3_GGA(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> VMUL_IN_GGA(V0, V1, Result)
+   VMUL_IN_GGA(.(H1, T1), .(H2, T2), Result) -> U5_GGA(H1, T1, H2, T2, Result, vmul_in_gga(T1, T2, Newresult))
+   VMUL_IN_GGA(.(H1, T1), .(H2, T2), Result) -> VMUL_IN_GGA(T1, T2, Newresult)
+   U5_GGA(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> U6_GGA(H1, T1, H2, T2, Result, Newresult, is_in_ag(Product, *(H1, H2)))
+   U5_GGA(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> IS_IN_AG(Product, *(H1, H2))
+   U6_GGA(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> U7_GGA(H1, T1, H2, T2, Result, is_in_aa(Result, +(Product, Newresult)))
+   U6_GGA(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> IS_IN_AA(Result, +(Product, Newresult))
+
+The TRS R consists of the following rules:
+
+   mmultiply_in_gga([], X1, []) -> mmultiply_out_gga([], X1, [])
+   mmultiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U1_gga(V0, Rest, V1, Result, Others, mmultiply_in_gga(Rest, V1, Others))
+   U1_gga(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> U2_gga(V0, Rest, V1, Result, Others, multiply_in_gga(V1, V0, Result))
+   multiply_in_gga([], X2, []) -> multiply_out_gga([], X2, [])
+   multiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U3_gga(V0, Rest, V1, Result, Others, multiply_in_gga(Rest, V1, Others))
+   U3_gga(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> U4_gga(V0, Rest, V1, Result, Others, vmul_in_gga(V0, V1, Result))
+   vmul_in_gga([], [], 0) -> vmul_out_gga([], [], 0)
+   vmul_in_gga(.(H1, T1), .(H2, T2), Result) -> U5_gga(H1, T1, H2, T2, Result, vmul_in_gga(T1, T2, Newresult))
+   U5_gga(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> U6_gga(H1, T1, H2, T2, Result, Newresult, is_in_ag(Product, *(H1, H2)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U6_gga(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> U7_gga(H1, T1, H2, T2, Result, is_in_aa(Result, +(Product, Newresult)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U7_gga(H1, T1, H2, T2, Result, is_out_aa(Result, +(Product, Newresult))) -> vmul_out_gga(.(H1, T1), .(H2, T2), Result)
+   U4_gga(V0, Rest, V1, Result, Others, vmul_out_gga(V0, V1, Result)) -> multiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+   U2_gga(V0, Rest, V1, Result, Others, multiply_out_gga(V1, V0, Result)) -> mmultiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+
+The argument filtering Pi contains the following mapping:
+mmultiply_in_gga(x1, x2, x3)  =  mmultiply_in_gga(x1, x2)
+
+[]  =  []
+
+mmultiply_out_gga(x1, x2, x3)  =  mmultiply_out_gga(x1, x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x6)
+
+multiply_in_gga(x1, x2, x3)  =  multiply_in_gga(x1, x2)
+
+multiply_out_gga(x1, x2, x3)  =  multiply_out_gga(x1, x2)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x6)
+
+vmul_in_gga(x1, x2, x3)  =  vmul_in_gga(x1, x2)
+
+vmul_out_gga(x1, x2, x3)  =  vmul_out_gga(x1, x2)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+U6_gga(x1, x2, x3, x4, x5, x6, x7)  =  U6_gga(x1, x2, x3, x4, x7)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag(x2)
+
+*(x1, x2)  =  *(x1, x2)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+MMULTIPLY_IN_GGA(x1, x2, x3)  =  MMULTIPLY_IN_GGA(x1, x2)
+
+U1_GGA(x1, x2, x3, x4, x5, x6)  =  U1_GGA(x1, x2, x3, x6)
+
+U2_GGA(x1, x2, x3, x4, x5, x6)  =  U2_GGA(x1, x2, x3, x6)
+
+MULTIPLY_IN_GGA(x1, x2, x3)  =  MULTIPLY_IN_GGA(x1, x2)
+
+U3_GGA(x1, x2, x3, x4, x5, x6)  =  U3_GGA(x1, x2, x3, x6)
+
+U4_GGA(x1, x2, x3, x4, x5, x6)  =  U4_GGA(x1, x2, x3, x6)
+
+VMUL_IN_GGA(x1, x2, x3)  =  VMUL_IN_GGA(x1, x2)
+
+U5_GGA(x1, x2, x3, x4, x5, x6)  =  U5_GGA(x1, x2, x3, x4, x6)
+
+U6_GGA(x1, x2, x3, x4, x5, x6, x7)  =  U6_GGA(x1, x2, x3, x4, x7)
+
+IS_IN_AG(x1, x2)  =  IS_IN_AG(x2)
+
+U7_GGA(x1, x2, x3, x4, x5, x6)  =  U7_GGA(x1, x2, x3, x4, x6)
+
+IS_IN_AA(x1, x2)  =  IS_IN_AA
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(6)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   MMULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> U1_GGA(V0, Rest, V1, Result, Others, mmultiply_in_gga(Rest, V1, Others))
+   MMULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> MMULTIPLY_IN_GGA(Rest, V1, Others)
+   U1_GGA(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> U2_GGA(V0, Rest, V1, Result, Others, multiply_in_gga(V1, V0, Result))
+   U1_GGA(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> MULTIPLY_IN_GGA(V1, V0, Result)
+   MULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> U3_GGA(V0, Rest, V1, Result, Others, multiply_in_gga(Rest, V1, Others))
+   MULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> MULTIPLY_IN_GGA(Rest, V1, Others)
+   U3_GGA(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> U4_GGA(V0, Rest, V1, Result, Others, vmul_in_gga(V0, V1, Result))
+   U3_GGA(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> VMUL_IN_GGA(V0, V1, Result)
+   VMUL_IN_GGA(.(H1, T1), .(H2, T2), Result) -> U5_GGA(H1, T1, H2, T2, Result, vmul_in_gga(T1, T2, Newresult))
+   VMUL_IN_GGA(.(H1, T1), .(H2, T2), Result) -> VMUL_IN_GGA(T1, T2, Newresult)
+   U5_GGA(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> U6_GGA(H1, T1, H2, T2, Result, Newresult, is_in_ag(Product, *(H1, H2)))
+   U5_GGA(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> IS_IN_AG(Product, *(H1, H2))
+   U6_GGA(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> U7_GGA(H1, T1, H2, T2, Result, is_in_aa(Result, +(Product, Newresult)))
+   U6_GGA(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> IS_IN_AA(Result, +(Product, Newresult))
+
+The TRS R consists of the following rules:
+
+   mmultiply_in_gga([], X1, []) -> mmultiply_out_gga([], X1, [])
+   mmultiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U1_gga(V0, Rest, V1, Result, Others, mmultiply_in_gga(Rest, V1, Others))
+   U1_gga(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> U2_gga(V0, Rest, V1, Result, Others, multiply_in_gga(V1, V0, Result))
+   multiply_in_gga([], X2, []) -> multiply_out_gga([], X2, [])
+   multiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U3_gga(V0, Rest, V1, Result, Others, multiply_in_gga(Rest, V1, Others))
+   U3_gga(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> U4_gga(V0, Rest, V1, Result, Others, vmul_in_gga(V0, V1, Result))
+   vmul_in_gga([], [], 0) -> vmul_out_gga([], [], 0)
+   vmul_in_gga(.(H1, T1), .(H2, T2), Result) -> U5_gga(H1, T1, H2, T2, Result, vmul_in_gga(T1, T2, Newresult))
+   U5_gga(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> U6_gga(H1, T1, H2, T2, Result, Newresult, is_in_ag(Product, *(H1, H2)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U6_gga(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> U7_gga(H1, T1, H2, T2, Result, is_in_aa(Result, +(Product, Newresult)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U7_gga(H1, T1, H2, T2, Result, is_out_aa(Result, +(Product, Newresult))) -> vmul_out_gga(.(H1, T1), .(H2, T2), Result)
+   U4_gga(V0, Rest, V1, Result, Others, vmul_out_gga(V0, V1, Result)) -> multiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+   U2_gga(V0, Rest, V1, Result, Others, multiply_out_gga(V1, V0, Result)) -> mmultiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+
+The argument filtering Pi contains the following mapping:
+mmultiply_in_gga(x1, x2, x3)  =  mmultiply_in_gga(x1, x2)
+
+[]  =  []
+
+mmultiply_out_gga(x1, x2, x3)  =  mmultiply_out_gga(x1, x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x6)
+
+multiply_in_gga(x1, x2, x3)  =  multiply_in_gga(x1, x2)
+
+multiply_out_gga(x1, x2, x3)  =  multiply_out_gga(x1, x2)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x6)
+
+vmul_in_gga(x1, x2, x3)  =  vmul_in_gga(x1, x2)
+
+vmul_out_gga(x1, x2, x3)  =  vmul_out_gga(x1, x2)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+U6_gga(x1, x2, x3, x4, x5, x6, x7)  =  U6_gga(x1, x2, x3, x4, x7)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag(x2)
+
+*(x1, x2)  =  *(x1, x2)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+MMULTIPLY_IN_GGA(x1, x2, x3)  =  MMULTIPLY_IN_GGA(x1, x2)
+
+U1_GGA(x1, x2, x3, x4, x5, x6)  =  U1_GGA(x1, x2, x3, x6)
+
+U2_GGA(x1, x2, x3, x4, x5, x6)  =  U2_GGA(x1, x2, x3, x6)
+
+MULTIPLY_IN_GGA(x1, x2, x3)  =  MULTIPLY_IN_GGA(x1, x2)
+
+U3_GGA(x1, x2, x3, x4, x5, x6)  =  U3_GGA(x1, x2, x3, x6)
+
+U4_GGA(x1, x2, x3, x4, x5, x6)  =  U4_GGA(x1, x2, x3, x6)
+
+VMUL_IN_GGA(x1, x2, x3)  =  VMUL_IN_GGA(x1, x2)
+
+U5_GGA(x1, x2, x3, x4, x5, x6)  =  U5_GGA(x1, x2, x3, x4, x6)
+
+U6_GGA(x1, x2, x3, x4, x5, x6, x7)  =  U6_GGA(x1, x2, x3, x4, x7)
+
+IS_IN_AG(x1, x2)  =  IS_IN_AG(x2)
+
+U7_GGA(x1, x2, x3, x4, x5, x6)  =  U7_GGA(x1, x2, x3, x4, x6)
+
+IS_IN_AA(x1, x2)  =  IS_IN_AA
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(7) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LOPSTR] contains 3 SCCs with 11 less nodes.
+----------------------------------------
+
+(8)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(9)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   VMUL_IN_GGA(.(H1, T1), .(H2, T2), Result) -> VMUL_IN_GGA(T1, T2, Newresult)
+
+The TRS R consists of the following rules:
+
+   mmultiply_in_gga([], X1, []) -> mmultiply_out_gga([], X1, [])
+   mmultiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U1_gga(V0, Rest, V1, Result, Others, mmultiply_in_gga(Rest, V1, Others))
+   U1_gga(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> U2_gga(V0, Rest, V1, Result, Others, multiply_in_gga(V1, V0, Result))
+   multiply_in_gga([], X2, []) -> multiply_out_gga([], X2, [])
+   multiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U3_gga(V0, Rest, V1, Result, Others, multiply_in_gga(Rest, V1, Others))
+   U3_gga(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> U4_gga(V0, Rest, V1, Result, Others, vmul_in_gga(V0, V1, Result))
+   vmul_in_gga([], [], 0) -> vmul_out_gga([], [], 0)
+   vmul_in_gga(.(H1, T1), .(H2, T2), Result) -> U5_gga(H1, T1, H2, T2, Result, vmul_in_gga(T1, T2, Newresult))
+   U5_gga(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> U6_gga(H1, T1, H2, T2, Result, Newresult, is_in_ag(Product, *(H1, H2)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U6_gga(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> U7_gga(H1, T1, H2, T2, Result, is_in_aa(Result, +(Product, Newresult)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U7_gga(H1, T1, H2, T2, Result, is_out_aa(Result, +(Product, Newresult))) -> vmul_out_gga(.(H1, T1), .(H2, T2), Result)
+   U4_gga(V0, Rest, V1, Result, Others, vmul_out_gga(V0, V1, Result)) -> multiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+   U2_gga(V0, Rest, V1, Result, Others, multiply_out_gga(V1, V0, Result)) -> mmultiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+
+The argument filtering Pi contains the following mapping:
+mmultiply_in_gga(x1, x2, x3)  =  mmultiply_in_gga(x1, x2)
+
+[]  =  []
+
+mmultiply_out_gga(x1, x2, x3)  =  mmultiply_out_gga(x1, x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x6)
+
+multiply_in_gga(x1, x2, x3)  =  multiply_in_gga(x1, x2)
+
+multiply_out_gga(x1, x2, x3)  =  multiply_out_gga(x1, x2)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x6)
+
+vmul_in_gga(x1, x2, x3)  =  vmul_in_gga(x1, x2)
+
+vmul_out_gga(x1, x2, x3)  =  vmul_out_gga(x1, x2)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+U6_gga(x1, x2, x3, x4, x5, x6, x7)  =  U6_gga(x1, x2, x3, x4, x7)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag(x2)
+
+*(x1, x2)  =  *(x1, x2)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+VMUL_IN_GGA(x1, x2, x3)  =  VMUL_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(10) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(11)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   VMUL_IN_GGA(.(H1, T1), .(H2, T2), Result) -> VMUL_IN_GGA(T1, T2, Newresult)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+VMUL_IN_GGA(x1, x2, x3)  =  VMUL_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(12) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(13)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   VMUL_IN_GGA(.(H1, T1), .(H2, T2)) -> VMUL_IN_GGA(T1, T2)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(14) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*VMUL_IN_GGA(.(H1, T1), .(H2, T2)) -> VMUL_IN_GGA(T1, T2)
+The graph contains the following edges 1 > 1, 2 > 2
+
+
+----------------------------------------
+
+(15)
+YES
+
+----------------------------------------
+
+(16)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   MULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> MULTIPLY_IN_GGA(Rest, V1, Others)
+
+The TRS R consists of the following rules:
+
+   mmultiply_in_gga([], X1, []) -> mmultiply_out_gga([], X1, [])
+   mmultiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U1_gga(V0, Rest, V1, Result, Others, mmultiply_in_gga(Rest, V1, Others))
+   U1_gga(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> U2_gga(V0, Rest, V1, Result, Others, multiply_in_gga(V1, V0, Result))
+   multiply_in_gga([], X2, []) -> multiply_out_gga([], X2, [])
+   multiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U3_gga(V0, Rest, V1, Result, Others, multiply_in_gga(Rest, V1, Others))
+   U3_gga(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> U4_gga(V0, Rest, V1, Result, Others, vmul_in_gga(V0, V1, Result))
+   vmul_in_gga([], [], 0) -> vmul_out_gga([], [], 0)
+   vmul_in_gga(.(H1, T1), .(H2, T2), Result) -> U5_gga(H1, T1, H2, T2, Result, vmul_in_gga(T1, T2, Newresult))
+   U5_gga(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> U6_gga(H1, T1, H2, T2, Result, Newresult, is_in_ag(Product, *(H1, H2)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U6_gga(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> U7_gga(H1, T1, H2, T2, Result, is_in_aa(Result, +(Product, Newresult)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U7_gga(H1, T1, H2, T2, Result, is_out_aa(Result, +(Product, Newresult))) -> vmul_out_gga(.(H1, T1), .(H2, T2), Result)
+   U4_gga(V0, Rest, V1, Result, Others, vmul_out_gga(V0, V1, Result)) -> multiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+   U2_gga(V0, Rest, V1, Result, Others, multiply_out_gga(V1, V0, Result)) -> mmultiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+
+The argument filtering Pi contains the following mapping:
+mmultiply_in_gga(x1, x2, x3)  =  mmultiply_in_gga(x1, x2)
+
+[]  =  []
+
+mmultiply_out_gga(x1, x2, x3)  =  mmultiply_out_gga(x1, x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x6)
+
+multiply_in_gga(x1, x2, x3)  =  multiply_in_gga(x1, x2)
+
+multiply_out_gga(x1, x2, x3)  =  multiply_out_gga(x1, x2)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x6)
+
+vmul_in_gga(x1, x2, x3)  =  vmul_in_gga(x1, x2)
+
+vmul_out_gga(x1, x2, x3)  =  vmul_out_gga(x1, x2)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+U6_gga(x1, x2, x3, x4, x5, x6, x7)  =  U6_gga(x1, x2, x3, x4, x7)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag(x2)
+
+*(x1, x2)  =  *(x1, x2)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+MULTIPLY_IN_GGA(x1, x2, x3)  =  MULTIPLY_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(17) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(18)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   MULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> MULTIPLY_IN_GGA(Rest, V1, Others)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+MULTIPLY_IN_GGA(x1, x2, x3)  =  MULTIPLY_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(19) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(20)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   MULTIPLY_IN_GGA(.(V0, Rest), V1) -> MULTIPLY_IN_GGA(Rest, V1)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(21) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*MULTIPLY_IN_GGA(.(V0, Rest), V1) -> MULTIPLY_IN_GGA(Rest, V1)
+The graph contains the following edges 1 > 1, 2 >= 2
+
+
+----------------------------------------
+
+(22)
+YES
+
+----------------------------------------
+
+(23)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   MMULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> MMULTIPLY_IN_GGA(Rest, V1, Others)
+
+The TRS R consists of the following rules:
+
+   mmultiply_in_gga([], X1, []) -> mmultiply_out_gga([], X1, [])
+   mmultiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U1_gga(V0, Rest, V1, Result, Others, mmultiply_in_gga(Rest, V1, Others))
+   U1_gga(V0, Rest, V1, Result, Others, mmultiply_out_gga(Rest, V1, Others)) -> U2_gga(V0, Rest, V1, Result, Others, multiply_in_gga(V1, V0, Result))
+   multiply_in_gga([], X2, []) -> multiply_out_gga([], X2, [])
+   multiply_in_gga(.(V0, Rest), V1, .(Result, Others)) -> U3_gga(V0, Rest, V1, Result, Others, multiply_in_gga(Rest, V1, Others))
+   U3_gga(V0, Rest, V1, Result, Others, multiply_out_gga(Rest, V1, Others)) -> U4_gga(V0, Rest, V1, Result, Others, vmul_in_gga(V0, V1, Result))
+   vmul_in_gga([], [], 0) -> vmul_out_gga([], [], 0)
+   vmul_in_gga(.(H1, T1), .(H2, T2), Result) -> U5_gga(H1, T1, H2, T2, Result, vmul_in_gga(T1, T2, Newresult))
+   U5_gga(H1, T1, H2, T2, Result, vmul_out_gga(T1, T2, Newresult)) -> U6_gga(H1, T1, H2, T2, Result, Newresult, is_in_ag(Product, *(H1, H2)))
+   is_in_ag(X0, X1) -> is_out_ag(X0, X1)
+   U6_gga(H1, T1, H2, T2, Result, Newresult, is_out_ag(Product, *(H1, H2))) -> U7_gga(H1, T1, H2, T2, Result, is_in_aa(Result, +(Product, Newresult)))
+   is_in_aa(X0, X1) -> is_out_aa(X0, X1)
+   U7_gga(H1, T1, H2, T2, Result, is_out_aa(Result, +(Product, Newresult))) -> vmul_out_gga(.(H1, T1), .(H2, T2), Result)
+   U4_gga(V0, Rest, V1, Result, Others, vmul_out_gga(V0, V1, Result)) -> multiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+   U2_gga(V0, Rest, V1, Result, Others, multiply_out_gga(V1, V0, Result)) -> mmultiply_out_gga(.(V0, Rest), V1, .(Result, Others))
+
+The argument filtering Pi contains the following mapping:
+mmultiply_in_gga(x1, x2, x3)  =  mmultiply_in_gga(x1, x2)
+
+[]  =  []
+
+mmultiply_out_gga(x1, x2, x3)  =  mmultiply_out_gga(x1, x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U1_gga(x1, x2, x3, x4, x5, x6)  =  U1_gga(x1, x2, x3, x6)
+
+U2_gga(x1, x2, x3, x4, x5, x6)  =  U2_gga(x1, x2, x3, x6)
+
+multiply_in_gga(x1, x2, x3)  =  multiply_in_gga(x1, x2)
+
+multiply_out_gga(x1, x2, x3)  =  multiply_out_gga(x1, x2)
+
+U3_gga(x1, x2, x3, x4, x5, x6)  =  U3_gga(x1, x2, x3, x6)
+
+U4_gga(x1, x2, x3, x4, x5, x6)  =  U4_gga(x1, x2, x3, x6)
+
+vmul_in_gga(x1, x2, x3)  =  vmul_in_gga(x1, x2)
+
+vmul_out_gga(x1, x2, x3)  =  vmul_out_gga(x1, x2)
+
+U5_gga(x1, x2, x3, x4, x5, x6)  =  U5_gga(x1, x2, x3, x4, x6)
+
+U6_gga(x1, x2, x3, x4, x5, x6, x7)  =  U6_gga(x1, x2, x3, x4, x7)
+
+is_in_ag(x1, x2)  =  is_in_ag(x2)
+
+is_out_ag(x1, x2)  =  is_out_ag(x2)
+
+*(x1, x2)  =  *(x1, x2)
+
+U7_gga(x1, x2, x3, x4, x5, x6)  =  U7_gga(x1, x2, x3, x4, x6)
+
+is_in_aa(x1, x2)  =  is_in_aa
+
+is_out_aa(x1, x2)  =  is_out_aa
+
+MMULTIPLY_IN_GGA(x1, x2, x3)  =  MMULTIPLY_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(24) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(25)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   MMULTIPLY_IN_GGA(.(V0, Rest), V1, .(Result, Others)) -> MMULTIPLY_IN_GGA(Rest, V1, Others)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+MMULTIPLY_IN_GGA(x1, x2, x3)  =  MMULTIPLY_IN_GGA(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(26) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(27)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   MMULTIPLY_IN_GGA(.(V0, Rest), V1) -> MMULTIPLY_IN_GGA(Rest, V1)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(28) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*MMULTIPLY_IN_GGA(.(V0, Rest), V1) -> MMULTIPLY_IN_GGA(Rest, V1)
+The graph contains the following edges 1 > 1, 2 >= 2
+
+
+----------------------------------------
+
+(29)
+YES

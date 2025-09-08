@@ -1,0 +1,96 @@
+YES
+We consider the system IynYj.
+
+  Alphabet:
+
+    O : [] --> c 
+    cons : [c * b] --> b 
+    map : [c -> c * b] --> b 
+    nil : [] --> b 
+    node : [a * b] --> c 
+    plus : [c * c] --> c 
+    s : [c] --> c 
+    size : [] --> c -> c 
+    sum : [b] --> c 
+
+  Rules:
+
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    sum(cons(X, Y)) => plus(X, sum(Y)) 
+    size node(X, Y) => s(sum(map(size, Y))) 
+    plus(O, X) => O 
+    plus(s(X), Y) => s(plus(X, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  sum(cons(X, Y)) >? plus(X, sum(Y)) 
+  size node(X, Y) >? s(sum(map(size, Y))) 
+  plus(O, X) >? O 
+  plus(s(X), Y) >? s(plus(X, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  cons = Lam[y0;y1].3 + y0 + 2*y1 
+  map = Lam[G0;y1].2*y1 + G0(0) + y1*G0(y1) 
+  nil = 3 
+  node = Lam[y0;y1].3 + y0 + 3*y1 
+  plus = Lam[y0;y1].y0 + y1 
+  s = Lam[y0].y0 
+  size = Lam[y0].1 
+  sum = Lam[y0].y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[map(_F0, nil)]] = 6 + F0(0) + 3*F0(3) > 3 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 6 + 2*x1 + 4*x2 + F0(0) + 2*x2*F0(3 + x1 + 2*x2) + 3*F0(3 + x1 + 2*x2) + x1*F0(3 + x1 + 2*x2) > 3 + x1 + 4*x2 + F0(x1) + 2*x2*F0(x2) + 2*F0(0) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+  [[sum(cons(_x0, _x1))]] = 3 + x0 + 2*x1 > x0 + x1 = [[plus(_x0, sum(_x1))]] 
+  [[size node(_x0, _x1)]] = 4 + x0 + 3*x1 > 1 + 3*x1 = [[s(sum(map(size, _x1)))]] 
+  [[plus(O, _x0)]] = x0 >= 0 = [[O]] 
+  [[plus(s(_x0), _x1)]] = x0 + x1 >= x0 + x1 = [[s(plus(_x0, _x1))]] 
+
+We can thus remove the following rules:
+
+  map(F, nil) => nil 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  sum(cons(X, Y)) => plus(X, sum(Y)) 
+  size node(X, Y) => s(sum(map(size, Y))) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(O, X) >? O 
+  plus(s(X), Y) >? s(plus(X, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  plus = Lam[y0;y1].3 + y1 + 3*y0 
+  s = Lam[y0].3 + y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[plus(O, _x0)]] = 3 + x0 > 0 = [[O]] 
+  [[plus(s(_x0), _x1)]] = 12 + x1 + 3*x0 > 6 + x1 + 3*x0 = [[s(plus(_x0, _x1))]] 
+
+We can thus remove the following rules:
+
+  plus(O, X) => O 
+  plus(s(X), Y) => s(plus(X, Y)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

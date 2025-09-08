@@ -1,0 +1,819 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/T3Cfi.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+search_tree(g)
+
+w.r.t. the given Prolog program could successfully be proven:
+
+(0) Prolog
+(1) PrologToPiTRSProof [SOUND, 0 ms]
+(2) PiTRS
+(3) DependencyPairsProof [EQUIVALENT, 0 ms]
+(4) PiDP
+(5) DependencyGraphProof [EQUIVALENT, 0 ms]
+(6) AND
+    (7) PiDP
+        (8) UsableRulesProof [EQUIVALENT, 0 ms]
+        (9) PiDP
+        (10) PiDPToQDPProof [EQUIVALENT, 0 ms]
+        (11) QDP
+        (12) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (13) YES
+    (14) PiDP
+        (15) UsableRulesProof [EQUIVALENT, 0 ms]
+        (16) PiDP
+        (17) PiDPToQDPProof [SOUND, 0 ms]
+        (18) QDP
+        (19) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (20) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+search_tree(void).
+search_tree(T) :- search_tree(T, X1, X2).
+search_tree(tree(X, void, void), X, X).
+search_tree(tree(X, void, Right), X, Max) :- ','(search_tree(Right, Min, Max), less(X, Min)).
+search_tree(tree(X, Left, void), Min, X) :- ','(search_tree(Left, Min, Max), less(Max, X)).
+search_tree(tree(X, Left, Right), Min1, Max2) :- ','(search_tree(Left, Min1, Max1), ','(less(Max1, X), ','(search_tree(Right, Min2, Max2), less(X, Min2)))).
+less(0, s(X3)).
+less(s(X), s(Y)) :- less(X, Y).
+
+
+Query: search_tree(g)
+----------------------------------------
+
+(1) PrologToPiTRSProof (SOUND)
+We use the technique of [TOCL09]. With regard to the inferred argument filtering the predicates were used in the following modes:
+
+search_tree_in_1: (b)
+
+search_tree_in_3: (b,f,f)
+
+less_in_2: (b,b)
+
+Transforming Prolog into the following Term Rewriting System:
+
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   search_tree_in_g(void) -> search_tree_out_g(void)
+   search_tree_in_g(T) -> U1_g(T, search_tree_in_gaa(T, X1, X2))
+   search_tree_in_gaa(tree(X, void, void), X, X) -> search_tree_out_gaa(tree(X, void, void), X, X)
+   search_tree_in_gaa(tree(X, void, Right), X, Max) -> U2_gaa(X, Right, Max, search_tree_in_gaa(Right, Min, Max))
+   search_tree_in_gaa(tree(X, Left, void), Min, X) -> U4_gaa(X, Left, Min, search_tree_in_gaa(Left, Min, Max))
+   search_tree_in_gaa(tree(X, Left, Right), Min1, Max2) -> U6_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   U6_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_gaa(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U10_gg(X, Y, less_in_gg(X, Y))
+   U10_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U7_gaa(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> U8_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Right, Min2, Max2))
+   U8_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> U9_gaa(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U9_gaa(X, Left, Right, Min1, Max2, less_out_gg(X, Min2)) -> search_tree_out_gaa(tree(X, Left, Right), Min1, Max2)
+   U4_gaa(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> U5_gaa(X, Left, Min, less_in_gg(Max, X))
+   U5_gaa(X, Left, Min, less_out_gg(Max, X)) -> search_tree_out_gaa(tree(X, Left, void), Min, X)
+   U2_gaa(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> U3_gaa(X, Right, Max, less_in_gg(X, Min))
+   U3_gaa(X, Right, Max, less_out_gg(X, Min)) -> search_tree_out_gaa(tree(X, void, Right), X, Max)
+   U1_g(T, search_tree_out_gaa(T, X1, X2)) -> search_tree_out_g(T)
+
+The argument filtering Pi contains the following mapping:
+search_tree_in_g(x1)  =  search_tree_in_g(x1)
+
+void  =  void
+
+search_tree_out_g(x1)  =  search_tree_out_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x1, x2)
+
+search_tree_in_gaa(x1, x2, x3)  =  search_tree_in_gaa(x1)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+search_tree_out_gaa(x1, x2, x3)  =  search_tree_out_gaa(x1, x2, x3)
+
+U2_gaa(x1, x2, x3, x4)  =  U2_gaa(x1, x2, x4)
+
+U4_gaa(x1, x2, x3, x4)  =  U4_gaa(x1, x2, x4)
+
+U6_gaa(x1, x2, x3, x4, x5, x6)  =  U6_gaa(x1, x2, x3, x6)
+
+U7_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U7_gaa(x1, x2, x3, x4, x7)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x1, x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5, x6)  =  U8_gaa(x1, x2, x3, x4, x6)
+
+U9_gaa(x1, x2, x3, x4, x5, x6)  =  U9_gaa(x1, x2, x3, x4, x5, x6)
+
+U5_gaa(x1, x2, x3, x4)  =  U5_gaa(x1, x2, x3, x4)
+
+U3_gaa(x1, x2, x3, x4)  =  U3_gaa(x1, x2, x3, x4)
+
+
+
+
+
+Infinitary Constructor Rewriting Termination of PiTRS implies Termination of Prolog
+
+
+
+----------------------------------------
+
+(2)
+Obligation:
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   search_tree_in_g(void) -> search_tree_out_g(void)
+   search_tree_in_g(T) -> U1_g(T, search_tree_in_gaa(T, X1, X2))
+   search_tree_in_gaa(tree(X, void, void), X, X) -> search_tree_out_gaa(tree(X, void, void), X, X)
+   search_tree_in_gaa(tree(X, void, Right), X, Max) -> U2_gaa(X, Right, Max, search_tree_in_gaa(Right, Min, Max))
+   search_tree_in_gaa(tree(X, Left, void), Min, X) -> U4_gaa(X, Left, Min, search_tree_in_gaa(Left, Min, Max))
+   search_tree_in_gaa(tree(X, Left, Right), Min1, Max2) -> U6_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   U6_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_gaa(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U10_gg(X, Y, less_in_gg(X, Y))
+   U10_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U7_gaa(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> U8_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Right, Min2, Max2))
+   U8_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> U9_gaa(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U9_gaa(X, Left, Right, Min1, Max2, less_out_gg(X, Min2)) -> search_tree_out_gaa(tree(X, Left, Right), Min1, Max2)
+   U4_gaa(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> U5_gaa(X, Left, Min, less_in_gg(Max, X))
+   U5_gaa(X, Left, Min, less_out_gg(Max, X)) -> search_tree_out_gaa(tree(X, Left, void), Min, X)
+   U2_gaa(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> U3_gaa(X, Right, Max, less_in_gg(X, Min))
+   U3_gaa(X, Right, Max, less_out_gg(X, Min)) -> search_tree_out_gaa(tree(X, void, Right), X, Max)
+   U1_g(T, search_tree_out_gaa(T, X1, X2)) -> search_tree_out_g(T)
+
+The argument filtering Pi contains the following mapping:
+search_tree_in_g(x1)  =  search_tree_in_g(x1)
+
+void  =  void
+
+search_tree_out_g(x1)  =  search_tree_out_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x1, x2)
+
+search_tree_in_gaa(x1, x2, x3)  =  search_tree_in_gaa(x1)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+search_tree_out_gaa(x1, x2, x3)  =  search_tree_out_gaa(x1, x2, x3)
+
+U2_gaa(x1, x2, x3, x4)  =  U2_gaa(x1, x2, x4)
+
+U4_gaa(x1, x2, x3, x4)  =  U4_gaa(x1, x2, x4)
+
+U6_gaa(x1, x2, x3, x4, x5, x6)  =  U6_gaa(x1, x2, x3, x6)
+
+U7_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U7_gaa(x1, x2, x3, x4, x7)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x1, x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5, x6)  =  U8_gaa(x1, x2, x3, x4, x6)
+
+U9_gaa(x1, x2, x3, x4, x5, x6)  =  U9_gaa(x1, x2, x3, x4, x5, x6)
+
+U5_gaa(x1, x2, x3, x4)  =  U5_gaa(x1, x2, x3, x4)
+
+U3_gaa(x1, x2, x3, x4)  =  U3_gaa(x1, x2, x3, x4)
+
+
+
+----------------------------------------
+
+(3) DependencyPairsProof (EQUIVALENT)
+Using Dependency Pairs [AG00,LOPSTR] we result in the following initial DP problem:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   SEARCH_TREE_IN_G(T) -> U1_G(T, search_tree_in_gaa(T, X1, X2))
+   SEARCH_TREE_IN_G(T) -> SEARCH_TREE_IN_GAA(T, X1, X2)
+   SEARCH_TREE_IN_GAA(tree(X, void, Right), X, Max) -> U2_GAA(X, Right, Max, search_tree_in_gaa(Right, Min, Max))
+   SEARCH_TREE_IN_GAA(tree(X, void, Right), X, Max) -> SEARCH_TREE_IN_GAA(Right, Min, Max)
+   SEARCH_TREE_IN_GAA(tree(X, Left, void), Min, X) -> U4_GAA(X, Left, Min, search_tree_in_gaa(Left, Min, Max))
+   SEARCH_TREE_IN_GAA(tree(X, Left, void), Min, X) -> SEARCH_TREE_IN_GAA(Left, Min, Max)
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right), Min1, Max2) -> U6_GAA(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right), Min1, Max2) -> SEARCH_TREE_IN_GAA(Left, Min1, Max1)
+   U6_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_GAA(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   U6_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> LESS_IN_GG(Max1, X)
+   LESS_IN_GG(s(X), s(Y)) -> U10_GG(X, Y, less_in_gg(X, Y))
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+   U7_GAA(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> U8_GAA(X, Left, Right, Min1, Max2, search_tree_in_gaa(Right, Min2, Max2))
+   U7_GAA(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> SEARCH_TREE_IN_GAA(Right, Min2, Max2)
+   U8_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> U9_GAA(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U8_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> LESS_IN_GG(X, Min2)
+   U4_GAA(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> U5_GAA(X, Left, Min, less_in_gg(Max, X))
+   U4_GAA(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> LESS_IN_GG(Max, X)
+   U2_GAA(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> U3_GAA(X, Right, Max, less_in_gg(X, Min))
+   U2_GAA(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> LESS_IN_GG(X, Min)
+
+The TRS R consists of the following rules:
+
+   search_tree_in_g(void) -> search_tree_out_g(void)
+   search_tree_in_g(T) -> U1_g(T, search_tree_in_gaa(T, X1, X2))
+   search_tree_in_gaa(tree(X, void, void), X, X) -> search_tree_out_gaa(tree(X, void, void), X, X)
+   search_tree_in_gaa(tree(X, void, Right), X, Max) -> U2_gaa(X, Right, Max, search_tree_in_gaa(Right, Min, Max))
+   search_tree_in_gaa(tree(X, Left, void), Min, X) -> U4_gaa(X, Left, Min, search_tree_in_gaa(Left, Min, Max))
+   search_tree_in_gaa(tree(X, Left, Right), Min1, Max2) -> U6_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   U6_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_gaa(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U10_gg(X, Y, less_in_gg(X, Y))
+   U10_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U7_gaa(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> U8_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Right, Min2, Max2))
+   U8_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> U9_gaa(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U9_gaa(X, Left, Right, Min1, Max2, less_out_gg(X, Min2)) -> search_tree_out_gaa(tree(X, Left, Right), Min1, Max2)
+   U4_gaa(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> U5_gaa(X, Left, Min, less_in_gg(Max, X))
+   U5_gaa(X, Left, Min, less_out_gg(Max, X)) -> search_tree_out_gaa(tree(X, Left, void), Min, X)
+   U2_gaa(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> U3_gaa(X, Right, Max, less_in_gg(X, Min))
+   U3_gaa(X, Right, Max, less_out_gg(X, Min)) -> search_tree_out_gaa(tree(X, void, Right), X, Max)
+   U1_g(T, search_tree_out_gaa(T, X1, X2)) -> search_tree_out_g(T)
+
+The argument filtering Pi contains the following mapping:
+search_tree_in_g(x1)  =  search_tree_in_g(x1)
+
+void  =  void
+
+search_tree_out_g(x1)  =  search_tree_out_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x1, x2)
+
+search_tree_in_gaa(x1, x2, x3)  =  search_tree_in_gaa(x1)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+search_tree_out_gaa(x1, x2, x3)  =  search_tree_out_gaa(x1, x2, x3)
+
+U2_gaa(x1, x2, x3, x4)  =  U2_gaa(x1, x2, x4)
+
+U4_gaa(x1, x2, x3, x4)  =  U4_gaa(x1, x2, x4)
+
+U6_gaa(x1, x2, x3, x4, x5, x6)  =  U6_gaa(x1, x2, x3, x6)
+
+U7_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U7_gaa(x1, x2, x3, x4, x7)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x1, x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5, x6)  =  U8_gaa(x1, x2, x3, x4, x6)
+
+U9_gaa(x1, x2, x3, x4, x5, x6)  =  U9_gaa(x1, x2, x3, x4, x5, x6)
+
+U5_gaa(x1, x2, x3, x4)  =  U5_gaa(x1, x2, x3, x4)
+
+U3_gaa(x1, x2, x3, x4)  =  U3_gaa(x1, x2, x3, x4)
+
+SEARCH_TREE_IN_G(x1)  =  SEARCH_TREE_IN_G(x1)
+
+U1_G(x1, x2)  =  U1_G(x1, x2)
+
+SEARCH_TREE_IN_GAA(x1, x2, x3)  =  SEARCH_TREE_IN_GAA(x1)
+
+U2_GAA(x1, x2, x3, x4)  =  U2_GAA(x1, x2, x4)
+
+U4_GAA(x1, x2, x3, x4)  =  U4_GAA(x1, x2, x4)
+
+U6_GAA(x1, x2, x3, x4, x5, x6)  =  U6_GAA(x1, x2, x3, x6)
+
+U7_GAA(x1, x2, x3, x4, x5, x6, x7)  =  U7_GAA(x1, x2, x3, x4, x7)
+
+LESS_IN_GG(x1, x2)  =  LESS_IN_GG(x1, x2)
+
+U10_GG(x1, x2, x3)  =  U10_GG(x1, x2, x3)
+
+U8_GAA(x1, x2, x3, x4, x5, x6)  =  U8_GAA(x1, x2, x3, x4, x6)
+
+U9_GAA(x1, x2, x3, x4, x5, x6)  =  U9_GAA(x1, x2, x3, x4, x5, x6)
+
+U5_GAA(x1, x2, x3, x4)  =  U5_GAA(x1, x2, x3, x4)
+
+U3_GAA(x1, x2, x3, x4)  =  U3_GAA(x1, x2, x3, x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(4)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   SEARCH_TREE_IN_G(T) -> U1_G(T, search_tree_in_gaa(T, X1, X2))
+   SEARCH_TREE_IN_G(T) -> SEARCH_TREE_IN_GAA(T, X1, X2)
+   SEARCH_TREE_IN_GAA(tree(X, void, Right), X, Max) -> U2_GAA(X, Right, Max, search_tree_in_gaa(Right, Min, Max))
+   SEARCH_TREE_IN_GAA(tree(X, void, Right), X, Max) -> SEARCH_TREE_IN_GAA(Right, Min, Max)
+   SEARCH_TREE_IN_GAA(tree(X, Left, void), Min, X) -> U4_GAA(X, Left, Min, search_tree_in_gaa(Left, Min, Max))
+   SEARCH_TREE_IN_GAA(tree(X, Left, void), Min, X) -> SEARCH_TREE_IN_GAA(Left, Min, Max)
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right), Min1, Max2) -> U6_GAA(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right), Min1, Max2) -> SEARCH_TREE_IN_GAA(Left, Min1, Max1)
+   U6_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_GAA(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   U6_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> LESS_IN_GG(Max1, X)
+   LESS_IN_GG(s(X), s(Y)) -> U10_GG(X, Y, less_in_gg(X, Y))
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+   U7_GAA(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> U8_GAA(X, Left, Right, Min1, Max2, search_tree_in_gaa(Right, Min2, Max2))
+   U7_GAA(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> SEARCH_TREE_IN_GAA(Right, Min2, Max2)
+   U8_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> U9_GAA(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U8_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> LESS_IN_GG(X, Min2)
+   U4_GAA(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> U5_GAA(X, Left, Min, less_in_gg(Max, X))
+   U4_GAA(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> LESS_IN_GG(Max, X)
+   U2_GAA(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> U3_GAA(X, Right, Max, less_in_gg(X, Min))
+   U2_GAA(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> LESS_IN_GG(X, Min)
+
+The TRS R consists of the following rules:
+
+   search_tree_in_g(void) -> search_tree_out_g(void)
+   search_tree_in_g(T) -> U1_g(T, search_tree_in_gaa(T, X1, X2))
+   search_tree_in_gaa(tree(X, void, void), X, X) -> search_tree_out_gaa(tree(X, void, void), X, X)
+   search_tree_in_gaa(tree(X, void, Right), X, Max) -> U2_gaa(X, Right, Max, search_tree_in_gaa(Right, Min, Max))
+   search_tree_in_gaa(tree(X, Left, void), Min, X) -> U4_gaa(X, Left, Min, search_tree_in_gaa(Left, Min, Max))
+   search_tree_in_gaa(tree(X, Left, Right), Min1, Max2) -> U6_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   U6_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_gaa(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U10_gg(X, Y, less_in_gg(X, Y))
+   U10_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U7_gaa(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> U8_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Right, Min2, Max2))
+   U8_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> U9_gaa(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U9_gaa(X, Left, Right, Min1, Max2, less_out_gg(X, Min2)) -> search_tree_out_gaa(tree(X, Left, Right), Min1, Max2)
+   U4_gaa(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> U5_gaa(X, Left, Min, less_in_gg(Max, X))
+   U5_gaa(X, Left, Min, less_out_gg(Max, X)) -> search_tree_out_gaa(tree(X, Left, void), Min, X)
+   U2_gaa(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> U3_gaa(X, Right, Max, less_in_gg(X, Min))
+   U3_gaa(X, Right, Max, less_out_gg(X, Min)) -> search_tree_out_gaa(tree(X, void, Right), X, Max)
+   U1_g(T, search_tree_out_gaa(T, X1, X2)) -> search_tree_out_g(T)
+
+The argument filtering Pi contains the following mapping:
+search_tree_in_g(x1)  =  search_tree_in_g(x1)
+
+void  =  void
+
+search_tree_out_g(x1)  =  search_tree_out_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x1, x2)
+
+search_tree_in_gaa(x1, x2, x3)  =  search_tree_in_gaa(x1)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+search_tree_out_gaa(x1, x2, x3)  =  search_tree_out_gaa(x1, x2, x3)
+
+U2_gaa(x1, x2, x3, x4)  =  U2_gaa(x1, x2, x4)
+
+U4_gaa(x1, x2, x3, x4)  =  U4_gaa(x1, x2, x4)
+
+U6_gaa(x1, x2, x3, x4, x5, x6)  =  U6_gaa(x1, x2, x3, x6)
+
+U7_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U7_gaa(x1, x2, x3, x4, x7)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x1, x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5, x6)  =  U8_gaa(x1, x2, x3, x4, x6)
+
+U9_gaa(x1, x2, x3, x4, x5, x6)  =  U9_gaa(x1, x2, x3, x4, x5, x6)
+
+U5_gaa(x1, x2, x3, x4)  =  U5_gaa(x1, x2, x3, x4)
+
+U3_gaa(x1, x2, x3, x4)  =  U3_gaa(x1, x2, x3, x4)
+
+SEARCH_TREE_IN_G(x1)  =  SEARCH_TREE_IN_G(x1)
+
+U1_G(x1, x2)  =  U1_G(x1, x2)
+
+SEARCH_TREE_IN_GAA(x1, x2, x3)  =  SEARCH_TREE_IN_GAA(x1)
+
+U2_GAA(x1, x2, x3, x4)  =  U2_GAA(x1, x2, x4)
+
+U4_GAA(x1, x2, x3, x4)  =  U4_GAA(x1, x2, x4)
+
+U6_GAA(x1, x2, x3, x4, x5, x6)  =  U6_GAA(x1, x2, x3, x6)
+
+U7_GAA(x1, x2, x3, x4, x5, x6, x7)  =  U7_GAA(x1, x2, x3, x4, x7)
+
+LESS_IN_GG(x1, x2)  =  LESS_IN_GG(x1, x2)
+
+U10_GG(x1, x2, x3)  =  U10_GG(x1, x2, x3)
+
+U8_GAA(x1, x2, x3, x4, x5, x6)  =  U8_GAA(x1, x2, x3, x4, x6)
+
+U9_GAA(x1, x2, x3, x4, x5, x6)  =  U9_GAA(x1, x2, x3, x4, x5, x6)
+
+U5_GAA(x1, x2, x3, x4)  =  U5_GAA(x1, x2, x3, x4)
+
+U3_GAA(x1, x2, x3, x4)  =  U3_GAA(x1, x2, x3, x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(5) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LOPSTR] contains 2 SCCs with 13 less nodes.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+
+The TRS R consists of the following rules:
+
+   search_tree_in_g(void) -> search_tree_out_g(void)
+   search_tree_in_g(T) -> U1_g(T, search_tree_in_gaa(T, X1, X2))
+   search_tree_in_gaa(tree(X, void, void), X, X) -> search_tree_out_gaa(tree(X, void, void), X, X)
+   search_tree_in_gaa(tree(X, void, Right), X, Max) -> U2_gaa(X, Right, Max, search_tree_in_gaa(Right, Min, Max))
+   search_tree_in_gaa(tree(X, Left, void), Min, X) -> U4_gaa(X, Left, Min, search_tree_in_gaa(Left, Min, Max))
+   search_tree_in_gaa(tree(X, Left, Right), Min1, Max2) -> U6_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   U6_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_gaa(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U10_gg(X, Y, less_in_gg(X, Y))
+   U10_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U7_gaa(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> U8_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Right, Min2, Max2))
+   U8_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> U9_gaa(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U9_gaa(X, Left, Right, Min1, Max2, less_out_gg(X, Min2)) -> search_tree_out_gaa(tree(X, Left, Right), Min1, Max2)
+   U4_gaa(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> U5_gaa(X, Left, Min, less_in_gg(Max, X))
+   U5_gaa(X, Left, Min, less_out_gg(Max, X)) -> search_tree_out_gaa(tree(X, Left, void), Min, X)
+   U2_gaa(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> U3_gaa(X, Right, Max, less_in_gg(X, Min))
+   U3_gaa(X, Right, Max, less_out_gg(X, Min)) -> search_tree_out_gaa(tree(X, void, Right), X, Max)
+   U1_g(T, search_tree_out_gaa(T, X1, X2)) -> search_tree_out_g(T)
+
+The argument filtering Pi contains the following mapping:
+search_tree_in_g(x1)  =  search_tree_in_g(x1)
+
+void  =  void
+
+search_tree_out_g(x1)  =  search_tree_out_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x1, x2)
+
+search_tree_in_gaa(x1, x2, x3)  =  search_tree_in_gaa(x1)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+search_tree_out_gaa(x1, x2, x3)  =  search_tree_out_gaa(x1, x2, x3)
+
+U2_gaa(x1, x2, x3, x4)  =  U2_gaa(x1, x2, x4)
+
+U4_gaa(x1, x2, x3, x4)  =  U4_gaa(x1, x2, x4)
+
+U6_gaa(x1, x2, x3, x4, x5, x6)  =  U6_gaa(x1, x2, x3, x6)
+
+U7_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U7_gaa(x1, x2, x3, x4, x7)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x1, x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5, x6)  =  U8_gaa(x1, x2, x3, x4, x6)
+
+U9_gaa(x1, x2, x3, x4, x5, x6)  =  U9_gaa(x1, x2, x3, x4, x5, x6)
+
+U5_gaa(x1, x2, x3, x4)  =  U5_gaa(x1, x2, x3, x4)
+
+U3_gaa(x1, x2, x3, x4)  =  U3_gaa(x1, x2, x3, x4)
+
+LESS_IN_GG(x1, x2)  =  LESS_IN_GG(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(8) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(9)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+
+R is empty.
+Pi is empty.
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(10) PiDPToQDPProof (EQUIVALENT)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(12) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*LESS_IN_GG(s(X), s(Y)) -> LESS_IN_GG(X, Y)
+The graph contains the following edges 1 > 1, 2 > 2
+
+
+----------------------------------------
+
+(13)
+YES
+
+----------------------------------------
+
+(14)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   SEARCH_TREE_IN_GAA(tree(X, Left, void), Min, X) -> SEARCH_TREE_IN_GAA(Left, Min, Max)
+   SEARCH_TREE_IN_GAA(tree(X, void, Right), X, Max) -> SEARCH_TREE_IN_GAA(Right, Min, Max)
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right), Min1, Max2) -> U6_GAA(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   U6_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_GAA(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   U7_GAA(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> SEARCH_TREE_IN_GAA(Right, Min2, Max2)
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right), Min1, Max2) -> SEARCH_TREE_IN_GAA(Left, Min1, Max1)
+
+The TRS R consists of the following rules:
+
+   search_tree_in_g(void) -> search_tree_out_g(void)
+   search_tree_in_g(T) -> U1_g(T, search_tree_in_gaa(T, X1, X2))
+   search_tree_in_gaa(tree(X, void, void), X, X) -> search_tree_out_gaa(tree(X, void, void), X, X)
+   search_tree_in_gaa(tree(X, void, Right), X, Max) -> U2_gaa(X, Right, Max, search_tree_in_gaa(Right, Min, Max))
+   search_tree_in_gaa(tree(X, Left, void), Min, X) -> U4_gaa(X, Left, Min, search_tree_in_gaa(Left, Min, Max))
+   search_tree_in_gaa(tree(X, Left, Right), Min1, Max2) -> U6_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   U6_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_gaa(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U10_gg(X, Y, less_in_gg(X, Y))
+   U10_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U7_gaa(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> U8_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Right, Min2, Max2))
+   U8_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> U9_gaa(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U9_gaa(X, Left, Right, Min1, Max2, less_out_gg(X, Min2)) -> search_tree_out_gaa(tree(X, Left, Right), Min1, Max2)
+   U4_gaa(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> U5_gaa(X, Left, Min, less_in_gg(Max, X))
+   U5_gaa(X, Left, Min, less_out_gg(Max, X)) -> search_tree_out_gaa(tree(X, Left, void), Min, X)
+   U2_gaa(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> U3_gaa(X, Right, Max, less_in_gg(X, Min))
+   U3_gaa(X, Right, Max, less_out_gg(X, Min)) -> search_tree_out_gaa(tree(X, void, Right), X, Max)
+   U1_g(T, search_tree_out_gaa(T, X1, X2)) -> search_tree_out_g(T)
+
+The argument filtering Pi contains the following mapping:
+search_tree_in_g(x1)  =  search_tree_in_g(x1)
+
+void  =  void
+
+search_tree_out_g(x1)  =  search_tree_out_g(x1)
+
+U1_g(x1, x2)  =  U1_g(x1, x2)
+
+search_tree_in_gaa(x1, x2, x3)  =  search_tree_in_gaa(x1)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+search_tree_out_gaa(x1, x2, x3)  =  search_tree_out_gaa(x1, x2, x3)
+
+U2_gaa(x1, x2, x3, x4)  =  U2_gaa(x1, x2, x4)
+
+U4_gaa(x1, x2, x3, x4)  =  U4_gaa(x1, x2, x4)
+
+U6_gaa(x1, x2, x3, x4, x5, x6)  =  U6_gaa(x1, x2, x3, x6)
+
+U7_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U7_gaa(x1, x2, x3, x4, x7)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x1, x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5, x6)  =  U8_gaa(x1, x2, x3, x4, x6)
+
+U9_gaa(x1, x2, x3, x4, x5, x6)  =  U9_gaa(x1, x2, x3, x4, x5, x6)
+
+U5_gaa(x1, x2, x3, x4)  =  U5_gaa(x1, x2, x3, x4)
+
+U3_gaa(x1, x2, x3, x4)  =  U3_gaa(x1, x2, x3, x4)
+
+SEARCH_TREE_IN_GAA(x1, x2, x3)  =  SEARCH_TREE_IN_GAA(x1)
+
+U6_GAA(x1, x2, x3, x4, x5, x6)  =  U6_GAA(x1, x2, x3, x6)
+
+U7_GAA(x1, x2, x3, x4, x5, x6, x7)  =  U7_GAA(x1, x2, x3, x4, x7)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(15) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(16)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   SEARCH_TREE_IN_GAA(tree(X, Left, void), Min, X) -> SEARCH_TREE_IN_GAA(Left, Min, Max)
+   SEARCH_TREE_IN_GAA(tree(X, void, Right), X, Max) -> SEARCH_TREE_IN_GAA(Right, Min, Max)
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right), Min1, Max2) -> U6_GAA(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   U6_GAA(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_GAA(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   U7_GAA(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> SEARCH_TREE_IN_GAA(Right, Min2, Max2)
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right), Min1, Max2) -> SEARCH_TREE_IN_GAA(Left, Min1, Max1)
+
+The TRS R consists of the following rules:
+
+   search_tree_in_gaa(tree(X, void, void), X, X) -> search_tree_out_gaa(tree(X, void, void), X, X)
+   search_tree_in_gaa(tree(X, void, Right), X, Max) -> U2_gaa(X, Right, Max, search_tree_in_gaa(Right, Min, Max))
+   search_tree_in_gaa(tree(X, Left, void), Min, X) -> U4_gaa(X, Left, Min, search_tree_in_gaa(Left, Min, Max))
+   search_tree_in_gaa(tree(X, Left, Right), Min1, Max2) -> U6_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Left, Min1, Max1))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U10_gg(X, Y, less_in_gg(X, Y))
+   U2_gaa(X, Right, Max, search_tree_out_gaa(Right, Min, Max)) -> U3_gaa(X, Right, Max, less_in_gg(X, Min))
+   U4_gaa(X, Left, Min, search_tree_out_gaa(Left, Min, Max)) -> U5_gaa(X, Left, Min, less_in_gg(Max, X))
+   U6_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Left, Min1, Max1)) -> U7_gaa(X, Left, Right, Min1, Max2, Max1, less_in_gg(Max1, X))
+   U10_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U3_gaa(X, Right, Max, less_out_gg(X, Min)) -> search_tree_out_gaa(tree(X, void, Right), X, Max)
+   U5_gaa(X, Left, Min, less_out_gg(Max, X)) -> search_tree_out_gaa(tree(X, Left, void), Min, X)
+   U7_gaa(X, Left, Right, Min1, Max2, Max1, less_out_gg(Max1, X)) -> U8_gaa(X, Left, Right, Min1, Max2, search_tree_in_gaa(Right, Min2, Max2))
+   U8_gaa(X, Left, Right, Min1, Max2, search_tree_out_gaa(Right, Min2, Max2)) -> U9_gaa(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U9_gaa(X, Left, Right, Min1, Max2, less_out_gg(X, Min2)) -> search_tree_out_gaa(tree(X, Left, Right), Min1, Max2)
+
+The argument filtering Pi contains the following mapping:
+void  =  void
+
+search_tree_in_gaa(x1, x2, x3)  =  search_tree_in_gaa(x1)
+
+tree(x1, x2, x3)  =  tree(x1, x2, x3)
+
+search_tree_out_gaa(x1, x2, x3)  =  search_tree_out_gaa(x1, x2, x3)
+
+U2_gaa(x1, x2, x3, x4)  =  U2_gaa(x1, x2, x4)
+
+U4_gaa(x1, x2, x3, x4)  =  U4_gaa(x1, x2, x4)
+
+U6_gaa(x1, x2, x3, x4, x5, x6)  =  U6_gaa(x1, x2, x3, x6)
+
+U7_gaa(x1, x2, x3, x4, x5, x6, x7)  =  U7_gaa(x1, x2, x3, x4, x7)
+
+less_in_gg(x1, x2)  =  less_in_gg(x1, x2)
+
+0  =  0
+
+s(x1)  =  s(x1)
+
+less_out_gg(x1, x2)  =  less_out_gg(x1, x2)
+
+U10_gg(x1, x2, x3)  =  U10_gg(x1, x2, x3)
+
+U8_gaa(x1, x2, x3, x4, x5, x6)  =  U8_gaa(x1, x2, x3, x4, x6)
+
+U9_gaa(x1, x2, x3, x4, x5, x6)  =  U9_gaa(x1, x2, x3, x4, x5, x6)
+
+U5_gaa(x1, x2, x3, x4)  =  U5_gaa(x1, x2, x3, x4)
+
+U3_gaa(x1, x2, x3, x4)  =  U3_gaa(x1, x2, x3, x4)
+
+SEARCH_TREE_IN_GAA(x1, x2, x3)  =  SEARCH_TREE_IN_GAA(x1)
+
+U6_GAA(x1, x2, x3, x4, x5, x6)  =  U6_GAA(x1, x2, x3, x6)
+
+U7_GAA(x1, x2, x3, x4, x5, x6, x7)  =  U7_GAA(x1, x2, x3, x4, x7)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(17) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(18)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   SEARCH_TREE_IN_GAA(tree(X, Left, void)) -> SEARCH_TREE_IN_GAA(Left)
+   SEARCH_TREE_IN_GAA(tree(X, void, Right)) -> SEARCH_TREE_IN_GAA(Right)
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right)) -> U6_GAA(X, Left, Right, search_tree_in_gaa(Left))
+   U6_GAA(X, Left, Right, search_tree_out_gaa(Left, Min1, Max1)) -> U7_GAA(X, Left, Right, Min1, less_in_gg(Max1, X))
+   U7_GAA(X, Left, Right, Min1, less_out_gg(Max1, X)) -> SEARCH_TREE_IN_GAA(Right)
+   SEARCH_TREE_IN_GAA(tree(X, Left, Right)) -> SEARCH_TREE_IN_GAA(Left)
+
+The TRS R consists of the following rules:
+
+   search_tree_in_gaa(tree(X, void, void)) -> search_tree_out_gaa(tree(X, void, void), X, X)
+   search_tree_in_gaa(tree(X, void, Right)) -> U2_gaa(X, Right, search_tree_in_gaa(Right))
+   search_tree_in_gaa(tree(X, Left, void)) -> U4_gaa(X, Left, search_tree_in_gaa(Left))
+   search_tree_in_gaa(tree(X, Left, Right)) -> U6_gaa(X, Left, Right, search_tree_in_gaa(Left))
+   less_in_gg(0, s(X3)) -> less_out_gg(0, s(X3))
+   less_in_gg(s(X), s(Y)) -> U10_gg(X, Y, less_in_gg(X, Y))
+   U2_gaa(X, Right, search_tree_out_gaa(Right, Min, Max)) -> U3_gaa(X, Right, Max, less_in_gg(X, Min))
+   U4_gaa(X, Left, search_tree_out_gaa(Left, Min, Max)) -> U5_gaa(X, Left, Min, less_in_gg(Max, X))
+   U6_gaa(X, Left, Right, search_tree_out_gaa(Left, Min1, Max1)) -> U7_gaa(X, Left, Right, Min1, less_in_gg(Max1, X))
+   U10_gg(X, Y, less_out_gg(X, Y)) -> less_out_gg(s(X), s(Y))
+   U3_gaa(X, Right, Max, less_out_gg(X, Min)) -> search_tree_out_gaa(tree(X, void, Right), X, Max)
+   U5_gaa(X, Left, Min, less_out_gg(Max, X)) -> search_tree_out_gaa(tree(X, Left, void), Min, X)
+   U7_gaa(X, Left, Right, Min1, less_out_gg(Max1, X)) -> U8_gaa(X, Left, Right, Min1, search_tree_in_gaa(Right))
+   U8_gaa(X, Left, Right, Min1, search_tree_out_gaa(Right, Min2, Max2)) -> U9_gaa(X, Left, Right, Min1, Max2, less_in_gg(X, Min2))
+   U9_gaa(X, Left, Right, Min1, Max2, less_out_gg(X, Min2)) -> search_tree_out_gaa(tree(X, Left, Right), Min1, Max2)
+
+The set Q consists of the following terms:
+
+   search_tree_in_gaa(x0)
+   less_in_gg(x0, x1)
+   U2_gaa(x0, x1, x2)
+   U4_gaa(x0, x1, x2)
+   U6_gaa(x0, x1, x2, x3)
+   U10_gg(x0, x1, x2)
+   U3_gaa(x0, x1, x2, x3)
+   U5_gaa(x0, x1, x2, x3)
+   U7_gaa(x0, x1, x2, x3, x4)
+   U8_gaa(x0, x1, x2, x3, x4)
+   U9_gaa(x0, x1, x2, x3, x4, x5)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(19) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*SEARCH_TREE_IN_GAA(tree(X, Left, Right)) -> U6_GAA(X, Left, Right, search_tree_in_gaa(Left))
+The graph contains the following edges 1 > 1, 1 > 2, 1 > 3
+
+
+*U7_GAA(X, Left, Right, Min1, less_out_gg(Max1, X)) -> SEARCH_TREE_IN_GAA(Right)
+The graph contains the following edges 3 >= 1
+
+
+*U6_GAA(X, Left, Right, search_tree_out_gaa(Left, Min1, Max1)) -> U7_GAA(X, Left, Right, Min1, less_in_gg(Max1, X))
+The graph contains the following edges 1 >= 1, 2 >= 2, 4 > 2, 3 >= 3, 4 > 4
+
+
+*SEARCH_TREE_IN_GAA(tree(X, Left, void)) -> SEARCH_TREE_IN_GAA(Left)
+The graph contains the following edges 1 > 1
+
+
+*SEARCH_TREE_IN_GAA(tree(X, void, Right)) -> SEARCH_TREE_IN_GAA(Right)
+The graph contains the following edges 1 > 1
+
+
+*SEARCH_TREE_IN_GAA(tree(X, Left, Right)) -> SEARCH_TREE_IN_GAA(Left)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(20)
+YES

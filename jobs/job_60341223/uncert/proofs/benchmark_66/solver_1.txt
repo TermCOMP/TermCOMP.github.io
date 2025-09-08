@@ -1,0 +1,196 @@
+YES
+We consider the system hBMzG.
+
+  Alphabet:
+
+    O : [] --> nat 
+    plus : [nat * nat] --> nat 
+    rec : [nat * nat * nat -> nat -> nat] --> nat 
+    s : [nat] --> nat 
+    succ : [nat * nat] --> nat 
+
+  Rules:
+
+    rec(O, X, F) => X 
+    rec(s(X), Y, F) => F X rec(X, Y, F) 
+    succ(X, Y) => s(Y) 
+    plus(X, Y) => rec(X, Y, /\x./\y.succ(x, y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(O, X, F) >? X 
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+  succ(X, Y) >? s(Y) 
+  plus(X, Y) >? rec(X, Y, /\x./\y.succ(x, y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, O, plus, rec, s, succ}, and the following precedence: O > plus > rec > @_{o -> o} > @_{o -> o -> o} > succ > s
+
+With these choices, we have:
+
+  1] rec(O, X, F) >= X  because [2], by (Star) 
+  2] rec*(O, X, F) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [5], by (Star) 
+  5] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [6] and [13], by (Copy) 
+  6] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec > @_{o -> o -> o}, [7] and [9], by (Copy) 
+  7] rec*(s(X), Y, F) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] rec*(s(X), Y, F) >= X  because [10], by (Select) 
+  10] s(X) >= X  because [11], by (Star) 
+  11] s*(X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+  13] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [14], [16] and [17], by (Stat) 
+  14] s(X) > X  because [15], by definition 
+  15] s*(X) >= X  because [12], by (Select) 
+  16] Y >= Y  by (Meta) 
+  17] F >= F  by (Meta) 
+
+  18] succ(X, Y) > s(Y)  because [19], by definition 
+  19] succ*(X, Y) >= s(Y)  because succ > s and [20], by (Copy) 
+  20] succ*(X, Y) >= Y  because [21], by (Select) 
+  21] Y >= Y  by (Meta) 
+
+  22] plus(X, Y) >= rec(X, Y, /\x./\y.succ(x, y))  because [23], by (Star) 
+  23] plus*(X, Y) >= rec(X, Y, /\x./\y.succ(x, y))  because plus > rec, [24], [26] and [28], by (Copy) 
+  24] plus*(X, Y) >= X  because [25], by (Select) 
+  25] X >= X  by (Meta) 
+  26] plus*(X, Y) >= Y  because [27], by (Select) 
+  27] Y >= Y  by (Meta) 
+  28] plus*(X, Y) >= /\y./\z.succ(y, z)  because [29], by (F-Abs) 
+  29] plus*(X, Y, x) >= /\z.succ(x, z)  because [30], by (F-Abs) 
+  30] plus*(X, Y, x, y) >= succ(x, y)  because plus > succ, [31] and [33], by (Copy) 
+  31] plus*(X, Y, x, y) >= x  because [32], by (Select) 
+  32] x >= x  by (Var) 
+  33] plus*(X, Y, x, y) >= y  because [34], by (Select) 
+  34] y >= y  by (Var) 
+
+We can thus remove the following rules:
+
+  succ(X, Y) => s(Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(O, X, F) >? X 
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+  plus(X, Y) >? rec(X, Y, /\x./\y.succ(x, y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, O, plus, rec, s, succ}, and the following precedence: O > plus > @_{o -> o -> o} = rec > @_{o -> o} > s > succ
+
+With these choices, we have:
+
+  1] rec(O, X, F) > X  because [2], by definition 
+  2] rec*(O, X, F) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [5], by (Star) 
+  5] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [6] and [11], by (Copy) 
+  6] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec = @_{o -> o -> o}, rec in Mul, [7] and [10], by (Stat) 
+  7] s(X) >= X  because [8], by (Star) 
+  8] s*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] F >= F  by (Meta) 
+  11] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [12], [14] and [10], by (Stat) 
+  12] s(X) > X  because [13], by definition 
+  13] s*(X) >= X  because [9], by (Select) 
+  14] Y >= Y  by (Meta) 
+
+  15] plus(X, Y) >= rec(X, Y, /\x./\y.succ(x, y))  because [16], by (Star) 
+  16] plus*(X, Y) >= rec(X, Y, /\x./\y.succ(x, y))  because plus > rec, [17], [19] and [21], by (Copy) 
+  17] plus*(X, Y) >= X  because [18], by (Select) 
+  18] X >= X  by (Meta) 
+  19] plus*(X, Y) >= Y  because [20], by (Select) 
+  20] Y >= Y  by (Meta) 
+  21] plus*(X, Y) >= /\y./\z.succ(y, z)  because [22], by (F-Abs) 
+  22] plus*(X, Y, x) >= /\z.succ(x, z)  because [23], by (F-Abs) 
+  23] plus*(X, Y, x, y) >= succ(x, y)  because plus > succ, [24] and [26], by (Copy) 
+  24] plus*(X, Y, x, y) >= x  because [25], by (Select) 
+  25] x >= x  by (Var) 
+  26] plus*(X, Y, x, y) >= y  because [27], by (Select) 
+  27] y >= y  by (Var) 
+
+We can thus remove the following rules:
+
+  rec(O, X, F) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+  plus(X, Y) >? rec(X, Y, /\x./\y.succ(x, y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, plus, rec, s, succ}, and the following precedence: s > plus > @_{o -> o -> o} = rec > @_{o -> o} > succ
+
+With these choices, we have:
+
+  1] rec(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [2], by (Star) 
+  2] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [3] and [8], by (Copy) 
+  3] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec = @_{o -> o -> o}, rec in Mul, [4] and [7], by (Stat) 
+  4] s(X) > X  because [5], by definition 
+  5] s*(X) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+  7] F >= F  by (Meta) 
+  8] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [4], [9] and [7], by (Stat) 
+  9] Y >= Y  by (Meta) 
+
+  10] plus(X, Y) > rec(X, Y, /\x./\y.succ(x, y))  because [11], by definition 
+  11] plus*(X, Y) >= rec(X, Y, /\x./\y.succ(x, y))  because plus > rec, [12], [14] and [16], by (Copy) 
+  12] plus*(X, Y) >= X  because [13], by (Select) 
+  13] X >= X  by (Meta) 
+  14] plus*(X, Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+  16] plus*(X, Y) >= /\y./\z.succ(y, z)  because [17], by (F-Abs) 
+  17] plus*(X, Y, x) >= /\z.succ(x, z)  because [18], by (F-Abs) 
+  18] plus*(X, Y, x, y) >= succ(x, y)  because plus > succ, [19] and [21], by (Copy) 
+  19] plus*(X, Y, x, y) >= x  because [20], by (Select) 
+  20] x >= x  by (Var) 
+  21] plus*(X, Y, x, y) >= y  because [22], by (Select) 
+  22] y >= y  by (Var) 
+
+We can thus remove the following rules:
+
+  plus(X, Y) => rec(X, Y, /\x./\y.succ(x, y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, rec, s}, and the following precedence: @_{o -> o -> o} = rec > @_{o -> o} > s
+
+With these choices, we have:
+
+  1] rec(s(X), Y, F) > @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [2], by definition 
+  2] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [3] and [8], by (Copy) 
+  3] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec = @_{o -> o -> o}, rec in Mul, [4] and [7], by (Stat) 
+  4] s(X) > X  because [5], by definition 
+  5] s*(X) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+  7] F >= F  by (Meta) 
+  8] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Mul, [4], [9] and [7], by (Stat) 
+  9] Y >= Y  by (Meta) 
+
+We can thus remove the following rules:
+
+  rec(s(X), Y, F) => F X rec(X, Y, F) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

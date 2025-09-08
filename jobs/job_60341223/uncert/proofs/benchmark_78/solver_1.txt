@@ -1,0 +1,290 @@
+YES
+We consider the system TGbvR.
+
+  Alphabet:
+
+    O : [] --> nat 
+    cons : [nat * list] --> list 
+    foldr : [nat -> nat -> nat * nat * list] --> nat 
+    length : [list] --> nat 
+    nil : [] --> list 
+    s : [nat] --> nat 
+    succ : [] --> nat -> nat -> nat 
+    xap : [nat -> nat -> nat * nat] --> nat -> nat 
+    yap : [nat -> nat * nat] --> nat 
+
+  Rules:
+
+    foldr(/\x./\y.yap(xap(F, x), y), X, nil) => X 
+    foldr(/\x./\y.yap(xap(F, x), y), X, cons(Y, Z)) => yap(xap(F, Y), foldr(/\z./\u.yap(xap(F, z), u), X, Z)) 
+    succ X Y => s(Y) 
+    length(X) => foldr(/\x./\y.yap(xap(succ, x), y), O, X) 
+    xap(F, X) => F X 
+    yap(F, X) => F X 
+
+Symbol xap is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    O : [] --> nat 
+    cons : [nat * list] --> list 
+    foldr : [nat -> nat -> nat * nat * list] --> nat 
+    length : [list] --> nat 
+    nil : [] --> list 
+    s : [nat] --> nat 
+    succ : [nat] --> nat -> nat 
+    yap : [nat -> nat * nat] --> nat 
+
+  Rules:
+
+    foldr(/\x./\y.yap(F[x], y), X, nil) => X 
+    foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) => yap(F[Y], foldr(/\z./\u.yap(F[z], u), X, Z)) 
+    succ(X) Y => s(Y) 
+    length(X) => foldr(/\x./\y.yap(succ(x), y), O, X) 
+    yap(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldr(/\x./\y.yap(F[x], y), X, nil) >? X 
+  foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >? yap(F[Y], foldr(/\z./\u.yap(F[z], u), X, Z)) 
+  succ(X) Y >? s(Y) 
+  length(X) >? foldr(/\x./\y.yap(succ(x), y), O, X) 
+  yap(F, X) >? F X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[s(x_1)]] = x_1 
+
+We choose Lex = {} and Mul = {@_{o -> o}, cons, foldr, length, nil, succ, yap}, and the following precedence: cons > length > nil > succ > yap > @_{o -> o} > foldr
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldr(/\x./\y.yap(F[x], y), X, nil) >= X 
+  foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z)) 
+  @_{o -> o}(succ(X), Y) > Y 
+  length(X) >= foldr(/\x./\y.yap(succ(x), y), _|_, X) 
+  yap(F, X) > @_{o -> o}(F, X) 
+
+With these choices, we have:
+
+  1] foldr(/\x./\y.yap(F[x], y), X, nil) >= X  because [2], by (Star) 
+  2] foldr*(/\x./\y.yap(F[x], y), X, nil) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z))  because [5], by (Star) 
+  5] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z))  because [6], by (Select) 
+  6] yap(F[foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z))], foldr*(/\z./\u.yap(F[z], u), X, cons(Y, Z))) >= yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z))  because yap in Mul, [7] and [15], by (Fun) 
+  7] F[foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z))] >= F[Y]  because [8], by (Meta) 
+  8] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= Y  because [9], by (Select) 
+  9] yap(F[foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z))], foldr*(/\z./\u.yap(F[z], u), X, cons(Y, Z))) >= Y  because [10], by (Star) 
+  10] yap*(F[foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z))], foldr*(/\z./\u.yap(F[z], u), X, cons(Y, Z))) >= Y  because [11], by (Select) 
+  11] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= Y  because [12], by (Select) 
+  12] cons(Y, Z) >= Y  because [13], by (Star) 
+  13] cons*(Y, Z) >= Y  because [14], by (Select) 
+  14] Y >= Y  by (Meta) 
+  15] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldr(/\x./\y.yap(F[x], y), X, Z)  because foldr in Mul, [16], [22] and [23], by (Stat) 
+  16] /\x./\z.yap(F[x], z) >= /\x./\z.yap(F[x], z)  because [17], by (Abs) 
+  17] /\z.yap(F[y], z) >= /\z.yap(F[y], z)  because [18], by (Abs) 
+  18] yap(F[y], x) >= yap(F[y], x)  because yap in Mul, [19] and [21], by (Fun) 
+  19] F[y] >= F[y]  because [20], by (Meta) 
+  20] y >= y  by (Var) 
+  21] x >= x  by (Var) 
+  22] X >= X  by (Meta) 
+  23] cons(Y, Z) > Z  because [24], by definition 
+  24] cons*(Y, Z) >= Z  because [25], by (Select) 
+  25] Z >= Z  by (Meta) 
+
+  26] @_{o -> o}(succ(X), Y) > Y  because [27], by definition 
+  27] @_{o -> o}*(succ(X), Y) >= Y  because [28], by (Select) 
+  28] Y >= Y  by (Meta) 
+
+  29] length(X) >= foldr(/\x./\y.yap(succ(x), y), _|_, X)  because [30], by (Star) 
+  30] length*(X) >= foldr(/\x./\y.yap(succ(x), y), _|_, X)  because length > foldr, [31], [39] and [40], by (Copy) 
+  31] length*(X) >= /\y./\z.yap(succ(y), z)  because [32], by (F-Abs) 
+  32] length*(X, x) >= /\z.yap(succ(x), z)  because [33], by (F-Abs) 
+  33] length*(X, x, y) >= yap(succ(x), y)  because length > yap, [34] and [37], by (Copy) 
+  34] length*(X, x, y) >= succ(x)  because length > succ and [35], by (Copy) 
+  35] length*(X, x, y) >= x  because [36], by (Select) 
+  36] x >= x  by (Var) 
+  37] length*(X, x, y) >= y  because [38], by (Select) 
+  38] y >= y  by (Var) 
+  39] length*(X) >= _|_  by (Bot) 
+  40] length*(X) >= X  because [41], by (Select) 
+  41] X >= X  by (Meta) 
+
+  42] yap(F, X) > @_{o -> o}(F, X)  because [43], by definition 
+  43] yap*(F, X) >= @_{o -> o}(F, X)  because yap > @_{o -> o}, [44] and [46], by (Copy) 
+  44] yap*(F, X) >= F  because [45], by (Select) 
+  45] F >= F  by (Meta) 
+  46] yap*(F, X) >= X  because [47], by (Select) 
+  47] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  succ(X) Y => s(Y) 
+  yap(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldr(/\x./\y.yap(F[x], y), X, nil) >? X 
+  foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >? yap(F[Y], foldr(/\z./\u.yap(F[z], u), X, Z)) 
+  length(X) >? foldr(/\x./\y.yap(succ(x), y), O, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {cons, foldr, length, nil, succ, yap}, and the following precedence: length > foldr > nil > succ > yap > cons
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldr(/\x./\y.yap(F[x], y), X, nil) > X 
+  foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z)) 
+  length(X) >= foldr(/\x./\y.yap(succ(x), y), _|_, X) 
+
+With these choices, we have:
+
+  1] foldr(/\x./\y.yap(F[x], y), X, nil) > X  because [2], by definition 
+  2] foldr*(/\x./\y.yap(F[x], y), X, nil) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z))  because [5], by (Star) 
+  5] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z))  because foldr > yap, [6] and [13], by (Copy) 
+  6] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= F[Y]  because [7], by (Select) 
+  7] /\x.yap(F[foldr*(/\y./\z.yap(F[y], z), X, cons(Y, Z))], x) >= F[Y]  because [8], by (Eta)[Kop13:2] 
+  8] F[foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z))] >= F[Y]  because [9], by (Meta) 
+  9] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= Y  because [10], by (Select) 
+  10] cons(Y, Z) >= Y  because [11], by (Star) 
+  11] cons*(Y, Z) >= Y  because [12], by (Select) 
+  12] Y >= Y  by (Meta) 
+  13] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldr(/\x./\y.yap(F[x], y), X, Z)  because foldr in Mul, [14], [20] and [21], by (Stat) 
+  14] /\x./\z.yap(F[x], z) >= /\x./\z.yap(F[x], z)  because [15], by (Abs) 
+  15] /\z.yap(F[y], z) >= /\z.yap(F[y], z)  because [16], by (Abs) 
+  16] yap(F[y], x) >= yap(F[y], x)  because yap in Mul, [17] and [19], by (Fun) 
+  17] F[y] >= F[y]  because [18], by (Meta) 
+  18] y >= y  by (Var) 
+  19] x >= x  by (Var) 
+  20] X >= X  by (Meta) 
+  21] cons(Y, Z) > Z  because [22], by definition 
+  22] cons*(Y, Z) >= Z  because [23], by (Select) 
+  23] Z >= Z  by (Meta) 
+
+  24] length(X) >= foldr(/\x./\y.yap(succ(x), y), _|_, X)  because [25], by (Star) 
+  25] length*(X) >= foldr(/\x./\y.yap(succ(x), y), _|_, X)  because length > foldr, [26], [34] and [35], by (Copy) 
+  26] length*(X) >= /\y./\z.yap(succ(y), z)  because [27], by (F-Abs) 
+  27] length*(X, x) >= /\z.yap(succ(x), z)  because [28], by (F-Abs) 
+  28] length*(X, x, y) >= yap(succ(x), y)  because length > yap, [29] and [32], by (Copy) 
+  29] length*(X, x, y) >= succ(x)  because length > succ and [30], by (Copy) 
+  30] length*(X, x, y) >= x  because [31], by (Select) 
+  31] x >= x  by (Var) 
+  32] length*(X, x, y) >= y  because [33], by (Select) 
+  33] y >= y  by (Var) 
+  34] length*(X) >= _|_  by (Bot) 
+  35] length*(X) >= X  because [36], by (Select) 
+  36] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  foldr(/\x./\y.yap(F[x], y), X, nil) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >? yap(F[Y], foldr(/\z./\u.yap(F[z], u), X, Z)) 
+  length(X) >? foldr(/\x./\y.yap(succ(x), y), O, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {cons, foldr, length, succ, yap}, and the following precedence: length > foldr > succ > yap > cons
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) > yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z)) 
+  length(X) >= foldr(/\x./\y.yap(succ(x), y), _|_, X) 
+
+With these choices, we have:
+
+  1] foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) > yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z))  because [2], by definition 
+  2] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= yap(F[Y], foldr(/\x./\y.yap(F[x], y), X, Z))  because foldr > yap, [3] and [10], by (Copy) 
+  3] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= F[Y]  because [4], by (Select) 
+  4] /\x.yap(F[foldr*(/\y./\z.yap(F[y], z), X, cons(Y, Z))], x) >= F[Y]  because [5], by (Eta)[Kop13:2] 
+  5] F[foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z))] >= F[Y]  because [6], by (Meta) 
+  6] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= Y  because [7], by (Select) 
+  7] cons(Y, Z) >= Y  because [8], by (Star) 
+  8] cons*(Y, Z) >= Y  because [9], by (Select) 
+  9] Y >= Y  by (Meta) 
+  10] foldr*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldr(/\x./\y.yap(F[x], y), X, Z)  because foldr in Mul, [11], [17] and [18], by (Stat) 
+  11] /\x./\z.yap(F[x], z) >= /\x./\z.yap(F[x], z)  because [12], by (Abs) 
+  12] /\z.yap(F[y], z) >= /\z.yap(F[y], z)  because [13], by (Abs) 
+  13] yap(F[y], x) >= yap(F[y], x)  because yap in Mul, [14] and [16], by (Fun) 
+  14] F[y] >= F[y]  because [15], by (Meta) 
+  15] y >= y  by (Var) 
+  16] x >= x  by (Var) 
+  17] X >= X  by (Meta) 
+  18] cons(Y, Z) > Z  because [19], by definition 
+  19] cons*(Y, Z) >= Z  because [20], by (Select) 
+  20] Z >= Z  by (Meta) 
+
+  21] length(X) >= foldr(/\x./\y.yap(succ(x), y), _|_, X)  because [22], by (Star) 
+  22] length*(X) >= foldr(/\x./\y.yap(succ(x), y), _|_, X)  because length > foldr, [23], [31] and [32], by (Copy) 
+  23] length*(X) >= /\y./\z.yap(succ(y), z)  because [24], by (F-Abs) 
+  24] length*(X, x) >= /\z.yap(succ(x), z)  because [25], by (F-Abs) 
+  25] length*(X, x, y) >= yap(succ(x), y)  because length > yap, [26] and [29], by (Copy) 
+  26] length*(X, x, y) >= succ(x)  because length > succ and [27], by (Copy) 
+  27] length*(X, x, y) >= x  because [28], by (Select) 
+  28] x >= x  by (Var) 
+  29] length*(X, x, y) >= y  because [30], by (Select) 
+  30] y >= y  by (Var) 
+  31] length*(X) >= _|_  by (Bot) 
+  32] length*(X) >= X  because [33], by (Select) 
+  33] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  foldr(/\x./\y.yap(F[x], y), X, cons(Y, Z)) => yap(F[Y], foldr(/\z./\u.yap(F[z], u), X, Z)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  length(X) >? foldr(/\x./\y.yap(succ(x), y), O, X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  foldr = Lam[G0;y1;y2].y1 + y2 + G0(0,0) 
+  length = Lam[y0].3 + 3*y0 
+  succ = Lam[y0;y1].y0 
+  yap = Lam[G0;y1].y1 + G0(0) 
+
+Using this interpretation, the requirements translate to:
+
+  [[length(_x0)]] = 3 + 3*x0 > x0 = [[foldr(/\x./\y.yap(succ(x), y), O, _x0)]] 
+
+We can thus remove the following rules:
+
+  length(X) => foldr(/\x./\y.yap(succ(x), y), O, X) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[Kop13:2]  C. Kop.  StarHorpo with an Eta-Rule.  Unpublished manuscript, http://cl-informatik.uibk.ac.at/users/kop/etahorpo.pdf, 2013.

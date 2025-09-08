@@ -1,0 +1,157 @@
+YES
+We consider the system Ipl1O.
+
+  Alphabet:
+
+    app : [list * list] --> list 
+    cons : [nat * list] --> list 
+    map : [nat -> nat * list] --> list 
+    nil : [] --> list 
+    reverse : [list] --> list 
+    shuffle : [list] --> list 
+
+  Rules:
+
+    app(nil, X) => X 
+    app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+    reverse(nil) => nil 
+    reverse(cons(X, Y)) => app(reverse(Y), cons(X, nil)) 
+    shuffle(nil) => nil 
+    shuffle(cons(X, Y)) => cons(X, shuffle(reverse(Y))) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  app(nil, X) >? X 
+  app(cons(X, Y), Z) >? cons(X, app(Y, Z)) 
+  reverse(nil) >? nil 
+  reverse(cons(X, Y)) >? app(reverse(Y), cons(X, nil)) 
+  shuffle(nil) >? nil 
+  shuffle(cons(X, Y)) >? cons(X, shuffle(reverse(Y))) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  app = Lam[y0;y1].y0 + y1 
+  cons = Lam[y0;y1].2 + y0 + y1 
+  map = Lam[G0;y1].3*y1 + G0(0) + 2*y1*G0(y1) 
+  nil = 0 
+  reverse = Lam[y0].y0 
+  shuffle = Lam[y0].2 + y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[app(nil, _x0)]] = x0 >= x0 = [[_x0]] 
+  [[app(cons(_x0, _x1), _x2)]] = 2 + x0 + x1 + x2 >= 2 + x0 + x1 + x2 = [[cons(_x0, app(_x1, _x2))]] 
+  [[reverse(nil)]] = 0 >= 0 = [[nil]] 
+  [[reverse(cons(_x0, _x1))]] = 2 + x0 + x1 >= 2 + x0 + x1 = [[app(reverse(_x1), cons(_x0, nil))]] 
+  [[shuffle(nil)]] = 2 > 0 = [[nil]] 
+  [[shuffle(cons(_x0, _x1))]] = 4 + x0 + x1 >= 4 + x0 + x1 = [[cons(_x0, shuffle(reverse(_x1)))]] 
+  [[map(_F0, nil)]] = F0(0) >= 0 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 6 + 3*x1 + 3*x2 + F0(0) + 2*x1*F0(2 + x1 + x2) + 2*x2*F0(2 + x1 + x2) + 4*F0(2 + x1 + x2) > 2 + x1 + 3*x2 + F0(0) + F0(x1) + 2*x2*F0(x2) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+
+We can thus remove the following rules:
+
+  shuffle(nil) => nil 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  app(nil, X) >? X 
+  app(cons(X, Y), Z) >? cons(X, app(Y, Z)) 
+  reverse(nil) >? nil 
+  reverse(cons(X, Y)) >? app(reverse(Y), cons(X, nil)) 
+  shuffle(cons(X, Y)) >? cons(X, shuffle(reverse(Y))) 
+  map(F, nil) >? nil 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  app = Lam[y0;y1].y0 + y1 
+  cons = Lam[y0;y1].1 + y1 + 2*y0 
+  map = Lam[G0;y1].3 + 3*y1 + G0(0) 
+  nil = 0 
+  reverse = Lam[y0].y0 
+  shuffle = Lam[y0].2*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[app(nil, _x0)]] = x0 >= x0 = [[_x0]] 
+  [[app(cons(_x0, _x1), _x2)]] = 1 + x1 + x2 + 2*x0 >= 1 + x1 + x2 + 2*x0 = [[cons(_x0, app(_x1, _x2))]] 
+  [[reverse(nil)]] = 0 >= 0 = [[nil]] 
+  [[reverse(cons(_x0, _x1))]] = 1 + x1 + 2*x0 >= 1 + x1 + 2*x0 = [[app(reverse(_x1), cons(_x0, nil))]] 
+  [[shuffle(cons(_x0, _x1))]] = 2 + 2*x1 + 4*x0 > 1 + 2*x0 + 2*x1 = [[cons(_x0, shuffle(reverse(_x1)))]] 
+  [[map(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+
+We can thus remove the following rules:
+
+  shuffle(cons(X, Y)) => cons(X, shuffle(reverse(Y))) 
+  map(F, nil) => nil 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  app(nil, X) >? X 
+  app(cons(X, Y), Z) >? cons(X, app(Y, Z)) 
+  reverse(nil) >? nil 
+  reverse(cons(X, Y)) >? app(reverse(Y), cons(X, nil)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  app = Lam[y0;y1].2 + y0 + y1 
+  cons = Lam[y0;y1].3 + y1 + 3*y0 
+  nil = 1 
+  reverse = Lam[y0].1 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[app(nil, _x0)]] = 3 + x0 > x0 = [[_x0]] 
+  [[app(cons(_x0, _x1), _x2)]] = 5 + x1 + x2 + 3*x0 >= 5 + x1 + x2 + 3*x0 = [[cons(_x0, app(_x1, _x2))]] 
+  [[reverse(nil)]] = 4 > 1 = [[nil]] 
+  [[reverse(cons(_x0, _x1))]] = 10 + 3*x1 + 9*x0 > 7 + 3*x0 + 3*x1 = [[app(reverse(_x1), cons(_x0, nil))]] 
+
+We can thus remove the following rules:
+
+  app(nil, X) => X 
+  reverse(nil) => nil 
+  reverse(cons(X, Y)) => app(reverse(Y), cons(X, nil)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  app(cons(X, Y), Z) >? cons(X, app(Y, Z)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  app = Lam[y0;y1].y1 + 3*y0 
+  cons = Lam[y0;y1].1 + y0 + y1 
+
+Using this interpretation, the requirements translate to:
+
+  [[app(cons(_x0, _x1), _x2)]] = 3 + x2 + 3*x0 + 3*x1 > 1 + x0 + x2 + 3*x1 = [[cons(_x0, app(_x1, _x2))]] 
+
+We can thus remove the following rules:
+
+  app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

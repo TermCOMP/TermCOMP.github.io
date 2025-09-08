@@ -1,0 +1,79 @@
+YES
+We consider the system ceeaJ.
+
+  Alphabet:
+
+    cons : [b * c] --> c 
+    leaf : [a] --> b 
+    mapt : [a -> a * b] --> b 
+    maptlist : [a -> a * c] --> c 
+    nil : [] --> c 
+    node : [c] --> b 
+
+  Rules:
+
+    mapt(F, leaf(X)) => leaf(F X) 
+    mapt(F, node(X)) => node(maptlist(F, X)) 
+    maptlist(F, nil) => nil 
+    maptlist(F, cons(X, Y)) => cons(mapt(F, X), maptlist(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  mapt(F, leaf(X)) >? leaf(F X) 
+  mapt(F, node(X)) >? node(maptlist(F, X)) 
+  maptlist(F, nil) >? nil 
+  maptlist(F, cons(X, Y)) >? cons(mapt(F, X), maptlist(F, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  cons = Lam[y0;y1].2 + y1 + 2*y0 
+  leaf = Lam[y0].y0 
+  mapt = Lam[G0;y1].1 + 3*y1 + G0(y1) + 2*y1*G0(y1) 
+  maptlist = Lam[G0;y1].3*y1 + G0(0) + G0(y1) + 2*y1*G0(y1) 
+  nil = 0 
+  node = Lam[y0].1 + y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[mapt(_F0, leaf(_x1))]] = 1 + 3*x1 + F0(x1) + 2*x1*F0(x1) > x1 + F0(x1) = [[leaf(_F0 _x1)]] 
+  [[mapt(_F0, node(_x1))]] = 4 + 3*x1 + 2*x1*F0(1 + x1) + 3*F0(1 + x1) > 1 + 3*x1 + F0(0) + F0(x1) + 2*x1*F0(x1) = [[node(maptlist(_F0, _x1))]] 
+  [[maptlist(_F0, nil)]] = 2*F0(0) >= 0 = [[nil]] 
+  [[maptlist(_F0, cons(_x1, _x2))]] = 6 + 3*x2 + 6*x1 + F0(0) + 2*x2*F0(2 + x2 + 2*x1) + 4*x1*F0(2 + x2 + 2*x1) + 5*F0(2 + x2 + 2*x1) > 4 + 3*x2 + 6*x1 + F0(0) + F0(x2) + 2*x2*F0(x2) + 2*F0(x1) + 4*x1*F0(x1) = [[cons(mapt(_F0, _x1), maptlist(_F0, _x2))]] 
+
+We can thus remove the following rules:
+
+  mapt(F, leaf(X)) => leaf(F X) 
+  mapt(F, node(X)) => node(maptlist(F, X)) 
+  maptlist(F, cons(X, Y)) => cons(mapt(F, X), maptlist(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  maptlist(F, nil) >? nil 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  maptlist = Lam[G0;y1].3 + 3*y1 + G0(0) 
+  nil = 0 
+
+Using this interpretation, the requirements translate to:
+
+  [[maptlist(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+
+We can thus remove the following rules:
+
+  maptlist(F, nil) => nil 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

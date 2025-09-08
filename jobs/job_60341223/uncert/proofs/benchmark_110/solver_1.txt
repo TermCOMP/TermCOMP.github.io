@@ -1,0 +1,154 @@
+YES
+We consider the system z4UfR.
+
+  Alphabet:
+
+    !plus : [nat * nat] --> nat 
+    !times : [nat * nat] --> nat 
+    O : [] --> nat 
+    rec : [nat * nat * nat -> nat -> nat] --> nat 
+    s : [nat] --> nat 
+
+  Rules:
+
+    !plus(X, O) => X 
+    !plus(X, s(Y)) => s(!plus(X, Y)) 
+    rec(O, X, F) => X 
+    rec(s(X), Y, F) => F X rec(X, Y, F) 
+    !times(X, Y) => rec(Y, O, /\x./\y.!plus(X, y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  !plus(X, O) >? X 
+  !plus(X, s(Y)) >? s(!plus(X, Y)) 
+  rec(O, X, F) >? X 
+  rec(s(X), Y, F) >? F X rec(X, Y, F) 
+  !times(X, Y) >? rec(Y, O, /\x./\y.!plus(X, y)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[rec(x_1, x_2, x_3)]] = rec(x_3, x_1, x_2) 
+
+We choose Lex = {rec} and Mul = {!plus, !times, @_{o -> o -> o}, @_{o -> o}, s}, and the following precedence: !times > !plus > rec > @_{o -> o -> o} > @_{o -> o} > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  !plus(X, _|_) > X 
+  !plus(X, s(Y)) >= s(!plus(X, Y)) 
+  rec(_|_, X, F) >= X 
+  rec(s(X), Y, F) > @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F)) 
+  !times(X, Y) >= rec(Y, _|_, /\x./\y.!plus(X, y)) 
+
+With these choices, we have:
+
+  1] !plus(X, _|_) > X  because [2], by definition 
+  2] !plus*(X, _|_) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] !plus(X, s(Y)) >= s(!plus(X, Y))  because [5], by (Star) 
+  5] !plus*(X, s(Y)) >= s(!plus(X, Y))  because !plus > s and [6], by (Copy) 
+  6] !plus*(X, s(Y)) >= !plus(X, Y)  because !plus in Mul, [7] and [8], by (Stat) 
+  7] X >= X  by (Meta) 
+  8] s(Y) > Y  because [9], by definition 
+  9] s*(Y) >= Y  because [10], by (Select) 
+  10] Y >= Y  by (Meta) 
+
+  11] rec(_|_, X, F) >= X  because [12], by (Star) 
+  12] rec*(_|_, X, F) >= X  because [13], by (Select) 
+  13] X >= X  by (Meta) 
+
+  14] rec(s(X), Y, F) > @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because [15], by definition 
+  15] rec*(s(X), Y, F) >= @_{o -> o}(@_{o -> o -> o}(F, X), rec(X, Y, F))  because rec > @_{o -> o}, [16] and [23], by (Copy) 
+  16] rec*(s(X), Y, F) >= @_{o -> o -> o}(F, X)  because rec > @_{o -> o -> o}, [17] and [19], by (Copy) 
+  17] rec*(s(X), Y, F) >= F  because [18], by (Select) 
+  18] F >= F  by (Meta) 
+  19] rec*(s(X), Y, F) >= X  because [20], by (Select) 
+  20] s(X) >= X  because [21], by (Star) 
+  21] s*(X) >= X  because [22], by (Select) 
+  22] X >= X  by (Meta) 
+  23] rec*(s(X), Y, F) >= rec(X, Y, F)  because rec in Lex, [24], [26], [19], [27] and [17], by (Stat) 
+  24] s(X) > X  because [25], by definition 
+  25] s*(X) >= X  because [22], by (Select) 
+  26] F >= F  by (Meta) 
+  27] rec*(s(X), Y, F) >= Y  because [28], by (Select) 
+  28] Y >= Y  by (Meta) 
+
+  29] !times(X, Y) >= rec(Y, _|_, /\x./\y.!plus(X, y))  because [30], by (Star) 
+  30] !times*(X, Y) >= rec(Y, _|_, /\x./\y.!plus(X, y))  because !times > rec, [31], [33] and [34], by (Copy) 
+  31] !times*(X, Y) >= Y  because [32], by (Select) 
+  32] Y >= Y  by (Meta) 
+  33] !times*(X, Y) >= _|_  by (Bot) 
+  34] !times*(X, Y) >= /\y./\z.!plus(X, z)  because [35], by (F-Abs) 
+  35] !times*(X, Y, x) >= /\z.!plus(X, z)  because [36], by (F-Abs) 
+  36] !times*(X, Y, x, y) >= !plus(X, y)  because !times > !plus, [37] and [39], by (Copy) 
+  37] !times*(X, Y, x, y) >= X  because [38], by (Select) 
+  38] X >= X  by (Meta) 
+  39] !times*(X, Y, x, y) >= y  because [40], by (Select) 
+  40] y >= y  by (Var) 
+
+We can thus remove the following rules:
+
+  !plus(X, O) => X 
+  rec(s(X), Y, F) => F X rec(X, Y, F) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  !plus(X, s(Y)) >? s(!plus(X, Y)) 
+  rec(O, X, F) >? X 
+  !times(X, Y) >? rec(Y, O, /\x./\y.!plus(X, y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  !plus = Lam[y0;y1].y0 + 2*y1 
+  !times = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  O = 0 
+  rec = Lam[y0;y1;G2].y0 + y1 + G2(0,0) 
+  s = Lam[y0].1 + y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[!plus(_x0, s(_x1))]] = 2 + x0 + 2*x1 > 1 + x0 + 2*x1 = [[s(!plus(_x0, _x1))]] 
+  [[rec(O, _x0, _F1)]] = x0 + F1(0,0) >= x0 = [[_x0]] 
+  [[!times(_x0, _x1)]] = 3 + 3*x0 + 3*x1 > x0 + x1 = [[rec(_x1, O, /\x./\y.!plus(_x0, y))]] 
+
+We can thus remove the following rules:
+
+  !plus(X, s(Y)) => s(!plus(X, Y)) 
+  !times(X, Y) => rec(Y, O, /\x./\y.!plus(X, y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(O, X, F) >? X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  rec = Lam[y0;y1;G2].3 + y0 + y1 + G2(0,0) 
+
+Using this interpretation, the requirements translate to:
+
+  [[rec(O, _x0, _F1)]] = 6 + x0 + F1(0,0) > x0 = [[_x0]] 
+
+We can thus remove the following rules:
+
+  rec(O, X, F) => X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

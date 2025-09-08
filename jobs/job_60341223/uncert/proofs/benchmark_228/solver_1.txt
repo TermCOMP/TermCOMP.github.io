@@ -1,0 +1,170 @@
+YES
+We consider the system Ws2uO.
+
+  Alphabet:
+
+    !plus : [b * b] --> b 
+    !times : [a * b] --> b 
+    cons : [d * e] --> e 
+    false : [] --> c 
+    filter : [d -> c * e] --> e 
+    filter2 : [c * d -> c * d * e] --> e 
+    map : [d -> d * e] --> e 
+    nil : [] --> e 
+    true : [] --> c 
+
+  Rules:
+
+    !times(X, !plus(Y, Z)) => !plus(!times(X, Y), !times(X, Z)) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  !times(X, !plus(Y, Z)) >? !plus(!times(X, Y), !times(X, Z)) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >? filter(F, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[filter2(x_1, x_2, x_3, x_4)]] = filter2(x_2, x_4, x_1, x_3) 
+  [[nil]] = _|_ 
+
+We choose Lex = {@_{o -> o}, filter, filter2} and Mul = {!plus, !times, cons, false, map, true}, and the following precedence: map > false > @_{o -> o} = filter = filter2 > !times > !plus > cons > true
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  !times(X, !plus(Y, Z)) > !plus(!times(X, Y), !times(X, Z)) 
+  map(F, _|_) >= _|_ 
+  map(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y)) 
+  filter(F, _|_) >= _|_ 
+  filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y) 
+  filter2(true, F, X, Y) >= cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) > filter(F, Y) 
+
+With these choices, we have:
+
+  1] !times(X, !plus(Y, Z)) > !plus(!times(X, Y), !times(X, Z))  because [2], by definition 
+  2] !times*(X, !plus(Y, Z)) >= !plus(!times(X, Y), !times(X, Z))  because !times > !plus, [3] and [8], by (Copy) 
+  3] !times*(X, !plus(Y, Z)) >= !times(X, Y)  because !times in Mul, [4] and [5], by (Stat) 
+  4] X >= X  by (Meta) 
+  5] !plus(Y, Z) > Y  because [6], by definition 
+  6] !plus*(Y, Z) >= Y  because [7], by (Select) 
+  7] Y >= Y  by (Meta) 
+  8] !times*(X, !plus(Y, Z)) >= !times(X, Z)  because !times in Mul, [4] and [9], by (Stat) 
+  9] !plus(Y, Z) > Z  because [10], by definition 
+  10] !plus*(Y, Z) >= Z  because [11], by (Select) 
+  11] Z >= Z  by (Meta) 
+
+  12] map(F, _|_) >= _|_  by (Bot) 
+
+  13] map(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because [14], by (Star) 
+  14] map*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because map > cons, [15] and [22], by (Copy) 
+  15] map*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because map > @_{o -> o}, [16] and [18], by (Copy) 
+  16] map*(F, cons(X, Y)) >= F  because [17], by (Select) 
+  17] F >= F  by (Meta) 
+  18] map*(F, cons(X, Y)) >= X  because [19], by (Select) 
+  19] cons(X, Y) >= X  because [20], by (Star) 
+  20] cons*(X, Y) >= X  because [21], by (Select) 
+  21] X >= X  by (Meta) 
+  22] map*(F, cons(X, Y)) >= map(F, Y)  because map in Mul, [23] and [24], by (Stat) 
+  23] F >= F  by (Meta) 
+  24] cons(X, Y) > Y  because [25], by definition 
+  25] cons*(X, Y) >= Y  because [26], by (Select) 
+  26] Y >= Y  by (Meta) 
+
+  27] filter(F, _|_) >= _|_  by (Bot) 
+
+  28] filter(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because [29], by (Star) 
+  29] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter = filter2, filter in Lex, [30], [31], [34], [38], [39] and [41], by (Stat) 
+  30] F >= F  by (Meta) 
+  31] cons(X, Y) > Y  because [32], by definition 
+  32] cons*(X, Y) >= Y  because [33], by (Select) 
+  33] Y >= Y  by (Meta) 
+  34] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter = @_{o -> o}, filter in Lex, [30], [35], [38] and [39], by (Stat) 
+  35] cons(X, Y) > X  because [36], by definition 
+  36] cons*(X, Y) >= X  because [37], by (Select) 
+  37] X >= X  by (Meta) 
+  38] filter*(F, cons(X, Y)) >= F  because [30], by (Select) 
+  39] filter*(F, cons(X, Y)) >= X  because [40], by (Select) 
+  40] cons(X, Y) >= X  because [36], by (Star) 
+  41] filter*(F, cons(X, Y)) >= Y  because [42], by (Select) 
+  42] cons(X, Y) >= Y  because [32], by (Star) 
+
+  43] filter2(true, F, X, Y) >= cons(X, filter(F, Y))  because [44], by (Star) 
+  44] filter2*(true, F, X, Y) >= cons(X, filter(F, Y))  because filter2 > cons, [45] and [47], by (Copy) 
+  45] filter2*(true, F, X, Y) >= X  because [46], by (Select) 
+  46] X >= X  by (Meta) 
+  47] filter2*(true, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [48], [49], [50] and [51], by (Stat) 
+  48] F >= F  by (Meta) 
+  49] Y >= Y  by (Meta) 
+  50] filter2*(true, F, X, Y) >= F  because [48], by (Select) 
+  51] filter2*(true, F, X, Y) >= Y  because [49], by (Select) 
+
+  52] filter2(false, F, X, Y) > filter(F, Y)  because [53], by definition 
+  53] filter2*(false, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [54], [55], [56] and [57], by (Stat) 
+  54] F >= F  by (Meta) 
+  55] Y >= Y  by (Meta) 
+  56] filter2*(false, F, X, Y) >= F  because [54], by (Select) 
+  57] filter2*(false, F, X, Y) >= Y  because [55], by (Select) 
+
+We can thus remove the following rules:
+
+  !times(X, !plus(Y, Z)) => !plus(!times(X, Y), !times(X, Z)) 
+  filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  cons = Lam[y0;y1].3 + y0 + y1 
+  filter = Lam[G0;y1].3*y1 + G0(y1) + 3*y1*G0(y1) 
+  filter2 = Lam[y0;G1;y2;y3].1 + y0 + 2*y2 + 3*y3 + G1(y3) + 2*G1(0) + 3*y3*G1(y3) 
+  map = Lam[G0;y1].3*y1 + G0(0) + 2*y1*G0(y1) + 2*G0(y1) 
+  nil = 2 
+  true = 3 
+
+Using this interpretation, the requirements translate to:
+
+  [[map(_F0, nil)]] = 6 + F0(0) + 6*F0(2) > 2 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 9 + 3*x1 + 3*x2 + F0(0) + 2*x1*F0(3 + x1 + x2) + 2*x2*F0(3 + x1 + x2) + 8*F0(3 + x1 + x2) > 3 + x1 + 3*x2 + F0(0) + F0(x1) + 2*x2*F0(x2) + 2*F0(x2) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+  [[filter(_F0, nil)]] = 6 + 7*F0(2) > 2 = [[nil]] 
+  [[filter(_F0, cons(_x1, _x2))]] = 9 + 3*x1 + 3*x2 + 3*x1*F0(3 + x1 + x2) + 3*x2*F0(3 + x1 + x2) + 10*F0(3 + x1 + x2) > 1 + 3*x1 + 3*x2 + F0(x1) + F0(x2) + 2*F0(0) + 3*x2*F0(x2) = [[filter2(_F0 _x1, _F0, _x1, _x2)]] 
+  [[filter2(true, _F0, _x1, _x2)]] = 4 + 2*x1 + 3*x2 + F0(x2) + 2*F0(0) + 3*x2*F0(x2) > 3 + x1 + 3*x2 + F0(x2) + 3*x2*F0(x2) = [[cons(_x1, filter(_F0, _x2))]] 
+
+We can thus remove the following rules:
+
+  map(F, nil) => nil 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  filter(F, nil) => nil 
+  filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

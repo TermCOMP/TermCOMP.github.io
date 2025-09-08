@@ -1,0 +1,51 @@
+YES
+We consider the system DozaY.
+
+  Alphabet:
+
+    lim : [N -> O] --> O 
+    plus : [O * O] --> O 
+    s : [O] --> O 
+    z : [] --> O 
+
+  Rules:
+
+    plus(z, X) => X 
+    plus(s(X), Y) => s(plus(X, Y)) 
+    plus(lim(F), X) => lim(/\x.plus(F x, X)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plus(z, X) >? X 
+  plus(s(X), Y) >? s(plus(X, Y)) 
+  plus(lim(F), X) >? lim(/\x.plus(F x, X)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  lim = Lam[G0].3 + G0(0) 
+  plus = Lam[y0;y1].3 + y1 + 3*y0 
+  s = Lam[y0].3 + y0 
+  z = 3 
+
+Using this interpretation, the requirements translate to:
+
+  [[plus(z, _x0)]] = 12 + x0 > x0 = [[_x0]] 
+  [[plus(s(_x0), _x1)]] = 12 + x1 + 3*x0 > 6 + x1 + 3*x0 = [[s(plus(_x0, _x1))]] 
+  [[plus(lim(_F0), _x1)]] = 12 + x1 + 3*F0(0) > 6 + x1 + 3*F0(0) = [[lim(/\x.plus(_F0 x, _x1))]] 
+
+We can thus remove the following rules:
+
+  plus(z, X) => X 
+  plus(s(X), Y) => s(plus(X, Y)) 
+  plus(lim(F), X) => lim(/\x.plus(F x, X)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

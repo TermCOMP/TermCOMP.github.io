@@ -1,0 +1,713 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/S2MVV.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 31 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 575 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 26 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 9 ms]
+        (13) IRSwT
+        (14) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (15) IRSwT
+        (16) TempFilterProof [SOUND, 22 ms]
+        (17) IntTRS
+        (18) PolynomialOrderProcessor [EQUIVALENT, 3 ms]
+        (19) IntTRS
+        (20) RankingReductionPairProof [EQUIVALENT, 0 ms]
+        (21) YES
+    (22) JBCTerminationSCC
+        (23) SCCToIRSProof [SOUND, 36 ms]
+        (24) IRSwT
+        (25) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (26) IRSwT
+        (27) IRSwTTerminationDigraphProof [EQUIVALENT, 14 ms]
+        (28) IRSwT
+        (29) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (30) IRSwT
+        (31) TempFilterProof [SOUND, 21 ms]
+        (32) IntTRS
+        (33) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (34) IntTRS
+        (35) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (36) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+class Curseur{
+	private int X=0, Y=0, maxX, maxY;
+	private boolean torique=false;
+
+	public Curseur(int maxX, int maxY, boolean espaceTorique){
+		super();
+		this.maxX=maxX;
+		this.maxY=maxY;
+		this.torique=espaceTorique;		
+	}
+
+	public void centrer(){
+		
+			int cX=maxX/2;
+			int cY=maxY/2;
+			X=cX;
+			Y=cY;
+		
+	}
+
+	public void haut(){
+
+			Y--;
+			if(torique&&Y<0) Y=maxY-1;
+	}
+
+	public void bas(){
+			Y++;
+			if(torique&&Y==maxY) Y=0;
+	}
+
+	public void droite(){
+			X++;
+			if(torique&&X==maxX) X=0;
+	}
+
+	public void gauche(){
+			X--;
+			if(torique&&X<0) X=maxX-1;
+	}
+
+	public int getX(){
+			return X;
+	}
+
+	public int getY(){
+			return Y;
+	}
+	
+	public void imprimer(){
+	    //System.out.println("Curseur@["+getX()+","+getY()+"]");
+	}
+}
+
+public class Carre {
+
+	private Curseur curseur=null;
+	private int cote=0;
+
+	public Carre(int cote){
+		if(cote>1&cote%2==1){
+			this.cote=cote; 
+		}else{
+		    //System.out.println("Cette classe ne genere pas les carres magiques d\'ordre pair.");
+		    //System.exit(0);
+		}
+		this.curseur=new Curseur(cote,cote,true);
+	}
+	
+	private int [][] carre=null;
+
+	public void init(){
+		carre=new int[cote][cote];
+		int n=0;
+		for(int x=0;x<3;x++) for(int y=0;y<3;y++) carre[x][y]=0;
+		curseur.centrer();
+	}
+
+	public void peupler(){
+		curseur.bas();
+		int nbre=1;
+		int cpteur=1;
+		while(cpteur<3){			
+			if(!ajouter(nbre,curseur.getX(),curseur.getY())){
+				curseur.bas();
+				curseur.gauche();
+				cpteur++;
+			}else{
+				cpteur=1;
+				curseur.bas();
+				curseur.droite();
+				nbre++;
+			}
+		}
+	}
+
+	public Curseur curseur(){
+		return curseur;
+	}
+
+	public int cote(){
+		return cote;
+	}
+
+	public boolean ajouter(int nombre, int X, int Y){
+		if(carre[X][Y]!=0) return false; 
+		carre[X][Y]=nombre;
+		return true;
+	}
+
+	public void imprimer(){
+		for(int j=0;j<cote;j++){
+			for(int i=0;i<cote;i++){
+			    //System.out.print(carre[i][j]+"\t");
+			}
+			//System.out.println();
+		}
+	}
+
+	public static void main(String args[]){
+	    Random.args = args;
+	    Carre carre=new Carre(2*Random.random()+1);
+	    carre.init();
+	    //carre.peupler();
+	    carre.imprimer();
+	}
+    
+}
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+      if (index >= args.length)
+	  return 0;
+
+      String string = args[index];
+      index++;
+      return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+class Curseur{
+	private int X=0, Y=0, maxX, maxY;
+	private boolean torique=false;
+
+	public Curseur(int maxX, int maxY, boolean espaceTorique){
+		super();
+		this.maxX=maxX;
+		this.maxY=maxY;
+		this.torique=espaceTorique;		
+	}
+
+	public void centrer(){
+		
+			int cX=maxX/2;
+			int cY=maxY/2;
+			X=cX;
+			Y=cY;
+		
+	}
+
+	public void haut(){
+
+			Y--;
+			if(torique&&Y<0) Y=maxY-1;
+	}
+
+	public void bas(){
+			Y++;
+			if(torique&&Y==maxY) Y=0;
+	}
+
+	public void droite(){
+			X++;
+			if(torique&&X==maxX) X=0;
+	}
+
+	public void gauche(){
+			X--;
+			if(torique&&X<0) X=maxX-1;
+	}
+
+	public int getX(){
+			return X;
+	}
+
+	public int getY(){
+			return Y;
+	}
+	
+	public void imprimer(){
+	    //System.out.println("Curseur@["+getX()+","+getY()+"]");
+	}
+}
+
+public class Carre {
+
+	private Curseur curseur=null;
+	private int cote=0;
+
+	public Carre(int cote){
+		if(cote>1&cote%2==1){
+			this.cote=cote; 
+		}else{
+		    //System.out.println("Cette classe ne genere pas les carres magiques d\'ordre pair.");
+		    //System.exit(0);
+		}
+		this.curseur=new Curseur(cote,cote,true);
+	}
+	
+	private int [][] carre=null;
+
+	public void init(){
+		carre=new int[cote][cote];
+		int n=0;
+		for(int x=0;x<3;x++) for(int y=0;y<3;y++) carre[x][y]=0;
+		curseur.centrer();
+	}
+
+	public void peupler(){
+		curseur.bas();
+		int nbre=1;
+		int cpteur=1;
+		while(cpteur<3){			
+			if(!ajouter(nbre,curseur.getX(),curseur.getY())){
+				curseur.bas();
+				curseur.gauche();
+				cpteur++;
+			}else{
+				cpteur=1;
+				curseur.bas();
+				curseur.droite();
+				nbre++;
+			}
+		}
+	}
+
+	public Curseur curseur(){
+		return curseur;
+	}
+
+	public int cote(){
+		return cote;
+	}
+
+	public boolean ajouter(int nombre, int X, int Y){
+		if(carre[X][Y]!=0) return false; 
+		carre[X][Y]=nombre;
+		return true;
+	}
+
+	public void imprimer(){
+		for(int j=0;j<cote;j++){
+			for(int i=0;i<cote;i++){
+			    //System.out.print(carre[i][j]+"\t");
+			}
+			//System.out.println();
+		}
+	}
+
+	public static void main(String args[]){
+	    Random.args = args;
+	    Carre carre=new Carre(2*Random.random()+1);
+	    carre.init();
+	    //carre.peupler();
+	    carre.imprimer();
+	}
+    
+}
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+      if (index >= args.length)
+	  return 0;
+
+      String string = args[index];
+      index++;
+      return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+Carre.main([Ljava/lang/String;)V: Graph of 630 nodes with 2 SCCs.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Carre.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*Carre: [cote]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 23 IRulesP rules:
+f8332_0_imprimer_Load(EOS(STATIC_8332), java.lang.Object(Carre(EOC, i31)), i511, i511) -> f8333_0_imprimer_FieldAccess(EOS(STATIC_8333), java.lang.Object(Carre(EOC, i31)), i511, i511, java.lang.Object(Carre(EOC, i31))) :|: TRUE
+f8333_0_imprimer_FieldAccess(EOS(STATIC_8333), java.lang.Object(Carre(EOC, i31)), i511, i511, java.lang.Object(Carre(EOC, i31))) -> f8336_0_imprimer_GE(EOS(STATIC_8336), java.lang.Object(Carre(EOC, i31)), i511, i511, i31) :|: TRUE
+f8336_0_imprimer_GE(EOS(STATIC_8336), java.lang.Object(Carre(EOC, i31)), i511, i511, i31) -> f8348_0_imprimer_GE(EOS(STATIC_8348), java.lang.Object(Carre(EOC, i31)), i511, i511, i31) :|: i511 < i31
+f8348_0_imprimer_GE(EOS(STATIC_8348), java.lang.Object(Carre(EOC, i31)), i511, i511, i31) -> f8358_0_imprimer_ConstantStackPush(EOS(STATIC_8358), java.lang.Object(Carre(EOC, i31)), i511) :|: i511 < i31
+f8358_0_imprimer_ConstantStackPush(EOS(STATIC_8358), java.lang.Object(Carre(EOC, i31)), i511) -> f8363_0_imprimer_Store(EOS(STATIC_8363), java.lang.Object(Carre(EOC, i31)), i511, 0) :|: TRUE
+f8363_0_imprimer_Store(EOS(STATIC_8363), java.lang.Object(Carre(EOC, i31)), i511, matching1) -> f8366_0_imprimer_Load(EOS(STATIC_8366), java.lang.Object(Carre(EOC, i31)), i511, 0) :|: TRUE && matching1 = 0
+f8366_0_imprimer_Load(EOS(STATIC_8366), java.lang.Object(Carre(EOC, i31)), i511, matching1) -> f8438_0_imprimer_Load(EOS(STATIC_8438), java.lang.Object(Carre(EOC, i31)), i511, 0) :|: TRUE && matching1 = 0
+f8438_0_imprimer_Load(EOS(STATIC_8438), java.lang.Object(Carre(EOC, i31)), i511, i514) -> f8578_0_imprimer_Load(EOS(STATIC_8578), java.lang.Object(Carre(EOC, i31)), i511, i514) :|: TRUE
+f8578_0_imprimer_Load(EOS(STATIC_8578), java.lang.Object(Carre(EOC, i31)), i511, i517) -> f8759_0_imprimer_Load(EOS(STATIC_8759), java.lang.Object(Carre(EOC, i31)), i511, i517) :|: TRUE
+f8759_0_imprimer_Load(EOS(STATIC_8759), java.lang.Object(Carre(EOC, i31)), i511, i523) -> f9087_0_imprimer_Load(EOS(STATIC_9087), java.lang.Object(Carre(EOC, i31)), i511, i523, i523) :|: TRUE
+f9087_0_imprimer_Load(EOS(STATIC_9087), java.lang.Object(Carre(EOC, i31)), i511, i523, i523) -> f9090_0_imprimer_FieldAccess(EOS(STATIC_9090), java.lang.Object(Carre(EOC, i31)), i511, i523, i523, java.lang.Object(Carre(EOC, i31))) :|: TRUE
+f9090_0_imprimer_FieldAccess(EOS(STATIC_9090), java.lang.Object(Carre(EOC, i31)), i511, i523, i523, java.lang.Object(Carre(EOC, i31))) -> f9093_0_imprimer_GE(EOS(STATIC_9093), java.lang.Object(Carre(EOC, i31)), i511, i523, i523, i31) :|: TRUE
+f9093_0_imprimer_GE(EOS(STATIC_9093), java.lang.Object(Carre(EOC, i31)), i511, i523, i523, i31) -> f9102_0_imprimer_GE(EOS(STATIC_9102), java.lang.Object(Carre(EOC, i31)), i511, i523, i523, i31) :|: i523 >= i31
+f9093_0_imprimer_GE(EOS(STATIC_9093), java.lang.Object(Carre(EOC, i31)), i511, i523, i523, i31) -> f9103_0_imprimer_GE(EOS(STATIC_9103), java.lang.Object(Carre(EOC, i31)), i511, i523, i523, i31) :|: i523 < i31
+f9102_0_imprimer_GE(EOS(STATIC_9102), java.lang.Object(Carre(EOC, i31)), i511, i523, i523, i31) -> f9111_0_imprimer_Inc(EOS(STATIC_9111), java.lang.Object(Carre(EOC, i31)), i511) :|: i523 >= i31
+f9111_0_imprimer_Inc(EOS(STATIC_9111), java.lang.Object(Carre(EOC, i31)), i511) -> f9121_0_imprimer_JMP(EOS(STATIC_9121), java.lang.Object(Carre(EOC, i31)), i511 + 1) :|: TRUE
+f9121_0_imprimer_JMP(EOS(STATIC_9121), java.lang.Object(Carre(EOC, i31)), i526) -> f9167_0_imprimer_Load(EOS(STATIC_9167), java.lang.Object(Carre(EOC, i31)), i526) :|: TRUE
+f9167_0_imprimer_Load(EOS(STATIC_9167), java.lang.Object(Carre(EOC, i31)), i526) -> f8327_0_imprimer_Load(EOS(STATIC_8327), java.lang.Object(Carre(EOC, i31)), i526) :|: TRUE
+f8327_0_imprimer_Load(EOS(STATIC_8327), java.lang.Object(Carre(EOC, i31)), i511) -> f8332_0_imprimer_Load(EOS(STATIC_8332), java.lang.Object(Carre(EOC, i31)), i511, i511) :|: TRUE
+f9103_0_imprimer_GE(EOS(STATIC_9103), java.lang.Object(Carre(EOC, i31)), i511, i523, i523, i31) -> f9118_0_imprimer_Inc(EOS(STATIC_9118), java.lang.Object(Carre(EOC, i31)), i511, i523) :|: i523 < i31
+f9118_0_imprimer_Inc(EOS(STATIC_9118), java.lang.Object(Carre(EOC, i31)), i511, i523) -> f9122_0_imprimer_JMP(EOS(STATIC_9122), java.lang.Object(Carre(EOC, i31)), i511, i523 + 1) :|: TRUE
+f9122_0_imprimer_JMP(EOS(STATIC_9122), java.lang.Object(Carre(EOC, i31)), i511, i527) -> f9226_0_imprimer_Load(EOS(STATIC_9226), java.lang.Object(Carre(EOC, i31)), i511, i527) :|: TRUE
+f9226_0_imprimer_Load(EOS(STATIC_9226), java.lang.Object(Carre(EOC, i31)), i511, i527) -> f8759_0_imprimer_Load(EOS(STATIC_8759), java.lang.Object(Carre(EOC, i31)), i511, i527) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f9093_0_imprimer_GE(EOS(STATIC_9093), java.lang.Object(Carre(EOC, i31:0)), i511:0, i523:0, i523:0, i31:0) -> f9093_0_imprimer_GE(EOS(STATIC_9093), java.lang.Object(Carre(EOC, i31:0)), i511:0, i523:0 + 1, i523:0 + 1, i31:0) :|: i523:0 < i31:0
+f9093_0_imprimer_GE(EOS(STATIC_9093), java.lang.Object(Carre(EOC, i31:0)), i511:0, i523:0, i523:0, i31:0) -> f9093_0_imprimer_GE(EOS(STATIC_9093), java.lang.Object(Carre(EOC, i31:0)), i511:0 + 1, 0, 0, i31:0) :|: i511:0 + 1 < i31:0 && i523:0 >= i31:0
+Filtered constant ground arguments:
+   f9093_0_imprimer_GE(x1, x2, x3, x4, x5, x6) -> f9093_0_imprimer_GE(x2, x3, x4, x5, x6)
+   EOS(x1) -> EOS
+   Carre(x1, x2) -> Carre(x2)
+Filtered duplicate arguments:
+   f9093_0_imprimer_GE(x1, x2, x3, x4, x5) -> f9093_0_imprimer_GE(x1, x2, x4, x5)
+Finished conversion. Obtained 2 rules.P rules:
+f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, i523:0, i31:0, i31:0) -> f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, i523:0 + 1, i31:0, i31:0) :|: i523:0 < i31:0
+f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, i523:0, i31:0, i31:0) -> f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0 + 1, 0, i31:0, i31:0) :|: i511:0 + 1 < i31:0 && i523:0 >= i31:0
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, i523:0, i31:0, i31:0) -> f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, i523:0 + 1, i31:0, i31:0) :|: i523:0 < i31:0
+f9093_0_imprimer_GE(java.lang.Object(Carre(x)), x1, x2, x, x) -> f9093_0_imprimer_GE(java.lang.Object(Carre(x)), x1 + 1, 0, x, x) :|: x1 + 1 < x && x2 >= x
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, i523:0, i31:0, i31:0) -> f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, arith, i31:0, i31:0) :|: i523:0 < i31:0 && arith = i523:0 + 1
+f9093_0_imprimer_GE(java.lang.Object(Carre(x3)), x4, x5, x3, x3) -> f9093_0_imprimer_GE(java.lang.Object(Carre(x3)), x6, 0, x3, x3) :|: x4 + 1 < x3 && x5 >= x3 && x6 = x4 + 1
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, i523:0, i31:0, i31:0) -> f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, arith, i31:0, i31:0) :|: i523:0 < i31:0 && arith = i523:0 + 1
+(2) f9093_0_imprimer_GE(java.lang.Object(Carre(x3)), x4, x5, x3, x3) -> f9093_0_imprimer_GE(java.lang.Object(Carre(x3)), x6, 0, x3, x3) :|: x4 + 1 < x3 && x5 >= x3 && x6 = x4 + 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, i523:0, i31:0, i31:0) -> f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0)), i511:0, arith, i31:0, i31:0) :|: i523:0 < i31:0 && arith = i523:0 + 1
+(2) f9093_0_imprimer_GE(java.lang.Object(Carre(x3)), x4, x5, x3, x3) -> f9093_0_imprimer_GE(java.lang.Object(Carre(x3)), x6, 0, x3, x3) :|: x4 + 1 < x3 && x5 >= x3 && x6 = x4 + 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(14) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(15)
+Obligation:
+Rules:
+f9093_0_imprimer_GE(java.lang.Object(Carre(x3:0)), x4:0, x5:0, x3:0, x3:0) -> f9093_0_imprimer_GE(java.lang.Object(Carre(x3:0)), x4:0 + 1, 0, x3:0, x3:0) :|: x4:0 + 1 < x3:0 && x5:0 >= x3:0
+f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0:0)), i511:0:0, i523:0:0, i31:0:0, i31:0:0) -> f9093_0_imprimer_GE(java.lang.Object(Carre(i31:0:0)), i511:0:0, i523:0:0 + 1, i31:0:0, i31:0:0) :|: i523:0:0 < i31:0:0
+
+----------------------------------------
+
+(16) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f9093_0_imprimer_GE(VARIABLE, VARIABLE, VARIABLE, INTEGER, INTEGER)
+java.lang.Object(VARIABLE)
+Carre(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(17)
+Obligation:
+Rules:
+f9093_0_imprimer_GE(c, x4:0, x5:0, x3:0, x3:0) -> f9093_0_imprimer_GE(c1, c2, c3, x3:0, x3:0) :|: c3 = 0 && (c2 = x4:0 + 1 && (c1 = 0 && c = 0)) && (x4:0 + 1 < x3:0 && x5:0 >= x3:0)
+f9093_0_imprimer_GE(c4, i511:0:0, i523:0:0, i31:0:0, i31:0:0) -> f9093_0_imprimer_GE(c5, i511:0:0, c6, i31:0:0, i31:0:0) :|: c6 = i523:0:0 + 1 && (c5 = 0 && c4 = 0) && i523:0:0 < i31:0:0
+
+----------------------------------------
+
+(18) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f9093_0_imprimer_GE(x, x1, x2, x3, x4)] = -1 + c*x - x1 + x4
+
+The following rules are decreasing:
+f9093_0_imprimer_GE(c, x4:0, x5:0, x3:0, x3:0) -> f9093_0_imprimer_GE(c1, c2, c3, x3:0, x3:0) :|: c3 = 0 && (c2 = x4:0 + 1 && (c1 = 0 && c = 0)) && (x4:0 + 1 < x3:0 && x5:0 >= x3:0)
+The following rules are bounded:
+f9093_0_imprimer_GE(c, x4:0, x5:0, x3:0, x3:0) -> f9093_0_imprimer_GE(c1, c2, c3, x3:0, x3:0) :|: c3 = 0 && (c2 = x4:0 + 1 && (c1 = 0 && c = 0)) && (x4:0 + 1 < x3:0 && x5:0 >= x3:0)
+
+----------------------------------------
+
+(19)
+Obligation:
+Rules:
+f9093_0_imprimer_GE(c4, i511:0:0, i523:0:0, i31:0:0, i31:0:0) -> f9093_0_imprimer_GE(c5, i511:0:0, c6, i31:0:0, i31:0:0) :|: c6 = i523:0:0 + 1 && (c5 = 0 && c4 = 0) && i523:0:0 < i31:0:0
+
+----------------------------------------
+
+(20) RankingReductionPairProof (EQUIVALENT)
+Interpretation:
+[ f9093_0_imprimer_GE ] = -1*f9093_0_imprimer_GE_3 + f9093_0_imprimer_GE_5
+
+The following rules are decreasing:
+f9093_0_imprimer_GE(c4, i511:0:0, i523:0:0, i31:0:0, i31:0:0) -> f9093_0_imprimer_GE(c5, i511:0:0, c6, i31:0:0, i31:0:0) :|: c6 = i523:0:0 + 1 && (c5 = 0 && c4 = 0) && i523:0:0 < i31:0:0
+
+The following rules are bounded:
+f9093_0_imprimer_GE(c4, i511:0:0, i523:0:0, i31:0:0, i31:0:0) -> f9093_0_imprimer_GE(c5, i511:0:0, c6, i31:0:0, i31:0:0) :|: c6 = i523:0:0 + 1 && (c5 = 0 && c4 = 0) && i523:0:0 < i31:0:0
+
+
+----------------------------------------
+
+(21)
+YES
+
+----------------------------------------
+
+(22)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Carre.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*Carre: [carre]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(23) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 32 IRulesP rules:
+f4729_0_init_ConstantStackPush(EOS(STATIC_4729), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i355, i355) -> f4745_0_init_GE(EOS(STATIC_4745), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i355, i355, 3) :|: TRUE
+f4745_0_init_GE(EOS(STATIC_4745), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i375, matching1) -> f4749_0_init_GE(EOS(STATIC_4749), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i375, 3) :|: TRUE && matching1 = 3
+f4749_0_init_GE(EOS(STATIC_4749), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i375, matching1) -> f4757_0_init_ConstantStackPush(EOS(STATIC_4757), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375) :|: i375 < 3 && matching1 = 3
+f4757_0_init_ConstantStackPush(EOS(STATIC_4757), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375) -> f4768_0_init_Store(EOS(STATIC_4768), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, 0) :|: TRUE
+f4768_0_init_Store(EOS(STATIC_4768), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, matching1) -> f4771_0_init_Load(EOS(STATIC_4771), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, 0) :|: TRUE && matching1 = 0
+f4771_0_init_Load(EOS(STATIC_4771), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, matching1) -> f4989_0_init_Load(EOS(STATIC_4989), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, 0) :|: TRUE && matching1 = 0
+f4989_0_init_Load(EOS(STATIC_4989), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i389) -> f5336_0_init_Load(EOS(STATIC_5336), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i389) :|: TRUE
+f5336_0_init_Load(EOS(STATIC_5336), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i427) -> f5978_0_init_Load(EOS(STATIC_5978), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i427) :|: TRUE
+f5978_0_init_Load(EOS(STATIC_5978), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i452) -> f6193_0_init_ConstantStackPush(EOS(STATIC_6193), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i452, i452) :|: TRUE
+f6193_0_init_ConstantStackPush(EOS(STATIC_6193), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i452, i452) -> f6217_0_init_GE(EOS(STATIC_6217), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i452, i452, 3) :|: TRUE
+f6217_0_init_GE(EOS(STATIC_6217), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, i472, matching1) -> f6285_0_init_GE(EOS(STATIC_6285), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, i472, 3) :|: TRUE && matching1 = 3
+f6217_0_init_GE(EOS(STATIC_6217), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i473, i473, matching1) -> f6286_0_init_GE(EOS(STATIC_6286), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i473, i473, 3) :|: TRUE && matching1 = 3
+f6285_0_init_GE(EOS(STATIC_6285), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, i472, matching1) -> f6288_0_init_Load(EOS(STATIC_6288), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472) :|: i472 < 3 && matching1 = 3
+f6288_0_init_Load(EOS(STATIC_6288), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472) -> f6291_0_init_FieldAccess(EOS(STATIC_6291), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31))))) :|: TRUE
+f6291_0_init_FieldAccess(EOS(STATIC_6291), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31))))) -> f6294_0_init_Load(EOS(STATIC_6294), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i31))) :|: TRUE
+f6294_0_init_Load(EOS(STATIC_6294), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i31))) -> f6585_0_init_ArrayAccess(EOS(STATIC_6585), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i31)), i375) :|: TRUE
+f6585_0_init_ArrayAccess(EOS(STATIC_6585), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i31)), i375) -> f6592_0_init_ArrayAccess(EOS(STATIC_6592), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i31)), i375) :|: TRUE
+f6592_0_init_ArrayAccess(EOS(STATIC_6592), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i31)), i375) -> f6597_0_init_Load(EOS(STATIC_6597), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, o1084) :|: i375 < i31
+f6597_0_init_Load(EOS(STATIC_6597), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, o1084) -> f6603_0_init_ConstantStackPush(EOS(STATIC_6603), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, o1084, i472) :|: TRUE
+f6603_0_init_ConstantStackPush(EOS(STATIC_6603), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, o1084, i472) -> f6609_0_init_ArrayAccess(EOS(STATIC_6609), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, o1084, i472, 0) :|: TRUE
+f6609_0_init_ArrayAccess(EOS(STATIC_6609), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(o1090put), i472, matching1) -> f6620_0_init_ArrayAccess(EOS(STATIC_6620), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(o1090put), i472, 0) :|: TRUE && matching1 = 0
+f6620_0_init_ArrayAccess(EOS(STATIC_6620), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i485)), i472, matching1) -> f6636_0_init_ArrayAccess(EOS(STATIC_6636), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i485)), i472, 0) :|: i485 >= 0 && matching1 = 0
+f6636_0_init_ArrayAccess(EOS(STATIC_6636), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i485)), i472, matching1) -> f6645_0_init_ArrayAccess(EOS(STATIC_6645), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i485)), i472, 0) :|: TRUE && matching1 = 0
+f6645_0_init_ArrayAccess(EOS(STATIC_6645), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472, java.lang.Object(ARRAY(i485)), i472, matching1) -> f7038_0_init_Inc(EOS(STATIC_7038), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472) :|: i472 < i485 && matching1 = 0
+f7038_0_init_Inc(EOS(STATIC_7038), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472) -> f7053_0_init_JMP(EOS(STATIC_7053), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i472 + 1) :|: TRUE
+f7053_0_init_JMP(EOS(STATIC_7053), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i490) -> f7097_0_init_Load(EOS(STATIC_7097), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i490) :|: TRUE
+f7097_0_init_Load(EOS(STATIC_7097), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i490) -> f5978_0_init_Load(EOS(STATIC_5978), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i490) :|: TRUE
+f6286_0_init_GE(EOS(STATIC_6286), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375, i473, i473, matching1) -> f6289_0_init_Inc(EOS(STATIC_6289), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375) :|: i473 >= 3 && matching1 = 3
+f6289_0_init_Inc(EOS(STATIC_6289), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375) -> f6292_0_init_JMP(EOS(STATIC_6292), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i375 + 1) :|: TRUE
+f6292_0_init_JMP(EOS(STATIC_6292), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i474) -> f6454_0_init_Load(EOS(STATIC_6454), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i474) :|: TRUE
+f6454_0_init_Load(EOS(STATIC_6454), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i474) -> f4725_0_init_Load(EOS(STATIC_4725), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i474) :|: TRUE
+f4725_0_init_Load(EOS(STATIC_4725), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i355) -> f4729_0_init_ConstantStackPush(EOS(STATIC_4729), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31)))), i355, i355) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f6217_0_init_GE(EOS(STATIC_6217), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31:0)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31:0)))), i375:0, i473:0, i473:0, 3) -> f6217_0_init_GE(EOS(STATIC_6217), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31:0)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31:0)))), i375:0 + 1, 0, 0, 3) :|: i473:0 > 2 && i375:0 < 2
+f6217_0_init_GE(EOS(STATIC_6217), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31:0)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31:0)))), i375:0, i472:0, i472:0, 3) -> f6217_0_init_GE(EOS(STATIC_6217), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31:0)))), java.lang.Object(Carre(EOC, java.lang.Object(ARRAY(i31:0)))), i375:0, i472:0 + 1, i472:0 + 1, 3) :|: i472:0 < 3 && i375:0 < i31:0 && i485:0 > i472:0 && i485:0 > -1
+Filtered constant ground arguments:
+   f6217_0_init_GE(x1, x2, x3, x4, x5, x6, x7) -> f6217_0_init_GE(x2, x3, x4, x5, x6)
+   EOS(x1) -> EOS
+   Carre(x1, x2) -> Carre(x2)
+Filtered duplicate arguments:
+   f6217_0_init_GE(x1, x2, x3, x4, x5) -> f6217_0_init_GE(x2, x3, x5)
+Finished conversion. Obtained 2 rules.P rules:
+f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), i375:0, i473:0, i31:0) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), i375:0 + 1, 0, i31:0) :|: i473:0 > 2 && i375:0 < 2
+f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), i375:0, i472:0, i31:0) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), i375:0, i472:0 + 1, i31:0) :|: i375:0 < i31:0 && i472:0 < 3 && i485:0 > -1 && i485:0 > i472:0
+
+----------------------------------------
+
+(24)
+Obligation:
+Rules:
+f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), i375:0, i473:0, i31:0) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), i375:0 + 1, 0, i31:0) :|: i473:0 > 2 && i375:0 < 2
+f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x)))), x1, x2, x) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x)))), x1, x2 + 1, x) :|: x1 < x && x2 < 3 && x3 > -1 && x3 > x2
+
+----------------------------------------
+
+(25) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(26)
+Obligation:
+Rules:
+f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), i375:0, i473:0, i31:0) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), arith, 0, i31:0) :|: i473:0 > 2 && i375:0 < 2 && arith = i375:0 + 1
+f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x4)))), x5, x6, x4) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x4)))), x5, x7, x4) :|: x5 < x4 && x6 < 3 && x8 > -1 && x8 > x6 && x7 = x6 + 1
+
+----------------------------------------
+
+(27) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), i375:0, i473:0, i31:0) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), arith, 0, i31:0) :|: i473:0 > 2 && i375:0 < 2 && arith = i375:0 + 1
+(2) f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x4)))), x5, x6, x4) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x4)))), x5, x7, x4) :|: x5 < x4 && x6 < 3 && x8 > -1 && x8 > x6 && x7 = x6 + 1
+
+Arcs:
+(1) -> (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(28)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), i375:0, i473:0, i31:0) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0)))), arith, 0, i31:0) :|: i473:0 > 2 && i375:0 < 2 && arith = i375:0 + 1
+(2) f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x4)))), x5, x6, x4) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x4)))), x5, x7, x4) :|: x5 < x4 && x6 < 3 && x8 > -1 && x8 > x6 && x7 = x6 + 1
+
+Arcs:
+(1) -> (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(29) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(30)
+Obligation:
+Rules:
+f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x4:0)))), x5:0, x6:0, x4:0) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(x4:0)))), x5:0, x6:0 + 1, x4:0) :|: x8:0 > -1 && x8:0 > x6:0 && x6:0 < 3 && x5:0 < x4:0
+f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0:0)))), i375:0:0, i473:0:0, i31:0:0) -> f6217_0_init_GE(java.lang.Object(Carre(java.lang.Object(ARRAY(i31:0:0)))), i375:0:0 + 1, 0, i31:0:0) :|: i473:0:0 > 2 && i375:0:0 < 2
+
+----------------------------------------
+
+(31) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f6217_0_init_GE(VARIABLE, INTEGER, VARIABLE, VARIABLE)
+java.lang.Object(VARIABLE)
+Carre(VARIABLE)
+ARRAY(VARIABLE)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(32)
+Obligation:
+Rules:
+f6217_0_init_GE(c, x5:0, x6:0, x4:0) -> f6217_0_init_GE(c1, x5:0, c2, x4:0) :|: c2 = x6:0 + 1 && (c1 = 0 && c = 0) && (x8:0 > -1 && x8:0 > x6:0 && x6:0 < 3 && x5:0 < x4:0)
+f6217_0_init_GE(c3, i375:0:0, i473:0:0, i31:0:0) -> f6217_0_init_GE(c4, c5, c6, i31:0:0) :|: c6 = 0 && (c5 = i375:0:0 + 1 && (c4 = 0 && c3 = 0)) && (i473:0:0 > 2 && i375:0:0 < 2)
+
+----------------------------------------
+
+(33) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f6217_0_init_GE(x, x1, x2, x3)] = 1 + c*x - x1
+
+The following rules are decreasing:
+f6217_0_init_GE(c3, i375:0:0, i473:0:0, i31:0:0) -> f6217_0_init_GE(c4, c5, c6, i31:0:0) :|: c6 = 0 && (c5 = i375:0:0 + 1 && (c4 = 0 && c3 = 0)) && (i473:0:0 > 2 && i375:0:0 < 2)
+The following rules are bounded:
+f6217_0_init_GE(c3, i375:0:0, i473:0:0, i31:0:0) -> f6217_0_init_GE(c4, c5, c6, i31:0:0) :|: c6 = 0 && (c5 = i375:0:0 + 1 && (c4 = 0 && c3 = 0)) && (i473:0:0 > 2 && i375:0:0 < 2)
+
+----------------------------------------
+
+(34)
+Obligation:
+Rules:
+f6217_0_init_GE(c, x5:0, x6:0, x4:0) -> f6217_0_init_GE(c1, x5:0, c2, x4:0) :|: c2 = x6:0 + 1 && (c1 = 0 && c = 0) && (x8:0 > -1 && x8:0 > x6:0 && x6:0 < 3 && x5:0 < x4:0)
+
+----------------------------------------
+
+(35) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f6217_0_init_GE(x, x1, x2, x3)] = 2 + c*x - x2
+
+The following rules are decreasing:
+f6217_0_init_GE(c, x5:0, x6:0, x4:0) -> f6217_0_init_GE(c1, x5:0, c2, x4:0) :|: c2 = x6:0 + 1 && (c1 = 0 && c = 0) && (x8:0 > -1 && x8:0 > x6:0 && x6:0 < 3 && x5:0 < x4:0)
+The following rules are bounded:
+f6217_0_init_GE(c, x5:0, x6:0, x4:0) -> f6217_0_init_GE(c1, x5:0, c2, x4:0) :|: c2 = x6:0 + 1 && (c1 = 0 && c = 0) && (x8:0 > -1 && x8:0 > x6:0 && x6:0 < 3 && x5:0 < x4:0)
+
+----------------------------------------
+
+(36)
+YES

@@ -1,0 +1,1237 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/1D8JB.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 62 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 904 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToQDPProof [SOUND, 412 ms]
+        (9) QDP
+        (10) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (11) QDP
+        (12) UsableRulesProof [EQUIVALENT, 0 ms]
+        (13) QDP
+        (14) QReductionProof [EQUIVALENT, 0 ms]
+        (15) QDP
+        (16) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (17) YES
+    (18) JBCTerminationSCC
+        (19) SCCToIRSProof [SOUND, 162 ms]
+        (20) IRSwT
+        (21) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (22) IRSwT
+        (23) IRSwTTerminationDigraphProof [EQUIVALENT, 28 ms]
+        (24) IRSwT
+        (25) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (26) IRSwT
+        (27) TempFilterProof [SOUND, 46 ms]
+        (28) IntTRS
+        (29) PolynomialOrderProcessor [EQUIVALENT, 12 ms]
+        (30) IntTRS
+        (31) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (32) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package Terms;
+
+public final class FunctionApplication extends Term {
+	FunctionSymbol fs;
+	List<Term> args;
+	
+	public FunctionApplication(FunctionSymbol f, List<Term> a) {
+		this.fs = f;
+		this.args = a;
+	}
+
+	public void collectVariables(List<Variable> vars) {
+		List<Term> cur = this.args;
+		while (cur != null) {
+			cur.value.collectVariables(vars);
+			cur = cur.next;
+		}
+	}
+
+	public Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that) {
+		if (that instanceof Variable) {
+			return null;
+		}
+		FunctionApplication fThat = (FunctionApplication) that;
+		if (this.fs.equals(fThat.fs)) {
+			List<Term> curThisArg = this.args; 
+			List<Term> curThatArg = fThat.args; 
+			while (curThisArg != null && curThatArg != null) {
+				sigma = curThisArg.value.extendMatchingSubstitution(sigma, curThatArg.value);
+				if (sigma == null) {
+					return null;
+				}
+				curThisArg = curThisArg.next;
+				curThatArg = curThatArg.next;
+			}
+			return sigma;
+		} else {
+			return null;
+		}
+	}
+
+
+	public int getDepth(){
+		int currentMaximum=0;
+		List<Term> cur = this.args;
+		while (cur != null) {
+			int currentDepth = cur.value.getDepth()+1;
+			if (currentDepth > currentMaximum) currentMaximum=currentDepth;
+			cur = cur.next;
+		}
+		return currentMaximum;
+	}
+	
+	public boolean equals(Object o) {
+		if (o instanceof FunctionApplication) {
+			FunctionApplication oFA = (FunctionApplication) o;
+			return (this.fs.equals(oFA.fs) && this.args.equals(oFA.args));
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return args.hashCode() * fs.hashCode();
+	}
+}
+
+
+package Terms;
+
+public final class FunctionSymbol {
+	int number;
+
+	public FunctionSymbol(int id) {
+		this.number = id;
+	}
+
+	public int getArity() {
+		return this.number;
+	}
+
+	public boolean equals(Object o) {
+		if (o instanceof FunctionSymbol) {
+			return this.number == ((FunctionSymbol) o).number;
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return this.number;
+	}
+}
+
+
+package Terms;
+
+public final class List<T> {
+	public T value;
+	public List<T> next;
+
+	public void add(T v) {
+		List<T> newEle = new List<T>();
+		newEle.value = this.value;
+		newEle.next = this.next;
+		this.next = newEle;
+		this.value = v;
+	}
+}
+
+
+
+package Terms;
+
+public final class Map<K, V> {
+	private K key;
+	private V value;
+	private Map<K, V> next;
+
+	public void put(K k, V v) {
+		Map<K, V> newEntry = new Map<K, V>();
+		newEntry.key = this.key;
+		newEntry.value = this.value;
+		newEntry.next = this.next;
+		this.next = newEntry;
+		this.key = k;
+		this.value = v;
+	}
+
+	public V get(K k) {
+		if (this.key.equals(k)) {
+			return this.value;
+		}
+		if (this.next != null) {
+			return this.next.get(k);
+		}
+		return null;
+	}
+}
+
+
+
+package Terms;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package Terms;
+
+public class TermCreateCollect {
+	public static void main(String[] args) {
+		Random.args = args;
+		Term t = Term.create(Random.random());
+		t.getVariables();
+	}
+}
+
+
+package Terms;
+
+public abstract class Term {
+	/**
+	 * @param n maximal depth of the return term
+	 * @return some term of maximal depth n
+	 */
+	public static Term create(int n) {
+		if (n <= 1) {
+			return new Variable(Random.random());
+		} else {
+			int arity = Random.random();
+			List<Term> args = new List<Term>();
+			for (int i = 0; i < arity; i++) {
+				args.add(Term.create(n-1));
+			}
+			return new FunctionApplication(new FunctionSymbol(arity), args);
+		}
+	}
+
+	public final boolean matches(final Term that) {
+		Map<Variable, Term> sigma = new Map<Variable, Term>();
+		sigma = this.extendMatchingSubstitution(sigma, that);
+		return sigma != null;
+	}
+
+	public abstract Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that);
+
+	public abstract void collectVariables(List<Variable> vars);
+
+	public final List<Variable> getVariables() {
+		final List<Variable> vars = new List<Variable>();
+		this.collectVariables(vars);
+		return vars;
+	}
+
+	public abstract int getDepth();
+}
+
+
+package Terms;
+
+public final class Variable extends Term {
+	int number;
+
+	public Variable(int id) {
+		this.number = id;
+	}
+
+
+	public void collectVariables(List<Variable> vars) {
+		vars.add(this);
+	}
+	
+	public Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that) {
+		Term thisSigma = sigma.get(this);
+		if (thisSigma == null) {
+			sigma.put(this, that);
+			return sigma;
+		} else {
+			if (thisSigma.equals(that)) {
+				return sigma;
+			} else {
+				return null;
+			}
+		}
+	}
+
+
+	public int getDepth(){
+		return 0;
+	}
+
+	public boolean equals(Object o) {
+		if (o instanceof Variable) {
+			return this.number == ((Variable) o).number;
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return number;
+	}
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package Terms;
+
+public final class FunctionApplication extends Term {
+	FunctionSymbol fs;
+	List<Term> args;
+	
+	public FunctionApplication(FunctionSymbol f, List<Term> a) {
+		this.fs = f;
+		this.args = a;
+	}
+
+	public void collectVariables(List<Variable> vars) {
+		List<Term> cur = this.args;
+		while (cur != null) {
+			cur.value.collectVariables(vars);
+			cur = cur.next;
+		}
+	}
+
+	public Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that) {
+		if (that instanceof Variable) {
+			return null;
+		}
+		FunctionApplication fThat = (FunctionApplication) that;
+		if (this.fs.equals(fThat.fs)) {
+			List<Term> curThisArg = this.args; 
+			List<Term> curThatArg = fThat.args; 
+			while (curThisArg != null && curThatArg != null) {
+				sigma = curThisArg.value.extendMatchingSubstitution(sigma, curThatArg.value);
+				if (sigma == null) {
+					return null;
+				}
+				curThisArg = curThisArg.next;
+				curThatArg = curThatArg.next;
+			}
+			return sigma;
+		} else {
+			return null;
+		}
+	}
+
+
+	public int getDepth(){
+		int currentMaximum=0;
+		List<Term> cur = this.args;
+		while (cur != null) {
+			int currentDepth = cur.value.getDepth()+1;
+			if (currentDepth > currentMaximum) currentMaximum=currentDepth;
+			cur = cur.next;
+		}
+		return currentMaximum;
+	}
+	
+	public boolean equals(Object o) {
+		if (o instanceof FunctionApplication) {
+			FunctionApplication oFA = (FunctionApplication) o;
+			return (this.fs.equals(oFA.fs) && this.args.equals(oFA.args));
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return args.hashCode() * fs.hashCode();
+	}
+}
+
+
+package Terms;
+
+public final class FunctionSymbol {
+	int number;
+
+	public FunctionSymbol(int id) {
+		this.number = id;
+	}
+
+	public int getArity() {
+		return this.number;
+	}
+
+	public boolean equals(Object o) {
+		if (o instanceof FunctionSymbol) {
+			return this.number == ((FunctionSymbol) o).number;
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return this.number;
+	}
+}
+
+
+package Terms;
+
+public final class List<T> {
+	public T value;
+	public List<T> next;
+
+	public void add(T v) {
+		List<T> newEle = new List<T>();
+		newEle.value = this.value;
+		newEle.next = this.next;
+		this.next = newEle;
+		this.value = v;
+	}
+}
+
+
+
+package Terms;
+
+public final class Map<K, V> {
+	private K key;
+	private V value;
+	private Map<K, V> next;
+
+	public void put(K k, V v) {
+		Map<K, V> newEntry = new Map<K, V>();
+		newEntry.key = this.key;
+		newEntry.value = this.value;
+		newEntry.next = this.next;
+		this.next = newEntry;
+		this.key = k;
+		this.value = v;
+	}
+
+	public V get(K k) {
+		if (this.key.equals(k)) {
+			return this.value;
+		}
+		if (this.next != null) {
+			return this.next.get(k);
+		}
+		return null;
+	}
+}
+
+
+
+package Terms;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+package Terms;
+
+public class TermCreateCollect {
+	public static void main(String[] args) {
+		Random.args = args;
+		Term t = Term.create(Random.random());
+		t.getVariables();
+	}
+}
+
+
+package Terms;
+
+public abstract class Term {
+	/**
+	 * @param n maximal depth of the return term
+	 * @return some term of maximal depth n
+	 */
+	public static Term create(int n) {
+		if (n <= 1) {
+			return new Variable(Random.random());
+		} else {
+			int arity = Random.random();
+			List<Term> args = new List<Term>();
+			for (int i = 0; i < arity; i++) {
+				args.add(Term.create(n-1));
+			}
+			return new FunctionApplication(new FunctionSymbol(arity), args);
+		}
+	}
+
+	public final boolean matches(final Term that) {
+		Map<Variable, Term> sigma = new Map<Variable, Term>();
+		sigma = this.extendMatchingSubstitution(sigma, that);
+		return sigma != null;
+	}
+
+	public abstract Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that);
+
+	public abstract void collectVariables(List<Variable> vars);
+
+	public final List<Variable> getVariables() {
+		final List<Variable> vars = new List<Variable>();
+		this.collectVariables(vars);
+		return vars;
+	}
+
+	public abstract int getDepth();
+}
+
+
+package Terms;
+
+public final class Variable extends Term {
+	int number;
+
+	public Variable(int id) {
+		this.number = id;
+	}
+
+
+	public void collectVariables(List<Variable> vars) {
+		vars.add(this);
+	}
+	
+	public Map<Variable, Term> extendMatchingSubstitution(Map<Variable, Term> sigma, Term that) {
+		Term thisSigma = sigma.get(this);
+		if (thisSigma == null) {
+			sigma.put(this, that);
+			return sigma;
+		} else {
+			if (thisSigma.equals(that)) {
+				return sigma;
+			} else {
+				return null;
+			}
+		}
+	}
+
+
+	public int getDepth(){
+		return 0;
+	}
+
+	public boolean equals(Object o) {
+		if (o instanceof Variable) {
+			return this.number == ((Variable) o).number;
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return number;
+	}
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+Terms.TermCreateCollect.main([Ljava/lang/String;)V: Graph of 196 nodes with 0 SCCs.
+
+
+
+Terms.Term.create(I)LTerms/Term;: Graph of 274 nodes with 1 SCC.
+
+
+
+Terms.FunctionApplication.collectVariables(LTerms/List;)V: Graph of 116 nodes with 1 SCC.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Terms.FunctionApplication.collectVariables(LTerms/List;)V
+SCC calls the following helper methods: Terms.FunctionApplication.collectVariables(LTerms/List;)V
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*Terms.FunctionApplication: [args]
+*Terms.List: [value, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated 63 rules for P and 117 rules for R.P rules:
+f9743_0_collectVariables_FieldAccess(EOS(STATIC_9743), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889)))) -> f9744_0_collectVariables_FieldAccess(EOS(STATIC_9744), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889)))) :|: TRUE
+f9744_0_collectVariables_FieldAccess(EOS(STATIC_9744), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889)))) -> f9745_0_collectVariables_Store(EOS(STATIC_9745), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) :|: TRUE
+f9745_0_collectVariables_Store(EOS(STATIC_9745), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) -> f9746_0_collectVariables_Load(EOS(STATIC_9746), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) :|: TRUE
+f9746_0_collectVariables_Load(EOS(STATIC_9746), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) -> f9863_0_collectVariables_Load(EOS(STATIC_9863), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) :|: TRUE
+f9863_0_collectVariables_Load(EOS(STATIC_9863), o4327, java.lang.Object(Terms.List(EOC, o4330, o4329)), java.lang.Object(Terms.List(EOC, o4330, o4329)), o4334) -> f9919_0_collectVariables_Load(EOS(STATIC_9919), o4327, java.lang.Object(Terms.List(EOC, o4330, o4329)), java.lang.Object(Terms.List(EOC, o4330, o4329)), o4334) :|: TRUE
+f9919_0_collectVariables_Load(EOS(STATIC_9919), o4468, java.lang.Object(Terms.List(EOC, o4471, o4470)), java.lang.Object(Terms.List(EOC, o4471, o4470)), o4475) -> f10045_0_collectVariables_Load(EOS(STATIC_10045), o4468, java.lang.Object(Terms.List(EOC, o4471, o4470)), java.lang.Object(Terms.List(EOC, o4471, o4470)), o4475) :|: TRUE
+f10045_0_collectVariables_Load(EOS(STATIC_10045), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4964) -> f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4964, o4964) :|: TRUE
+f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub), java.lang.Object(o4983sub)) -> f10047_0_collectVariables_NULL(EOS(STATIC_10047), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub), java.lang.Object(o4983sub)) :|: TRUE
+f10047_0_collectVariables_NULL(EOS(STATIC_10047), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub), java.lang.Object(o4983sub)) -> f10049_0_collectVariables_Load(EOS(STATIC_10049), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub)) :|: TRUE
+f10049_0_collectVariables_Load(EOS(STATIC_10049), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub)) -> f10051_0_collectVariables_FieldAccess(EOS(STATIC_10051), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub), java.lang.Object(o4983sub)) :|: TRUE
+f10051_0_collectVariables_FieldAccess(EOS(STATIC_10051), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4985, o4986)), java.lang.Object(Terms.List(EOC, o4985, o4986))) -> f10053_0_collectVariables_FieldAccess(EOS(STATIC_10053), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4985, o4986)), java.lang.Object(Terms.List(EOC, o4985, o4986))) :|: TRUE
+f10053_0_collectVariables_FieldAccess(EOS(STATIC_10053), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4985, o4986)), java.lang.Object(Terms.List(EOC, o4985, o4986))) -> f10054_0_collectVariables_CheckCast(EOS(STATIC_10054), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4985, o4986)), o4985) :|: TRUE
+f10054_0_collectVariables_CheckCast(EOS(STATIC_10054), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub), o4986)), java.lang.Object(o4996sub)) -> f10056_0_collectVariables_CheckCast(EOS(STATIC_10056), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub), o4986)), java.lang.Object(o4996sub)) :|: TRUE
+f10056_0_collectVariables_CheckCast(EOS(STATIC_10056), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) -> f10058_0_collectVariables_CheckCast(EOS(STATIC_10058), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) :|: TRUE
+f10058_0_collectVariables_CheckCast(EOS(STATIC_10058), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) -> f10061_0_collectVariables_Load(EOS(STATIC_10061), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) :|: TRUE
+f10061_0_collectVariables_Load(EOS(STATIC_10061), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) -> f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10066_0_collectVariables_InvokeMethod(EOS(STATIC_10066), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10067_0_collectVariables_InvokeMethod(EOS(STATIC_10067), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10066_0_collectVariables_InvokeMethod(EOS(STATIC_10066), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10069_0_collectVariables_Load(EOS(STATIC_10069), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10069_0_collectVariables_Load(EOS(STATIC_10069), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10075_0_collectVariables_Load(EOS(STATIC_10075), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10075_0_collectVariables_Load(EOS(STATIC_10075), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10078_0_collectVariables_InvokeMethod(EOS(STATIC_10078), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub)) :|: TRUE
+f10078_0_collectVariables_InvokeMethod(EOS(STATIC_10078), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub)) -> f10081_0_add_New(EOS(STATIC_10081), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub)) :|: TRUE
+f10081_0_add_New(EOS(STATIC_10081), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub)) -> f10086_0_add_Duplicate(EOS(STATIC_10086), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10086_0_add_Duplicate(EOS(STATIC_10086), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10090_0_add_InvokeMethod(EOS(STATIC_10090), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10090_0_add_InvokeMethod(EOS(STATIC_10090), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10093_0__init__Load(EOS(STATIC_10093), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10093_0__init__Load(EOS(STATIC_10093), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10099_0__init__InvokeMethod(EOS(STATIC_10099), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10099_0__init__InvokeMethod(EOS(STATIC_10099), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10103_0__init__Return(EOS(STATIC_10103), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10103_0__init__Return(EOS(STATIC_10103), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10106_0_add_Store(EOS(STATIC_10106), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10106_0_add_Store(EOS(STATIC_10106), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10109_0_add_Load(EOS(STATIC_10109), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10109_0_add_Load(EOS(STATIC_10109), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10112_0_add_Load(EOS(STATIC_10112), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10112_0_add_Load(EOS(STATIC_10112), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10115_0_add_FieldAccess(EOS(STATIC_10115), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10115_0_add_FieldAccess(EOS(STATIC_10115), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10118_0_add_FieldAccess(EOS(STATIC_10118), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL)), o4960) :|: TRUE
+f10118_0_add_FieldAccess(EOS(STATIC_10118), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL)), o4960) -> f10121_0_add_Load(EOS(STATIC_10121), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL))) :|: TRUE
+f10121_0_add_Load(EOS(STATIC_10121), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL))) -> f10124_0_add_Load(EOS(STATIC_10124), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL))) :|: TRUE
+f10124_0_add_Load(EOS(STATIC_10124), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL))) -> f10127_0_add_FieldAccess(EOS(STATIC_10127), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10127_0_add_FieldAccess(EOS(STATIC_10127), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10130_0_add_FieldAccess(EOS(STATIC_10130), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL)), o4959) :|: TRUE
+f10130_0_add_FieldAccess(EOS(STATIC_10130), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL)), o4959) -> f10133_0_add_Load(EOS(STATIC_10133), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10133_0_add_Load(EOS(STATIC_10133), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10135_0_add_Load(EOS(STATIC_10135), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10135_0_add_Load(EOS(STATIC_10135), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10138_0_add_FieldAccess(EOS(STATIC_10138), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10138_0_add_FieldAccess(EOS(STATIC_10138), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10142_0_add_Load(EOS(STATIC_10142), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(o5049sub)) :|: TRUE
+f10142_0_add_Load(EOS(STATIC_10142), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(o5049sub)) -> f10145_0_add_Load(EOS(STATIC_10145), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959))))) :|: TRUE
+f10145_0_add_Load(EOS(STATIC_10145), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959))))) -> f10147_0_add_FieldAccess(EOS(STATIC_10147), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(o5049sub)) :|: TRUE
+f10147_0_add_FieldAccess(EOS(STATIC_10147), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(o5049sub)) -> f10152_0_add_Return(EOS(STATIC_10152), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) :|: TRUE
+f10152_0_add_Return(EOS(STATIC_10152), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) -> f10155_0_collectVariables_Return(EOS(STATIC_10155), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) :|: TRUE
+f10155_0_collectVariables_Return(EOS(STATIC_10155), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) -> f10157_0_collectVariables_Load(EOS(STATIC_10157), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) :|: TRUE
+f10157_0_collectVariables_Load(EOS(STATIC_10157), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) -> f10158_0_collectVariables_FieldAccess(EOS(STATIC_10158), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) :|: TRUE
+f10158_0_collectVariables_FieldAccess(EOS(STATIC_10158), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) -> f10161_0_collectVariables_Store(EOS(STATIC_10161), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) :|: TRUE
+f10161_0_collectVariables_Store(EOS(STATIC_10161), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) -> f10162_0_collectVariables_JMP(EOS(STATIC_10162), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) :|: TRUE
+f10162_0_collectVariables_JMP(EOS(STATIC_10162), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) -> f10163_0_collectVariables_Load(EOS(STATIC_10163), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) :|: TRUE
+f10163_0_collectVariables_Load(EOS(STATIC_10163), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) -> f10045_0_collectVariables_Load(EOS(STATIC_10045), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) :|: TRUE
+f10067_0_collectVariables_InvokeMethod(EOS(STATIC_10067), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10070_1_collectVariables_InvokeMethod(f10070_0_collectVariables_Load(EOS(STATIC_10070), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986))) :|: TRUE
+f10070_0_collectVariables_Load(EOS(STATIC_10070), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10073_0_collectVariables_Load(EOS(STATIC_10073), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10073_0_collectVariables_Load(EOS(STATIC_10073), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10076_0_collectVariables_Load(EOS(STATIC_10076), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4984[List.value]o5050) :|: o4984[List.value]o5050 = 1
+f10076_0_collectVariables_Load(EOS(STATIC_10076), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), o5058, o5061, java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), o5061[List.value]o5053) -> f10083_0_collectVariables_Load(EOS(STATIC_10083), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055))) :|: TRUE
+f10083_0_collectVariables_Load(EOS(STATIC_10083), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055))) -> f9742_0_collectVariables_Load(EOS(STATIC_9742), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055))) :|: TRUE
+f9742_0_collectVariables_Load(EOS(STATIC_9742), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(o3886sub), java.lang.Object(Terms.List(EOC, o3882, o3881))) -> f9743_0_collectVariables_FieldAccess(EOS(STATIC_9743), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(o3886sub)) :|: TRUE
+f10084_0_collectVariables_Return(EOS(STATIC_10084), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) -> f10087_0_collectVariables_Load(EOS(STATIC_10087), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) :|: TRUE
+f10087_0_collectVariables_Load(EOS(STATIC_10087), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) -> f10091_0_collectVariables_FieldAccess(EOS(STATIC_10091), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) :|: TRUE
+f10091_0_collectVariables_FieldAccess(EOS(STATIC_10091), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) -> f10094_0_collectVariables_Store(EOS(STATIC_10094), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) :|: TRUE
+f10094_0_collectVariables_Store(EOS(STATIC_10094), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) -> f10096_0_collectVariables_JMP(EOS(STATIC_10096), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) :|: TRUE
+f10096_0_collectVariables_JMP(EOS(STATIC_10096), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) -> f10100_0_collectVariables_Load(EOS(STATIC_10100), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) :|: TRUE
+f10100_0_collectVariables_Load(EOS(STATIC_10100), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) -> f10045_0_collectVariables_Load(EOS(STATIC_10045), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(EOS(STATIC_10050), java.lang.Object(o5092sub), java.lang.Object(Terms.List(EOC, o5084, o5083))), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) -> f10084_0_collectVariables_Return(EOS(STATIC_10084), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) :|: TRUE
+R rules:
+f9742_0_collectVariables_Load(EOS(STATIC_9742), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(o3886sub), java.lang.Object(Terms.List(EOC, o3882, o3881))) -> f9743_0_collectVariables_FieldAccess(EOS(STATIC_9743), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(o3886sub)) :|: TRUE
+f9743_0_collectVariables_FieldAccess(EOS(STATIC_9743), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889)))) -> f9744_0_collectVariables_FieldAccess(EOS(STATIC_9744), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889)))) :|: TRUE
+f9744_0_collectVariables_FieldAccess(EOS(STATIC_9744), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889)))) -> f9745_0_collectVariables_Store(EOS(STATIC_9745), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) :|: TRUE
+f9745_0_collectVariables_Store(EOS(STATIC_9745), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) -> f9746_0_collectVariables_Load(EOS(STATIC_9746), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) :|: TRUE
+f9746_0_collectVariables_Load(EOS(STATIC_9746), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) -> f9863_0_collectVariables_Load(EOS(STATIC_9863), o3879, java.lang.Object(Terms.List(EOC, o3882, o3881)), java.lang.Object(Terms.List(EOC, o3882, o3881)), o3889) :|: TRUE
+f9863_0_collectVariables_Load(EOS(STATIC_9863), o4327, java.lang.Object(Terms.List(EOC, o4330, o4329)), java.lang.Object(Terms.List(EOC, o4330, o4329)), o4334) -> f9919_0_collectVariables_Load(EOS(STATIC_9919), o4327, java.lang.Object(Terms.List(EOC, o4330, o4329)), java.lang.Object(Terms.List(EOC, o4330, o4329)), o4334) :|: TRUE
+f9919_0_collectVariables_Load(EOS(STATIC_9919), o4468, java.lang.Object(Terms.List(EOC, o4471, o4470)), java.lang.Object(Terms.List(EOC, o4471, o4470)), o4475) -> f10045_0_collectVariables_Load(EOS(STATIC_10045), o4468, java.lang.Object(Terms.List(EOC, o4471, o4470)), java.lang.Object(Terms.List(EOC, o4471, o4470)), o4475) :|: TRUE
+f10045_0_collectVariables_Load(EOS(STATIC_10045), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4964) -> f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4964, o4964) :|: TRUE
+f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub), java.lang.Object(o4983sub)) -> f10047_0_collectVariables_NULL(EOS(STATIC_10047), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub), java.lang.Object(o4983sub)) :|: TRUE
+f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), NULL, NULL) -> f10048_0_collectVariables_NULL(EOS(STATIC_10048), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), NULL, NULL) :|: TRUE
+f10047_0_collectVariables_NULL(EOS(STATIC_10047), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub), java.lang.Object(o4983sub)) -> f10049_0_collectVariables_Load(EOS(STATIC_10049), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub)) :|: TRUE
+f10048_0_collectVariables_NULL(EOS(STATIC_10048), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), NULL, NULL) -> f10050_0_collectVariables_Return(EOS(STATIC_10050), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10049_0_collectVariables_Load(EOS(STATIC_10049), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub)) -> f10051_0_collectVariables_FieldAccess(EOS(STATIC_10051), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o4983sub), java.lang.Object(o4983sub)) :|: TRUE
+f10051_0_collectVariables_FieldAccess(EOS(STATIC_10051), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4985, o4986)), java.lang.Object(Terms.List(EOC, o4985, o4986))) -> f10053_0_collectVariables_FieldAccess(EOS(STATIC_10053), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4985, o4986)), java.lang.Object(Terms.List(EOC, o4985, o4986))) :|: TRUE
+f10053_0_collectVariables_FieldAccess(EOS(STATIC_10053), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4985, o4986)), java.lang.Object(Terms.List(EOC, o4985, o4986))) -> f10054_0_collectVariables_CheckCast(EOS(STATIC_10054), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4985, o4986)), o4985) :|: TRUE
+f10054_0_collectVariables_CheckCast(EOS(STATIC_10054), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub), o4986)), java.lang.Object(o4996sub)) -> f10056_0_collectVariables_CheckCast(EOS(STATIC_10056), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub), o4986)), java.lang.Object(o4996sub)) :|: TRUE
+f10054_0_collectVariables_CheckCast(EOS(STATIC_10054), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986)), NULL) -> f10057_0_collectVariables_CheckCast(EOS(STATIC_10057), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986)), NULL) :|: TRUE
+f10056_0_collectVariables_CheckCast(EOS(STATIC_10056), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) -> f10058_0_collectVariables_CheckCast(EOS(STATIC_10058), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) :|: TRUE
+f10056_0_collectVariables_CheckCast(EOS(STATIC_10056), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986)), java.lang.Object(o4998sub)) -> f10059_0_collectVariables_CheckCast(EOS(STATIC_10059), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986)), java.lang.Object(o4998sub)) :|: TRUE
+f10057_0_collectVariables_CheckCast(EOS(STATIC_10057), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986)), NULL) -> f10060_0_collectVariables_Load(EOS(STATIC_10060), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986)), NULL) :|: TRUE
+f10058_0_collectVariables_CheckCast(EOS(STATIC_10058), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) -> f10061_0_collectVariables_Load(EOS(STATIC_10061), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) :|: TRUE
+f10059_0_collectVariables_CheckCast(EOS(STATIC_10059), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986)), java.lang.Object(o4998sub)) -> f10062_0__init__Load(EOS(STATIC_10062), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10060_0_collectVariables_Load(EOS(STATIC_10060), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986)), NULL) -> f10063_0_collectVariables_InvokeMethod(EOS(STATIC_10063), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986)), NULL, java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10061_0_collectVariables_Load(EOS(STATIC_10061), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub)) -> f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4997sub), o4986)), java.lang.Object(o4997sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10062_0__init__Load(EOS(STATIC_10062), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10068_0__init__InvokeMethod(EOS(STATIC_10068), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10063_0_collectVariables_InvokeMethod(EOS(STATIC_10063), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986)), NULL, java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10065_0__init__Load(EOS(STATIC_10065), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10066_0_collectVariables_InvokeMethod(EOS(STATIC_10066), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10067_0_collectVariables_InvokeMethod(EOS(STATIC_10067), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10065_0__init__Load(EOS(STATIC_10065), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10072_0__init__InvokeMethod(EOS(STATIC_10072), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10066_0_collectVariables_InvokeMethod(EOS(STATIC_10066), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10069_0_collectVariables_Load(EOS(STATIC_10069), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10067_0_collectVariables_InvokeMethod(EOS(STATIC_10067), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10070_1_collectVariables_InvokeMethod(f10070_0_collectVariables_Load(EOS(STATIC_10070), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986))) :|: TRUE
+f10068_0__init__InvokeMethod(EOS(STATIC_10068), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10071_0__init__Load(EOS(STATIC_10071), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10069_0_collectVariables_Load(EOS(STATIC_10069), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10075_0_collectVariables_Load(EOS(STATIC_10075), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10070_0_collectVariables_Load(EOS(STATIC_10070), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10073_0_collectVariables_Load(EOS(STATIC_10073), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10071_0__init__Load(EOS(STATIC_10071), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10077_0__init__InvokeMethod(EOS(STATIC_10077), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10072_0__init__InvokeMethod(EOS(STATIC_10072), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10074_0__init__Load(EOS(STATIC_10074), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10073_0_collectVariables_Load(EOS(STATIC_10073), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10076_0_collectVariables_Load(EOS(STATIC_10076), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5050sub), o4986)), java.lang.Object(o5050sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), o4984[List.value]o5050) :|: o4984[List.value]o5050 = 1
+f10074_0__init__Load(EOS(STATIC_10074), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10080_0__init__InvokeMethod(EOS(STATIC_10080), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10075_0_collectVariables_Load(EOS(STATIC_10075), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10078_0_collectVariables_InvokeMethod(EOS(STATIC_10078), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub)) :|: TRUE
+f10076_0_collectVariables_Load(EOS(STATIC_10076), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), o5058, o5061, java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), o5061[List.value]o5053) -> f10083_0_collectVariables_Load(EOS(STATIC_10083), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055))) :|: TRUE
+f10077_0__init__InvokeMethod(EOS(STATIC_10077), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10079_0__init__Load(EOS(STATIC_10079), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10078_0_collectVariables_InvokeMethod(EOS(STATIC_10078), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub)) -> f10081_0_add_New(EOS(STATIC_10081), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub)) :|: TRUE
+f10079_0__init__Load(EOS(STATIC_10079), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10085_0__init__InvokeMethod(EOS(STATIC_10085), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10080_0__init__InvokeMethod(EOS(STATIC_10080), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10082_0__init__Load(EOS(STATIC_10082), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10081_0_add_New(EOS(STATIC_10081), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub)) -> f10086_0_add_Duplicate(EOS(STATIC_10086), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10082_0__init__Load(EOS(STATIC_10082), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10089_0__init__InvokeMethod(EOS(STATIC_10089), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10084_0_collectVariables_Return(EOS(STATIC_10084), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) -> f10087_0_collectVariables_Load(EOS(STATIC_10087), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) :|: TRUE
+f10085_0__init__InvokeMethod(EOS(STATIC_10085), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10088_0__init__Load(EOS(STATIC_10088), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10086_0_add_Duplicate(EOS(STATIC_10086), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10090_0_add_InvokeMethod(EOS(STATIC_10090), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10087_0_collectVariables_Load(EOS(STATIC_10087), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) -> f10091_0_collectVariables_FieldAccess(EOS(STATIC_10091), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) :|: TRUE
+f10088_0__init__Load(EOS(STATIC_10088), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10095_0__init__InvokeMethod(EOS(STATIC_10095), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10089_0__init__InvokeMethod(EOS(STATIC_10089), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10092_0__init__Load(EOS(STATIC_10092), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10090_0_add_InvokeMethod(EOS(STATIC_10090), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10093_0__init__Load(EOS(STATIC_10093), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10091_0_collectVariables_FieldAccess(EOS(STATIC_10091), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) -> f10094_0_collectVariables_Store(EOS(STATIC_10094), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) :|: TRUE
+f10092_0__init__Load(EOS(STATIC_10092), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10098_0__init__InvokeMethod(EOS(STATIC_10098), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10093_0__init__Load(EOS(STATIC_10093), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10099_0__init__InvokeMethod(EOS(STATIC_10099), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10094_0_collectVariables_Store(EOS(STATIC_10094), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) -> f10096_0_collectVariables_JMP(EOS(STATIC_10096), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) :|: TRUE
+f10095_0__init__InvokeMethod(EOS(STATIC_10095), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10097_0__init__Load(EOS(STATIC_10097), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10096_0_collectVariables_JMP(EOS(STATIC_10096), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) -> f10100_0_collectVariables_Load(EOS(STATIC_10100), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) :|: TRUE
+f10097_0__init__Load(EOS(STATIC_10097), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10101_0__init__Load(EOS(STATIC_10101), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10098_0__init__InvokeMethod(EOS(STATIC_10098), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10102_0__init__Load(EOS(STATIC_10102), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10099_0__init__InvokeMethod(EOS(STATIC_10099), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10103_0__init__Return(EOS(STATIC_10103), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10100_0_collectVariables_Load(EOS(STATIC_10100), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) -> f10045_0_collectVariables_Load(EOS(STATIC_10045), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), o4986) :|: TRUE
+f10101_0__init__Load(EOS(STATIC_10101), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10104_0__init__FieldAccess(EOS(STATIC_10104), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10102_0__init__Load(EOS(STATIC_10102), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10105_0__init__Load(EOS(STATIC_10105), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10103_0__init__Return(EOS(STATIC_10103), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10106_0_add_Store(EOS(STATIC_10106), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10104_0__init__FieldAccess(EOS(STATIC_10104), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10107_0__init__Load(EOS(STATIC_10107), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10105_0__init__Load(EOS(STATIC_10105), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10108_0__init__FieldAccess(EOS(STATIC_10108), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10106_0_add_Store(EOS(STATIC_10106), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10109_0_add_Load(EOS(STATIC_10109), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10107_0__init__Load(EOS(STATIC_10107), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10110_0__init__InvokeMethod(EOS(STATIC_10110), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10108_0__init__FieldAccess(EOS(STATIC_10108), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10111_0__init__Load(EOS(STATIC_10111), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10109_0_add_Load(EOS(STATIC_10109), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10112_0_add_Load(EOS(STATIC_10112), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) :|: TRUE
+f10110_0__init__InvokeMethod(EOS(STATIC_10110), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10113_0__init__StackPop(EOS(STATIC_10113), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10111_0__init__Load(EOS(STATIC_10111), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10114_0__init__InvokeMethod(EOS(STATIC_10114), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10112_0_add_Load(EOS(STATIC_10112), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL))) -> f10115_0_add_FieldAccess(EOS(STATIC_10115), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10113_0__init__StackPop(EOS(STATIC_10113), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10116_0__init__Return(EOS(STATIC_10116), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10114_0__init__InvokeMethod(EOS(STATIC_10114), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10117_0__init__StackPop(EOS(STATIC_10117), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10115_0_add_FieldAccess(EOS(STATIC_10115), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10118_0_add_FieldAccess(EOS(STATIC_10118), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL)), o4960) :|: TRUE
+f10116_0__init__Return(EOS(STATIC_10116), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10119_0__init__Return(EOS(STATIC_10119), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10117_0__init__StackPop(EOS(STATIC_10117), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10120_0__init__Return(EOS(STATIC_10120), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10118_0_add_FieldAccess(EOS(STATIC_10118), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, NULL, NULL)), java.lang.Object(Terms.List(EOC, NULL, NULL)), o4960) -> f10121_0_add_Load(EOS(STATIC_10121), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL))) :|: TRUE
+f10119_0__init__Return(EOS(STATIC_10119), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10122_0__init__Return(EOS(STATIC_10122), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10120_0__init__Return(EOS(STATIC_10120), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10123_0__init__Return(EOS(STATIC_10123), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10121_0_add_Load(EOS(STATIC_10121), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL))) -> f10124_0_add_Load(EOS(STATIC_10124), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL))) :|: TRUE
+f10122_0__init__Return(EOS(STATIC_10122), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10125_0__init__Return(EOS(STATIC_10125), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10123_0__init__Return(EOS(STATIC_10123), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10126_0__init__Return(EOS(STATIC_10126), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10124_0_add_Load(EOS(STATIC_10124), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL))) -> f10127_0_add_FieldAccess(EOS(STATIC_10127), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10125_0__init__Return(EOS(STATIC_10125), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) -> f10128_0_collectVariables_CheckCast(EOS(STATIC_10128), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4998sub), o4986))) :|: TRUE
+f10126_0__init__Return(EOS(STATIC_10126), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10129_0__init__Return(EOS(STATIC_10129), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10127_0_add_FieldAccess(EOS(STATIC_10127), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10130_0_add_FieldAccess(EOS(STATIC_10130), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL)), o4959) :|: TRUE
+f10129_0__init__Return(EOS(STATIC_10129), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) -> f10132_0_collectVariables_InvokeMethod(EOS(STATIC_10132), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, NULL, o4986))) :|: TRUE
+f10130_0_add_FieldAccess(EOS(STATIC_10130), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, NULL)), java.lang.Object(Terms.List(EOC, o4960, NULL)), o4959) -> f10133_0_add_Load(EOS(STATIC_10133), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10133_0_add_Load(EOS(STATIC_10133), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10135_0_add_Load(EOS(STATIC_10135), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10135_0_add_Load(EOS(STATIC_10135), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10138_0_add_FieldAccess(EOS(STATIC_10138), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959))) :|: TRUE
+f10137_0_collectVariables_CheckCast(EOS(STATIC_10137), o4957, java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5143sub), o4986)), java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5135sub), o5134))) -> f10139_0_collectVariables_InvokeMethod(EOS(STATIC_10139), o4957, java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5143sub), o4986))) :|: TRUE
+f10138_0_add_FieldAccess(EOS(STATIC_10138), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959))) -> f10142_0_add_Load(EOS(STATIC_10142), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(o5049sub)) :|: TRUE
+f10139_0_collectVariables_InvokeMethod(EOS(STATIC_10139), o4957, java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5143sub), o4986))) -> f10154_0_collectVariables_InvokeMethod(EOS(STATIC_10154), o4957, java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5143sub), o4986))) :|: TRUE
+f10141_0_collectVariables_InvokeMethod(EOS(STATIC_10141), o4957, java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5178sub), o4986)), java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, NULL, o5170))) -> f10151_0_collectVariables_InvokeMethod(EOS(STATIC_10151), o4957, java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5178sub), o4986)), java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, NULL, o5170))) :|: TRUE
+f10142_0_add_Load(EOS(STATIC_10142), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(o5049sub)) -> f10145_0_add_Load(EOS(STATIC_10145), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959))))) :|: TRUE
+f10145_0_add_Load(EOS(STATIC_10145), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959))))) -> f10147_0_add_FieldAccess(EOS(STATIC_10147), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(o5049sub)) :|: TRUE
+f10147_0_add_FieldAccess(EOS(STATIC_10147), o4957, java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986)), java.lang.Object(Terms.List(EOC, o4960, java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(o5049sub)) -> f10152_0_add_Return(EOS(STATIC_10152), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) :|: TRUE
+f10150_0_collectVariables_InvokeMethod(EOS(STATIC_10150), o4957, java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5248sub), o4986)), java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5240sub), o5239))) -> f10151_0_collectVariables_InvokeMethod(EOS(STATIC_10151), o4957, java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5248sub), o4986)), java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5240sub), o5239))) :|: TRUE
+f10151_0_collectVariables_InvokeMethod(EOS(STATIC_10151), o5292, java.lang.Object(Terms.List(EOC, o5287, o5286)), java.lang.Object(Terms.List(EOC, o5287, o5286)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5298sub), o5297)), java.lang.Object(Terms.List(EOC, o5287, o5286)), java.lang.Object(Terms.List(EOC, o5290, o5289))) -> f10154_0_collectVariables_InvokeMethod(EOS(STATIC_10154), o5292, java.lang.Object(Terms.List(EOC, o5287, o5286)), java.lang.Object(Terms.List(EOC, o5287, o5286)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5298sub), o5297))) :|: TRUE
+f10152_0_add_Return(EOS(STATIC_10152), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) -> f10155_0_collectVariables_Return(EOS(STATIC_10155), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) :|: TRUE
+f10155_0_collectVariables_Return(EOS(STATIC_10155), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) -> f10157_0_collectVariables_Load(EOS(STATIC_10157), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) :|: TRUE
+f10157_0_collectVariables_Load(EOS(STATIC_10157), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) -> f10158_0_collectVariables_FieldAccess(EOS(STATIC_10158), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) :|: TRUE
+f10158_0_collectVariables_FieldAccess(EOS(STATIC_10158), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), o4986))) -> f10161_0_collectVariables_Store(EOS(STATIC_10161), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) :|: TRUE
+f10160_0_collectVariables_InvokeMethod(EOS(STATIC_10160), o4957, java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5373sub), o4986)), java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5365sub), o5364))) -> f10151_0_collectVariables_InvokeMethod(EOS(STATIC_10151), o4957, java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5373sub), o4986)), java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5365sub), o5364))) :|: TRUE
+f10161_0_collectVariables_Store(EOS(STATIC_10161), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) -> f10162_0_collectVariables_JMP(EOS(STATIC_10162), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) :|: TRUE
+f10162_0_collectVariables_JMP(EOS(STATIC_10162), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) -> f10163_0_collectVariables_Load(EOS(STATIC_10163), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) :|: TRUE
+f10163_0_collectVariables_Load(EOS(STATIC_10163), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) -> f10045_0_collectVariables_Load(EOS(STATIC_10045), o4957, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub), java.lang.Object(Terms.List(EOC, o4960, o4959)))), o4986) :|: TRUE
+f10083_0_collectVariables_Load(EOS(STATIC_10083), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055))) -> f9742_0_collectVariables_Load(EOS(STATIC_9742), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055)), java.lang.Object(o5053sub), java.lang.Object(Terms.List(EOC, o5056, o5055))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(EOS(STATIC_10050), java.lang.Object(o5092sub), java.lang.Object(Terms.List(EOC, o5084, o5083))), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) -> f10084_0_collectVariables_Return(EOS(STATIC_10084), o4957, java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, o5084, o5083)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub), o4986))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10128_0_collectVariables_CheckCast(EOS(STATIC_10128), java.lang.Object(o5143sub), java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5135sub), o5134))), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5143sub), o4986))) -> f10137_0_collectVariables_CheckCast(EOS(STATIC_10137), o4957, java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5143sub), o4986)), java.lang.Object(Terms.List(EOC, o5133, o5132)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5135sub), o5134))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10132_0_collectVariables_InvokeMethod(EOS(STATIC_10132), java.lang.Object(o5178sub), java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, NULL, o5170))), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5178sub), o4986))) -> f10141_0_collectVariables_InvokeMethod(EOS(STATIC_10141), o4957, java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5178sub), o4986)), java.lang.Object(Terms.List(EOC, o5169, o5168)), java.lang.Object(Terms.List(EOC, NULL, o5170))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10139_0_collectVariables_InvokeMethod(EOS(STATIC_10139), java.lang.Object(o5248sub), java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5240sub), o5239))), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5248sub), o4986))) -> f10150_0_collectVariables_InvokeMethod(EOS(STATIC_10150), o4957, java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5248sub), o4986)), java.lang.Object(Terms.List(EOC, o5238, o5237)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5240sub), o5239))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10154_0_collectVariables_InvokeMethod(EOS(STATIC_10154), java.lang.Object(o5373sub), java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5365sub), o5364))), o4957, java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, o4960, o4959)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5373sub), o4986))) -> f10160_0_collectVariables_InvokeMethod(EOS(STATIC_10160), o4957, java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5373sub), o4986)), java.lang.Object(Terms.List(EOC, o5363, o5362)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5365sub), o5364))) :|: TRUE
+Combined rules. Obtained 3 conditional rules for P and 11 conditional rules for R.P rules:
+f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub:0), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0)))), java.lang.Object(o5049sub:0), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0))) -> f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957:0, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub:0), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub:0), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0)), java.lang.Object(o4996sub:0), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub:0), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0))))) :|: TRUE
+f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0))))), o4986:1)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0))))), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0))) -> f10070_1_collectVariables_InvokeMethod(f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0))))), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0)), java.lang.Object(o4996sub:0), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0))), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0))))), o4986:1))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(EOS(STATIC_10050), java.lang.Object(o5092sub:0), java.lang.Object(Terms.List(EOC, o5084:0, o5083:0))), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub:0), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0))))) -> f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957:0, java.lang.Object(Terms.List(EOC, o5084:0, o5083:0)), java.lang.Object(Terms.List(EOC, o5084:0, o5083:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0)), java.lang.Object(o4996sub:0), java.lang.Object(Terms.List(EOC, o5084:0, o5083:0))) :|: TRUE
+R rules:
+f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889:0))), o4986:0)), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889:0))), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0))) -> f10070_1_collectVariables_InvokeMethod(f10046_0_collectVariables_NULL(EOS(STATIC_10046), java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889:0))), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), o3889:0, o3889:0), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(Terms.Term(Terms.FunctionApplication(EOC, o3889:0))), o4986:0))) :|: TRUE
+f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0))) -> f10128_0_collectVariables_CheckCast(EOS(STATIC_10128), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10139_0_collectVariables_InvokeMethod(EOS(STATIC_10139), java.lang.Object(o5248sub:0), java.lang.Object(Terms.List(EOC, o5238:0, o5237:0)), java.lang.Object(Terms.List(EOC, o5238:0, o5237:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5240sub:0), o5239:0))), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5248sub:0), o4986:0))) -> f10154_0_collectVariables_InvokeMethod(EOS(STATIC_10154), o4957:0, java.lang.Object(Terms.List(EOC, o5238:0, o5237:0)), java.lang.Object(Terms.List(EOC, o5238:0, o5237:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5248sub:0), o4986:0))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(EOS(STATIC_10050), java.lang.Object(o5092sub:0), java.lang.Object(Terms.List(EOC, o5084:0, o5083:0))), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5092sub:0), o4986:0))) -> f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957:0, java.lang.Object(Terms.List(EOC, o5084:0, o5083:0)), java.lang.Object(Terms.List(EOC, o5084:0, o5083:0)), o4986:0, o4986:0) :|: TRUE
+f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0))) -> f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o4996sub:0), o4986:0)), java.lang.Object(o4996sub:0), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10154_0_collectVariables_InvokeMethod(EOS(STATIC_10154), java.lang.Object(o5373sub:0), java.lang.Object(Terms.List(EOC, o5363:0, o5362:0)), java.lang.Object(Terms.List(EOC, o5363:0, o5362:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5365sub:0), o5364:0))), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5373sub:0), o4986:0))) -> f10154_0_collectVariables_InvokeMethod(EOS(STATIC_10154), o4957:0, java.lang.Object(Terms.List(EOC, o5363:0, o5362:0)), java.lang.Object(Terms.List(EOC, o5363:0, o5362:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5373sub:0), o4986:0))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10128_0_collectVariables_CheckCast(EOS(STATIC_10128), java.lang.Object(o5143sub:0), java.lang.Object(Terms.List(EOC, o5133:0, o5132:0)), java.lang.Object(Terms.List(EOC, o5133:0, o5132:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5135sub:0), o5134:0))), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5143sub:0), o4986:0))) -> f10154_0_collectVariables_InvokeMethod(EOS(STATIC_10154), o4957:0, java.lang.Object(Terms.List(EOC, o5133:0, o5132:0)), java.lang.Object(Terms.List(EOC, o5133:0, o5132:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5143sub:0), o4986:0))) :|: TRUE
+f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, NULL, o4986:0)), java.lang.Object(Terms.List(EOC, NULL, o4986:0))) -> f10132_0_collectVariables_InvokeMethod(EOS(STATIC_10132), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, NULL, o4986:0))) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10132_0_collectVariables_InvokeMethod(EOS(STATIC_10132), java.lang.Object(o5178sub:0), java.lang.Object(Terms.List(EOC, o5169:0, o5168:0)), java.lang.Object(Terms.List(EOC, o5169:0, o5168:0)), java.lang.Object(Terms.List(EOC, NULL, o5170:0))), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5178sub:0), o4986:0))) -> f10154_0_collectVariables_InvokeMethod(EOS(STATIC_10154), o4957:0, java.lang.Object(Terms.List(EOC, o5169:0, o5168:0)), java.lang.Object(Terms.List(EOC, o5169:0, o5168:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5178sub:0), o4986:0))) :|: TRUE
+f10064_0_collectVariables_InvokeMethod(EOS(STATIC_10064), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub:0), o4986:0)), java.lang.Object(o5049sub:0), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0))) -> f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957:0, java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub:0), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)))), java.lang.Object(Terms.List(EOC, java.lang.Object(o5049sub:0), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)))), o4986:0, o4986:0) :|: TRUE
+f10046_0_collectVariables_NULL(EOS(STATIC_10046), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), java.lang.Object(Terms.List(EOC, o4960:0, o4959:0)), NULL, NULL) -> f10050_0_collectVariables_Return(EOS(STATIC_10050), o4957:0, java.lang.Object(Terms.List(EOC, o4960:0, o4959:0))) :|: TRUE
+Filtered ground terms:
+   f10064_0_collectVariables_InvokeMethod(x1, x2, x3, x4, x5, x6, x7) -> f10064_0_collectVariables_InvokeMethod(x2, x3, x4, x5, x6, x7)
+   f10050_0_collectVariables_Return(x1, x2, x3) -> f10050_0_collectVariables_Return(x2, x3)
+   Terms.List(x1, x2, x3) -> Terms.List(x2, x3)
+   Terms.FunctionApplication(x1, x2) -> Terms.FunctionApplication(x2)
+   f10046_0_collectVariables_NULL(x1, x2, x3, x4, x5, x6) -> f10046_0_collectVariables_NULL(x2, x3, x4, x5, x6)
+   f10128_0_collectVariables_CheckCast(x1, x2, x3, x4, x5) -> f10128_0_collectVariables_CheckCast(x2, x3, x4, x5)
+   f10154_0_collectVariables_InvokeMethod(x1, x2, x3, x4, x5) -> f10154_0_collectVariables_InvokeMethod(x2, x3, x4, x5)
+   f10132_0_collectVariables_InvokeMethod(x1, x2, x3, x4, x5) -> f10132_0_collectVariables_InvokeMethod(x2, x3, x4, x5)
+   f10139_0_collectVariables_InvokeMethod(x1, x2, x3, x4, x5) -> f10139_0_collectVariables_InvokeMethod(x2, x3, x4, x5)
+Filtered unneeded arguments:
+   f10070_1_collectVariables_InvokeMethod(x1, x2, x3, x4, x5) -> f10070_1_collectVariables_InvokeMethod(x1, x2, x5)
+   f10154_0_collectVariables_InvokeMethod(x1, x2, x3, x4) -> f10154_0_collectVariables_InvokeMethod(x1)
+   f10128_0_collectVariables_CheckCast(x1, x2, x3, x4) -> f10128_0_collectVariables_CheckCast(x1)
+   f10132_0_collectVariables_InvokeMethod(x1, x2, x3, x4) -> f10132_0_collectVariables_InvokeMethod(x1)
+Filtered duplicate args:
+   f10064_0_collectVariables_InvokeMethod(x1, x2, x3, x4, x5, x6) -> f10064_0_collectVariables_InvokeMethod(x1, x4, x6)
+   f10046_0_collectVariables_NULL(x1, x2, x3, x4, x5) -> f10046_0_collectVariables_NULL(x1, x3, x5)
+   f10139_0_collectVariables_InvokeMethod(x1, x2, x3, x4) -> f10139_0_collectVariables_InvokeMethod(x1, x3, x4)
+Combined rules. Obtained 4 conditional rules for P and 10 conditional rules for R.P rules:
+F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)))), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))))) :|: TRUE
+F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10070_1_COLLECTVARIABLES_INVOKEMETHOD(f10064_0_collectVariables_InvokeMethod(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0))) :|: TRUE
+F10070_1_COLLECTVARIABLES_INVOKEMETHOD(f10050_0_collectVariables_Return(java.lang.Object(o5092sub:0:0), java.lang.Object(Terms.List(o5084:0:0, o5083:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5092sub:0:0), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o5084:0:0, o5083:0:0))) :|: TRUE
+F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) :|: TRUE
+R rules:
+f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(java.lang.Object(o5092sub:0:0), java.lang.Object(Terms.List(o5084:0:0, o5083:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5092sub:0:0), o4986:0:0))) -> f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o5084:0:0, o5083:0:0)), o4986:0:0) :|: TRUE
+f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))) -> f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))), o4986:0:0) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10139_0_collectVariables_InvokeMethod(java.lang.Object(o5248sub:0:0), java.lang.Object(Terms.List(o5238:0:0, o5237:0:0)), java.lang.Object(Terms.List(java.lang.Object(o5240sub:0:0), o5239:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5248sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10154_0_collectVariables_InvokeMethod(java.lang.Object(o5373sub:0:0)), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5373sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10132_0_collectVariables_InvokeMethod(java.lang.Object(o5178sub:0:0)), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5178sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0) :|: TRUE
+f10070_1_collectVariables_InvokeMethod(f10128_0_collectVariables_CheckCast(java.lang.Object(o5143sub:0:0)), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5143sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0) :|: TRUE
+f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(o3889:0:0))), o4986:0:0))) -> f10070_1_collectVariables_InvokeMethod(f10046_0_collectVariables_NULL(java.lang.Object(Terms.Term(Terms.FunctionApplication(o3889:0:0))), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), o3889:0:0), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(o3889:0:0))), o4986:0:0))) :|: TRUE
+f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(NULL, o4986:0:0))) -> f10132_0_collectVariables_InvokeMethod(o4957:0:0) :|: TRUE
+f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), NULL) -> f10050_0_collectVariables_Return(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) :|: TRUE
+f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))) -> f10128_0_collectVariables_CheckCast(o4957:0:0) :|: TRUE
+
+----------------------------------------
+
+(9)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)))), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))))
+   F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10070_1_COLLECTVARIABLES_INVOKEMETHOD(f10064_0_collectVariables_InvokeMethod(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0)))
+   F10070_1_COLLECTVARIABLES_INVOKEMETHOD(f10050_0_collectVariables_Return(java.lang.Object(o5092sub:0:0), java.lang.Object(Terms.List(o5084:0:0, o5083:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5092sub:0:0), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o5084:0:0, o5083:0:0)))
+   F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))
+
+The TRS R consists of the following rules:
+
+   f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(java.lang.Object(o5092sub:0:0), java.lang.Object(Terms.List(o5084:0:0, o5083:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5092sub:0:0), o4986:0:0))) -> f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o5084:0:0, o5083:0:0)), o4986:0:0)
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))) -> f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))), o4986:0:0)
+   f10070_1_collectVariables_InvokeMethod(f10139_0_collectVariables_InvokeMethod(java.lang.Object(o5248sub:0:0), java.lang.Object(Terms.List(o5238:0:0, o5237:0:0)), java.lang.Object(Terms.List(java.lang.Object(o5240sub:0:0), o5239:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5248sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10070_1_collectVariables_InvokeMethod(f10154_0_collectVariables_InvokeMethod(java.lang.Object(o5373sub:0:0)), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5373sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10070_1_collectVariables_InvokeMethod(f10132_0_collectVariables_InvokeMethod(java.lang.Object(o5178sub:0:0)), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5178sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10070_1_collectVariables_InvokeMethod(f10128_0_collectVariables_CheckCast(java.lang.Object(o5143sub:0:0)), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5143sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(o3889:0:0))), o4986:0:0))) -> f10070_1_collectVariables_InvokeMethod(f10046_0_collectVariables_NULL(java.lang.Object(Terms.Term(Terms.FunctionApplication(o3889:0:0))), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), o3889:0:0), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(o3889:0:0))), o4986:0:0)))
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(NULL, o4986:0:0))) -> f10132_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), NULL) -> f10050_0_collectVariables_Return(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))) -> f10128_0_collectVariables_CheckCast(o4957:0:0)
+
+The set Q consists of the following terms:
+
+   f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(java.lang.Object(x0), java.lang.Object(Terms.List(x1, x2))), x3, java.lang.Object(Terms.List(java.lang.Object(x0), x4)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(java.lang.Object(x3), x4)))
+   f10070_1_collectVariables_InvokeMethod(f10139_0_collectVariables_InvokeMethod(java.lang.Object(x0), java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(java.lang.Object(x3), x4))), x5, java.lang.Object(Terms.List(java.lang.Object(x0), x6)))
+   f10070_1_collectVariables_InvokeMethod(f10154_0_collectVariables_InvokeMethod(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10070_1_collectVariables_InvokeMethod(f10132_0_collectVariables_InvokeMethod(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10070_1_collectVariables_InvokeMethod(f10128_0_collectVariables_CheckCast(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(NULL, x3)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), NULL)
+
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(10) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 1 SCC with 2 less nodes.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))
+   F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)))), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))))
+
+The TRS R consists of the following rules:
+
+   f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(java.lang.Object(o5092sub:0:0), java.lang.Object(Terms.List(o5084:0:0, o5083:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5092sub:0:0), o4986:0:0))) -> f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o5084:0:0, o5083:0:0)), o4986:0:0)
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))) -> f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))), o4986:0:0)
+   f10070_1_collectVariables_InvokeMethod(f10139_0_collectVariables_InvokeMethod(java.lang.Object(o5248sub:0:0), java.lang.Object(Terms.List(o5238:0:0, o5237:0:0)), java.lang.Object(Terms.List(java.lang.Object(o5240sub:0:0), o5239:0:0))), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5248sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10070_1_collectVariables_InvokeMethod(f10154_0_collectVariables_InvokeMethod(java.lang.Object(o5373sub:0:0)), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5373sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10070_1_collectVariables_InvokeMethod(f10132_0_collectVariables_InvokeMethod(java.lang.Object(o5178sub:0:0)), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5178sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10070_1_collectVariables_InvokeMethod(f10128_0_collectVariables_CheckCast(java.lang.Object(o5143sub:0:0)), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5143sub:0:0), o4986:0:0))) -> f10154_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(o3889:0:0))), o4986:0:0))) -> f10070_1_collectVariables_InvokeMethod(f10046_0_collectVariables_NULL(java.lang.Object(Terms.Term(Terms.FunctionApplication(o3889:0:0))), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), o3889:0:0), o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(o3889:0:0))), o4986:0:0)))
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(NULL, o4986:0:0))) -> f10132_0_collectVariables_InvokeMethod(o4957:0:0)
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), NULL) -> f10050_0_collectVariables_Return(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))
+   f10046_0_collectVariables_NULL(o4957:0:0, java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))) -> f10128_0_collectVariables_CheckCast(o4957:0:0)
+
+The set Q consists of the following terms:
+
+   f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(java.lang.Object(x0), java.lang.Object(Terms.List(x1, x2))), x3, java.lang.Object(Terms.List(java.lang.Object(x0), x4)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(java.lang.Object(x3), x4)))
+   f10070_1_collectVariables_InvokeMethod(f10139_0_collectVariables_InvokeMethod(java.lang.Object(x0), java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(java.lang.Object(x3), x4))), x5, java.lang.Object(Terms.List(java.lang.Object(x0), x6)))
+   f10070_1_collectVariables_InvokeMethod(f10154_0_collectVariables_InvokeMethod(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10070_1_collectVariables_InvokeMethod(f10132_0_collectVariables_InvokeMethod(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10070_1_collectVariables_InvokeMethod(f10128_0_collectVariables_CheckCast(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(NULL, x3)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), NULL)
+
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(12) UsableRulesProof (EQUIVALENT)
+As all Q-normal forms are R-normal forms we are in the innermost case. Hence, by the usable rules processor [LPAR04] we can delete all non-usable rules [FROCOS05] from R.
+----------------------------------------
+
+(13)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))
+   F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)))), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))))
+
+R is empty.
+The set Q consists of the following terms:
+
+   f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(java.lang.Object(x0), java.lang.Object(Terms.List(x1, x2))), x3, java.lang.Object(Terms.List(java.lang.Object(x0), x4)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(java.lang.Object(x3), x4)))
+   f10070_1_collectVariables_InvokeMethod(f10139_0_collectVariables_InvokeMethod(java.lang.Object(x0), java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(java.lang.Object(x3), x4))), x5, java.lang.Object(Terms.List(java.lang.Object(x0), x6)))
+   f10070_1_collectVariables_InvokeMethod(f10154_0_collectVariables_InvokeMethod(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10070_1_collectVariables_InvokeMethod(f10132_0_collectVariables_InvokeMethod(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10070_1_collectVariables_InvokeMethod(f10128_0_collectVariables_CheckCast(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(NULL, x3)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), NULL)
+
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(14) QReductionProof (EQUIVALENT)
+We deleted the following terms from Q as each root-symbol of these terms does neither occur in P nor in R.[THIEMANN].
+
+   f10070_1_collectVariables_InvokeMethod(f10050_0_collectVariables_Return(java.lang.Object(x0), java.lang.Object(Terms.List(x1, x2))), x3, java.lang.Object(Terms.List(java.lang.Object(x0), x4)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(java.lang.Object(x3), x4)))
+   f10070_1_collectVariables_InvokeMethod(f10139_0_collectVariables_InvokeMethod(java.lang.Object(x0), java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(java.lang.Object(x3), x4))), x5, java.lang.Object(Terms.List(java.lang.Object(x0), x6)))
+   f10070_1_collectVariables_InvokeMethod(f10154_0_collectVariables_InvokeMethod(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10070_1_collectVariables_InvokeMethod(f10132_0_collectVariables_InvokeMethod(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10070_1_collectVariables_InvokeMethod(f10128_0_collectVariables_CheckCast(java.lang.Object(x0)), x1, java.lang.Object(Terms.List(java.lang.Object(x0), x2)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), java.lang.Object(Terms.List(NULL, x3)))
+   f10046_0_collectVariables_NULL(x0, java.lang.Object(Terms.List(x1, x2)), NULL)
+
+
+----------------------------------------
+
+(15)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))
+   F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)))), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(16) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), o4986:1:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(java.lang.Object(Terms.Term(Terms.FunctionApplication(java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0))))), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))
+The graph contains the following edges 2 > 1, 2 > 2, 3 >= 3
+
+
+*F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)))), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0))) -> F10064_0_COLLECTVARIABLES_INVOKEMETHOD(o4957:0:0, java.lang.Object(Terms.List(java.lang.Object(o4996sub:0:0), o4986:0:0)), java.lang.Object(Terms.List(java.lang.Object(o5049sub:0:0), java.lang.Object(Terms.List(o4960:0:0, o4959:0:0)))))
+The graph contains the following edges 1 >= 1, 2 > 2
+
+
+----------------------------------------
+
+(17)
+YES
+
+----------------------------------------
+
+(18)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: Terms.Term.create(I)LTerms/Term;
+SCC calls the following helper methods: Terms.Term.create(I)LTerms/Term;
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*java.lang.String: [count]
+*Terms.List: [value, next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(19) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 108 IRulesP rules:
+f148_0_create_ConstantStackPush(EOS(STATIC_148(java.lang.Object(o22sub), i15)), i19, i19, i19) -> f152_0_create_GT(EOS(STATIC_152(java.lang.Object(o22sub), i15)), i19, i19, i19, 1) :|: TRUE
+f152_0_create_GT(EOS(STATIC_152(java.lang.Object(o22sub), i15)), i24, i24, i24, matching1) -> f159_0_create_GT(EOS(STATIC_159(java.lang.Object(o22sub), i15)), i24, i24, i24, 1) :|: TRUE && matching1 = 1
+f159_0_create_GT(EOS(STATIC_159(java.lang.Object(o22sub), i15)), i24, i24, i24, matching1) -> f172_0_create_InvokeMethod(EOS(STATIC_172(java.lang.Object(o22sub), i15)), i24, i24) :|: i24 > 1 && matching1 = 1
+f172_0_create_InvokeMethod(EOS(STATIC_172(java.lang.Object(o22sub), i15)), i24, i24) -> f177_0_random_FieldAccess(EOS(STATIC_177(java.lang.Object(o22sub), i15)), i24, i24) :|: TRUE
+f177_0_random_FieldAccess(EOS(STATIC_177(java.lang.Object(o22sub), i15)), i24, i24) -> f212_0_random_FieldAccess(EOS(STATIC_212(java.lang.Object(o22sub), i15)), i24, i24, java.lang.Object(o22sub)) :|: TRUE
+f212_0_random_FieldAccess(EOS(STATIC_212(java.lang.Object(o22sub), i15)), i24, i24, java.lang.Object(o22sub)) -> f221_0_random_ArrayAccess(EOS(STATIC_221(java.lang.Object(o22sub), i15)), i24, i24, java.lang.Object(o22sub), i15) :|: TRUE
+f221_0_random_ArrayAccess(EOS(STATIC_221(java.lang.Object(ARRAY(i25)), i15)), i24, i24, java.lang.Object(ARRAY(i25)), i15) -> f233_0_random_ArrayAccess(EOS(STATIC_233(java.lang.Object(ARRAY(i25)), i15)), i24, i24, java.lang.Object(ARRAY(i25)), i15) :|: i25 >= 0
+f233_0_random_ArrayAccess(EOS(STATIC_233(java.lang.Object(ARRAY(i25)), i15)), i24, i24, java.lang.Object(ARRAY(i25)), i15) -> f247_0_random_ArrayAccess(EOS(STATIC_247(java.lang.Object(ARRAY(i25)), i15)), i24, i24, java.lang.Object(ARRAY(i25)), i15) :|: TRUE
+f247_0_random_ArrayAccess(EOS(STATIC_247(java.lang.Object(ARRAY(i25)), i15)), i24, i24, java.lang.Object(ARRAY(i25)), i15) -> f256_0_random_Store(EOS(STATIC_256(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34) :|: i15 < i25
+f256_0_random_Store(EOS(STATIC_256(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34) -> f268_0_random_FieldAccess(EOS(STATIC_268(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34) :|: TRUE
+f268_0_random_FieldAccess(EOS(STATIC_268(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34) -> f278_0_random_ConstantStackPush(EOS(STATIC_278(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34, i15) :|: TRUE
+f278_0_random_ConstantStackPush(EOS(STATIC_278(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34, i15) -> f286_0_random_IntArithmetic(EOS(STATIC_286(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34, i15, 1) :|: TRUE
+f286_0_random_IntArithmetic(EOS(STATIC_286(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34, i15, matching1) -> f297_0_random_FieldAccess(EOS(STATIC_297(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34, i15 + 1) :|: i15 > 0 && matching1 = 1
+f297_0_random_FieldAccess(EOS(STATIC_297(java.lang.Object(ARRAY(i25)), i15)), i24, i24, o34, i39) -> f304_0_random_Load(EOS(STATIC_304(java.lang.Object(ARRAY(i25)), i39)), i24, i24, o34) :|: TRUE
+f304_0_random_Load(EOS(STATIC_304(java.lang.Object(ARRAY(i25)), i39)), i24, i24, o34) -> f314_0_random_InvokeMethod(EOS(STATIC_314(java.lang.Object(ARRAY(i25)), i39)), i24, i24, o34) :|: TRUE
+f314_0_random_InvokeMethod(EOS(STATIC_314(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(o55sub)) -> f327_0_random_InvokeMethod(EOS(STATIC_327(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(o55sub)) :|: TRUE
+f327_0_random_InvokeMethod(EOS(STATIC_327(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(o58sub)) -> f332_0_random_InvokeMethod(EOS(STATIC_332(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(o58sub)) :|: TRUE
+f332_0_random_InvokeMethod(EOS(STATIC_332(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(o58sub)) -> f344_0_length_Load(EOS(STATIC_344(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(o58sub)) :|: TRUE
+f344_0_length_Load(EOS(STATIC_344(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(o58sub)) -> f359_0_length_FieldAccess(EOS(STATIC_359(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(o58sub)) :|: TRUE
+f359_0_length_FieldAccess(EOS(STATIC_359(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(java.lang.String(EOC, i64))) -> f368_0_length_FieldAccess(EOS(STATIC_368(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(java.lang.String(EOC, i64))) :|: i64 >= 0
+f368_0_length_FieldAccess(EOS(STATIC_368(java.lang.Object(ARRAY(i25)), i39)), i24, i24, java.lang.Object(java.lang.String(EOC, i64))) -> f386_0_length_Return(EOS(STATIC_386(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f386_0_length_Return(EOS(STATIC_386(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f396_0_random_Return(EOS(STATIC_396(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f396_0_random_Return(EOS(STATIC_396(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f407_0_create_Store(EOS(STATIC_407(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f407_0_create_Store(EOS(STATIC_407(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f423_0_create_New(EOS(STATIC_423(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f423_0_create_New(EOS(STATIC_423(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f438_0_create_Duplicate(EOS(STATIC_438(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f438_0_create_Duplicate(EOS(STATIC_438(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f453_0_create_InvokeMethod(EOS(STATIC_453(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f453_0_create_InvokeMethod(EOS(STATIC_453(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f459_0__init__Load(EOS(STATIC_459(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f459_0__init__Load(EOS(STATIC_459(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f480_0__init__InvokeMethod(EOS(STATIC_480(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f480_0__init__InvokeMethod(EOS(STATIC_480(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f492_0__init__Return(EOS(STATIC_492(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f492_0__init__Return(EOS(STATIC_492(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f502_0_create_Store(EOS(STATIC_502(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f502_0_create_Store(EOS(STATIC_502(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f518_0_create_ConstantStackPush(EOS(STATIC_518(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) :|: TRUE
+f518_0_create_ConstantStackPush(EOS(STATIC_518(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64) -> f528_0_create_Store(EOS(STATIC_528(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64, 0) :|: TRUE
+f528_0_create_Store(EOS(STATIC_528(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64, matching1) -> f542_0_create_Load(EOS(STATIC_542(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64, 0) :|: TRUE && matching1 = 0
+f542_0_create_Load(EOS(STATIC_542(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64, matching1) -> f3361_0_create_Load(EOS(STATIC_3361(java.lang.Object(ARRAY(i25)), i39)), i24, i24, i64, 0) :|: TRUE && matching1 = 0
+f3361_0_create_Load(EOS(STATIC_3361(java.lang.Object(ARRAY(i515)), i516)), i24, i24, i517, i518) -> f4635_0_create_Load(EOS(STATIC_4635(java.lang.Object(ARRAY(i515)), i516)), i24, i24, i517, i518) :|: TRUE
+f4635_0_create_Load(EOS(STATIC_4635(java.lang.Object(ARRAY(i766)), i767)), i24, i24, i768, i769) -> f6016_0_create_Load(EOS(STATIC_6016(java.lang.Object(ARRAY(i766)), i767)), i24, i24, i768, i769) :|: TRUE
+f6016_0_create_Load(EOS(STATIC_6016(java.lang.Object(ARRAY(i1061)), i1062)), i24, i24, i1063, i1064) -> f8056_0_create_Load(EOS(STATIC_8056(java.lang.Object(ARRAY(i1061)), i1062)), i24, i24, i1063, i1064) :|: TRUE
+f8056_0_create_Load(EOS(STATIC_8056(java.lang.Object(ARRAY(i1426)), i1427)), i24, i24, i1428, i1429) -> f8822_0_create_Load(EOS(STATIC_8822(java.lang.Object(ARRAY(i1426)), i1427)), i24, i24, i1428, i1429) :|: TRUE
+f8822_0_create_Load(EOS(STATIC_8822(java.lang.Object(ARRAY(i1624)), i1625)), i24, i24, i1626, i1627) -> f9077_0_create_Load(EOS(STATIC_9077(java.lang.Object(ARRAY(i1624)), i1625)), i24, i24, i1626, i1627) :|: TRUE
+f9077_0_create_Load(EOS(STATIC_9077(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892) -> f9079_0_create_Load(EOS(STATIC_9079(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i1892) :|: TRUE
+f9079_0_create_Load(EOS(STATIC_9079(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i1892) -> f9082_0_create_GE(EOS(STATIC_9082(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i1892, i1891) :|: TRUE
+f9082_0_create_GE(EOS(STATIC_9082(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i1892, i1891) -> f9087_0_create_GE(EOS(STATIC_9087(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i1892, i1891) :|: i1892 < i1891
+f9087_0_create_GE(EOS(STATIC_9087(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i1892, i1891) -> f9093_0_create_Load(EOS(STATIC_9093(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892) :|: i1892 < i1891
+f9093_0_create_Load(EOS(STATIC_9093(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892) -> f9099_0_create_Load(EOS(STATIC_9099(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892) :|: TRUE
+f9099_0_create_Load(EOS(STATIC_9099(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892) -> f9104_0_create_ConstantStackPush(EOS(STATIC_9104(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i24) :|: TRUE
+f9104_0_create_ConstantStackPush(EOS(STATIC_9104(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i24) -> f9110_0_create_IntArithmetic(EOS(STATIC_9110(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i24, 1) :|: TRUE
+f9110_0_create_IntArithmetic(EOS(STATIC_9110(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i24, matching1) -> f9116_0_create_InvokeMethod(EOS(STATIC_9116(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i24 - 1) :|: i24 > 0 && matching1 = 1
+f9116_0_create_InvokeMethod(EOS(STATIC_9116(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i1912) -> f9120_0_create_Load(EOS(STATIC_9120(java.lang.Object(ARRAY(i1889)), i1890)), i1912, i1912) :|: i24 > 1 && i1912 >= 1 && i1891 >= 1 && i1890 > 1 && i1892 < i1891 && i1912 < i24
+f9116_0_create_InvokeMethod(EOS(STATIC_9116(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i1912) -> f9120_1_create_Load(EOS(STATIC_9120(java.lang.Object(ARRAY(i1889)), i1890)), i24, i24, i1891, i1892, i1912) :|: i24 > 1 && i1912 >= 1 && i1891 >= 1 && i1890 > 1 && i1892 < i1891 && i1912 < i24
+f9120_0_create_Load(EOS(STATIC_9120(java.lang.Object(ARRAY(i1889)), i1890)), i1912, i1912) -> f9125_0_create_Load(EOS(STATIC_9125(java.lang.Object(ARRAY(i1889)), i1890)), i1912, i1912) :|: TRUE
+f9125_0_create_Load(EOS(STATIC_9125(java.lang.Object(ARRAY(i1889)), i1890)), i1912, i1912) -> f144_0_create_Load(EOS(STATIC_144(java.lang.Object(ARRAY(i1889)), i1890)), i1912, i1912) :|: TRUE
+f144_0_create_Load(EOS(STATIC_144(java.lang.Object(o22sub), i15)), i19, i19) -> f148_0_create_ConstantStackPush(EOS(STATIC_148(java.lang.Object(o22sub), i15)), i19, i19, i19) :|: TRUE
+f9137_0_create_Return(EOS(STATIC_9137(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9145_0_create_InvokeMethod(EOS(STATIC_9145(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9145_0_create_InvokeMethod(EOS(STATIC_9145(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9150_0_add_New(EOS(STATIC_9150(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9150_0_add_New(EOS(STATIC_9150(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9157_0_add_Duplicate(EOS(STATIC_9157(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9157_0_add_Duplicate(EOS(STATIC_9157(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9164_0_add_InvokeMethod(EOS(STATIC_9164(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9164_0_add_InvokeMethod(EOS(STATIC_9164(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9169_0__init__Load(EOS(STATIC_9169(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9169_0__init__Load(EOS(STATIC_9169(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9176_0__init__InvokeMethod(EOS(STATIC_9176(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9176_0__init__InvokeMethod(EOS(STATIC_9176(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9179_0__init__Return(EOS(STATIC_9179(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9179_0__init__Return(EOS(STATIC_9179(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9184_0_add_Store(EOS(STATIC_9184(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9184_0_add_Store(EOS(STATIC_9184(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9189_0_add_Load(EOS(STATIC_9189(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9189_0_add_Load(EOS(STATIC_9189(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9193_0_add_Load(EOS(STATIC_9193(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9193_0_add_Load(EOS(STATIC_9193(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9198_0_add_FieldAccess(EOS(STATIC_9198(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9198_0_add_FieldAccess(EOS(STATIC_9198(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9204_0_add_FieldAccess(EOS(STATIC_9204(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9204_0_add_FieldAccess(EOS(STATIC_9204(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9208_0_add_Load(EOS(STATIC_9208(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9208_0_add_Load(EOS(STATIC_9208(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9213_0_add_Load(EOS(STATIC_9213(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9213_0_add_Load(EOS(STATIC_9213(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9218_0_add_FieldAccess(EOS(STATIC_9218(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9218_0_add_FieldAccess(EOS(STATIC_9218(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9222_0_add_FieldAccess(EOS(STATIC_9222(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9222_0_add_FieldAccess(EOS(STATIC_9222(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9227_0_add_Load(EOS(STATIC_9227(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9227_0_add_Load(EOS(STATIC_9227(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9233_0_add_Load(EOS(STATIC_9233(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9233_0_add_Load(EOS(STATIC_9233(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9237_0_add_FieldAccess(EOS(STATIC_9237(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9237_0_add_FieldAccess(EOS(STATIC_9237(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9244_0_add_Load(EOS(STATIC_9244(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9244_0_add_Load(EOS(STATIC_9244(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9250_0_add_Load(EOS(STATIC_9250(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9250_0_add_Load(EOS(STATIC_9250(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9257_0_add_FieldAccess(EOS(STATIC_9257(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9257_0_add_FieldAccess(EOS(STATIC_9257(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9262_0_add_Return(EOS(STATIC_9262(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9262_0_add_Return(EOS(STATIC_9262(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9268_0_create_Inc(EOS(STATIC_9268(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9268_0_create_Inc(EOS(STATIC_9268(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) -> f9273_0_create_JMP(EOS(STATIC_9273(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892 + 1) :|: TRUE
+f9273_0_create_JMP(EOS(STATIC_9273(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i2075) -> f9279_0_create_Load(EOS(STATIC_9279(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i2075) :|: TRUE
+f9279_0_create_Load(EOS(STATIC_9279(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i2075) -> f9077_0_create_Load(EOS(STATIC_9077(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i2075) :|: TRUE
+f9243_0_create_Return(EOS(STATIC_9243(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9249_0_create_InvokeMethod(EOS(STATIC_9249(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9249_0_create_InvokeMethod(EOS(STATIC_9249(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9256_0_add_New(EOS(STATIC_9256(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9256_0_add_New(EOS(STATIC_9256(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9267_0_add_Duplicate(EOS(STATIC_9267(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9267_0_add_Duplicate(EOS(STATIC_9267(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9272_0_add_InvokeMethod(EOS(STATIC_9272(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9272_0_add_InvokeMethod(EOS(STATIC_9272(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9278_0__init__Load(EOS(STATIC_9278(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9278_0__init__Load(EOS(STATIC_9278(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9288_0__init__InvokeMethod(EOS(STATIC_9288(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9288_0__init__InvokeMethod(EOS(STATIC_9288(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9292_0__init__Return(EOS(STATIC_9292(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9292_0__init__Return(EOS(STATIC_9292(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9297_0_add_Store(EOS(STATIC_9297(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9297_0_add_Store(EOS(STATIC_9297(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9302_0_add_Load(EOS(STATIC_9302(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9302_0_add_Load(EOS(STATIC_9302(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9307_0_add_Load(EOS(STATIC_9307(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9307_0_add_Load(EOS(STATIC_9307(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9311_0_add_FieldAccess(EOS(STATIC_9311(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9311_0_add_FieldAccess(EOS(STATIC_9311(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9315_0_add_FieldAccess(EOS(STATIC_9315(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9315_0_add_FieldAccess(EOS(STATIC_9315(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9320_0_add_Load(EOS(STATIC_9320(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9320_0_add_Load(EOS(STATIC_9320(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9325_0_add_Load(EOS(STATIC_9325(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9325_0_add_Load(EOS(STATIC_9325(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9329_0_add_FieldAccess(EOS(STATIC_9329(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9329_0_add_FieldAccess(EOS(STATIC_9329(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9334_0_add_FieldAccess(EOS(STATIC_9334(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9334_0_add_FieldAccess(EOS(STATIC_9334(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9338_0_add_Load(EOS(STATIC_9338(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9338_0_add_Load(EOS(STATIC_9338(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9341_0_add_Load(EOS(STATIC_9341(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9341_0_add_Load(EOS(STATIC_9341(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9350_0_add_FieldAccess(EOS(STATIC_9350(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9350_0_add_FieldAccess(EOS(STATIC_9350(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9356_0_add_Load(EOS(STATIC_9356(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9356_0_add_Load(EOS(STATIC_9356(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9360_0_add_Load(EOS(STATIC_9360(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9360_0_add_Load(EOS(STATIC_9360(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9364_0_add_FieldAccess(EOS(STATIC_9364(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9364_0_add_FieldAccess(EOS(STATIC_9364(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9368_0_add_Return(EOS(STATIC_9368(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9368_0_add_Return(EOS(STATIC_9368(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9370_0_create_Inc(EOS(STATIC_9370(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+f9370_0_create_Inc(EOS(STATIC_9370(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) -> f9373_0_create_JMP(EOS(STATIC_9373(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892 + 1) :|: TRUE
+f9373_0_create_JMP(EOS(STATIC_9373(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i2200) -> f9376_0_create_Load(EOS(STATIC_9376(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i2200) :|: TRUE
+f9376_0_create_Load(EOS(STATIC_9376(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i2200) -> f9077_0_create_Load(EOS(STATIC_9077(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i2200) :|: TRUE
+f9120_1_create_Load(EOS(STATIC_9120(java.lang.Object(ARRAY(i1931)), i1890)), i24, i24, i1891, i1892, i1912) -> f9137_0_create_Return(EOS(STATIC_9137(java.lang.Object(ARRAY(i1931)), i1927)), i24, i24, i1891, i1892) :|: TRUE
+f9120_1_create_Load(EOS(STATIC_9120(java.lang.Object(ARRAY(i2047)), i1890)), i24, i24, i1891, i1892, i1912) -> f9243_0_create_Return(EOS(STATIC_9243(java.lang.Object(ARRAY(i2047)), i2043)), i24, i24, i1891, i1892) :|: TRUE
+Combined rules. Obtained 2 IRulesP rules:
+f9116_0_create_InvokeMethod(EOS(STATIC_9116(java.lang.Object(ARRAY(i1889:0)), i1890:0)), i24:0, i24:0, i1891:0, i1892:0, i1912:0) -> f9116_0_create_InvokeMethod(EOS(STATIC_9116(java.lang.Object(ARRAY(i1889:0)), i1890:0 + 1)), i1912:0, i1912:0, i64:0, 0, i1912:0 - 1) :|: i1912:0 > 1 && i64:0 > 0 && i1890:0 > 1 && i1889:0 > -1 && i1890:0 < i1889:0 && i24:0 > 1 && i1891:0 > 0 && i24:0 > i1912:0 && i1892:0 < i1891:0
+f9116_0_create_InvokeMethod(EOS(STATIC_9116(java.lang.Object(ARRAY(i1889:0)), i1890:0)), i24:0, i24:0, i1891:0, i1892:0, i1912:0) -> f9116_0_create_InvokeMethod(EOS(STATIC_9116(java.lang.Object(ARRAY(i1889:0)), i1927:0)), i24:0, i24:0, i1891:0, i1892:0 + 1, i24:0 - 1) :|: i24:0 > 1 && i1892:0 + 1 < i1891:0 && i1912:0 > 0 && i1891:0 > 0 && i24:0 > i1912:0 && i1890:0 > 1
+Filtered duplicate arguments:
+   f9116_0_create_InvokeMethod(x1, x2, x3, x4, x5, x6) -> f9116_0_create_InvokeMethod(x1, x3, x4, x5, x6)
+Finished conversion. Obtained 2 rules.P rules:
+f9116_0_create_InvokeMethod(i24:0, i1891:0, i1892:0, i1912:0, i1889:0, i1890:0) -> f9116_0_create_InvokeMethod(i1912:0, i64:0, 0, i1912:0 - 1, i1889:0, i1890:0 + 1) :|: i64:0 > 0 && i1912:0 > 1 && i1890:0 > 1 && i1889:0 > -1 && i1890:0 < i1889:0 && i24:0 > 1 && i1891:0 > 0 && i1892:0 < i1891:0 && i24:0 > i1912:0
+f9116_0_create_InvokeMethod(i24:0, i1891:0, i1892:0, i1912:0, i1889:0, i1890:0) -> f9116_0_create_InvokeMethod(i24:0, i1891:0, i1892:0 + 1, i24:0 - 1, i1889:0, i1927:0) :|: i1892:0 + 1 < i1891:0 && i24:0 > 1 && i1912:0 > 0 && i1891:0 > 0 && i1890:0 > 1 && i24:0 > i1912:0
+
+----------------------------------------
+
+(20)
+Obligation:
+Rules:
+f9116_0_create_InvokeMethod(i24:0, i1891:0, i1892:0, i1912:0, i1889:0, i1890:0) -> f9116_0_create_InvokeMethod(i1912:0, i64:0, 0, i1912:0 - 1, i1889:0, i1890:0 + 1) :|: i64:0 > 0 && i1912:0 > 1 && i1890:0 > 1 && i1889:0 > -1 && i1890:0 < i1889:0 && i24:0 > 1 && i1891:0 > 0 && i1892:0 < i1891:0 && i24:0 > i1912:0
+f9116_0_create_InvokeMethod(x, x1, x2, x3, x4, x5) -> f9116_0_create_InvokeMethod(x, x1, x2 + 1, x - 1, x4, x6) :|: x2 + 1 < x1 && x > 1 && x3 > 0 && x1 > 0 && x5 > 1 && x > x3
+
+----------------------------------------
+
+(21) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(22)
+Obligation:
+Rules:
+f9116_0_create_InvokeMethod(i24:0, i1891:0, i1892:0, i1912:0, i1889:0, i1890:0) -> f9116_0_create_InvokeMethod(i1912:0, i64:0, 0, arith, i1889:0, arith1) :|: i64:0 > 0 && i1912:0 > 1 && i1890:0 > 1 && i1889:0 > -1 && i1890:0 < i1889:0 && i24:0 > 1 && i1891:0 > 0 && i1892:0 < i1891:0 && i24:0 > i1912:0 && arith = i1912:0 - 1 && arith1 = i1890:0 + 1
+f9116_0_create_InvokeMethod(x7, x8, x9, x10, x11, x12) -> f9116_0_create_InvokeMethod(x7, x8, x13, x14, x11, x15) :|: x9 + 1 < x8 && x7 > 1 && x10 > 0 && x8 > 0 && x12 > 1 && x7 > x10 && x13 = x9 + 1 && x14 = x7 - 1
+
+----------------------------------------
+
+(23) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f9116_0_create_InvokeMethod(i24:0, i1891:0, i1892:0, i1912:0, i1889:0, i1890:0) -> f9116_0_create_InvokeMethod(i1912:0, i64:0, 0, arith, i1889:0, arith1) :|: i64:0 > 0 && i1912:0 > 1 && i1890:0 > 1 && i1889:0 > -1 && i1890:0 < i1889:0 && i24:0 > 1 && i1891:0 > 0 && i1892:0 < i1891:0 && i24:0 > i1912:0 && arith = i1912:0 - 1 && arith1 = i1890:0 + 1
+(2) f9116_0_create_InvokeMethod(x7, x8, x9, x10, x11, x12) -> f9116_0_create_InvokeMethod(x7, x8, x13, x14, x11, x15) :|: x9 + 1 < x8 && x7 > 1 && x10 > 0 && x8 > 0 && x12 > 1 && x7 > x10 && x13 = x9 + 1 && x14 = x7 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(24)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f9116_0_create_InvokeMethod(i24:0, i1891:0, i1892:0, i1912:0, i1889:0, i1890:0) -> f9116_0_create_InvokeMethod(i1912:0, i64:0, 0, arith, i1889:0, arith1) :|: i64:0 > 0 && i1912:0 > 1 && i1890:0 > 1 && i1889:0 > -1 && i1890:0 < i1889:0 && i24:0 > 1 && i1891:0 > 0 && i1892:0 < i1891:0 && i24:0 > i1912:0 && arith = i1912:0 - 1 && arith1 = i1890:0 + 1
+(2) f9116_0_create_InvokeMethod(x7, x8, x9, x10, x11, x12) -> f9116_0_create_InvokeMethod(x7, x8, x13, x14, x11, x15) :|: x9 + 1 < x8 && x7 > 1 && x10 > 0 && x8 > 0 && x12 > 1 && x7 > x10 && x13 = x9 + 1 && x14 = x7 - 1
+
+Arcs:
+(1) -> (1), (2)
+(2) -> (1), (2)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(25) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(26)
+Obligation:
+Rules:
+f9116_0_create_InvokeMethod(i24:0:0, i1891:0:0, i1892:0:0, i1912:0:0, i1889:0:0, i1890:0:0) -> f9116_0_create_InvokeMethod(i1912:0:0, i64:0:0, 0, i1912:0:0 - 1, i1889:0:0, i1890:0:0 + 1) :|: i1892:0:0 < i1891:0:0 && i24:0:0 > i1912:0:0 && i1891:0:0 > 0 && i24:0:0 > 1 && i1890:0:0 < i1889:0:0 && i1889:0:0 > -1 && i1890:0:0 > 1 && i1912:0:0 > 1 && i64:0:0 > 0
+f9116_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f9116_0_create_InvokeMethod(x7:0, x8:0, x9:0 + 1, x7:0 - 1, x11:0, x15:0) :|: x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0
+
+----------------------------------------
+
+(27) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f9116_0_create_InvokeMethod(INTEGER, INTEGER, VARIABLE, INTEGER, VARIABLE, VARIABLE)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(28)
+Obligation:
+Rules:
+f9116_0_create_InvokeMethod(i24:0:0, i1891:0:0, i1892:0:0, i1912:0:0, i1889:0:0, i1890:0:0) -> f9116_0_create_InvokeMethod(i1912:0:0, i64:0:0, c, c1, i1889:0:0, c2) :|: c2 = i1890:0:0 + 1 && (c1 = i1912:0:0 - 1 && c = 0) && (i1892:0:0 < i1891:0:0 && i24:0:0 > i1912:0:0 && i1891:0:0 > 0 && i24:0:0 > 1 && i1890:0:0 < i1889:0:0 && i1889:0:0 > -1 && i1890:0:0 > 1 && i1912:0:0 > 1 && i64:0:0 > 0)
+f9116_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f9116_0_create_InvokeMethod(x7:0, x8:0, c3, c4, x11:0, x15:0) :|: c4 = x7:0 - 1 && c3 = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+
+----------------------------------------
+
+(29) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f9116_0_create_InvokeMethod(x, x1, x2, x3, x4, x5)] = x
+
+The following rules are decreasing:
+f9116_0_create_InvokeMethod(i24:0:0, i1891:0:0, i1892:0:0, i1912:0:0, i1889:0:0, i1890:0:0) -> f9116_0_create_InvokeMethod(i1912:0:0, i64:0:0, c, c1, i1889:0:0, c2) :|: c2 = i1890:0:0 + 1 && (c1 = i1912:0:0 - 1 && c = 0) && (i1892:0:0 < i1891:0:0 && i24:0:0 > i1912:0:0 && i1891:0:0 > 0 && i24:0:0 > 1 && i1890:0:0 < i1889:0:0 && i1889:0:0 > -1 && i1890:0:0 > 1 && i1912:0:0 > 1 && i64:0:0 > 0)
+The following rules are bounded:
+f9116_0_create_InvokeMethod(i24:0:0, i1891:0:0, i1892:0:0, i1912:0:0, i1889:0:0, i1890:0:0) -> f9116_0_create_InvokeMethod(i1912:0:0, i64:0:0, c, c1, i1889:0:0, c2) :|: c2 = i1890:0:0 + 1 && (c1 = i1912:0:0 - 1 && c = 0) && (i1892:0:0 < i1891:0:0 && i24:0:0 > i1912:0:0 && i1891:0:0 > 0 && i24:0:0 > 1 && i1890:0:0 < i1889:0:0 && i1889:0:0 > -1 && i1890:0:0 > 1 && i1912:0:0 > 1 && i64:0:0 > 0)
+f9116_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f9116_0_create_InvokeMethod(x7:0, x8:0, c3, c4, x11:0, x15:0) :|: c4 = x7:0 - 1 && c3 = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+
+----------------------------------------
+
+(30)
+Obligation:
+Rules:
+f9116_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f9116_0_create_InvokeMethod(x7:0, x8:0, c3, c4, x11:0, x15:0) :|: c4 = x7:0 - 1 && c3 = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+
+----------------------------------------
+
+(31) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f9116_0_create_InvokeMethod(x, x1, x2, x3, x4, x5)] = x1 - x2
+
+The following rules are decreasing:
+f9116_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f9116_0_create_InvokeMethod(x7:0, x8:0, c3, c4, x11:0, x15:0) :|: c4 = x7:0 - 1 && c3 = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+The following rules are bounded:
+f9116_0_create_InvokeMethod(x7:0, x8:0, x9:0, x10:0, x11:0, x12:0) -> f9116_0_create_InvokeMethod(x7:0, x8:0, c3, c4, x11:0, x15:0) :|: c4 = x7:0 - 1 && c3 = x9:0 + 1 && (x12:0 > 1 && x7:0 > x10:0 && x8:0 > 0 && x10:0 > 0 && x7:0 > 1 && x9:0 + 1 < x8:0)
+
+----------------------------------------
+
+(32)
+YES

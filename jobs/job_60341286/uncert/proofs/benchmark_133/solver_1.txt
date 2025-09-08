@@ -1,0 +1,254 @@
+YES
+
+Problem 1: 
+
+(VAR vu95NonEmpty x xu39 y yu39 z)
+(RULES
+fib(num0) -> pair(num0,s(num0))
+fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+)
+
+
+Problem 1: 
+Valid CTRS Processor:
+-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+-> The system is a deterministic 3-CTRS.
+
+Problem 1: 
+
+Operational Termination Transformation Processor:
+-> PSchema is moved from (Black,A) to (M,Black)
+
+-> We prove Operational Termination instead of Termination
+ 
+
+Problem 1: 
+
+2D Dependency Pair Processor:
+
+Conditional Termination Problem 1:
+-> Pairs:
+ FIB(s(x)) -> PLUS(y,z) | fib(x) ->* pair(y,z)
+ PLUS(x,y) -> PLUS(xu39,yu39) | x ->* s(xu39), y ->* yu39
+-> QPairs:
+ Empty
+-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+
+Conditional Termination Problem 2:
+-> Pairs:
+ FIB(s(x)) -> FIB(x)
+-> QPairs:
+ FIB(s(x)) -> PLUS(y,z) | fib(x) ->* pair(y,z)
+ PLUS(x,y) -> PLUS(xu39,yu39) | x ->* s(xu39), y ->* yu39
+-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+
+
+The problem is decomposed in 2 subproblems.
+
+Problem 1.1: 
+
+SCC Processor:
+-> Pairs:
+ FIB(s(x)) -> PLUS(y,z) | fib(x) ->* pair(y,z)
+ PLUS(x,y) -> PLUS(xu39,yu39) | x ->* s(xu39), y ->* yu39
+-> QPairs:
+ Empty
+-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+->Strongly Connected Components:
+->->Cycle:
+->->-> Pairs:
+ PLUS(x,y) -> PLUS(xu39,yu39) | x ->* s(xu39), y ->* yu39
+-> QPairs:
+ Empty
+->->-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+
+Problem 1.1: 
+
+Semantic Removal Triple Processor:
+-> Pairs:
+ PLUS(x,y) -> PLUS(xu39,yu39) | x ->* s(xu39), y ->* yu39
+-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+-> Usable rules:
+ Empty
+-> Needed rules:
+ Empty
+->AGES Output:
+ 
+Model Results
+
+System:
+mod InTheory is
+sort S .
+sort Bool .
+sort PSharp .
+
+
+op _->*_ : S S -> Bool [m = 2] .
+op _->_ : S S -> Bool [m = 2] .
+op fib : S -> S .
+op plus : S S -> S .
+op num0 :  -> S .
+op fSNonEmpty :  -> S .
+op pair : S S -> S .
+op s : S -> S .
+op _->P_ : PSharp PSharp -> Bool .
+op _->Q_ : PSharp PSharp -> Bool .
+op FIB : S -> PSharp .
+op PLUS : S S -> PSharp .
+op pi : S S -> S .
+op gtrsim : PSharp PSharp -> Bool .
+op succeq : PSharp PSharp -> Bool .
+op sqsupset : PSharp PSharp -> Bool [wellfounded m = 1] .
+op _->N_ : S S -> Bool .
+op _->N_ : PSharp PSharp -> Bool .
+
+endm
+
+
+Property:
+x ->R* x
+x ->R y /\ y ->R* z => x ->R* z
+gtrsim(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+succeq(x,y) /\ sqsupset(y,z) => sqsupset(x,z)
+gtrsim(x,y) /\ succeq(y,z) => gtrsim(x,z)
+_->N_(x,y) => gtrsim(x,y)
+_->P_(x,y) => gtrsim(x,y) \/ succeq(x,y) \/ sqsupset(x,y)
+_->Q_(x,y) => gtrsim(x,y) \/ succeq(x,y) \/ sqsupset(x,y)
+x1 ->R y1 => s(x1) ->R s(y1)
+_->N_(x1,y1) => _->N_(s(x1),s(y1))
+_->N_(x1,y1) => _->N_(PLUS(x1,x2),PLUS(y1,x2))
+_->N_(x2,y2) => _->N_(PLUS(x1,x2),PLUS(x1,y2))
+pi(x6,x7) ->R x6
+pi(x6,x7) ->R x7
+_->N_(pi(x6,x7),x6)
+_->N_(pi(x6,x7),x7)
+x ->R* s(xu39) /\ y ->R* yu39 => sqsupset(PLUS(x,y),PLUS(xu39,yu39))
+
+Results:
+
+
+Domains:
+S: |N \ {0}
+PSharp: |N \ {0}
+
+Function Interpretations:
+|[FIB(x_1_1:S)]| = - 1 + 2.x_1_1:S
+|[PLUS(x_1_1:S,x_2_1:S)]| = x_1_1:S
+|[fSNonEmpty]| = 1
+|[fib(x_1_1:S)]| = 1
+|[num0]| = 1
+|[pair(x_1_1:S,x_2_1:S)]| = 1
+|[pi(x_1_1:S,x_2_1:S)]| = 13.x_1_1:S + x_2_1:S
+|[plus(x_1_1:S,x_2_1:S)]| = x_1_1:S
+|[s(x_1_1:S)]| = 1 + x_1_1:S
+
+Predicate Interpretations:
+ x_1_1:S ->* x_2_1:S <=> (x_1_1:S >= x_2_1:S)
+ x_1_1:S ->N x_2_1:S <=> (x_1_1:S >= x_2_1:S)
+ x_1_1:PSharp ->N x_2_1:PSharp <=> (x_1_1:PSharp >= x_2_1:PSharp)
+ x_1_1:PSharp ->P x_2_1:PSharp <=> (0 >= x_1_1:PSharp + 9.x_2_1:PSharp)
+ x_1_1:PSharp ->Q x_2_1:PSharp <=> (0 >= 1 + x_1_1:PSharp + 2.x_2_1:PSharp)
+ x_1_1:S -> x_2_1:S <=> (x_1_1:S >= x_2_1:S)
+gtrsim(x_1_1:PSharp,x_2_1:PSharp) <=> (x_1_1:PSharp >= x_2_1:PSharp)
+sqsupset(x_1_1:PSharp,x_2_1:PSharp) <=> (x_1_1:PSharp >= 1 + x_2_1:PSharp)
+succeq(x_1_1:PSharp,x_2_1:PSharp) <=> (0 >= 1 + x_2_1:PSharp)
+
+Problem 1.1: 
+
+SCC Processor:
+-> Pairs:
+ Empty
+-> QPairs:
+ Empty
+-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+->Strongly Connected Components:
+ There is no strongly connected component
+
+The problem is finite.
+
+Problem 1.2: 
+
+SCC Processor:
+-> Pairs:
+ FIB(s(x)) -> FIB(x)
+-> QPairs:
+ FIB(s(x)) -> PLUS(y,z) | fib(x) ->* pair(y,z)
+ PLUS(x,y) -> PLUS(xu39,yu39) | x ->* s(xu39), y ->* yu39
+-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+->Strongly Connected Components:
+->->Cycle:
+->->-> Pairs:
+ FIB(s(x)) -> FIB(x)
+-> QPairs:
+ Empty
+->->-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+
+Problem 1.2: 
+
+Subterm Processor:
+-> Pairs:
+ FIB(s(x)) -> FIB(x)
+-> QPairs:
+ Empty
+-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+->Projection:
+ pi(FIB) = 1
+
+Problem 1.2: 
+
+SCC Processor:
+-> Pairs:
+ Empty
+-> QPairs:
+ Empty
+-> Rules:
+ fib(num0) -> pair(num0,s(num0))
+ fib(s(x)) -> pair(z,plus(y,z)) | fib(x) ->* pair(y,z)
+ plus(x,y) -> s(plus(xu39,yu39)) | x ->* s(xu39), y ->* yu39
+ plus(x,y) -> yu39 | x ->* num0, y ->* yu39
+->Strongly Connected Components:
+ There is no strongly connected component
+
+The problem is finite.

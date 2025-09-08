@@ -1,0 +1,56 @@
+YES
+We consider the system M2GV8.
+
+  Alphabet:
+
+    O : [] --> a 
+    rec : [a -> b -> b * b * a] --> b 
+    s : [a] --> a 
+
+  Rules:
+
+    rec(F, X, O) => X 
+    rec(F, X, s(Y)) => F s(Y) rec(F, X, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  rec(F, X, O) >? X 
+  rec(F, X, s(Y)) >? F s(Y) rec(F, X, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, O, rec, s}, and the following precedence: O > rec > @_{o -> o -> o} > @_{o -> o} > s
+
+With these choices, we have:
+
+  1] rec(F, X, O) > X  because [2], by definition 
+  2] rec*(F, X, O) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] rec(F, X, s(Y)) > @_{o -> o}(@_{o -> o -> o}(F, s(Y)), rec(F, X, Y))  because [5], by definition 
+  5] rec*(F, X, s(Y)) >= @_{o -> o}(@_{o -> o -> o}(F, s(Y)), rec(F, X, Y))  because rec > @_{o -> o}, [6] and [12], by (Copy) 
+  6] rec*(F, X, s(Y)) >= @_{o -> o -> o}(F, s(Y))  because rec > @_{o -> o -> o}, [7] and [9], by (Copy) 
+  7] rec*(F, X, s(Y)) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] rec*(F, X, s(Y)) >= s(Y)  because [10], by (Select) 
+  10] s(Y) >= s(Y)  because s in Mul and [11], by (Fun) 
+  11] Y >= Y  by (Meta) 
+  12] rec*(F, X, s(Y)) >= rec(F, X, Y)  because rec in Mul, [13], [14] and [15], by (Stat) 
+  13] F >= F  by (Meta) 
+  14] X >= X  by (Meta) 
+  15] s(Y) > Y  because [16], by definition 
+  16] s*(Y) >= Y  because [11], by (Select) 
+
+We can thus remove the following rules:
+
+  rec(F, X, O) => X 
+  rec(F, X, s(Y)) => F s(Y) rec(F, X, Y) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

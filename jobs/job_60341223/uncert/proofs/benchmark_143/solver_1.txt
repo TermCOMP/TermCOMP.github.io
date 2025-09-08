@@ -1,0 +1,248 @@
+YES
+We consider the system joQpi.
+
+  Alphabet:
+
+    O : [] --> nat 
+    app : [natlist * natlist] --> natlist 
+    apply2 : [pair -> nat -> pair * pair * nat] --> pair 
+    cons : [nat * natlist] --> natlist 
+    fst : [pair] --> natlist 
+    nil : [] --> natlist 
+    p : [natlist * natlist] --> pair 
+    pcons : [pair * plist] --> plist 
+    pnil : [] --> plist 
+    pps : [natlist] --> plist 
+    prefixshuffle : [pair * natlist] --> plist 
+    pshuffle : [natlist] --> pair 
+    reverse : [natlist] --> natlist 
+    s : [nat] --> nat 
+    shuffle : [natlist] --> natlist 
+
+  Rules:
+
+    app(nil, X) => X 
+    app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+    reverse(nil) => nil 
+    reverse(cons(X, Y)) => app(reverse(Y), cons(X, nil)) 
+    shuffle(nil) => nil 
+    shuffle(cons(X, Y)) => cons(X, shuffle(reverse(Y))) 
+    fst(p(X, Y)) => X 
+    pshuffle(X) => p(X, shuffle(X)) 
+    prefixshuffle(X, nil) => pcons(X, pnil) 
+    prefixshuffle(X, cons(Y, Z)) => pcons(X, prefixshuffle(apply2(/\x./\y.pshuffle(app(fst(x), cons(y, nil))), X, Y), reverse(Z))) 
+    apply2(F, X, O) => X 
+    apply2(F, X, s(Y)) => F X s(Y) 
+    pps(X) => prefixshuffle(p(nil, nil), X) 
+
+We observe that the rules contain a first-order subset:
+
+  app(nil, X) => X 
+  app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+  reverse(nil) => nil 
+  reverse(cons(X, Y)) => app(reverse(Y), cons(X, nil)) 
+  shuffle(nil) => nil 
+  shuffle(cons(X, Y)) => cons(X, shuffle(reverse(Y))) 
+  fst(p(X, Y)) => X 
+  pshuffle(X) => p(X, shuffle(X)) 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: app(nil(),PeRCenTX) -> PeRCenTX
+ ||     2: app(cons(PeRCenTX,PeRCenTY),PeRCenTZ) -> cons(PeRCenTX,app(PeRCenTY,PeRCenTZ))
+ ||     3: reverse(nil()) -> nil()
+ ||     4: reverse(cons(PeRCenTX,PeRCenTY)) -> app(reverse(PeRCenTY),cons(PeRCenTX,nil()))
+ ||     5: shuffle(nil()) -> nil()
+ ||     6: shuffle(cons(PeRCenTX,PeRCenTY)) -> cons(PeRCenTX,shuffle(reverse(PeRCenTY)))
+ ||     7: fst(p(PeRCenTX,PeRCenTY)) -> PeRCenTX
+ ||     8: pshuffle(PeRCenTX) -> p(PeRCenTX,shuffle(PeRCenTX))
+ || Number of strict rules: 8
+ || Direct POLO(bPol) ... removes: 8 5 7
+ ||       fst	w: 2 * x1 + 1
+ ||       reverse	w: x1
+ ||       shuffle	w: x1 + 1
+ ||       p 	w: x1 + x2 + 1
+ ||       pshuffle	w: 2 * x1 + 3
+ ||       nil	w: 0
+ ||       cons	w: x1 + x2 + 3
+ ||       app	w: x1 + x2
+ || Number of strict rules: 5
+ || Direct POLO(bPol) ... removes: 6
+ ||       fst	w: 2 * x1 + 1
+ ||       reverse	w: x1
+ ||       shuffle	w: 2 * x1 + 1
+ ||       p 	w: x1 + x2 + 1
+ ||       pshuffle	w: 2 * x1 + 3
+ ||       nil	w: 0
+ ||       cons	w: x1 + x2 + 1
+ ||       app	w: x1 + x2
+ || Number of strict rules: 4
+ || Direct POLO(bPol) ... removes: 4 3
+ ||       fst	w: 2 * x1 + 1
+ ||       reverse	w: 2 * x1 + 1
+ ||       shuffle	w: x1 + 1
+ ||       p 	w: x1 + x2 + 1
+ ||       pshuffle	w: 2 * x1 + 3
+ ||       nil	w: 0
+ ||       cons	w: x1 + x2 + 1
+ ||       app	w: x1 + x2
+ || Number of strict rules: 2
+ || Direct POLO(bPol) ... removes: 1
+ ||       fst	w: 2 * x1 + 1
+ ||       reverse	w: 2 * x1 + 1
+ ||       shuffle	w: x1 + 1
+ ||       p 	w: x1 + x2 + 1
+ ||       pshuffle	w: 2 * x1 + 3
+ ||       nil	w: 0
+ ||       cons	w: x1 + x2 + 1
+ ||       app	w: x1 + x2 + 1
+ || Number of strict rules: 1
+ || Direct POLO(bPol) ... removes: 2
+ ||       fst	w: 2 * x1 + 1
+ ||       reverse	w: x1 + 1
+ ||       shuffle	w: x1 + 1
+ ||       p 	w: x1 + x2 + 1
+ ||       pshuffle	w: 2 * x1 + 4
+ ||       nil	w: 1
+ ||       cons	w: 2 * x1 + x2 + 1
+ ||       app	w: 2 * x1 + 2 * x2 + 1
+ || Number of strict rules: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] prefixshuffle#(X, cons(Y, Z)) =#> prefixshuffle#(apply2(/\x./\y.pshuffle(app(fst(x), cons(y, nil))), X, Y), reverse(Z))   
+    1] prefixshuffle#(X, cons(Y, Z)) =#> apply2#(/\x./\y.pshuffle(app(fst(x), cons(y, nil))), X, Y)   
+    2] prefixshuffle#(X, cons(Y, Z)) =#> pshuffle#(app(fst(U), cons(V, nil)))   
+    3] prefixshuffle#(X, cons(Y, Z)) =#> app#(fst(U), cons(V, nil))   
+    4] prefixshuffle#(X, cons(Y, Z)) =#> fst#(U)   
+    5] prefixshuffle#(X, cons(Y, Z)) =#> reverse#(Z)   
+    6] pps#(X) =#> prefixshuffle#(p(nil, nil), X)   
+
+  Rules R_0:
+
+    app(nil, X) => X 
+    app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+    reverse(nil) => nil 
+    reverse(cons(X, Y)) => app(reverse(Y), cons(X, nil)) 
+    shuffle(nil) => nil 
+    shuffle(cons(X, Y)) => cons(X, shuffle(reverse(Y))) 
+    fst(p(X, Y)) => X 
+    pshuffle(X) => p(X, shuffle(X)) 
+    prefixshuffle(X, nil) => pcons(X, pnil) 
+    prefixshuffle(X, cons(Y, Z)) => pcons(X, prefixshuffle(apply2(/\x./\y.pshuffle(app(fst(x), cons(y, nil))), X, Y), reverse(Z))) 
+    apply2(F, X, O) => X 
+    apply2(F, X, s(Y)) => F X s(Y) 
+    pps(X) => prefixshuffle(p(nil, nil), X) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0, 1, 2, 3, 4, 5 
+    * 1 :  
+    * 2 :  
+    * 3 :  
+    * 4 :  
+    * 5 :  
+    * 6 : 0, 1, 2, 3, 4, 5 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    prefixshuffle#(X, cons(Y, Z)) =#> prefixshuffle#(apply2(/\x./\y.pshuffle(app(fst(x), cons(y, nil))), X, Y), reverse(Z))   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+The formative rules of (P_1, R_0) are R_1 ::=
+
+  app(nil, X) => X 
+  app(cons(X, Y), Z) => cons(X, app(Y, Z)) 
+  reverse(nil) => nil 
+  reverse(cons(X, Y)) => app(reverse(Y), cons(X, nil)) 
+  shuffle(nil) => nil 
+  shuffle(cons(X, Y)) => cons(X, shuffle(reverse(Y))) 
+  fst(p(X, Y)) => X 
+  pshuffle(X) => p(X, shuffle(X)) 
+  apply2(F, X, O) => X 
+  apply2(F, X, s(Y)) => F X s(Y) 
+
+By [Kop12, Thm. 7.17], we may replace the dependency pair problem (P_1, R_0, computable, formative) by (P_1, R_1, computable, formative).
+
+Thus, the original system is terminating if (P_1, R_1, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_1, computable, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  It suffices to find a standard reduction pair [Kop12, Def. 6.69].  Thus, we must orient:
+
+  prefixshuffle#(X, cons(Y, Z)) >? prefixshuffle#(apply2(/\x./\y.pshuffle(app(fst(x), cons(y, nil))), X, Y), reverse(Z)) 
+  app(nil, X) >= X 
+  app(cons(X, Y), Z) >= cons(X, app(Y, Z)) 
+  reverse(nil) >= nil 
+  reverse(cons(X, Y)) >= app(reverse(Y), cons(X, nil)) 
+  shuffle(nil) >= nil 
+  shuffle(cons(X, Y)) >= cons(X, shuffle(reverse(Y))) 
+  fst(p(X, Y)) >= X 
+  pshuffle(X) >= p(X, shuffle(X)) 
+  apply2(F, X, O) >= X 
+  apply2(F, X, s(Y)) >= F X s(Y) 
+
+We apply [Kop12, Thm. 6.75] and use the following argument functions:
+
+  pi( pshuffle(X) ) = #argfun-pshuffle#(p(X, shuffle(X))) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  #argfun-pshuffle# = Lam[y0].y0 
+  O = 0 
+  app = Lam[y0;y1].y0 + y1 
+  apply2 = Lam[G0;y1;y2].y1 + G0(y1,y1) 
+  cons = Lam[y0;y1].1 + y1 
+  fst = Lam[y0].y0 
+  nil = 0 
+  p = Lam[y0;y1].y0 
+  prefixshuffle# = Lam[y0;y1].2*y1 
+  pshuffle = Lam[y0].0 
+  reverse = Lam[y0].y0 
+  s = Lam[y0].0 
+  shuffle = Lam[y0].2*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[prefixshuffle#(_x0, cons(_x1, _x2))]] = 2 + 2*x2 > 2*x2 = [[prefixshuffle#(apply2(/\x./\y.#argfun-pshuffle#(p(app(fst(x), cons(y, nil)), shuffle(app(fst(x), cons(y, nil))))), _x0, _x1), reverse(_x2))]] 
+  [[app(nil, _x0)]] = x0 >= x0 = [[_x0]] 
+  [[app(cons(_x0, _x1), _x2)]] = 1 + x1 + x2 >= 1 + x1 + x2 = [[cons(_x0, app(_x1, _x2))]] 
+  [[reverse(nil)]] = 0 >= 0 = [[nil]] 
+  [[reverse(cons(_x0, _x1))]] = 1 + x1 >= 1 + x1 = [[app(reverse(_x1), cons(_x0, nil))]] 
+  [[shuffle(nil)]] = 0 >= 0 = [[nil]] 
+  [[shuffle(cons(_x0, _x1))]] = 2 + 2*x1 >= 1 + 2*x1 = [[cons(_x0, shuffle(reverse(_x1)))]] 
+  [[fst(p(_x0, _x1))]] = x0 >= x0 = [[_x0]] 
+  [[#argfun-pshuffle#(p(_x0, shuffle(_x0)))]] = x0 >= x0 = [[p(_x0, shuffle(_x0))]] 
+  [[apply2(_F0, _x1, O)]] = x1 + F0(x1,x1) >= x1 = [[_x1]] 
+  [[apply2(_F0, _x1, s(_x2))]] = x1 + F0(x1,x1) >= F0(x1,0) = [[_F0 _x1 s(_x2)]] 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace a dependency pair problem (P_1, R_1) by ({}, R_1).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

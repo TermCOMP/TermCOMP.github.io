@@ -1,0 +1,108 @@
+YES
+We consider the system 5YQhD.
+
+  Alphabet:
+
+    O : [] --> c 
+    cons : [a * b] --> b 
+    div : [c * c] --> c 
+    map : [a -> a * b] --> b 
+    minus : [c * c] --> c 
+    nil : [] --> b 
+    s : [c] --> c 
+
+  Rules:
+
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    minus(X, O) => X 
+    minus(s(X), s(Y)) => minus(X, Y) 
+    div(O, s(X)) => O 
+    div(s(X), s(Y)) => s(div(minus(X, Y), s(Y))) 
+
+We observe that the rules contain a first-order subset:
+
+  minus(X, O) => X 
+  minus(s(X), s(Y)) => minus(X, Y) 
+  div(O, s(X)) => O 
+  div(s(X), s(Y)) => s(div(minus(X, Y), s(Y))) 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: minus(PeRCenTX,O()) -> PeRCenTX
+ ||     2: minus(s(PeRCenTX),s(PeRCenTY)) -> minus(PeRCenTX,PeRCenTY)
+ ||     3: div(O(),s(PeRCenTX)) -> O()
+ ||     4: div(s(PeRCenTX),s(PeRCenTY)) -> s(div(minus(PeRCenTX,PeRCenTY),s(PeRCenTY)))
+ || Number of strict rules: 4
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #minus(s(PeRCenTX),s(PeRCenTY)) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #2: #div(s(PeRCenTX),s(PeRCenTY)) -> #div(minus(PeRCenTX,PeRCenTY),s(PeRCenTY))
+ ||    #3: #div(s(PeRCenTX),s(PeRCenTY)) -> #minus(PeRCenTX,PeRCenTY)
+ || Number of SCCs: 2, DPs: 2
+ ||   SCC { #1 }
+ || POLO(Sum)... succeeded.
+ ||       #div	w: 0
+ ||       s 	w: x1 + 1
+ ||       minus	w: 0
+ ||       div	w: 0
+ ||       O 	w: 0
+ ||       #minus	w: x1
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #1
+ || Number of SCCs: 1, DPs: 1
+ ||   SCC { #2 }
+ || POLO(Sum)... succeeded.
+ ||       #div	w: x1
+ ||       s 	w: x1 + 2
+ ||       minus	w: x1 + 1
+ ||       div	w: 0
+ ||       O 	w: 1
+ ||       #minus	w: 0
+ ||     USABLE RULES: { 1 2 }
+ ||     Removed DPs: #2
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] map#(F, cons(X, Y)) =#> map#(F, Y)   
+
+  Rules R_0:
+
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    minus(X, O) => X 
+    minus(s(X), s(Y)) => minus(X, Y) 
+    div(O, s(X)) => O 
+    div(s(X), s(Y)) => s(div(minus(X, Y), s(Y))) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(map#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(map#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(map#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_0, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

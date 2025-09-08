@@ -1,0 +1,336 @@
+YES
+We consider the system yU3PN.
+
+  Alphabet:
+
+    O : [] --> nat 
+    cons : [nat * list] --> list 
+    foldl : [nat -> nat -> nat * nat * list] --> nat 
+    nil : [] --> list 
+    plusc : [] --> nat -> nat -> nat 
+    s : [nat] --> nat 
+    sum : [list] --> nat 
+    xap : [nat -> nat -> nat * nat] --> nat -> nat 
+    yap : [nat -> nat * nat] --> nat 
+
+  Rules:
+
+    foldl(/\x./\y.yap(xap(F, x), y), X, nil) => X 
+    foldl(/\x./\y.yap(xap(F, x), y), X, cons(Y, Z)) => foldl(/\z./\u.yap(xap(F, z), u), yap(xap(F, X), Y), Z) 
+    plusc X O => X 
+    plusc X s(Y) => s(plusc X Y) 
+    sum(X) => foldl(/\x./\y.yap(xap(plusc, x), y), O, X) 
+    xap(F, X) => F X 
+    yap(F, X) => F X 
+
+Symbol xap is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    O : [] --> nat 
+    cons : [nat * list] --> list 
+    foldl : [nat -> nat -> nat * nat * list] --> nat 
+    nil : [] --> list 
+    plusc : [nat] --> nat -> nat 
+    s : [nat] --> nat 
+    sum : [list] --> nat 
+    yap : [nat -> nat * nat] --> nat 
+
+  Rules:
+
+    foldl(/\x./\y.yap(F[x], y), X, nil) => X 
+    foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) => foldl(/\z./\u.yap(F[z], u), yap(F[X], Y), Z) 
+    plusc(X) O => X 
+    plusc(X) s(Y) => s(plusc(X) Y) 
+    sum(X) => foldl(/\x./\y.yap(plusc(x), y), O, X) 
+    yap(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldl(/\x./\y.yap(F[x], y), X, nil) >? X 
+  foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >? foldl(/\z./\u.yap(F[z], u), yap(F[X], Y), Z) 
+  plusc(X) O >? X 
+  plusc(X) s(Y) >? s(plusc(X) Y) 
+  sum(X) >? foldl(/\x./\y.yap(plusc(x), y), O, X) 
+  yap(F, X) >? F X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[foldl(x_1, x_2, x_3)]] = foldl(x_1, x_3, x_2) 
+  [[s(x_1)]] = x_1 
+
+We choose Lex = {foldl} and Mul = {@_{o -> o}, cons, nil, plusc, sum, yap}, and the following precedence: cons > nil > sum > plusc > yap > foldl > @_{o -> o}
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldl(/\x./\y.yap(F[x], y), X, nil) >= X 
+  foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldl(/\x./\y.yap(F[x], y), yap(F[X], Y), Z) 
+  @_{o -> o}(plusc(X), _|_) > X 
+  @_{o -> o}(plusc(X), Y) >= @_{o -> o}(plusc(X), Y) 
+  sum(X) >= foldl(/\x./\y.yap(plusc(x), y), _|_, X) 
+  yap(F, X) > @_{o -> o}(F, X) 
+
+With these choices, we have:
+
+  1] foldl(/\x./\y.yap(F[x], y), X, nil) >= X  because [2], by (Star) 
+  2] foldl*(/\x./\y.yap(F[x], y), X, nil) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldl(/\x./\y.yap(F[x], y), yap(F[X], Y), Z)  because [5], by (Star) 
+  5] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldl(/\x./\y.yap(F[x], y), yap(F[X], Y), Z)  because foldl in Lex, [6], [12], [15], [16] and [25], by (Stat) 
+  6] /\x./\z.yap(F[x], z) >= /\x./\z.yap(F[x], z)  because [7], by (Abs) 
+  7] /\z.yap(F[y], z) >= /\z.yap(F[y], z)  because [8], by (Abs) 
+  8] yap(F[y], x) >= yap(F[y], x)  because yap in Mul, [9] and [11], by (Fun) 
+  9] F[y] >= F[y]  because [10], by (Meta) 
+  10] y >= y  by (Var) 
+  11] x >= x  by (Var) 
+  12] cons(Y, Z) > Z  because [13], by definition 
+  13] cons*(Y, Z) >= Z  because [14], by (Select) 
+  14] Z >= Z  by (Meta) 
+  15] foldl*(/\z./\u.yap(F[z], u), X, cons(Y, Z)) >= /\z./\u.yap(F[z], u)  because [6], by (Select) 
+  16] foldl*(/\z./\u.yap(F[z], u), X, cons(Y, Z)) >= yap(F[X], Y)  because [17], by (Select) 
+  17] yap(F[foldl*(/\z./\u.yap(F[z], u), X, cons(Y, Z))], foldl*(/\v./\w.yap(F[v], w), X, cons(Y, Z))) >= yap(F[X], Y)  because yap in Mul, [18] and [21], by (Fun) 
+  18] F[foldl*(/\z./\u.yap(F[z], u), X, cons(Y, Z))] >= F[X]  because [19], by (Meta) 
+  19] foldl*(/\z./\u.yap(F[z], u), X, cons(Y, Z)) >= X  because [20], by (Select) 
+  20] X >= X  by (Meta) 
+  21] foldl*(/\z./\u.yap(F[z], u), X, cons(Y, Z)) >= Y  because [22], by (Select) 
+  22] cons(Y, Z) >= Y  because [23], by (Star) 
+  23] cons*(Y, Z) >= Y  because [24], by (Select) 
+  24] Y >= Y  by (Meta) 
+  25] foldl*(/\z./\u.yap(F[z], u), X, cons(Y, Z)) >= Z  because [26], by (Select) 
+  26] cons(Y, Z) >= Z  because [13], by (Star) 
+
+  27] @_{o -> o}(plusc(X), _|_) > X  because [28], by definition 
+  28] @_{o -> o}*(plusc(X), _|_) >= X  because [29], by (Select) 
+  29] plusc(X) @_{o -> o}*(plusc(X), _|_) >= X  because [30] 
+  30] plusc*(X, @_{o -> o}*(plusc(X), _|_)) >= X  because [31], by (Select) 
+  31] X >= X  by (Meta) 
+
+  32] @_{o -> o}(plusc(X), Y) >= @_{o -> o}(plusc(X), Y)  because @_{o -> o} in Mul, [33] and [35], by (Fun) 
+  33] plusc(X) >= plusc(X)  because plusc in Mul and [34], by (Fun) 
+  34] X >= X  by (Meta) 
+  35] Y >= Y  by (Meta) 
+
+  36] sum(X) >= foldl(/\x./\y.yap(plusc(x), y), _|_, X)  because [37], by (Star) 
+  37] sum*(X) >= foldl(/\x./\y.yap(plusc(x), y), _|_, X)  because sum > foldl, [38], [46] and [47], by (Copy) 
+  38] sum*(X) >= /\y./\z.yap(plusc(y), z)  because [39], by (F-Abs) 
+  39] sum*(X, x) >= /\z.yap(plusc(x), z)  because [40], by (F-Abs) 
+  40] sum*(X, x, y) >= yap(plusc(x), y)  because sum > yap, [41] and [44], by (Copy) 
+  41] sum*(X, x, y) >= plusc(x)  because sum > plusc and [42], by (Copy) 
+  42] sum*(X, x, y) >= x  because [43], by (Select) 
+  43] x >= x  by (Var) 
+  44] sum*(X, x, y) >= y  because [45], by (Select) 
+  45] y >= y  by (Var) 
+  46] sum*(X) >= _|_  by (Bot) 
+  47] sum*(X) >= X  because [48], by (Select) 
+  48] X >= X  by (Meta) 
+
+  49] yap(F, X) > @_{o -> o}(F, X)  because [50], by definition 
+  50] yap*(F, X) >= @_{o -> o}(F, X)  because yap > @_{o -> o}, [51] and [53], by (Copy) 
+  51] yap*(F, X) >= F  because [52], by (Select) 
+  52] F >= F  by (Meta) 
+  53] yap*(F, X) >= X  because [54], by (Select) 
+  54] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  plusc(X) O => X 
+  yap(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldl(/\x./\y.yap(F[x], y), X, nil) >? X 
+  foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >? foldl(/\z./\u.yap(F[z], u), yap(F[X], Y), Z) 
+  plusc(X) s(Y) >? s(plusc(X) Y) 
+  sum(X) >? foldl(/\x./\y.yap(plusc(x), y), O, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[foldl(x_1, x_2, x_3)]] = foldl(x_3, x_1, x_2) 
+  [[s(x_1)]] = x_1 
+
+We choose Lex = {foldl} and Mul = {@_{o -> o}, cons, nil, plusc, sum, yap}, and the following precedence: @_{o -> o} > cons > nil > sum > plusc > foldl > yap
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldl(/\x./\y.yap(F[x], y), X, nil) > X 
+  foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldl(/\x./\y.yap(F[x], y), yap(F[X], Y), Z) 
+  @_{o -> o}(plusc(X), Y) >= @_{o -> o}(plusc(X), Y) 
+  sum(X) >= foldl(/\x./\y.yap(plusc(x), y), _|_, X) 
+
+With these choices, we have:
+
+  1] foldl(/\x./\y.yap(F[x], y), X, nil) > X  because [2], by definition 
+  2] foldl*(/\x./\y.yap(F[x], y), X, nil) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldl(/\x./\y.yap(F[x], y), yap(F[X], Y), Z)  because [5], by (Star) 
+  5] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldl(/\x./\y.yap(F[x], y), yap(F[X], Y), Z)  because foldl in Lex, [6], [9], [19] and [29], by (Stat) 
+  6] cons(Y, Z) > Z  because [7], by definition 
+  7] cons*(Y, Z) >= Z  because [8], by (Select) 
+  8] Z >= Z  by (Meta) 
+  9] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= /\x./\y.yap(F[x], y)  because [10], by (F-Abs) 
+  10] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z) >= /\x.yap(F[z], x)  because [11], by (F-Abs) 
+  11] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z, u) >= yap(F[z], u)  because foldl > yap, [12] and [17], by (Copy) 
+  12] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z, u) >= F[z]  because [13], by (Select) 
+  13] /\x.yap(F[foldl*(/\y./\v.yap(F[y], v), X, cons(Y, Z), z, u)], x) >= F[z]  because [14], by (Eta)[Kop13:2] 
+  14] F[foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z, u)] >= F[z]  because [15], by (Meta) 
+  15] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z, u) >= z  because [16], by (Select) 
+  16] z >= z  by (Var) 
+  17] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z, u) >= u  because [18], by (Select) 
+  18] u >= u  by (Var) 
+  19] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= yap(F[X], Y)  because foldl > yap, [20] and [25], by (Copy) 
+  20] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= F[X]  because [21], by (Select) 
+  21] /\x.yap(F[foldl*(/\y./\v.yap(F[y], v), X, cons(Y, Z))], x) >= F[X]  because [22], by (Eta)[Kop13:2] 
+  22] F[foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z))] >= F[X]  because [23], by (Meta) 
+  23] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= X  because [24], by (Select) 
+  24] X >= X  by (Meta) 
+  25] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= Y  because [26], by (Select) 
+  26] cons(Y, Z) >= Y  because [27], by (Star) 
+  27] cons*(Y, Z) >= Y  because [28], by (Select) 
+  28] Y >= Y  by (Meta) 
+  29] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= Z  because [30], by (Select) 
+  30] cons(Y, Z) >= Z  because [7], by (Star) 
+
+  31] @_{o -> o}(plusc(X), Y) >= @_{o -> o}(plusc(X), Y)  because @_{o -> o} in Mul, [32] and [34], by (Fun) 
+  32] plusc(X) >= plusc(X)  because plusc in Mul and [33], by (Fun) 
+  33] X >= X  by (Meta) 
+  34] Y >= Y  by (Meta) 
+
+  35] sum(X) >= foldl(/\x./\y.yap(plusc(x), y), _|_, X)  because [36], by (Star) 
+  36] sum*(X) >= foldl(/\x./\y.yap(plusc(x), y), _|_, X)  because sum > foldl, [37], [45] and [46], by (Copy) 
+  37] sum*(X) >= /\y./\z.yap(plusc(y), z)  because [38], by (F-Abs) 
+  38] sum*(X, x) >= /\z.yap(plusc(x), z)  because [39], by (F-Abs) 
+  39] sum*(X, x, y) >= yap(plusc(x), y)  because sum > yap, [40] and [43], by (Copy) 
+  40] sum*(X, x, y) >= plusc(x)  because sum > plusc and [41], by (Copy) 
+  41] sum*(X, x, y) >= x  because [42], by (Select) 
+  42] x >= x  by (Var) 
+  43] sum*(X, x, y) >= y  because [44], by (Select) 
+  44] y >= y  by (Var) 
+  45] sum*(X) >= _|_  by (Bot) 
+  46] sum*(X) >= X  because [47], by (Select) 
+  47] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  foldl(/\x./\y.yap(F[x], y), X, nil) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >? foldl(/\z./\u.yap(F[z], u), yap(F[X], Y), Z) 
+  plusc(X) s(Y) >? s(plusc(X) Y) 
+  sum(X) >? foldl(/\x./\y.yap(plusc(x), y), O, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[foldl(x_1, x_2, x_3)]] = foldl(x_3, x_2, x_1) 
+  [[s(x_1)]] = x_1 
+
+We choose Lex = {foldl} and Mul = {@_{o -> o}, cons, plusc, sum, yap}, and the following precedence: @_{o -> o} > sum > plusc > cons > yap > foldl
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) > foldl(/\x./\y.yap(F[x], y), yap(F[X], Y), Z) 
+  @_{o -> o}(plusc(X), Y) >= @_{o -> o}(plusc(X), Y) 
+  sum(X) >= foldl(/\x./\y.yap(plusc(x), y), _|_, X) 
+
+With these choices, we have:
+
+  1] foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) > foldl(/\x./\y.yap(F[x], y), yap(F[X], Y), Z)  because [2], by definition 
+  2] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= foldl(/\x./\y.yap(F[x], y), yap(F[X], Y), Z)  because foldl in Lex, [3], [6], [14] and [23], by (Stat) 
+  3] cons(Y, Z) > Z  because [4], by definition 
+  4] cons*(Y, Z) >= Z  because [5], by (Select) 
+  5] Z >= Z  by (Meta) 
+  6] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= /\x./\y.yap(F[x], y)  because [7], by (F-Abs) 
+  7] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z) >= /\x.yap(F[z], x)  because [8], by (Select) 
+  8] /\x.yap(F[foldl*(/\y./\v.yap(F[y], v), X, cons(Y, Z), z)], x) >= /\x.yap(F[z], x)  because [9], by (Abs) 
+  9] yap(F[foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z)], u) >= yap(F[z], u)  because yap in Mul, [10] and [13], by (Fun) 
+  10] F[foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z)] >= F[z]  because [11], by (Meta) 
+  11] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z), z) >= z  because [12], by (Select) 
+  12] z >= z  by (Var) 
+  13] u >= u  by (Var) 
+  14] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= yap(F[X], Y)  because [15], by (Select) 
+  15] yap(F[foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z))], foldl*(/\v./\w.yap(F[v], w), X, cons(Y, Z))) >= yap(F[X], Y)  because yap in Mul, [16] and [19], by (Fun) 
+  16] F[foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z))] >= F[X]  because [17], by (Meta) 
+  17] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= X  because [18], by (Select) 
+  18] X >= X  by (Meta) 
+  19] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= Y  because [20], by (Select) 
+  20] cons(Y, Z) >= Y  because [21], by (Star) 
+  21] cons*(Y, Z) >= Y  because [22], by (Select) 
+  22] Y >= Y  by (Meta) 
+  23] foldl*(/\x./\y.yap(F[x], y), X, cons(Y, Z)) >= Z  because [24], by (Select) 
+  24] cons(Y, Z) >= Z  because [4], by (Star) 
+
+  25] @_{o -> o}(plusc(X), Y) >= @_{o -> o}(plusc(X), Y)  because @_{o -> o} in Mul, [26] and [28], by (Fun) 
+  26] plusc(X) >= plusc(X)  because plusc in Mul and [27], by (Fun) 
+  27] X >= X  by (Meta) 
+  28] Y >= Y  by (Meta) 
+
+  29] sum(X) >= foldl(/\x./\y.yap(plusc(x), y), _|_, X)  because [30], by (Star) 
+  30] sum*(X) >= foldl(/\x./\y.yap(plusc(x), y), _|_, X)  because sum > foldl, [31], [39] and [40], by (Copy) 
+  31] sum*(X) >= /\y./\z.yap(plusc(y), z)  because [32], by (F-Abs) 
+  32] sum*(X, x) >= /\z.yap(plusc(x), z)  because [33], by (F-Abs) 
+  33] sum*(X, x, y) >= yap(plusc(x), y)  because sum > yap, [34] and [37], by (Copy) 
+  34] sum*(X, x, y) >= plusc(x)  because sum > plusc and [35], by (Copy) 
+  35] sum*(X, x, y) >= x  because [36], by (Select) 
+  36] x >= x  by (Var) 
+  37] sum*(X, x, y) >= y  because [38], by (Select) 
+  38] y >= y  by (Var) 
+  39] sum*(X) >= _|_  by (Bot) 
+  40] sum*(X) >= X  because [41], by (Select) 
+  41] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  foldl(/\x./\y.yap(F[x], y), X, cons(Y, Z)) => foldl(/\z./\u.yap(F[z], u), yap(F[X], Y), Z) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  plusc(X) s(Y) >? s(plusc(X) Y) 
+  sum(X) >? foldl(/\x./\y.yap(plusc(x), y), O, X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  foldl = Lam[G0;y1;y2].y1 + y2 + G0(0,0) 
+  plusc = Lam[y0;y1].y0 + y1 
+  s = Lam[y0].3 + y0 
+  sum = Lam[y0].3 + 3*y0 
+  yap = Lam[G0;y1].y1 + G0(0) 
+
+Using this interpretation, the requirements translate to:
+
+  [[plusc(_x0) s(_x1)]] = 6 + x0 + 2*x1 > 3 + x0 + 2*x1 = [[s(plusc(_x0) _x1)]] 
+  [[sum(_x0)]] = 3 + 3*x0 > x0 = [[foldl(/\x./\y.yap(plusc(x), y), O, _x0)]] 
+
+We can thus remove the following rules:
+
+  plusc(X) s(Y) => s(plusc(X) Y) 
+  sum(X) => foldl(/\x./\y.yap(plusc(x), y), O, X) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[Kop13:2]  C. Kop.  StarHorpo with an Eta-Rule.  Unpublished manuscript, http://cl-informatik.uibk.ac.at/users/kop/etahorpo.pdf, 2013.

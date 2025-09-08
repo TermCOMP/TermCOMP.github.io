@@ -1,0 +1,319 @@
+YES
+We consider the system KjTKK.
+
+  Alphabet:
+
+    O : [] --> a 
+    cons : [c * d] --> d 
+    f : [a * a * a * a] --> b 
+    false : [] --> b 
+    filter : [c -> b * d] --> d 
+    filter2 : [b * c -> b * c * d] --> d 
+    if : [b * b * b] --> b 
+    le : [a * a] --> b 
+    map : [c -> c * d] --> d 
+    minus : [a * a] --> a 
+    nil : [] --> d 
+    perfectp : [a] --> b 
+    s : [a] --> a 
+    true : [] --> b 
+
+  Rules:
+
+    minus(O, X) => O 
+    minus(s(X), O) => s(X) 
+    minus(s(X), s(Y)) => minus(X, Y) 
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    perfectp(O) => false 
+    perfectp(s(X)) => f(X, s(O), s(X), s(X)) 
+    f(O, X, O, Y) => true 
+    f(O, X, s(Y), Z) => false 
+    f(s(X), O, Y, Z) => f(X, Z, minus(Y, s(X)), Z) 
+    f(s(X), s(Y), Z, U) => if(le(X, Y), f(s(X), minus(Y, X), Z, U), f(X, U, Z, U)) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We observe that the rules contain a first-order subset:
+
+  minus(O, X) => O 
+  minus(s(X), O) => s(X) 
+  minus(s(X), s(Y)) => minus(X, Y) 
+  le(O, X) => true 
+  le(s(X), O) => false 
+  le(s(X), s(Y)) => le(X, Y) 
+  if(true, X, Y) => X 
+  if(false, X, Y) => Y 
+  perfectp(O) => false 
+  perfectp(s(X)) => f(X, s(O), s(X), s(X)) 
+  f(O, X, O, Y) => true 
+  f(O, X, s(Y), Z) => false 
+  f(s(X), O, Y, Z) => f(X, Z, minus(Y, s(X)), Z) 
+  f(s(X), s(Y), Z, U) => if(le(X, Y), f(s(X), minus(Y, X), Z, U), f(X, U, Z, U)) 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: minus(O(),PeRCenTX) -> O()
+ ||     2: minus(s(PeRCenTX),O()) -> s(PeRCenTX)
+ ||     3: minus(s(PeRCenTX),s(PeRCenTY)) -> minus(PeRCenTX,PeRCenTY)
+ ||     4: le(O(),PeRCenTX) -> true()
+ ||     5: le(s(PeRCenTX),O()) -> false()
+ ||     6: le(s(PeRCenTX),s(PeRCenTY)) -> le(PeRCenTX,PeRCenTY)
+ ||     7: if(true(),PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     8: if(false(),PeRCenTX,PeRCenTY) -> PeRCenTY
+ ||     9: perfectp(O()) -> false()
+ ||     10: perfectp(s(PeRCenTX)) -> f(PeRCenTX,s(O()),s(PeRCenTX),s(PeRCenTX))
+ ||     11: f(O(),PeRCenTX,O(),PeRCenTY) -> true()
+ ||     12: f(O(),PeRCenTX,s(PeRCenTY),PeRCenTZ) -> false()
+ ||     13: f(s(PeRCenTX),O(),PeRCenTY,PeRCenTZ) -> f(PeRCenTX,PeRCenTZ,minus(PeRCenTY,s(PeRCenTX)),PeRCenTZ)
+ ||     14: f(s(PeRCenTX),s(PeRCenTY),PeRCenTZ,PeRCenTU) -> if(le(PeRCenTX,PeRCenTY),f(s(PeRCenTX),minus(PeRCenTY,PeRCenTX),PeRCenTZ,PeRCenTU),f(PeRCenTX,PeRCenTU,PeRCenTZ,PeRCenTU))
+ || Number of strict rules: 14
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying f
+ || 1: minus(O(),PeRCenTX) -> O()
+ || 2: minus(s(PeRCenTX),O()) -> s(PeRCenTX)
+ || 3: minus(s(PeRCenTX),s(PeRCenTY)) -> minus(PeRCenTX,PeRCenTY)
+ || 4: le(O(),PeRCenTX) -> true()
+ || 5: le(s(PeRCenTX),O()) -> false()
+ || 6: le(s(PeRCenTX),s(PeRCenTY)) -> le(PeRCenTX,PeRCenTY)
+ || 7: if(true(),PeRCenTX,PeRCenTY) -> PeRCenTX
+ || 8: if(false(),PeRCenTX,PeRCenTY) -> PeRCenTY
+ || 9: perfectp(O()) -> false()
+ || 10: perfectp(s(PeRCenTX)) -> f(PeRCenTX,s(O()),s(PeRCenTX),s(PeRCenTX))
+ || 11: f^1_O(PeRCenTX,O(),PeRCenTY) -> true()
+ || 12: f^1_O(PeRCenTX,s(PeRCenTY),PeRCenTZ) -> false()
+ || 13: f^1_s(PeRCenTX,O(),PeRCenTY,PeRCenTZ) -> f(PeRCenTX,PeRCenTZ,minus(PeRCenTY,s(PeRCenTX)),PeRCenTZ)
+ || 14: f^1_s(PeRCenTX,s(PeRCenTY),PeRCenTZ,PeRCenTU) -> if(le(PeRCenTX,PeRCenTY),f^1_s(PeRCenTX,minus(PeRCenTY,PeRCenTX),PeRCenTZ,PeRCenTU),f(PeRCenTX,PeRCenTU,PeRCenTZ,PeRCenTU))
+ || 15: f(s(_1),_4,_5,_6) ->= f^1_s(_1,_4,_5,_6)
+ || 16: f(O(),_3,_4,_5) ->= f^1_O(_3,_4,_5)
+ || Number of strict rules: 14
+ || Direct POLO(bPol) ... failed.
+ || Dependency Pairs:
+ ||    #1: #le(s(PeRCenTX),s(PeRCenTY)) -> #le(PeRCenTX,PeRCenTY)
+ ||    #2: #f^1_s(PeRCenTX,O(),PeRCenTY,PeRCenTZ) -> #f(PeRCenTX,PeRCenTZ,minus(PeRCenTY,s(PeRCenTX)),PeRCenTZ)
+ ||    #3: #f^1_s(PeRCenTX,O(),PeRCenTY,PeRCenTZ) -> #minus(PeRCenTY,s(PeRCenTX))
+ ||    #4: #f^1_s(PeRCenTX,s(PeRCenTY),PeRCenTZ,PeRCenTU) -> #if(le(PeRCenTX,PeRCenTY),f^1_s(PeRCenTX,minus(PeRCenTY,PeRCenTX),PeRCenTZ,PeRCenTU),f(PeRCenTX,PeRCenTU,PeRCenTZ,PeRCenTU))
+ ||    #5: #f^1_s(PeRCenTX,s(PeRCenTY),PeRCenTZ,PeRCenTU) -> #le(PeRCenTX,PeRCenTY)
+ ||    #6: #f^1_s(PeRCenTX,s(PeRCenTY),PeRCenTZ,PeRCenTU) -> #f^1_s(PeRCenTX,minus(PeRCenTY,PeRCenTX),PeRCenTZ,PeRCenTU)
+ ||    #7: #f^1_s(PeRCenTX,s(PeRCenTY),PeRCenTZ,PeRCenTU) -> #minus(PeRCenTY,PeRCenTX)
+ ||    #8: #f^1_s(PeRCenTX,s(PeRCenTY),PeRCenTZ,PeRCenTU) -> #f(PeRCenTX,PeRCenTU,PeRCenTZ,PeRCenTU)
+ ||    #9: #perfectp(s(PeRCenTX)) -> #f(PeRCenTX,s(O()),s(PeRCenTX),s(PeRCenTX))
+ ||    #10: #f(O(),_3,_4,_5) ->? #f^1_O(_3,_4,_5)
+ ||    #11: #minus(s(PeRCenTX),s(PeRCenTY)) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #12: #f(s(_1),_4,_5,_6) ->? #f^1_s(_1,_4,_5,_6)
+ || Number of SCCs: 3, DPs: 6
+ ||   SCC { #1 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       f^1_O	w: 0
+ ||       s 	w: x1 + 1
+ ||       #le	w: x1
+ ||       minus	w: 0
+ ||       #f^1_s	w: 0
+ ||       #perfectp	w: 0
+ ||       false	w: 0
+ ||       #f^1_O	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       f 	w: 0
+ ||       if	w: 0
+ ||       #f 	w: 0
+ ||       #minus	w: 0
+ ||       #if	w: 0
+ ||       perfectp	w: 0
+ ||       f^1_s	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #1
+ || Number of SCCs: 2, DPs: 5
+ ||   SCC { #11 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       f^1_O	w: 0
+ ||       s 	w: x1 + 1
+ ||       #le	w: 0
+ ||       minus	w: 0
+ ||       #f^1_s	w: 0
+ ||       #perfectp	w: 0
+ ||       false	w: 0
+ ||       #f^1_O	w: 0
+ ||       O 	w: 0
+ ||       true	w: 0
+ ||       f 	w: 0
+ ||       if	w: 0
+ ||       #f 	w: 0
+ ||       #minus	w: x1
+ ||       #if	w: 0
+ ||       perfectp	w: 0
+ ||       f^1_s	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #11
+ || Number of SCCs: 1, DPs: 4
+ ||   SCC { #2 #6 #8 #12 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       f^1_O	w: 0
+ ||       s 	w: x1 + 2
+ ||       #le	w: 0
+ ||       minus	w: x1 + x2 + 1
+ ||       #f^1_s	w: x1 + x4 + 1
+ ||       #perfectp	w: 0
+ ||       false	w: 0
+ ||       #f^1_O	w: 0
+ ||       O 	w: 1
+ ||       true	w: 0
+ ||       f 	w: 0
+ ||       if	w: 0
+ ||       #f 	w: x1 + x4
+ ||       #minus	w: 0
+ ||       #if	w: 0
+ ||       perfectp	w: 0
+ ||       f^1_s	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #2 #8 #12
+ || Number of SCCs: 1, DPs: 1
+ ||   SCC { #6 }
+ || POLO(Sum)... succeeded.
+ ||       le	w: 0
+ ||       f^1_O	w: 0
+ ||       s 	w: x1 + 2
+ ||       #le	w: 0
+ ||       minus	w: x1 + 1
+ ||       #f^1_s	w: x2 + 1
+ ||       #perfectp	w: 0
+ ||       false	w: 0
+ ||       #f^1_O	w: 0
+ ||       O 	w: 1
+ ||       true	w: 0
+ ||       f 	w: 0
+ ||       if	w: 0
+ ||       #f 	w: 0
+ ||       #minus	w: 0
+ ||       #if	w: 0
+ ||       perfectp	w: 0
+ ||       f^1_s	w: 0
+ ||     USABLE RULES: { 1..3 }
+ ||     Removed DPs: #6
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] map#(F, cons(X, Y)) =#> map#(F, Y)   
+    1] filter#(F, cons(X, Y)) =#> filter2#(F X, F, X, Y)   
+    2] filter2#(true, F, X, Y) =#> filter#(F, Y)   
+    3] filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+  Rules R_0:
+
+    minus(O, X) => O 
+    minus(s(X), O) => s(X) 
+    minus(s(X), s(Y)) => minus(X, Y) 
+    le(O, X) => true 
+    le(s(X), O) => false 
+    le(s(X), s(Y)) => le(X, Y) 
+    if(true, X, Y) => X 
+    if(false, X, Y) => Y 
+    perfectp(O) => false 
+    perfectp(s(X)) => f(X, s(O), s(X), s(X)) 
+    f(O, X, O, Y) => true 
+    f(O, X, s(Y), Z) => false 
+    f(s(X), O, Y, Z) => f(X, Z, minus(Y, s(X)), Z) 
+    f(s(X), s(Y), Z, U) => if(le(X, Y), f(s(X), minus(Y, X), Z, U), f(X, U, Z, U)) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0 
+    * 1 : 2, 3 
+    * 2 : 1 
+    * 3 : 1 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    map#(F, cons(X, Y)) =#> map#(F, Y)   
+
+  P_2:
+
+    filter#(F, cons(X, Y)) =#> filter2#(F X, F, X, Y)   
+    filter2#(true, F, X, Y) =#> filter#(F, Y)   
+    filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f) and (P_2, R_0, m, f).
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_2, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(filter2#) = 4 
+  nu(filter#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(filter#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(filter2#(F X, F, X, Y)) 
+  nu(filter2#(true, F, X, Y)) = Y = Y = nu(filter#(F, Y)) 
+  nu(filter2#(false, F, X, Y)) = Y = Y = nu(filter#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_2, R_0, computable, f) by (P_3, R_0, computable, f), where P_3 contains:
+
+  filter2#(true, F, X, Y) =#> filter#(F, Y)   
+  filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_3, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_3, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+    * 1 :  
+
+This graph has no strongly connected components.  By [Kop12, Thm. 7.31], this implies finiteness of the dependency pair problem.
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(map#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(map#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(map#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

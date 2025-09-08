@@ -1,0 +1,1144 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/QskV4.pl
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+Left Termination of the query pattern
+
+slowsort(g,a)
+
+w.r.t. the given Prolog program could successfully be proven:
+
+(0) Prolog
+(1) PrologToPiTRSProof [SOUND, 0 ms]
+(2) PiTRS
+(3) DependencyPairsProof [EQUIVALENT, 0 ms]
+(4) PiDP
+(5) DependencyGraphProof [EQUIVALENT, 0 ms]
+(6) AND
+    (7) PiDP
+        (8) UsableRulesProof [EQUIVALENT, 0 ms]
+        (9) PiDP
+        (10) PiDPToQDPProof [EQUIVALENT, 0 ms]
+        (11) QDP
+        (12) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (13) YES
+    (14) PiDP
+        (15) UsableRulesProof [EQUIVALENT, 0 ms]
+        (16) PiDP
+        (17) PiDPToQDPProof [SOUND, 0 ms]
+        (18) QDP
+        (19) UsableRulesReductionPairsProof [EQUIVALENT, 23 ms]
+        (20) QDP
+        (21) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (22) TRUE
+    (23) PiDP
+        (24) UsableRulesProof [EQUIVALENT, 0 ms]
+        (25) PiDP
+        (26) PiDPToQDPProof [SOUND, 0 ms]
+        (27) QDP
+        (28) QDPSizeChangeProof [EQUIVALENT, 0 ms]
+        (29) YES
+    (30) PiDP
+        (31) UsableRulesProof [EQUIVALENT, 0 ms]
+        (32) PiDP
+        (33) PiDPToQDPProof [SOUND, 0 ms]
+        (34) QDP
+        (35) UsableRulesReductionPairsProof [EQUIVALENT, 0 ms]
+        (36) QDP
+        (37) DependencyGraphProof [EQUIVALENT, 0 ms]
+        (38) TRUE
+
+
+----------------------------------------
+
+(0)
+Obligation:
+Clauses:
+
+slowsort(X, Y) :- ','(perm(X, Y), sorted(Y)).
+sorted([]).
+sorted(.(X, [])).
+sorted(.(X, .(Y, Z))) :- ','(le(X, Y), sorted(.(Y, Z))).
+perm([], []).
+perm(.(X, .(Y, [])), .(U, .(V, []))) :- ','(delete(U, .(X, Y), Z), perm(Z, V)).
+delete(X, .(X, Y), Y).
+delete(X, .(Y, Z), W) :- delete(X, Z, W).
+le(s(X), s(Y)) :- le(X, Y).
+le(0, s(X)).
+le(0, 0).
+
+
+Query: slowsort(g,a)
+----------------------------------------
+
+(1) PrologToPiTRSProof (SOUND)
+We use the technique of [TOCL09]. With regard to the inferred argument filtering the predicates were used in the following modes:
+
+slowsort_in_2: (b,f)
+
+perm_in_2: (b,f)
+
+delete_in_3: (f,b,f)
+
+sorted_in_1: (b)
+
+le_in_2: (b,b)
+
+Transforming Prolog into the following Term Rewriting System:
+
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   slowsort_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, .(Y, [])), .(U, .(V, []))) -> U5_ga(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(Y, Z), W) -> U7_aga(X, Y, Z, W, delete_in_aga(X, Z, W))
+   U7_aga(X, Y, Z, W, delete_out_aga(X, Z, W)) -> delete_out_aga(X, .(Y, Z), W)
+   U5_ga(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_ga(X, Y, U, V, perm_in_ga(Z, V))
+   U6_ga(X, Y, U, V, perm_out_ga(Z, V)) -> perm_out_ga(.(X, .(Y, [])), .(U, .(V, [])))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, sorted_in_g(Y))
+   sorted_in_g([]) -> sorted_out_g([])
+   sorted_in_g(.(X, [])) -> sorted_out_g(.(X, []))
+   sorted_in_g(.(X, .(Y, Z))) -> U3_g(X, Y, Z, le_in_gg(X, Y))
+   le_in_gg(s(X), s(Y)) -> U8_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg(0, s(X))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U8_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U3_g(X, Y, Z, le_out_gg(X, Y)) -> U4_g(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U4_g(X, Y, Z, sorted_out_g(.(Y, Z))) -> sorted_out_g(.(X, .(Y, Z)))
+   U2_ga(X, Y, sorted_out_g(Y)) -> slowsort_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+slowsort_in_ga(x1, x2)  =  slowsort_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U5_ga(x1, x2, x3, x4, x5)  =  U5_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U7_aga(x1, x2, x3, x4, x5)  =  U7_aga(x5)
+
+U6_ga(x1, x2, x3, x4, x5)  =  U6_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+sorted_in_g(x1)  =  sorted_in_g(x1)
+
+sorted_out_g(x1)  =  sorted_out_g
+
+U3_g(x1, x2, x3, x4)  =  U3_g(x2, x3, x4)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U8_gg(x1, x2, x3)  =  U8_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x4)
+
+slowsort_out_ga(x1, x2)  =  slowsort_out_ga(x2)
+
+
+
+
+
+Infinitary Constructor Rewriting Termination of PiTRS implies Termination of Prolog
+
+
+
+----------------------------------------
+
+(2)
+Obligation:
+Pi-finite rewrite system:
+The TRS R consists of the following rules:
+
+   slowsort_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, .(Y, [])), .(U, .(V, []))) -> U5_ga(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(Y, Z), W) -> U7_aga(X, Y, Z, W, delete_in_aga(X, Z, W))
+   U7_aga(X, Y, Z, W, delete_out_aga(X, Z, W)) -> delete_out_aga(X, .(Y, Z), W)
+   U5_ga(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_ga(X, Y, U, V, perm_in_ga(Z, V))
+   U6_ga(X, Y, U, V, perm_out_ga(Z, V)) -> perm_out_ga(.(X, .(Y, [])), .(U, .(V, [])))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, sorted_in_g(Y))
+   sorted_in_g([]) -> sorted_out_g([])
+   sorted_in_g(.(X, [])) -> sorted_out_g(.(X, []))
+   sorted_in_g(.(X, .(Y, Z))) -> U3_g(X, Y, Z, le_in_gg(X, Y))
+   le_in_gg(s(X), s(Y)) -> U8_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg(0, s(X))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U8_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U3_g(X, Y, Z, le_out_gg(X, Y)) -> U4_g(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U4_g(X, Y, Z, sorted_out_g(.(Y, Z))) -> sorted_out_g(.(X, .(Y, Z)))
+   U2_ga(X, Y, sorted_out_g(Y)) -> slowsort_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+slowsort_in_ga(x1, x2)  =  slowsort_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U5_ga(x1, x2, x3, x4, x5)  =  U5_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U7_aga(x1, x2, x3, x4, x5)  =  U7_aga(x5)
+
+U6_ga(x1, x2, x3, x4, x5)  =  U6_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+sorted_in_g(x1)  =  sorted_in_g(x1)
+
+sorted_out_g(x1)  =  sorted_out_g
+
+U3_g(x1, x2, x3, x4)  =  U3_g(x2, x3, x4)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U8_gg(x1, x2, x3)  =  U8_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x4)
+
+slowsort_out_ga(x1, x2)  =  slowsort_out_ga(x2)
+
+
+
+----------------------------------------
+
+(3) DependencyPairsProof (EQUIVALENT)
+Using Dependency Pairs [AG00,LOPSTR] we result in the following initial DP problem:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   SLOWSORT_IN_GA(X, Y) -> U1_GA(X, Y, perm_in_ga(X, Y))
+   SLOWSORT_IN_GA(X, Y) -> PERM_IN_GA(X, Y)
+   PERM_IN_GA(.(X, .(Y, [])), .(U, .(V, []))) -> U5_GA(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   PERM_IN_GA(.(X, .(Y, [])), .(U, .(V, []))) -> DELETE_IN_AGA(U, .(X, Y), Z)
+   DELETE_IN_AGA(X, .(Y, Z), W) -> U7_AGA(X, Y, Z, W, delete_in_aga(X, Z, W))
+   DELETE_IN_AGA(X, .(Y, Z), W) -> DELETE_IN_AGA(X, Z, W)
+   U5_GA(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_GA(X, Y, U, V, perm_in_ga(Z, V))
+   U5_GA(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> PERM_IN_GA(Z, V)
+   U1_GA(X, Y, perm_out_ga(X, Y)) -> U2_GA(X, Y, sorted_in_g(Y))
+   U1_GA(X, Y, perm_out_ga(X, Y)) -> SORTED_IN_G(Y)
+   SORTED_IN_G(.(X, .(Y, Z))) -> U3_G(X, Y, Z, le_in_gg(X, Y))
+   SORTED_IN_G(.(X, .(Y, Z))) -> LE_IN_GG(X, Y)
+   LE_IN_GG(s(X), s(Y)) -> U8_GG(X, Y, le_in_gg(X, Y))
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+   U3_G(X, Y, Z, le_out_gg(X, Y)) -> U4_G(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U3_G(X, Y, Z, le_out_gg(X, Y)) -> SORTED_IN_G(.(Y, Z))
+
+The TRS R consists of the following rules:
+
+   slowsort_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, .(Y, [])), .(U, .(V, []))) -> U5_ga(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(Y, Z), W) -> U7_aga(X, Y, Z, W, delete_in_aga(X, Z, W))
+   U7_aga(X, Y, Z, W, delete_out_aga(X, Z, W)) -> delete_out_aga(X, .(Y, Z), W)
+   U5_ga(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_ga(X, Y, U, V, perm_in_ga(Z, V))
+   U6_ga(X, Y, U, V, perm_out_ga(Z, V)) -> perm_out_ga(.(X, .(Y, [])), .(U, .(V, [])))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, sorted_in_g(Y))
+   sorted_in_g([]) -> sorted_out_g([])
+   sorted_in_g(.(X, [])) -> sorted_out_g(.(X, []))
+   sorted_in_g(.(X, .(Y, Z))) -> U3_g(X, Y, Z, le_in_gg(X, Y))
+   le_in_gg(s(X), s(Y)) -> U8_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg(0, s(X))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U8_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U3_g(X, Y, Z, le_out_gg(X, Y)) -> U4_g(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U4_g(X, Y, Z, sorted_out_g(.(Y, Z))) -> sorted_out_g(.(X, .(Y, Z)))
+   U2_ga(X, Y, sorted_out_g(Y)) -> slowsort_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+slowsort_in_ga(x1, x2)  =  slowsort_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U5_ga(x1, x2, x3, x4, x5)  =  U5_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U7_aga(x1, x2, x3, x4, x5)  =  U7_aga(x5)
+
+U6_ga(x1, x2, x3, x4, x5)  =  U6_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+sorted_in_g(x1)  =  sorted_in_g(x1)
+
+sorted_out_g(x1)  =  sorted_out_g
+
+U3_g(x1, x2, x3, x4)  =  U3_g(x2, x3, x4)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U8_gg(x1, x2, x3)  =  U8_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x4)
+
+slowsort_out_ga(x1, x2)  =  slowsort_out_ga(x2)
+
+SLOWSORT_IN_GA(x1, x2)  =  SLOWSORT_IN_GA(x1)
+
+U1_GA(x1, x2, x3)  =  U1_GA(x3)
+
+PERM_IN_GA(x1, x2)  =  PERM_IN_GA(x1)
+
+U5_GA(x1, x2, x3, x4, x5)  =  U5_GA(x5)
+
+DELETE_IN_AGA(x1, x2, x3)  =  DELETE_IN_AGA(x2)
+
+U7_AGA(x1, x2, x3, x4, x5)  =  U7_AGA(x5)
+
+U6_GA(x1, x2, x3, x4, x5)  =  U6_GA(x3, x5)
+
+U2_GA(x1, x2, x3)  =  U2_GA(x2, x3)
+
+SORTED_IN_G(x1)  =  SORTED_IN_G(x1)
+
+U3_G(x1, x2, x3, x4)  =  U3_G(x2, x3, x4)
+
+LE_IN_GG(x1, x2)  =  LE_IN_GG(x1, x2)
+
+U8_GG(x1, x2, x3)  =  U8_GG(x3)
+
+U4_G(x1, x2, x3, x4)  =  U4_G(x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(4)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   SLOWSORT_IN_GA(X, Y) -> U1_GA(X, Y, perm_in_ga(X, Y))
+   SLOWSORT_IN_GA(X, Y) -> PERM_IN_GA(X, Y)
+   PERM_IN_GA(.(X, .(Y, [])), .(U, .(V, []))) -> U5_GA(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   PERM_IN_GA(.(X, .(Y, [])), .(U, .(V, []))) -> DELETE_IN_AGA(U, .(X, Y), Z)
+   DELETE_IN_AGA(X, .(Y, Z), W) -> U7_AGA(X, Y, Z, W, delete_in_aga(X, Z, W))
+   DELETE_IN_AGA(X, .(Y, Z), W) -> DELETE_IN_AGA(X, Z, W)
+   U5_GA(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_GA(X, Y, U, V, perm_in_ga(Z, V))
+   U5_GA(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> PERM_IN_GA(Z, V)
+   U1_GA(X, Y, perm_out_ga(X, Y)) -> U2_GA(X, Y, sorted_in_g(Y))
+   U1_GA(X, Y, perm_out_ga(X, Y)) -> SORTED_IN_G(Y)
+   SORTED_IN_G(.(X, .(Y, Z))) -> U3_G(X, Y, Z, le_in_gg(X, Y))
+   SORTED_IN_G(.(X, .(Y, Z))) -> LE_IN_GG(X, Y)
+   LE_IN_GG(s(X), s(Y)) -> U8_GG(X, Y, le_in_gg(X, Y))
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+   U3_G(X, Y, Z, le_out_gg(X, Y)) -> U4_G(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U3_G(X, Y, Z, le_out_gg(X, Y)) -> SORTED_IN_G(.(Y, Z))
+
+The TRS R consists of the following rules:
+
+   slowsort_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, .(Y, [])), .(U, .(V, []))) -> U5_ga(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(Y, Z), W) -> U7_aga(X, Y, Z, W, delete_in_aga(X, Z, W))
+   U7_aga(X, Y, Z, W, delete_out_aga(X, Z, W)) -> delete_out_aga(X, .(Y, Z), W)
+   U5_ga(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_ga(X, Y, U, V, perm_in_ga(Z, V))
+   U6_ga(X, Y, U, V, perm_out_ga(Z, V)) -> perm_out_ga(.(X, .(Y, [])), .(U, .(V, [])))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, sorted_in_g(Y))
+   sorted_in_g([]) -> sorted_out_g([])
+   sorted_in_g(.(X, [])) -> sorted_out_g(.(X, []))
+   sorted_in_g(.(X, .(Y, Z))) -> U3_g(X, Y, Z, le_in_gg(X, Y))
+   le_in_gg(s(X), s(Y)) -> U8_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg(0, s(X))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U8_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U3_g(X, Y, Z, le_out_gg(X, Y)) -> U4_g(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U4_g(X, Y, Z, sorted_out_g(.(Y, Z))) -> sorted_out_g(.(X, .(Y, Z)))
+   U2_ga(X, Y, sorted_out_g(Y)) -> slowsort_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+slowsort_in_ga(x1, x2)  =  slowsort_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U5_ga(x1, x2, x3, x4, x5)  =  U5_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U7_aga(x1, x2, x3, x4, x5)  =  U7_aga(x5)
+
+U6_ga(x1, x2, x3, x4, x5)  =  U6_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+sorted_in_g(x1)  =  sorted_in_g(x1)
+
+sorted_out_g(x1)  =  sorted_out_g
+
+U3_g(x1, x2, x3, x4)  =  U3_g(x2, x3, x4)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U8_gg(x1, x2, x3)  =  U8_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x4)
+
+slowsort_out_ga(x1, x2)  =  slowsort_out_ga(x2)
+
+SLOWSORT_IN_GA(x1, x2)  =  SLOWSORT_IN_GA(x1)
+
+U1_GA(x1, x2, x3)  =  U1_GA(x3)
+
+PERM_IN_GA(x1, x2)  =  PERM_IN_GA(x1)
+
+U5_GA(x1, x2, x3, x4, x5)  =  U5_GA(x5)
+
+DELETE_IN_AGA(x1, x2, x3)  =  DELETE_IN_AGA(x2)
+
+U7_AGA(x1, x2, x3, x4, x5)  =  U7_AGA(x5)
+
+U6_GA(x1, x2, x3, x4, x5)  =  U6_GA(x3, x5)
+
+U2_GA(x1, x2, x3)  =  U2_GA(x2, x3)
+
+SORTED_IN_G(x1)  =  SORTED_IN_G(x1)
+
+U3_G(x1, x2, x3, x4)  =  U3_G(x2, x3, x4)
+
+LE_IN_GG(x1, x2)  =  LE_IN_GG(x1, x2)
+
+U8_GG(x1, x2, x3)  =  U8_GG(x3)
+
+U4_G(x1, x2, x3, x4)  =  U4_G(x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(5) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LOPSTR] contains 4 SCCs with 10 less nodes.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+
+The TRS R consists of the following rules:
+
+   slowsort_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, .(Y, [])), .(U, .(V, []))) -> U5_ga(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(Y, Z), W) -> U7_aga(X, Y, Z, W, delete_in_aga(X, Z, W))
+   U7_aga(X, Y, Z, W, delete_out_aga(X, Z, W)) -> delete_out_aga(X, .(Y, Z), W)
+   U5_ga(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_ga(X, Y, U, V, perm_in_ga(Z, V))
+   U6_ga(X, Y, U, V, perm_out_ga(Z, V)) -> perm_out_ga(.(X, .(Y, [])), .(U, .(V, [])))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, sorted_in_g(Y))
+   sorted_in_g([]) -> sorted_out_g([])
+   sorted_in_g(.(X, [])) -> sorted_out_g(.(X, []))
+   sorted_in_g(.(X, .(Y, Z))) -> U3_g(X, Y, Z, le_in_gg(X, Y))
+   le_in_gg(s(X), s(Y)) -> U8_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg(0, s(X))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U8_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U3_g(X, Y, Z, le_out_gg(X, Y)) -> U4_g(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U4_g(X, Y, Z, sorted_out_g(.(Y, Z))) -> sorted_out_g(.(X, .(Y, Z)))
+   U2_ga(X, Y, sorted_out_g(Y)) -> slowsort_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+slowsort_in_ga(x1, x2)  =  slowsort_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U5_ga(x1, x2, x3, x4, x5)  =  U5_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U7_aga(x1, x2, x3, x4, x5)  =  U7_aga(x5)
+
+U6_ga(x1, x2, x3, x4, x5)  =  U6_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+sorted_in_g(x1)  =  sorted_in_g(x1)
+
+sorted_out_g(x1)  =  sorted_out_g
+
+U3_g(x1, x2, x3, x4)  =  U3_g(x2, x3, x4)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U8_gg(x1, x2, x3)  =  U8_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x4)
+
+slowsort_out_ga(x1, x2)  =  slowsort_out_ga(x2)
+
+LE_IN_GG(x1, x2)  =  LE_IN_GG(x1, x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(8) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(9)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+
+R is empty.
+Pi is empty.
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(10) PiDPToQDPProof (EQUIVALENT)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(11)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(12) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*LE_IN_GG(s(X), s(Y)) -> LE_IN_GG(X, Y)
+The graph contains the following edges 1 > 1, 2 > 2
+
+
+----------------------------------------
+
+(13)
+YES
+
+----------------------------------------
+
+(14)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U3_G(X, Y, Z, le_out_gg(X, Y)) -> SORTED_IN_G(.(Y, Z))
+   SORTED_IN_G(.(X, .(Y, Z))) -> U3_G(X, Y, Z, le_in_gg(X, Y))
+
+The TRS R consists of the following rules:
+
+   slowsort_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, .(Y, [])), .(U, .(V, []))) -> U5_ga(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(Y, Z), W) -> U7_aga(X, Y, Z, W, delete_in_aga(X, Z, W))
+   U7_aga(X, Y, Z, W, delete_out_aga(X, Z, W)) -> delete_out_aga(X, .(Y, Z), W)
+   U5_ga(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_ga(X, Y, U, V, perm_in_ga(Z, V))
+   U6_ga(X, Y, U, V, perm_out_ga(Z, V)) -> perm_out_ga(.(X, .(Y, [])), .(U, .(V, [])))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, sorted_in_g(Y))
+   sorted_in_g([]) -> sorted_out_g([])
+   sorted_in_g(.(X, [])) -> sorted_out_g(.(X, []))
+   sorted_in_g(.(X, .(Y, Z))) -> U3_g(X, Y, Z, le_in_gg(X, Y))
+   le_in_gg(s(X), s(Y)) -> U8_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg(0, s(X))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U8_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U3_g(X, Y, Z, le_out_gg(X, Y)) -> U4_g(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U4_g(X, Y, Z, sorted_out_g(.(Y, Z))) -> sorted_out_g(.(X, .(Y, Z)))
+   U2_ga(X, Y, sorted_out_g(Y)) -> slowsort_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+slowsort_in_ga(x1, x2)  =  slowsort_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U5_ga(x1, x2, x3, x4, x5)  =  U5_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U7_aga(x1, x2, x3, x4, x5)  =  U7_aga(x5)
+
+U6_ga(x1, x2, x3, x4, x5)  =  U6_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+sorted_in_g(x1)  =  sorted_in_g(x1)
+
+sorted_out_g(x1)  =  sorted_out_g
+
+U3_g(x1, x2, x3, x4)  =  U3_g(x2, x3, x4)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U8_gg(x1, x2, x3)  =  U8_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x4)
+
+slowsort_out_ga(x1, x2)  =  slowsort_out_ga(x2)
+
+SORTED_IN_G(x1)  =  SORTED_IN_G(x1)
+
+U3_G(x1, x2, x3, x4)  =  U3_G(x2, x3, x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(15) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(16)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U3_G(X, Y, Z, le_out_gg(X, Y)) -> SORTED_IN_G(.(Y, Z))
+   SORTED_IN_G(.(X, .(Y, Z))) -> U3_G(X, Y, Z, le_in_gg(X, Y))
+
+The TRS R consists of the following rules:
+
+   le_in_gg(s(X), s(Y)) -> U8_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg(0, s(X))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U8_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U8_gg(x1, x2, x3)  =  U8_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+SORTED_IN_G(x1)  =  SORTED_IN_G(x1)
+
+U3_G(x1, x2, x3, x4)  =  U3_G(x2, x3, x4)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(17) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(18)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U3_G(Y, Z, le_out_gg) -> SORTED_IN_G(.(Y, Z))
+   SORTED_IN_G(.(X, .(Y, Z))) -> U3_G(Y, Z, le_in_gg(X, Y))
+
+The TRS R consists of the following rules:
+
+   le_in_gg(s(X), s(Y)) -> U8_gg(le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg
+   le_in_gg(0, 0) -> le_out_gg
+   U8_gg(le_out_gg) -> le_out_gg
+
+The set Q consists of the following terms:
+
+   le_in_gg(x0, x1)
+   U8_gg(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(19) UsableRulesReductionPairsProof (EQUIVALENT)
+By using the usable rules with reduction pair processor [LPAR04] with a polynomial ordering [POLO], all dependency pairs and the corresponding usable rules [FROCOS05] can be oriented non-strictly. All non-usable rules are removed, and those dependency pairs and usable rules that have been oriented strictly or contain non-usable symbols in their left-hand side are removed as well.
+
+No dependency pairs are removed.
+
+The following rules are removed from R:
+
+   le_in_gg(s(X), s(Y)) -> U8_gg(le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg
+   le_in_gg(0, 0) -> le_out_gg
+Used ordering: POLO with Polynomial interpretation [POLO]:
+
+   POL(.(x_1, x_2)) = x_1 + 2*x_2
+   POL(0) = 0
+   POL(SORTED_IN_G(x_1)) = x_1
+   POL(U3_G(x_1, x_2, x_3)) = x_1 + 2*x_2 + x_3
+   POL(U8_gg(x_1)) = 2*x_1
+   POL(le_in_gg(x_1, x_2)) = x_1 + x_2
+   POL(le_out_gg) = 0
+   POL(s(x_1)) = 2 + 2*x_1
+
+
+----------------------------------------
+
+(20)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U3_G(Y, Z, le_out_gg) -> SORTED_IN_G(.(Y, Z))
+   SORTED_IN_G(.(X, .(Y, Z))) -> U3_G(Y, Z, le_in_gg(X, Y))
+
+The TRS R consists of the following rules:
+
+   U8_gg(le_out_gg) -> le_out_gg
+
+The set Q consists of the following terms:
+
+   le_in_gg(x0, x1)
+   U8_gg(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(21) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 0 SCCs with 2 less nodes.
+----------------------------------------
+
+(22)
+TRUE
+
+----------------------------------------
+
+(23)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_AGA(X, .(Y, Z), W) -> DELETE_IN_AGA(X, Z, W)
+
+The TRS R consists of the following rules:
+
+   slowsort_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, .(Y, [])), .(U, .(V, []))) -> U5_ga(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(Y, Z), W) -> U7_aga(X, Y, Z, W, delete_in_aga(X, Z, W))
+   U7_aga(X, Y, Z, W, delete_out_aga(X, Z, W)) -> delete_out_aga(X, .(Y, Z), W)
+   U5_ga(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_ga(X, Y, U, V, perm_in_ga(Z, V))
+   U6_ga(X, Y, U, V, perm_out_ga(Z, V)) -> perm_out_ga(.(X, .(Y, [])), .(U, .(V, [])))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, sorted_in_g(Y))
+   sorted_in_g([]) -> sorted_out_g([])
+   sorted_in_g(.(X, [])) -> sorted_out_g(.(X, []))
+   sorted_in_g(.(X, .(Y, Z))) -> U3_g(X, Y, Z, le_in_gg(X, Y))
+   le_in_gg(s(X), s(Y)) -> U8_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg(0, s(X))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U8_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U3_g(X, Y, Z, le_out_gg(X, Y)) -> U4_g(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U4_g(X, Y, Z, sorted_out_g(.(Y, Z))) -> sorted_out_g(.(X, .(Y, Z)))
+   U2_ga(X, Y, sorted_out_g(Y)) -> slowsort_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+slowsort_in_ga(x1, x2)  =  slowsort_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U5_ga(x1, x2, x3, x4, x5)  =  U5_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U7_aga(x1, x2, x3, x4, x5)  =  U7_aga(x5)
+
+U6_ga(x1, x2, x3, x4, x5)  =  U6_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+sorted_in_g(x1)  =  sorted_in_g(x1)
+
+sorted_out_g(x1)  =  sorted_out_g
+
+U3_g(x1, x2, x3, x4)  =  U3_g(x2, x3, x4)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U8_gg(x1, x2, x3)  =  U8_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x4)
+
+slowsort_out_ga(x1, x2)  =  slowsort_out_ga(x2)
+
+DELETE_IN_AGA(x1, x2, x3)  =  DELETE_IN_AGA(x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(24) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(25)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_AGA(X, .(Y, Z), W) -> DELETE_IN_AGA(X, Z, W)
+
+R is empty.
+The argument filtering Pi contains the following mapping:
+.(x1, x2)  =  .(x1, x2)
+
+DELETE_IN_AGA(x1, x2, x3)  =  DELETE_IN_AGA(x2)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(26) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(27)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   DELETE_IN_AGA(.(Y, Z)) -> DELETE_IN_AGA(Z)
+
+R is empty.
+Q is empty.
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(28) QDPSizeChangeProof (EQUIVALENT)
+By using the subterm criterion [SUBTERM_CRITERION] together with the size-change analysis [AAECC05] we have proven that there are no infinite chains for this DP problem. 
+
+From the DPs we obtained the following set of size-change graphs:
+*DELETE_IN_AGA(.(Y, Z)) -> DELETE_IN_AGA(Z)
+The graph contains the following edges 1 > 1
+
+
+----------------------------------------
+
+(29)
+YES
+
+----------------------------------------
+
+(30)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U5_GA(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> PERM_IN_GA(Z, V)
+   PERM_IN_GA(.(X, .(Y, [])), .(U, .(V, []))) -> U5_GA(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+
+The TRS R consists of the following rules:
+
+   slowsort_in_ga(X, Y) -> U1_ga(X, Y, perm_in_ga(X, Y))
+   perm_in_ga([], []) -> perm_out_ga([], [])
+   perm_in_ga(.(X, .(Y, [])), .(U, .(V, []))) -> U5_ga(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(Y, Z), W) -> U7_aga(X, Y, Z, W, delete_in_aga(X, Z, W))
+   U7_aga(X, Y, Z, W, delete_out_aga(X, Z, W)) -> delete_out_aga(X, .(Y, Z), W)
+   U5_ga(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> U6_ga(X, Y, U, V, perm_in_ga(Z, V))
+   U6_ga(X, Y, U, V, perm_out_ga(Z, V)) -> perm_out_ga(.(X, .(Y, [])), .(U, .(V, [])))
+   U1_ga(X, Y, perm_out_ga(X, Y)) -> U2_ga(X, Y, sorted_in_g(Y))
+   sorted_in_g([]) -> sorted_out_g([])
+   sorted_in_g(.(X, [])) -> sorted_out_g(.(X, []))
+   sorted_in_g(.(X, .(Y, Z))) -> U3_g(X, Y, Z, le_in_gg(X, Y))
+   le_in_gg(s(X), s(Y)) -> U8_gg(X, Y, le_in_gg(X, Y))
+   le_in_gg(0, s(X)) -> le_out_gg(0, s(X))
+   le_in_gg(0, 0) -> le_out_gg(0, 0)
+   U8_gg(X, Y, le_out_gg(X, Y)) -> le_out_gg(s(X), s(Y))
+   U3_g(X, Y, Z, le_out_gg(X, Y)) -> U4_g(X, Y, Z, sorted_in_g(.(Y, Z)))
+   U4_g(X, Y, Z, sorted_out_g(.(Y, Z))) -> sorted_out_g(.(X, .(Y, Z)))
+   U2_ga(X, Y, sorted_out_g(Y)) -> slowsort_out_ga(X, Y)
+
+The argument filtering Pi contains the following mapping:
+slowsort_in_ga(x1, x2)  =  slowsort_in_ga(x1)
+
+U1_ga(x1, x2, x3)  =  U1_ga(x3)
+
+perm_in_ga(x1, x2)  =  perm_in_ga(x1)
+
+[]  =  []
+
+perm_out_ga(x1, x2)  =  perm_out_ga(x2)
+
+.(x1, x2)  =  .(x1, x2)
+
+U5_ga(x1, x2, x3, x4, x5)  =  U5_ga(x5)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U7_aga(x1, x2, x3, x4, x5)  =  U7_aga(x5)
+
+U6_ga(x1, x2, x3, x4, x5)  =  U6_ga(x3, x5)
+
+U2_ga(x1, x2, x3)  =  U2_ga(x2, x3)
+
+sorted_in_g(x1)  =  sorted_in_g(x1)
+
+sorted_out_g(x1)  =  sorted_out_g
+
+U3_g(x1, x2, x3, x4)  =  U3_g(x2, x3, x4)
+
+le_in_gg(x1, x2)  =  le_in_gg(x1, x2)
+
+s(x1)  =  s(x1)
+
+U8_gg(x1, x2, x3)  =  U8_gg(x3)
+
+0  =  0
+
+le_out_gg(x1, x2)  =  le_out_gg
+
+U4_g(x1, x2, x3, x4)  =  U4_g(x4)
+
+slowsort_out_ga(x1, x2)  =  slowsort_out_ga(x2)
+
+PERM_IN_GA(x1, x2)  =  PERM_IN_GA(x1)
+
+U5_GA(x1, x2, x3, x4, x5)  =  U5_GA(x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(31) UsableRulesProof (EQUIVALENT)
+For (infinitary) constructor rewriting [LOPSTR] we can delete all non-usable rules from R.
+----------------------------------------
+
+(32)
+Obligation:
+Pi DP problem:
+The TRS P consists of the following rules:
+
+   U5_GA(X, Y, U, V, delete_out_aga(U, .(X, Y), Z)) -> PERM_IN_GA(Z, V)
+   PERM_IN_GA(.(X, .(Y, [])), .(U, .(V, []))) -> U5_GA(X, Y, U, V, delete_in_aga(U, .(X, Y), Z))
+
+The TRS R consists of the following rules:
+
+   delete_in_aga(X, .(X, Y), Y) -> delete_out_aga(X, .(X, Y), Y)
+   delete_in_aga(X, .(Y, Z), W) -> U7_aga(X, Y, Z, W, delete_in_aga(X, Z, W))
+   U7_aga(X, Y, Z, W, delete_out_aga(X, Z, W)) -> delete_out_aga(X, .(Y, Z), W)
+
+The argument filtering Pi contains the following mapping:
+[]  =  []
+
+.(x1, x2)  =  .(x1, x2)
+
+delete_in_aga(x1, x2, x3)  =  delete_in_aga(x2)
+
+delete_out_aga(x1, x2, x3)  =  delete_out_aga(x1, x3)
+
+U7_aga(x1, x2, x3, x4, x5)  =  U7_aga(x5)
+
+PERM_IN_GA(x1, x2)  =  PERM_IN_GA(x1)
+
+U5_GA(x1, x2, x3, x4, x5)  =  U5_GA(x5)
+
+
+We have to consider all (P,R,Pi)-chains
+----------------------------------------
+
+(33) PiDPToQDPProof (SOUND)
+Transforming (infinitary) constructor rewriting Pi-DP problem [LOPSTR] into ordinary QDP problem [LPAR04] by application of Pi.
+----------------------------------------
+
+(34)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U5_GA(delete_out_aga(U, Z)) -> PERM_IN_GA(Z)
+   PERM_IN_GA(.(X, .(Y, []))) -> U5_GA(delete_in_aga(.(X, Y)))
+
+The TRS R consists of the following rules:
+
+   delete_in_aga(.(X, Y)) -> delete_out_aga(X, Y)
+   delete_in_aga(.(Y, Z)) -> U7_aga(delete_in_aga(Z))
+   U7_aga(delete_out_aga(X, W)) -> delete_out_aga(X, W)
+
+The set Q consists of the following terms:
+
+   delete_in_aga(x0)
+   U7_aga(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(35) UsableRulesReductionPairsProof (EQUIVALENT)
+By using the usable rules with reduction pair processor [LPAR04] with a polynomial ordering [POLO], all dependency pairs and the corresponding usable rules [FROCOS05] can be oriented non-strictly. All non-usable rules are removed, and those dependency pairs and usable rules that have been oriented strictly or contain non-usable symbols in their left-hand side are removed as well.
+
+The following dependency pairs can be deleted:
+
+   PERM_IN_GA(.(X, .(Y, []))) -> U5_GA(delete_in_aga(.(X, Y)))
+The following rules are removed from R:
+
+   delete_in_aga(.(X, Y)) -> delete_out_aga(X, Y)
+Used ordering: POLO with Polynomial interpretation [POLO]:
+
+   POL(.(x_1, x_2)) = 2*x_1 + 2*x_2
+   POL(PERM_IN_GA(x_1)) = 2 + 2*x_1
+   POL(U5_GA(x_1)) = 2 + x_1
+   POL(U7_aga(x_1)) = x_1
+   POL([]) = 1
+   POL(delete_in_aga(x_1)) = 2 + 2*x_1
+   POL(delete_out_aga(x_1, x_2)) = 2*x_1 + 2*x_2
+
+
+----------------------------------------
+
+(36)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   U5_GA(delete_out_aga(U, Z)) -> PERM_IN_GA(Z)
+
+The TRS R consists of the following rules:
+
+   delete_in_aga(.(Y, Z)) -> U7_aga(delete_in_aga(Z))
+   U7_aga(delete_out_aga(X, W)) -> delete_out_aga(X, W)
+
+The set Q consists of the following terms:
+
+   delete_in_aga(x0)
+   U7_aga(x0)
+
+We have to consider all (P,Q,R)-chains.
+----------------------------------------
+
+(37) DependencyGraphProof (EQUIVALENT)
+The approximation of the Dependency Graph [LPAR04,FROCOS05,EDGSTAR] contains 0 SCCs with 1 less node.
+----------------------------------------
+
+(38)
+TRUE

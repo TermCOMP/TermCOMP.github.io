@@ -1,0 +1,170 @@
+YES
+We consider the system 4zyi6.
+
+  Alphabet:
+
+    O : [] --> d 
+    cons : [d * d] --> d 
+    f : [d] --> a 
+    false : [] --> c 
+    filter : [d -> c * d] --> d 
+    filter2 : [c * d -> c * d * d] --> d 
+    g : [d] --> d 
+    h : [d] --> b 
+    map : [d -> d * d] --> d 
+    nil : [] --> d 
+    s : [d] --> d 
+    true : [] --> c 
+
+  Rules:
+
+    f(s(X)) => f(X) 
+    g(cons(O, X)) => g(X) 
+    g(cons(s(X), Y)) => s(X) 
+    h(cons(X, Y)) => h(g(cons(X, Y))) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  f(s(X)) >? f(X) 
+  g(cons(O, X)) >? g(X) 
+  g(cons(s(X), Y)) >? s(X) 
+  h(cons(X, Y)) >? h(g(cons(X, Y))) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >? filter(F, Y) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  cons = Lam[y0;y1].1 + y0 + y1 
+  f = Lam[y0].2*y0 
+  false = 3 
+  filter = Lam[G0;y1].2*y1 + G0(0) + y1*G0(y1) 
+  filter2 = Lam[y0;G1;y2;y3].1 + y0 + y2 + 2*y3 + G1(0) + y3*G1(y3) 
+  g = Lam[y0].y0 
+  h = Lam[y0].2*y0 
+  map = Lam[G0;y1].1 + 3*y1 + G0(0) + 2*y1*G0(y1) 
+  nil = 0 
+  s = Lam[y0].2*y0 
+  true = 3 
+
+Using this interpretation, the requirements translate to:
+
+  [[f(s(_x0))]] = 4*x0 >= 2*x0 = [[f(_x0)]] 
+  [[g(cons(O, _x0))]] = 4 + x0 > x0 = [[g(_x0)]] 
+  [[g(cons(s(_x0), _x1))]] = 1 + x1 + 2*x0 > 2*x0 = [[s(_x0)]] 
+  [[h(cons(_x0, _x1))]] = 2 + 2*x0 + 2*x1 >= 2 + 2*x0 + 2*x1 = [[h(g(cons(_x0, _x1)))]] 
+  [[map(_F0, nil)]] = 1 + F0(0) > 0 = [[nil]] 
+  [[map(_F0, cons(_x1, _x2))]] = 4 + 3*x1 + 3*x2 + F0(0) + 2*x1*F0(1 + x1 + x2) + 2*x2*F0(1 + x1 + x2) + 2*F0(1 + x1 + x2) > 2 + x1 + 3*x2 + F0(0) + F0(x1) + 2*x2*F0(x2) = [[cons(_F0 _x1, map(_F0, _x2))]] 
+  [[filter(_F0, nil)]] = F0(0) >= 0 = [[nil]] 
+  [[filter(_F0, cons(_x1, _x2))]] = 2 + 2*x1 + 2*x2 + F0(0) + F0(1 + x1 + x2) + x1*F0(1 + x1 + x2) + x2*F0(1 + x1 + x2) > 1 + 2*x1 + 2*x2 + F0(0) + F0(x1) + x2*F0(x2) = [[filter2(_F0 _x1, _F0, _x1, _x2)]] 
+  [[filter2(true, _F0, _x1, _x2)]] = 4 + x1 + 2*x2 + F0(0) + x2*F0(x2) > 1 + x1 + 2*x2 + F0(0) + x2*F0(x2) = [[cons(_x1, filter(_F0, _x2))]] 
+  [[filter2(false, _F0, _x1, _x2)]] = 4 + x1 + 2*x2 + F0(0) + x2*F0(x2) > 2*x2 + F0(0) + x2*F0(x2) = [[filter(_F0, _x2)]] 
+
+We can thus remove the following rules:
+
+  g(cons(O, X)) => g(X) 
+  g(cons(s(X), Y)) => s(X) 
+  map(F, nil) => nil 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  f(s(X)) >? f(X) 
+  h(cons(X, Y)) >? h(g(cons(X, Y))) 
+  filter(F, nil) >? nil 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  cons = Lam[y0;y1].y0 + y1 
+  f = Lam[y0].y0 
+  filter = Lam[G0;y1].3 + 3*y1 + G0(0) 
+  g = Lam[y0].y0 
+  h = Lam[y0].y0 
+  nil = 0 
+  s = Lam[y0].3 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[f(s(_x0))]] = 3 + 3*x0 > x0 = [[f(_x0)]] 
+  [[h(cons(_x0, _x1))]] = x0 + x1 >= x0 + x1 = [[h(g(cons(_x0, _x1)))]] 
+  [[filter(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+
+We can thus remove the following rules:
+
+  f(s(X)) => f(X) 
+  filter(F, nil) => nil 
+
+We observe that the rules contain a first-order subset:
+
+  h(cons(X, Y)) => h(g(cons(X, Y))) 
+
+Moreover, the system is orthogonal.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed terminating:
+
+ || Input TRS:
+ ||     1: h(cons(PeRCenTX,PeRCenTY)) -> h(g(cons(PeRCenTX,PeRCenTY)))
+ || Number of strict rules: 1
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying h
+ || 1: h^1_cons(PeRCenTX,PeRCenTY) -> h^1_g(cons(PeRCenTX,PeRCenTY))
+ || 2: h(cons(_1,_2)) ->= h^1_cons(_1,_2)
+ || 3: h(g(_1)) ->= h^1_g(_1)
+ || Number of strict rules: 1
+ || Direct POLO(bPol) ... removes: 1 3 2
+ ||       h 	w: 2 * x1 + 2
+ ||       h^1_g	w: x1
+ ||       cons	w: x1 + x2 + 1
+ ||       g 	w: x1 + 1
+ ||       h^1_cons	w: x1 + x2 + 3
+ || Number of strict rules: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+
+  Rules R_0:
+
+    h(cons(X, Y)) => h(g(cons(X, Y))) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+
+This graph has no strongly connected components.  By [Kop12, Thm. 7.31], this implies finiteness of the dependency pair problem.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

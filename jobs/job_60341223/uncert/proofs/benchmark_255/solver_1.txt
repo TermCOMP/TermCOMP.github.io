@@ -1,0 +1,154 @@
+YES
+We consider the system HRHlp.
+
+  Alphabet:
+
+    cons : [c * d] --> d 
+    f : [a * a] --> a 
+    false : [] --> b 
+    filter : [c -> b * d] --> d 
+    filter2 : [b * c -> b * c * d] --> d 
+    g : [a] --> a 
+    h : [a] --> a 
+    map : [c -> c * d] --> d 
+    nil : [] --> d 
+    true : [] --> b 
+
+  Rules:
+
+    g(h(g(X))) => g(X) 
+    g(g(X)) => g(h(g(X))) 
+    h(h(X)) => h(f(h(X), X)) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We observe that the rules contain a first-order subset:
+
+  g(h(g(X))) => g(X) 
+  g(g(X)) => g(h(g(X))) 
+  h(h(X)) => h(f(h(X), X)) 
+
+Moreover, the system is finitely branching.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is Ce-terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed Ce-terminating:
+
+ || Input TRS:
+ ||     1: g(h(g(PeRCenTX))) -> g(PeRCenTX)
+ ||     2: g(g(PeRCenTX)) -> g(h(g(PeRCenTX)))
+ ||     3: h(h(PeRCenTX)) -> h(f(h(PeRCenTX),PeRCenTX))
+ ||     4: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     5: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 5
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #g(g(PeRCenTX)) -> #g(h(g(PeRCenTX)))
+ ||    #2: #g(g(PeRCenTX)) -> #h(g(PeRCenTX))
+ ||    #3: #h(h(PeRCenTX)) -> #h(f(h(PeRCenTX),PeRCenTX))
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] map#(F, cons(X, Y)) =#> map#(F, Y)   
+    1] filter#(F, cons(X, Y)) =#> filter2#(F X, F, X, Y)   
+    2] filter2#(true, F, X, Y) =#> filter#(F, Y)   
+    3] filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+  Rules R_0:
+
+    g(h(g(X))) => g(X) 
+    g(g(X)) => g(h(g(X))) 
+    h(h(X)) => h(f(h(X), X)) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 : 0 
+    * 1 : 2, 3 
+    * 2 : 1 
+    * 3 : 1 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    map#(F, cons(X, Y)) =#> map#(F, Y)   
+
+  P_2:
+
+    filter#(F, cons(X, Y)) =#> filter2#(F X, F, X, Y)   
+    filter2#(true, F, X, Y) =#> filter#(F, Y)   
+    filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f) and (P_2, R_0, m, f).
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_2, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(filter2#) = 4 
+  nu(filter#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(filter#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(filter2#(F X, F, X, Y)) 
+  nu(filter2#(true, F, X, Y)) = Y = Y = nu(filter#(F, Y)) 
+  nu(filter2#(false, F, X, Y)) = Y = Y = nu(filter#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_2, R_0, computable, f) by (P_3, R_0, computable, f), where P_3 contains:
+
+  filter2#(true, F, X, Y) =#> filter#(F, Y)   
+  filter2#(false, F, X, Y) =#> filter#(F, Y)   
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_3, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_3, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+    * 1 :  
+
+This graph has no strongly connected components.  By [Kop12, Thm. 7.31], this implies finiteness of the dependency pair problem.
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(map#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(map#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(map#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

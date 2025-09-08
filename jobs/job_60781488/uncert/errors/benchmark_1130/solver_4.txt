@@ -1,0 +1,466 @@
+Input TRS:
+    1: active(from(X)) -> mark(cons(X,from(s(X))))
+    2: active(2ndspos(0(),Z)) -> mark(rnil())
+    3: active(2ndspos(s(N),cons(X,Z))) -> mark(2ndspos(s(N),cons2(X,Z)))
+    4: active(2ndspos(s(N),cons2(X,cons(Y,Z)))) -> mark(rcons(posrecip(Y),2ndsneg(N,Z)))
+    5: active(2ndsneg(0(),Z)) -> mark(rnil())
+    6: active(2ndsneg(s(N),cons(X,Z))) -> mark(2ndsneg(s(N),cons2(X,Z)))
+    7: active(2ndsneg(s(N),cons2(X,cons(Y,Z)))) -> mark(rcons(negrecip(Y),2ndspos(N,Z)))
+    8: active(pi(X)) -> mark(2ndspos(X,from(0())))
+    9: active(plus(0(),Y)) -> mark(Y)
+    10: active(plus(s(X),Y)) -> mark(s(plus(X,Y)))
+    11: active(times(0(),Y)) -> mark(0())
+    12: active(times(s(X),Y)) -> mark(plus(Y,times(X,Y)))
+    13: active(square(X)) -> mark(times(X,X))
+    14: active(s(X)) -> s(active(X))
+    15: active(posrecip(X)) -> posrecip(active(X))
+    16: active(negrecip(X)) -> negrecip(active(X))
+    17: active(cons(X1,X2)) -> cons(active(X1),X2)
+    18: active(cons2(X1,X2)) -> cons2(X1,active(X2))
+    19: active(rcons(X1,X2)) -> rcons(active(X1),X2)
+    20: active(rcons(X1,X2)) -> rcons(X1,active(X2))
+    21: active(from(X)) -> from(active(X))
+    22: active(2ndspos(X1,X2)) -> 2ndspos(active(X1),X2)
+    23: active(2ndspos(X1,X2)) -> 2ndspos(X1,active(X2))
+    24: active(2ndsneg(X1,X2)) -> 2ndsneg(active(X1),X2)
+    25: active(2ndsneg(X1,X2)) -> 2ndsneg(X1,active(X2))
+    26: active(pi(X)) -> pi(active(X))
+    27: active(plus(X1,X2)) -> plus(active(X1),X2)
+    28: active(plus(X1,X2)) -> plus(X1,active(X2))
+    29: active(times(X1,X2)) -> times(active(X1),X2)
+    30: active(times(X1,X2)) -> times(X1,active(X2))
+    31: active(square(X)) -> square(active(X))
+    32: s(mark(X)) -> mark(s(X))
+    33: posrecip(mark(X)) -> mark(posrecip(X))
+    34: negrecip(mark(X)) -> mark(negrecip(X))
+    35: cons(mark(X1),X2) -> mark(cons(X1,X2))
+    36: cons2(X1,mark(X2)) -> mark(cons2(X1,X2))
+    37: rcons(mark(X1),X2) -> mark(rcons(X1,X2))
+    38: rcons(X1,mark(X2)) -> mark(rcons(X1,X2))
+    39: from(mark(X)) -> mark(from(X))
+    40: 2ndspos(mark(X1),X2) -> mark(2ndspos(X1,X2))
+    41: 2ndspos(X1,mark(X2)) -> mark(2ndspos(X1,X2))
+    42: 2ndsneg(mark(X1),X2) -> mark(2ndsneg(X1,X2))
+    43: 2ndsneg(X1,mark(X2)) -> mark(2ndsneg(X1,X2))
+    44: pi(mark(X)) -> mark(pi(X))
+    45: plus(mark(X1),X2) -> mark(plus(X1,X2))
+    46: plus(X1,mark(X2)) -> mark(plus(X1,X2))
+    47: times(mark(X1),X2) -> mark(times(X1,X2))
+    48: times(X1,mark(X2)) -> mark(times(X1,X2))
+    49: square(mark(X)) -> mark(square(X))
+    50: proper(0()) -> ok(0())
+    51: proper(s(X)) -> s(proper(X))
+    52: proper(posrecip(X)) -> posrecip(proper(X))
+    53: proper(negrecip(X)) -> negrecip(proper(X))
+    54: proper(nil()) -> ok(nil())
+    55: proper(cons(X1,X2)) -> cons(proper(X1),proper(X2))
+    56: proper(cons2(X1,X2)) -> cons2(proper(X1),proper(X2))
+    57: proper(rnil()) -> ok(rnil())
+    58: proper(rcons(X1,X2)) -> rcons(proper(X1),proper(X2))
+    59: proper(from(X)) -> from(proper(X))
+    60: proper(2ndspos(X1,X2)) -> 2ndspos(proper(X1),proper(X2))
+    61: proper(2ndsneg(X1,X2)) -> 2ndsneg(proper(X1),proper(X2))
+    62: proper(pi(X)) -> pi(proper(X))
+    63: proper(plus(X1,X2)) -> plus(proper(X1),proper(X2))
+    64: proper(times(X1,X2)) -> times(proper(X1),proper(X2))
+    65: proper(square(X)) -> square(proper(X))
+    66: s(ok(X)) -> ok(s(X))
+    67: posrecip(ok(X)) -> ok(posrecip(X))
+    68: negrecip(ok(X)) -> ok(negrecip(X))
+    69: cons(ok(X1),ok(X2)) -> ok(cons(X1,X2))
+    70: cons2(ok(X1),ok(X2)) -> ok(cons2(X1,X2))
+    71: rcons(ok(X1),ok(X2)) -> ok(rcons(X1,X2))
+    72: from(ok(X)) -> ok(from(X))
+    73: 2ndspos(ok(X1),ok(X2)) -> ok(2ndspos(X1,X2))
+    74: 2ndsneg(ok(X1),ok(X2)) -> ok(2ndsneg(X1,X2))
+    75: pi(ok(X)) -> ok(pi(X))
+    76: plus(ok(X1),ok(X2)) -> ok(plus(X1,X2))
+    77: times(ok(X1),ok(X2)) -> ok(times(X1,X2))
+    78: square(ok(X)) -> ok(square(X))
+    79: top(mark(X)) -> top(proper(X))
+    80: top(ok(X)) -> top(active(X))
+Number of strict rules: 80
+Direct Order(PosReal,>,Poly) ... failed.
+Freezing ... failed.
+Dependency Pairs:
+   #1: #2ndsneg(X1,mark(X2)) -> #2ndsneg(X1,X2)
+   #2: #active(times(X1,X2)) -> #times(active(X1),X2)
+   #3: #active(times(X1,X2)) -> #active(X1)
+   #4: #cons(mark(X1),X2) -> #cons(X1,X2)
+   #5: #s(ok(X)) -> #s(X)
+   #6: #plus(X1,mark(X2)) -> #plus(X1,X2)
+   #7: #2ndsneg(mark(X1),X2) -> #2ndsneg(X1,X2)
+   #8: #2ndspos(X1,mark(X2)) -> #2ndspos(X1,X2)
+   #9: #rcons(mark(X1),X2) -> #rcons(X1,X2)
+   #10: #2ndspos(ok(X1),ok(X2)) -> #2ndspos(X1,X2)
+   #11: #times(mark(X1),X2) -> #times(X1,X2)
+   #12: #proper(negrecip(X)) -> #negrecip(proper(X))
+   #13: #proper(negrecip(X)) -> #proper(X)
+   #14: #rcons(ok(X1),ok(X2)) -> #rcons(X1,X2)
+   #15: #times(X1,mark(X2)) -> #times(X1,X2)
+   #16: #pi(ok(X)) -> #pi(X)
+   #17: #2ndsneg(ok(X1),ok(X2)) -> #2ndsneg(X1,X2)
+   #18: #proper(rcons(X1,X2)) -> #rcons(proper(X1),proper(X2))
+   #19: #proper(rcons(X1,X2)) -> #proper(X1)
+   #20: #proper(rcons(X1,X2)) -> #proper(X2)
+   #21: #proper(2ndsneg(X1,X2)) -> #2ndsneg(proper(X1),proper(X2))
+   #22: #proper(2ndsneg(X1,X2)) -> #proper(X1)
+   #23: #proper(2ndsneg(X1,X2)) -> #proper(X2)
+   #24: #rcons(X1,mark(X2)) -> #rcons(X1,X2)
+   #25: #active(2ndsneg(s(N),cons(X,Z))) -> #2ndsneg(s(N),cons2(X,Z))
+   #26: #active(2ndsneg(s(N),cons(X,Z))) -> #cons2(X,Z)
+   #27: #proper(from(X)) -> #from(proper(X))
+   #28: #proper(from(X)) -> #proper(X)
+   #29: #proper(cons(X1,X2)) -> #cons(proper(X1),proper(X2))
+   #30: #proper(cons(X1,X2)) -> #proper(X1)
+   #31: #proper(cons(X1,X2)) -> #proper(X2)
+   #32: #posrecip(ok(X)) -> #posrecip(X)
+   #33: #2ndspos(mark(X1),X2) -> #2ndspos(X1,X2)
+   #34: #proper(s(X)) -> #s(proper(X))
+   #35: #proper(s(X)) -> #proper(X)
+   #36: #active(square(X)) -> #times(X,X)
+   #37: #plus(ok(X1),ok(X2)) -> #plus(X1,X2)
+   #38: #active(2ndsneg(X1,X2)) -> #2ndsneg(active(X1),X2)
+   #39: #active(2ndsneg(X1,X2)) -> #active(X1)
+   #40: #cons2(ok(X1),ok(X2)) -> #cons2(X1,X2)
+   #41: #active(2ndspos(X1,X2)) -> #2ndspos(X1,active(X2))
+   #42: #active(2ndspos(X1,X2)) -> #active(X2)
+   #43: #square(ok(X)) -> #square(X)
+   #44: #plus(mark(X1),X2) -> #plus(X1,X2)
+   #45: #cons(ok(X1),ok(X2)) -> #cons(X1,X2)
+   #46: #active(times(s(X),Y)) -> #plus(Y,times(X,Y))
+   #47: #active(times(s(X),Y)) -> #times(X,Y)
+   #48: #active(square(X)) -> #square(active(X))
+   #49: #active(square(X)) -> #active(X)
+   #50: #top(mark(X)) -> #top(proper(X))
+   #51: #top(mark(X)) -> #proper(X)
+   #52: #proper(cons2(X1,X2)) -> #cons2(proper(X1),proper(X2))
+   #53: #proper(cons2(X1,X2)) -> #proper(X1)
+   #54: #proper(cons2(X1,X2)) -> #proper(X2)
+   #55: #active(s(X)) -> #s(active(X))
+   #56: #active(s(X)) -> #active(X)
+   #57: #proper(pi(X)) -> #pi(proper(X))
+   #58: #proper(pi(X)) -> #proper(X)
+   #59: #active(times(X1,X2)) -> #times(X1,active(X2))
+   #60: #active(times(X1,X2)) -> #active(X2)
+   #61: #proper(posrecip(X)) -> #posrecip(proper(X))
+   #62: #proper(posrecip(X)) -> #proper(X)
+   #63: #square(mark(X)) -> #square(X)
+   #64: #active(2ndsneg(X1,X2)) -> #2ndsneg(X1,active(X2))
+   #65: #active(2ndsneg(X1,X2)) -> #active(X2)
+   #66: #active(rcons(X1,X2)) -> #rcons(X1,active(X2))
+   #67: #active(rcons(X1,X2)) -> #active(X2)
+   #68: #active(2ndsneg(s(N),cons2(X,cons(Y,Z)))) -> #rcons(negrecip(Y),2ndspos(N,Z))
+   #69: #active(2ndsneg(s(N),cons2(X,cons(Y,Z)))) -> #negrecip(Y)
+   #70: #active(2ndsneg(s(N),cons2(X,cons(Y,Z)))) -> #2ndspos(N,Z)
+   #71: #from(mark(X)) -> #from(X)
+   #72: #active(plus(s(X),Y)) -> #s(plus(X,Y))
+   #73: #active(plus(s(X),Y)) -> #plus(X,Y)
+   #74: #proper(times(X1,X2)) -> #times(proper(X1),proper(X2))
+   #75: #proper(times(X1,X2)) -> #proper(X1)
+   #76: #proper(times(X1,X2)) -> #proper(X2)
+   #77: #posrecip(mark(X)) -> #posrecip(X)
+   #78: #from(ok(X)) -> #from(X)
+   #79: #pi(mark(X)) -> #pi(X)
+   #80: #proper(square(X)) -> #square(proper(X))
+   #81: #proper(square(X)) -> #proper(X)
+   #82: #active(plus(X1,X2)) -> #plus(X1,active(X2))
+   #83: #active(plus(X1,X2)) -> #active(X2)
+   #84: #active(2ndspos(X1,X2)) -> #2ndspos(active(X1),X2)
+   #85: #active(2ndspos(X1,X2)) -> #active(X1)
+   #86: #negrecip(mark(X)) -> #negrecip(X)
+   #87: #active(plus(X1,X2)) -> #plus(active(X1),X2)
+   #88: #active(plus(X1,X2)) -> #active(X1)
+   #89: #proper(2ndspos(X1,X2)) -> #2ndspos(proper(X1),proper(X2))
+   #90: #proper(2ndspos(X1,X2)) -> #proper(X1)
+   #91: #proper(2ndspos(X1,X2)) -> #proper(X2)
+   #92: #active(cons(X1,X2)) -> #cons(active(X1),X2)
+   #93: #active(cons(X1,X2)) -> #active(X1)
+   #94: #s(mark(X)) -> #s(X)
+   #95: #active(rcons(X1,X2)) -> #rcons(active(X1),X2)
+   #96: #active(rcons(X1,X2)) -> #active(X1)
+   #97: #proper(plus(X1,X2)) -> #plus(proper(X1),proper(X2))
+   #98: #proper(plus(X1,X2)) -> #proper(X1)
+   #99: #proper(plus(X1,X2)) -> #proper(X2)
+   #100: #active(pi(X)) -> #pi(active(X))
+   #101: #active(pi(X)) -> #active(X)
+   #102: #negrecip(ok(X)) -> #negrecip(X)
+   #103: #cons2(X1,mark(X2)) -> #cons2(X1,X2)
+   #104: #active(from(X)) -> #from(active(X))
+   #105: #active(from(X)) -> #active(X)
+   #106: #active(negrecip(X)) -> #negrecip(active(X))
+   #107: #active(negrecip(X)) -> #active(X)
+   #108: #active(2ndspos(s(N),cons(X,Z))) -> #2ndspos(s(N),cons2(X,Z))
+   #109: #active(2ndspos(s(N),cons(X,Z))) -> #cons2(X,Z)
+   #110: #times(ok(X1),ok(X2)) -> #times(X1,X2)
+   #111: #active(from(X)) -> #cons(X,from(s(X)))
+   #112: #active(from(X)) -> #from(s(X))
+   #113: #active(from(X)) -> #s(X)
+   #114: #active(pi(X)) -> #2ndspos(X,from(0()))
+   #115: #active(pi(X)) -> #from(0())
+   #116: #active(posrecip(X)) -> #posrecip(active(X))
+   #117: #active(posrecip(X)) -> #active(X)
+   #118: #active(2ndspos(s(N),cons2(X,cons(Y,Z)))) -> #rcons(posrecip(Y),2ndsneg(N,Z))
+   #119: #active(2ndspos(s(N),cons2(X,cons(Y,Z)))) -> #posrecip(Y)
+   #120: #active(2ndspos(s(N),cons2(X,cons(Y,Z)))) -> #2ndsneg(N,Z)
+   #121: #top(ok(X)) -> #top(active(X))
+   #122: #top(ok(X)) -> #active(X)
+   #123: #active(cons2(X1,X2)) -> #cons2(X1,active(X2))
+   #124: #active(cons2(X1,X2)) -> #active(X2)
+Number of SCCs: 16, DPs: 71, edges: 805
+	SCC { #43 #63 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+negrecip(x1)	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+#negrecip(x1)	weight: 0
+2ndspos(x1,x2)	weight: 0
+   top(x1)	weight: 0
+  rnil()	weight: 0
+#plus(x1,x2)	weight: 0
+square(x1)	weight: 0
+ #top(x1)	weight: 0
+#cons2(x1,x2)	weight: 0
+#square(x1)	weight: x1
+    pi(x1)	weight: 0
+#rcons(x1,x2)	weight: 0
+ rcons(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+#times(x1,x2)	weight: 0
+     0()	weight: 0
+#posrecip(x1)	weight: 0
+  from(x1)	weight: 0
+ times(x1,x2)	weight: 0
+   #s(x1)	weight: 0
+   nil()	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+2ndsneg(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+  plus(x1,x2)	weight: 0
+#2ndspos(x1,x2)	weight: 0
+ cons2(x1,x2)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+  #pi(x1)	weight: 0
+#2ndsneg(x1,x2)	weight: 0
+posrecip(x1)	weight: 0
+    Usable rules: { }
+    Removed DPs: #43 #63
+Number of SCCs: 15, DPs: 69, edges: 801
+	SCC { #32 #77 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+negrecip(x1)	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+#negrecip(x1)	weight: 0
+2ndspos(x1,x2)	weight: 0
+   top(x1)	weight: 0
+  rnil()	weight: 0
+#plus(x1,x2)	weight: 0
+square(x1)	weight: 0
+ #top(x1)	weight: 0
+#cons2(x1,x2)	weight: 0
+#square(x1)	weight: 0
+    pi(x1)	weight: 0
+#rcons(x1,x2)	weight: 0
+ rcons(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+#times(x1,x2)	weight: 0
+     0()	weight: 0
+#posrecip(x1)	weight: x1
+  from(x1)	weight: 0
+ times(x1,x2)	weight: 0
+   #s(x1)	weight: 0
+   nil()	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+2ndsneg(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+  plus(x1,x2)	weight: 0
+#2ndspos(x1,x2)	weight: 0
+ cons2(x1,x2)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+  #pi(x1)	weight: 0
+#2ndsneg(x1,x2)	weight: 0
+posrecip(x1)	weight: 0
+    Usable rules: { }
+    Removed DPs: #32 #77
+Number of SCCs: 14, DPs: 67, edges: 797
+	SCC { #16 #79 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+negrecip(x1)	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+#negrecip(x1)	weight: 0
+2ndspos(x1,x2)	weight: 0
+   top(x1)	weight: 0
+  rnil()	weight: 0
+#plus(x1,x2)	weight: 0
+square(x1)	weight: 0
+ #top(x1)	weight: 0
+#cons2(x1,x2)	weight: 0
+#square(x1)	weight: 0
+    pi(x1)	weight: 0
+#rcons(x1,x2)	weight: 0
+ rcons(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+#times(x1,x2)	weight: 0
+     0()	weight: 0
+#posrecip(x1)	weight: 0
+  from(x1)	weight: 0
+ times(x1,x2)	weight: 0
+   #s(x1)	weight: 0
+   nil()	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+2ndsneg(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+  plus(x1,x2)	weight: 0
+#2ndspos(x1,x2)	weight: 0
+ cons2(x1,x2)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+  #pi(x1)	weight: x1
+#2ndsneg(x1,x2)	weight: 0
+posrecip(x1)	weight: 0
+    Usable rules: { }
+    Removed DPs: #16 #79
+Number of SCCs: 13, DPs: 65, edges: 793
+	SCC { #5 #94 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+negrecip(x1)	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+#negrecip(x1)	weight: 0
+2ndspos(x1,x2)	weight: 0
+   top(x1)	weight: 0
+  rnil()	weight: 0
+#plus(x1,x2)	weight: 0
+square(x1)	weight: 0
+ #top(x1)	weight: 0
+#cons2(x1,x2)	weight: 0
+#square(x1)	weight: 0
+    pi(x1)	weight: 0
+#rcons(x1,x2)	weight: 0
+ rcons(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+#times(x1,x2)	weight: 0
+     0()	weight: 0
+#posrecip(x1)	weight: 0
+  from(x1)	weight: 0
+ times(x1,x2)	weight: 0
+   #s(x1)	weight: x1
+   nil()	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+2ndsneg(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+  plus(x1,x2)	weight: 0
+#2ndspos(x1,x2)	weight: 0
+ cons2(x1,x2)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+  #pi(x1)	weight: 0
+#2ndsneg(x1,x2)	weight: 0
+posrecip(x1)	weight: 0
+    Usable rules: { }
+    Removed DPs: #5 #94
+Number of SCCs: 12, DPs: 63, edges: 789
+	SCC { #71 #78 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+negrecip(x1)	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+#negrecip(x1)	weight: 0
+2ndspos(x1,x2)	weight: 0
+   top(x1)	weight: 0
+  rnil()	weight: 0
+#plus(x1,x2)	weight: 0
+square(x1)	weight: 0
+ #top(x1)	weight: 0
+#cons2(x1,x2)	weight: 0
+#square(x1)	weight: 0
+    pi(x1)	weight: 0
+#rcons(x1,x2)	weight: 0
+ rcons(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+#times(x1,x2)	weight: 0
+     0()	weight: 0
+#posrecip(x1)	weight: 0
+  from(x1)	weight: 0
+ times(x1,x2)	weight: 0
+   #s(x1)	weight: 0
+   nil()	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+2ndsneg(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+  plus(x1,x2)	weight: 0
+#2ndspos(x1,x2)	weight: 0
+ cons2(x1,x2)	weight: 0
+#from(x1)	weight: x1
+active(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+  #pi(x1)	weight: 0
+#2ndsneg(x1,x2)	weight: 0
+posrecip(x1)	weight: 0
+    Usable rules: { }
+    Removed DPs: #71 #78
+Number of SCCs: 11, DPs: 61, edges: 785
+	SCC { #86 #102 }
+Removing DPs: Order(PosReal,>,Sum)... succeeded.
+negrecip(x1)	weight: 0
+#cons(x1,x2)	weight: 0
+     s(x1)	weight: 0
+#negrecip(x1)	weight: x1
+2ndspos(x1,x2)	weight: 0
+   top(x1)	weight: 0
+  rnil()	weight: 0
+#plus(x1,x2)	weight: 0
+square(x1)	weight: 0
+ #top(x1)	weight: 0
+#cons2(x1,x2)	weight: 0
+#square(x1)	weight: 0
+    pi(x1)	weight: 0
+#rcons(x1,x2)	weight: 0
+ rcons(x1,x2)	weight: 0
+proper(x1)	weight: 0
+    ok(x1)	weight: (/ 1 2) + x1
+#times(x1,x2)	weight: 0
+     0()	weight: 0
+#posrecip(x1)	weight: 0
+  from(x1)	weight: 0
+ times(x1,x2)	weight: 0
+   #s(x1)	weight: 0
+   nil()	weight: 0
+  mark(x1)	weight: (/ 1 2) + x1
+2ndsneg(x1,x2)	weight: 0
+#proper(x1)	weight: 0
+  plus(x1,x2)	weight: 0
+#2ndspos(x1,x2)	weight: 0
+ cons2(x1,x2)	weight: 0
+#from(x1)	weight: 0
+active(x1)	weight: 0
+  cons(x1,x2)	weight: 0
+#active(x1)	weight: 0
+  #pi(x1)	weight: 0
+#2ndsneg(x1,x2)	weight: 0
+posrecip(x1)	weight: 0
+    Usable rules: { }
+    Removed DPs: #86 #102
+Number of SCCs: 10, DPs: 59, edges: 781
+	SCC { #50 #121 }
+Removing DPs: Order(PosReal,>,Sum)... Order(PosReal,>,Max)... QLPOpS... Order(PosReal,>,MaxSum)... QWPOpS(PosReal,>,MaxSum)... Order(PosReal,>,Sum-Sum; PosReal,≥,Sum-Sum)... Order(PosReal,>,Sum-Sum; NegReal,≥,Sum)... Order(PosReal,>,MaxSum-Sum; NegReal,≥,Sum)... failed.
+Removing edges: failed.
+Finding a loop...  failed.

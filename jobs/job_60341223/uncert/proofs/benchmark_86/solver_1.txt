@@ -1,0 +1,108 @@
+YES
+We consider the system jnNMZ.
+
+  Alphabet:
+
+    O : [] --> o 
+    a : [] --> o 
+    f : [o -> o] --> o 
+    g : [o] --> o 
+    h : [o * o] --> o 
+    s : [o] --> o 
+
+  Rules:
+
+    a => f(/\x.g(x)) 
+    f(/\x.X) => a 
+    g(X) => h(X, X) 
+    h(O, X) => X 
+    h(s(X), O) => g(X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  a >? f(/\x.g(x)) 
+  f(/\x.X) >? a 
+  g(X) >? h(X, X) 
+  h(O, X) >? X 
+  h(s(X), O) >? g(X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 3 
+  a = 0 
+  f = Lam[G0].G0(0) 
+  g = Lam[y0].3*y0 
+  h = Lam[y0;y1].y0 + 2*y1 
+  s = Lam[y0].3 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[a]] = 0 >= 0 = [[f(/\x.g(x))]] 
+  [[f(/\x._x0)]] = x0 >= 0 = [[a]] 
+  [[g(_x0)]] = 3*x0 >= 3*x0 = [[h(_x0, _x0)]] 
+  [[h(O, _x0)]] = 3 + 2*x0 > x0 = [[_x0]] 
+  [[h(s(_x0), O)]] = 9 + 3*x0 > 3*x0 = [[g(_x0)]] 
+
+We can thus remove the following rules:
+
+  h(O, X) => X 
+  h(s(X), O) => g(X) 
+
+We observe that the rules contain a first-order subset:
+
+  g(X) => h(X, X) 
+
+Moreover, the system is finitely branching.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is Ce-terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed Ce-terminating:
+
+ || Input TRS:
+ ||     1: g(PeRCenTX) -> h(PeRCenTX,PeRCenTX)
+ ||     2: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     3: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 3
+ || Direct POLO(bPol) ... removes: 1 3 2
+ ||       h 	w: x1 + x2
+ ||       TIlDePAIR	w: 2 * x1 + 2 * x2 + 1
+ ||       g 	w: 2 * x1 + 1
+ || Number of strict rules: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs in [Kop12, Ch. 7.8]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, minimal, all):
+
+  Dependency Pairs P_0:
+
+    0] a# =#> f#(/\x.g(x))   
+    1] a# =#> g#(X)   
+    2] f#(/\x.X) =#> a#   
+
+  Rules R_0:
+
+    a => f(/\x.g(x)) 
+    f(/\x.X) => a 
+    g(X) => h(X, X) 
+
+Thus, the original system is terminating if (P_0, R_0, minimal, all) is finite.
+
+We consider the dependency pair problem (P_0, R_0, minimal, all).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+    * 1 :  
+    * 2 : 0, 1 
+
+This graph has no strongly connected components.  By [Kop12, Thm. 7.31], this implies finiteness of the dependency pair problem.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

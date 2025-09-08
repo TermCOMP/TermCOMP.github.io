@@ -1,0 +1,737 @@
+YES
+We consider the system zmStp.
+
+  Alphabet:
+
+    O : [] --> nat 
+    ascending!6220sort : [list] --> list 
+    cons : [nat * list] --> list 
+    descending!6220sort : [list] --> list 
+    dosort : [list * nat -> nat -> nat * nat -> nat -> nat] --> list 
+    insert : [nat * list * nat -> nat -> nat * nat -> nat -> nat] --> list 
+    max : [nat * nat] --> nat 
+    min : [nat * nat] --> nat 
+    nil : [] --> list 
+    s : [nat] --> nat 
+
+  Rules:
+
+    max(O, X) => X 
+    max(X, O) => X 
+    max(s(X), s(Y)) => s(max(X, Y)) 
+    min(O, X) => O 
+    min(X, O) => O 
+    min(s(X), s(Y)) => s(min(X, Y)) 
+    insert(X, nil, F, G) => cons(X, nil) 
+    insert(X, cons(Y, Z), F, G) => cons(F X Y, insert(G X Y, Z, F, G)) 
+    dosort(nil, F, G) => nil 
+    dosort(cons(X, Y), F, G) => insert(X, dosort(Y, F, G), F, G) 
+    ascending!6220sort(X) => dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+    descending!6220sort(X) => dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  max(O, X) >? X 
+  max(X, O) >? X 
+  max(s(X), s(Y)) >? s(max(X, Y)) 
+  min(O, X) >? O 
+  min(X, O) >? O 
+  min(s(X), s(Y)) >? s(min(X, Y)) 
+  insert(X, nil, F, G) >? cons(X, nil) 
+  insert(X, cons(Y, Z), F, G) >? cons(F X Y, insert(G X Y, Z, F, G)) 
+  dosort(nil, F, G) >? nil 
+  dosort(cons(X, Y), F, G) >? insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >? dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >? dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[insert(x_1, x_2, x_3, x_4)]] = insert(x_2, x_3, x_1, x_4) 
+
+We choose Lex = {insert, max} and Mul = {@_{o -> o -> o}, @_{o -> o}, ascending!6220sort, cons, descending!6220sort, dosort, min, nil, s}, and the following precedence: ascending!6220sort > descending!6220sort > dosort > insert > @_{o -> o -> o} > @_{o -> o} > cons > max > min > nil > s
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  max(_|_, X) >= X 
+  max(X, _|_) >= X 
+  max(s(X), s(Y)) > s(max(X, Y)) 
+  min(_|_, X) >= _|_ 
+  min(X, _|_) >= _|_ 
+  min(s(X), s(Y)) > s(min(X, Y)) 
+  insert(X, nil, F, G) > cons(X, nil) 
+  insert(X, cons(Y, Z), F, G) >= cons(@_{o -> o}(@_{o -> o -> o}(F, X), Y), insert(@_{o -> o}(@_{o -> o -> o}(G, X), Y), Z, F, G)) 
+  dosort(nil, F, G) > nil 
+  dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+With these choices, we have:
+
+  1] max(_|_, X) >= X  because [2], by (Star) 
+  2] max*(_|_, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] max(X, _|_) >= X  because [5], by (Star) 
+  5] max*(X, _|_) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+
+  7] max(s(X), s(Y)) > s(max(X, Y))  because [8], by definition 
+  8] max*(s(X), s(Y)) >= s(max(X, Y))  because max > s and [9], by (Copy) 
+  9] max*(s(X), s(Y)) >= max(X, Y)  because max in Lex, [10], [13] and [15], by (Stat) 
+  10] s(X) > X  because [11], by definition 
+  11] s*(X) >= X  because [12], by (Select) 
+  12] X >= X  by (Meta) 
+  13] max*(s(X), s(Y)) >= X  because [14], by (Select) 
+  14] s(X) >= X  because [11], by (Star) 
+  15] max*(s(X), s(Y)) >= Y  because [16], by (Select) 
+  16] s(Y) >= Y  because [17], by (Star) 
+  17] s*(Y) >= Y  because [18], by (Select) 
+  18] Y >= Y  by (Meta) 
+
+  19] min(_|_, X) >= _|_  by (Bot) 
+
+  20] min(X, _|_) >= _|_  by (Bot) 
+
+  21] min(s(X), s(Y)) > s(min(X, Y))  because [22], by definition 
+  22] min*(s(X), s(Y)) >= s(min(X, Y))  because min > s and [23], by (Copy) 
+  23] min*(s(X), s(Y)) >= min(X, Y)  because min in Mul, [24] and [27], by (Stat) 
+  24] s(X) >= X  because [25], by (Star) 
+  25] s*(X) >= X  because [26], by (Select) 
+  26] X >= X  by (Meta) 
+  27] s(Y) > Y  because [28], by definition 
+  28] s*(Y) >= Y  because [29], by (Select) 
+  29] Y >= Y  by (Meta) 
+
+  30] insert(X, nil, F, G) > cons(X, nil)  because [31], by definition 
+  31] insert*(X, nil, F, G) >= cons(X, nil)  because insert > cons, [32] and [34], by (Copy) 
+  32] insert*(X, nil, F, G) >= X  because [33], by (Select) 
+  33] X >= X  by (Meta) 
+  34] insert*(X, nil, F, G) >= nil  because insert > nil, by (Copy) 
+
+  35] insert(X, cons(Y, Z), F, G) >= cons(@_{o -> o}(@_{o -> o -> o}(F, X), Y), insert(@_{o -> o}(@_{o -> o -> o}(G, X), Y), Z, F, G))  because [36], by (Star) 
+  36] insert*(X, cons(Y, Z), F, G) >= cons(@_{o -> o}(@_{o -> o -> o}(F, X), Y), insert(@_{o -> o}(@_{o -> o -> o}(G, X), Y), Z, F, G))  because insert > cons, [37] and [47], by (Copy) 
+  37] insert*(X, cons(Y, Z), F, G) >= @_{o -> o}(@_{o -> o -> o}(F, X), Y)  because insert > @_{o -> o}, [38] and [43], by (Copy) 
+  38] insert*(X, cons(Y, Z), F, G) >= @_{o -> o -> o}(F, X)  because insert > @_{o -> o -> o}, [39] and [41], by (Copy) 
+  39] insert*(X, cons(Y, Z), F, G) >= F  because [40], by (Select) 
+  40] F >= F  by (Meta) 
+  41] insert*(X, cons(Y, Z), F, G) >= X  because [42], by (Select) 
+  42] X >= X  by (Meta) 
+  43] insert*(X, cons(Y, Z), F, G) >= Y  because [44], by (Select) 
+  44] cons(Y, Z) >= Y  because [45], by (Star) 
+  45] cons*(Y, Z) >= Y  because [46], by (Select) 
+  46] Y >= Y  by (Meta) 
+  47] insert*(X, cons(Y, Z), F, G) >= insert(@_{o -> o}(@_{o -> o -> o}(G, X), Y), Z, F, G)  because insert in Lex, [48], [51], [55], [39] and [53], by (Stat) 
+  48] cons(Y, Z) > Z  because [49], by definition 
+  49] cons*(Y, Z) >= Z  because [50], by (Select) 
+  50] Z >= Z  by (Meta) 
+  51] insert*(X, cons(Y, Z), F, G) >= @_{o -> o}(@_{o -> o -> o}(G, X), Y)  because insert > @_{o -> o}, [52] and [43], by (Copy) 
+  52] insert*(X, cons(Y, Z), F, G) >= @_{o -> o -> o}(G, X)  because insert > @_{o -> o -> o}, [53] and [41], by (Copy) 
+  53] insert*(X, cons(Y, Z), F, G) >= G  because [54], by (Select) 
+  54] G >= G  by (Meta) 
+  55] insert*(X, cons(Y, Z), F, G) >= Z  because [56], by (Select) 
+  56] cons(Y, Z) >= Z  because [49], by (Star) 
+
+  57] dosort(nil, F, G) > nil  because [58], by definition 
+  58] dosort*(nil, F, G) >= nil  because dosort > nil, by (Copy) 
+
+  59] dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because [60], by (Star) 
+  60] dosort*(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because dosort > insert, [61], [65], [71] and [72], by (Copy) 
+  61] dosort*(cons(X, Y), F, G) >= X  because [62], by (Select) 
+  62] cons(X, Y) >= X  because [63], by (Star) 
+  63] cons*(X, Y) >= X  because [64], by (Select) 
+  64] X >= X  by (Meta) 
+  65] dosort*(cons(X, Y), F, G) >= dosort(Y, F, G)  because dosort in Mul, [66], [69] and [70], by (Stat) 
+  66] cons(X, Y) > Y  because [67], by definition 
+  67] cons*(X, Y) >= Y  because [68], by (Select) 
+  68] Y >= Y  by (Meta) 
+  69] F >= F  by (Meta) 
+  70] G >= G  by (Meta) 
+  71] dosort*(cons(X, Y), F, G) >= F  because [69], by (Select) 
+  72] dosort*(cons(X, Y), F, G) >= G  because [70], by (Select) 
+
+  73] ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because [74], by (Star) 
+  74] ascending!6220sort*(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because ascending!6220sort > dosort, [75], [77] and [84], by (Copy) 
+  75] ascending!6220sort*(X) >= X  because [76], by (Select) 
+  76] X >= X  by (Meta) 
+  77] ascending!6220sort*(X) >= /\y./\z.min(y, z)  because [78], by (F-Abs) 
+  78] ascending!6220sort*(X, x) >= /\z.min(x, z)  because [79], by (F-Abs) 
+  79] ascending!6220sort*(X, x, y) >= min(x, y)  because ascending!6220sort > min, [80] and [82], by (Copy) 
+  80] ascending!6220sort*(X, x, y) >= x  because [81], by (Select) 
+  81] x >= x  by (Var) 
+  82] ascending!6220sort*(X, x, y) >= y  because [83], by (Select) 
+  83] y >= y  by (Var) 
+  84] ascending!6220sort*(X) >= /\u./\v.max(u, v)  because [85], by (F-Abs) 
+  85] ascending!6220sort*(X, z) >= /\v.max(z, v)  because [86], by (F-Abs) 
+  86] ascending!6220sort*(X, z, u) >= max(z, u)  because ascending!6220sort > max, [87] and [89], by (Copy) 
+  87] ascending!6220sort*(X, z, u) >= z  because [88], by (Select) 
+  88] z >= z  by (Var) 
+  89] ascending!6220sort*(X, z, u) >= u  because [90], by (Select) 
+  90] u >= u  by (Var) 
+
+  91] descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because [92], by (Star) 
+  92] descending!6220sort*(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because descending!6220sort > dosort, [93], [95] and [102], by (Copy) 
+  93] descending!6220sort*(X) >= X  because [94], by (Select) 
+  94] X >= X  by (Meta) 
+  95] descending!6220sort*(X) >= /\y./\z.max(y, z)  because [96], by (F-Abs) 
+  96] descending!6220sort*(X, x) >= /\z.max(x, z)  because [97], by (F-Abs) 
+  97] descending!6220sort*(X, x, y) >= max(x, y)  because descending!6220sort > max, [98] and [100], by (Copy) 
+  98] descending!6220sort*(X, x, y) >= x  because [99], by (Select) 
+  99] x >= x  by (Var) 
+  100] descending!6220sort*(X, x, y) >= y  because [101], by (Select) 
+  101] y >= y  by (Var) 
+  102] descending!6220sort*(X) >= /\u./\v.min(u, v)  because [103], by (F-Abs) 
+  103] descending!6220sort*(X, z) >= /\v.min(z, v)  because [104], by (F-Abs) 
+  104] descending!6220sort*(X, z, u) >= min(z, u)  because descending!6220sort > min, [105] and [107], by (Copy) 
+  105] descending!6220sort*(X, z, u) >= z  because [106], by (Select) 
+  106] z >= z  by (Var) 
+  107] descending!6220sort*(X, z, u) >= u  because [108], by (Select) 
+  108] u >= u  by (Var) 
+
+We can thus remove the following rules:
+
+  max(s(X), s(Y)) => s(max(X, Y)) 
+  min(s(X), s(Y)) => s(min(X, Y)) 
+  insert(X, nil, F, G) => cons(X, nil) 
+  dosort(nil, F, G) => nil 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  max(O, X) >? X 
+  max(X, O) >? X 
+  min(O, X) >? O 
+  min(X, O) >? O 
+  insert(X, cons(Y, Z), F, G) >? cons(F X Y, insert(G X Y, Z, F, G)) 
+  dosort(cons(X, Y), F, G) >? insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >? dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >? dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[insert(x_1, x_2, x_3, x_4)]] = insert(x_3, x_2, x_1, x_4) 
+
+We choose Lex = {insert} and Mul = {@_{o -> o -> o}, @_{o -> o}, ascending!6220sort, cons, descending!6220sort, dosort, max, min}, and the following precedence: ascending!6220sort > descending!6220sort > dosort > insert > @_{o -> o -> o} > @_{o -> o} > cons > max > min
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  max(_|_, X) >= X 
+  max(X, _|_) >= X 
+  min(_|_, X) >= _|_ 
+  min(X, _|_) >= _|_ 
+  insert(X, cons(Y, Z), F, G) > cons(@_{o -> o}(@_{o -> o -> o}(F, X), Y), insert(@_{o -> o}(@_{o -> o -> o}(G, X), Y), Z, F, G)) 
+  dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+With these choices, we have:
+
+  1] max(_|_, X) >= X  because [2], by (Star) 
+  2] max*(_|_, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] max(X, _|_) >= X  because [5], by (Star) 
+  5] max*(X, _|_) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+
+  7] min(_|_, X) >= _|_  by (Bot) 
+
+  8] min(X, _|_) >= _|_  by (Bot) 
+
+  9] insert(X, cons(Y, Z), F, G) > cons(@_{o -> o}(@_{o -> o -> o}(F, X), Y), insert(@_{o -> o}(@_{o -> o -> o}(G, X), Y), Z, F, G))  because [10], by definition 
+  10] insert*(X, cons(Y, Z), F, G) >= cons(@_{o -> o}(@_{o -> o -> o}(F, X), Y), insert(@_{o -> o}(@_{o -> o -> o}(G, X), Y), Z, F, G))  because insert > cons, [11] and [21], by (Copy) 
+  11] insert*(X, cons(Y, Z), F, G) >= @_{o -> o}(@_{o -> o -> o}(F, X), Y)  because insert > @_{o -> o}, [12] and [17], by (Copy) 
+  12] insert*(X, cons(Y, Z), F, G) >= @_{o -> o -> o}(F, X)  because insert > @_{o -> o -> o}, [13] and [15], by (Copy) 
+  13] insert*(X, cons(Y, Z), F, G) >= F  because [14], by (Select) 
+  14] F >= F  by (Meta) 
+  15] insert*(X, cons(Y, Z), F, G) >= X  because [16], by (Select) 
+  16] X >= X  by (Meta) 
+  17] insert*(X, cons(Y, Z), F, G) >= Y  because [18], by (Select) 
+  18] cons(Y, Z) >= Y  because [19], by (Star) 
+  19] cons*(Y, Z) >= Y  because [20], by (Select) 
+  20] Y >= Y  by (Meta) 
+  21] insert*(X, cons(Y, Z), F, G) >= insert(@_{o -> o}(@_{o -> o -> o}(G, X), Y), Z, F, G)  because insert in Lex, [22], [25], [26], [30], [13] and [28], by (Stat) 
+  22] cons(Y, Z) > Z  because [23], by definition 
+  23] cons*(Y, Z) >= Z  because [24], by (Select) 
+  24] Z >= Z  by (Meta) 
+  25] F >= F  by (Meta) 
+  26] insert*(X, cons(Y, Z), F, G) >= @_{o -> o}(@_{o -> o -> o}(G, X), Y)  because insert > @_{o -> o}, [27] and [17], by (Copy) 
+  27] insert*(X, cons(Y, Z), F, G) >= @_{o -> o -> o}(G, X)  because insert > @_{o -> o -> o}, [28] and [15], by (Copy) 
+  28] insert*(X, cons(Y, Z), F, G) >= G  because [29], by (Select) 
+  29] G >= G  by (Meta) 
+  30] insert*(X, cons(Y, Z), F, G) >= Z  because [31], by (Select) 
+  31] cons(Y, Z) >= Z  because [23], by (Star) 
+
+  32] dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because [33], by (Star) 
+  33] dosort*(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because dosort > insert, [34], [38], [44] and [45], by (Copy) 
+  34] dosort*(cons(X, Y), F, G) >= X  because [35], by (Select) 
+  35] cons(X, Y) >= X  because [36], by (Star) 
+  36] cons*(X, Y) >= X  because [37], by (Select) 
+  37] X >= X  by (Meta) 
+  38] dosort*(cons(X, Y), F, G) >= dosort(Y, F, G)  because dosort in Mul, [39], [42] and [43], by (Stat) 
+  39] cons(X, Y) > Y  because [40], by definition 
+  40] cons*(X, Y) >= Y  because [41], by (Select) 
+  41] Y >= Y  by (Meta) 
+  42] F >= F  by (Meta) 
+  43] G >= G  by (Meta) 
+  44] dosort*(cons(X, Y), F, G) >= F  because [42], by (Select) 
+  45] dosort*(cons(X, Y), F, G) >= G  because [43], by (Select) 
+
+  46] ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because [47], by (Star) 
+  47] ascending!6220sort*(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because ascending!6220sort > dosort, [48], [50] and [57], by (Copy) 
+  48] ascending!6220sort*(X) >= X  because [49], by (Select) 
+  49] X >= X  by (Meta) 
+  50] ascending!6220sort*(X) >= /\y./\z.min(y, z)  because [51], by (F-Abs) 
+  51] ascending!6220sort*(X, x) >= /\z.min(x, z)  because [52], by (F-Abs) 
+  52] ascending!6220sort*(X, x, y) >= min(x, y)  because ascending!6220sort > min, [53] and [55], by (Copy) 
+  53] ascending!6220sort*(X, x, y) >= x  because [54], by (Select) 
+  54] x >= x  by (Var) 
+  55] ascending!6220sort*(X, x, y) >= y  because [56], by (Select) 
+  56] y >= y  by (Var) 
+  57] ascending!6220sort*(X) >= /\u./\v.max(u, v)  because [58], by (F-Abs) 
+  58] ascending!6220sort*(X, z) >= /\v.max(z, v)  because [59], by (F-Abs) 
+  59] ascending!6220sort*(X, z, u) >= max(z, u)  because ascending!6220sort > max, [60] and [62], by (Copy) 
+  60] ascending!6220sort*(X, z, u) >= z  because [61], by (Select) 
+  61] z >= z  by (Var) 
+  62] ascending!6220sort*(X, z, u) >= u  because [63], by (Select) 
+  63] u >= u  by (Var) 
+
+  64] descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because [65], by (Star) 
+  65] descending!6220sort*(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because descending!6220sort > dosort, [66], [68] and [75], by (Copy) 
+  66] descending!6220sort*(X) >= X  because [67], by (Select) 
+  67] X >= X  by (Meta) 
+  68] descending!6220sort*(X) >= /\y./\z.max(y, z)  because [69], by (F-Abs) 
+  69] descending!6220sort*(X, x) >= /\z.max(x, z)  because [70], by (F-Abs) 
+  70] descending!6220sort*(X, x, y) >= max(x, y)  because descending!6220sort > max, [71] and [73], by (Copy) 
+  71] descending!6220sort*(X, x, y) >= x  because [72], by (Select) 
+  72] x >= x  by (Var) 
+  73] descending!6220sort*(X, x, y) >= y  because [74], by (Select) 
+  74] y >= y  by (Var) 
+  75] descending!6220sort*(X) >= /\u./\v.min(u, v)  because [76], by (F-Abs) 
+  76] descending!6220sort*(X, z) >= /\v.min(z, v)  because [77], by (F-Abs) 
+  77] descending!6220sort*(X, z, u) >= min(z, u)  because descending!6220sort > min, [78] and [80], by (Copy) 
+  78] descending!6220sort*(X, z, u) >= z  because [79], by (Select) 
+  79] z >= z  by (Var) 
+  80] descending!6220sort*(X, z, u) >= u  because [81], by (Select) 
+  81] u >= u  by (Var) 
+
+We can thus remove the following rules:
+
+  insert(X, cons(Y, Z), F, G) => cons(F X Y, insert(G X Y, Z, F, G)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  max(O, X) >? X 
+  max(X, O) >? X 
+  min(O, X) >? O 
+  min(X, O) >? O 
+  dosort(cons(X, Y), F, G) >? insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >? dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >? dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {ascending!6220sort, cons, descending!6220sort, dosort, insert, max, min}, and the following precedence: ascending!6220sort > descending!6220sort > cons > max > min > dosort > insert
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  max(_|_, X) > X 
+  max(X, _|_) >= X 
+  min(_|_, X) >= _|_ 
+  min(X, _|_) >= _|_ 
+  dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+With these choices, we have:
+
+  1] max(_|_, X) > X  because [2], by definition 
+  2] max*(_|_, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] max(X, _|_) >= X  because [5], by (Star) 
+  5] max*(X, _|_) >= X  because [6], by (Select) 
+  6] X >= X  by (Meta) 
+
+  7] min(_|_, X) >= _|_  by (Bot) 
+
+  8] min(X, _|_) >= _|_  by (Bot) 
+
+  9] dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because [10], by (Star) 
+  10] dosort*(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because dosort > insert, [11], [15], [21] and [22], by (Copy) 
+  11] dosort*(cons(X, Y), F, G) >= X  because [12], by (Select) 
+  12] cons(X, Y) >= X  because [13], by (Star) 
+  13] cons*(X, Y) >= X  because [14], by (Select) 
+  14] X >= X  by (Meta) 
+  15] dosort*(cons(X, Y), F, G) >= dosort(Y, F, G)  because dosort in Mul, [16], [19] and [20], by (Stat) 
+  16] cons(X, Y) > Y  because [17], by definition 
+  17] cons*(X, Y) >= Y  because [18], by (Select) 
+  18] Y >= Y  by (Meta) 
+  19] F >= F  by (Meta) 
+  20] G >= G  by (Meta) 
+  21] dosort*(cons(X, Y), F, G) >= F  because [19], by (Select) 
+  22] dosort*(cons(X, Y), F, G) >= G  because [20], by (Select) 
+
+  23] ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because [24], by (Star) 
+  24] ascending!6220sort*(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because ascending!6220sort > dosort, [25], [27] and [34], by (Copy) 
+  25] ascending!6220sort*(X) >= X  because [26], by (Select) 
+  26] X >= X  by (Meta) 
+  27] ascending!6220sort*(X) >= /\y./\z.min(y, z)  because [28], by (F-Abs) 
+  28] ascending!6220sort*(X, x) >= /\z.min(x, z)  because [29], by (F-Abs) 
+  29] ascending!6220sort*(X, x, y) >= min(x, y)  because ascending!6220sort > min, [30] and [32], by (Copy) 
+  30] ascending!6220sort*(X, x, y) >= x  because [31], by (Select) 
+  31] x >= x  by (Var) 
+  32] ascending!6220sort*(X, x, y) >= y  because [33], by (Select) 
+  33] y >= y  by (Var) 
+  34] ascending!6220sort*(X) >= /\u./\v.max(u, v)  because [35], by (F-Abs) 
+  35] ascending!6220sort*(X, z) >= /\v.max(z, v)  because [36], by (F-Abs) 
+  36] ascending!6220sort*(X, z, u) >= max(z, u)  because ascending!6220sort > max, [37] and [39], by (Copy) 
+  37] ascending!6220sort*(X, z, u) >= z  because [38], by (Select) 
+  38] z >= z  by (Var) 
+  39] ascending!6220sort*(X, z, u) >= u  because [40], by (Select) 
+  40] u >= u  by (Var) 
+
+  41] descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because [42], by (Star) 
+  42] descending!6220sort*(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because descending!6220sort > dosort, [43], [45] and [52], by (Copy) 
+  43] descending!6220sort*(X) >= X  because [44], by (Select) 
+  44] X >= X  by (Meta) 
+  45] descending!6220sort*(X) >= /\y./\z.max(y, z)  because [46], by (F-Abs) 
+  46] descending!6220sort*(X, x) >= /\z.max(x, z)  because [47], by (F-Abs) 
+  47] descending!6220sort*(X, x, y) >= max(x, y)  because descending!6220sort > max, [48] and [50], by (Copy) 
+  48] descending!6220sort*(X, x, y) >= x  because [49], by (Select) 
+  49] x >= x  by (Var) 
+  50] descending!6220sort*(X, x, y) >= y  because [51], by (Select) 
+  51] y >= y  by (Var) 
+  52] descending!6220sort*(X) >= /\u./\v.min(u, v)  because [53], by (F-Abs) 
+  53] descending!6220sort*(X, z) >= /\v.min(z, v)  because [54], by (F-Abs) 
+  54] descending!6220sort*(X, z, u) >= min(z, u)  because descending!6220sort > min, [55] and [57], by (Copy) 
+  55] descending!6220sort*(X, z, u) >= z  because [56], by (Select) 
+  56] z >= z  by (Var) 
+  57] descending!6220sort*(X, z, u) >= u  because [58], by (Select) 
+  58] u >= u  by (Var) 
+
+We can thus remove the following rules:
+
+  max(O, X) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  max(X, O) >? X 
+  min(O, X) >? O 
+  min(X, O) >? O 
+  dosort(cons(X, Y), F, G) >? insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >? dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >? dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {ascending!6220sort, cons, descending!6220sort, dosort, insert, max, min}, and the following precedence: ascending!6220sort > cons > descending!6220sort > dosort > insert > max > min
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  max(X, _|_) > X 
+  min(_|_, X) >= _|_ 
+  min(X, _|_) >= _|_ 
+  dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+With these choices, we have:
+
+  1] max(X, _|_) > X  because [2], by definition 
+  2] max*(X, _|_) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] min(_|_, X) >= _|_  by (Bot) 
+
+  5] min(X, _|_) >= _|_  by (Bot) 
+
+  6] dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because [7], by (Star) 
+  7] dosort*(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because dosort > insert, [8], [12], [18] and [19], by (Copy) 
+  8] dosort*(cons(X, Y), F, G) >= X  because [9], by (Select) 
+  9] cons(X, Y) >= X  because [10], by (Star) 
+  10] cons*(X, Y) >= X  because [11], by (Select) 
+  11] X >= X  by (Meta) 
+  12] dosort*(cons(X, Y), F, G) >= dosort(Y, F, G)  because dosort in Mul, [13], [16] and [17], by (Stat) 
+  13] cons(X, Y) > Y  because [14], by definition 
+  14] cons*(X, Y) >= Y  because [15], by (Select) 
+  15] Y >= Y  by (Meta) 
+  16] F >= F  by (Meta) 
+  17] G >= G  by (Meta) 
+  18] dosort*(cons(X, Y), F, G) >= F  because [16], by (Select) 
+  19] dosort*(cons(X, Y), F, G) >= G  because [17], by (Select) 
+
+  20] ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because [21], by (Star) 
+  21] ascending!6220sort*(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because ascending!6220sort > dosort, [22], [24] and [31], by (Copy) 
+  22] ascending!6220sort*(X) >= X  because [23], by (Select) 
+  23] X >= X  by (Meta) 
+  24] ascending!6220sort*(X) >= /\y./\z.min(y, z)  because [25], by (F-Abs) 
+  25] ascending!6220sort*(X, x) >= /\z.min(x, z)  because [26], by (F-Abs) 
+  26] ascending!6220sort*(X, x, y) >= min(x, y)  because ascending!6220sort > min, [27] and [29], by (Copy) 
+  27] ascending!6220sort*(X, x, y) >= x  because [28], by (Select) 
+  28] x >= x  by (Var) 
+  29] ascending!6220sort*(X, x, y) >= y  because [30], by (Select) 
+  30] y >= y  by (Var) 
+  31] ascending!6220sort*(X) >= /\u./\v.max(u, v)  because [32], by (F-Abs) 
+  32] ascending!6220sort*(X, z) >= /\v.max(z, v)  because [33], by (F-Abs) 
+  33] ascending!6220sort*(X, z, u) >= max(z, u)  because ascending!6220sort > max, [34] and [36], by (Copy) 
+  34] ascending!6220sort*(X, z, u) >= z  because [35], by (Select) 
+  35] z >= z  by (Var) 
+  36] ascending!6220sort*(X, z, u) >= u  because [37], by (Select) 
+  37] u >= u  by (Var) 
+
+  38] descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because [39], by (Star) 
+  39] descending!6220sort*(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because descending!6220sort > dosort, [40], [42] and [49], by (Copy) 
+  40] descending!6220sort*(X) >= X  because [41], by (Select) 
+  41] X >= X  by (Meta) 
+  42] descending!6220sort*(X) >= /\y./\z.max(y, z)  because [43], by (F-Abs) 
+  43] descending!6220sort*(X, x) >= /\z.max(x, z)  because [44], by (F-Abs) 
+  44] descending!6220sort*(X, x, y) >= max(x, y)  because descending!6220sort > max, [45] and [47], by (Copy) 
+  45] descending!6220sort*(X, x, y) >= x  because [46], by (Select) 
+  46] x >= x  by (Var) 
+  47] descending!6220sort*(X, x, y) >= y  because [48], by (Select) 
+  48] y >= y  by (Var) 
+  49] descending!6220sort*(X) >= /\u./\v.min(u, v)  because [50], by (F-Abs) 
+  50] descending!6220sort*(X, z) >= /\v.min(z, v)  because [51], by (F-Abs) 
+  51] descending!6220sort*(X, z, u) >= min(z, u)  because descending!6220sort > min, [52] and [54], by (Copy) 
+  52] descending!6220sort*(X, z, u) >= z  because [53], by (Select) 
+  53] z >= z  by (Var) 
+  54] descending!6220sort*(X, z, u) >= u  because [55], by (Select) 
+  55] u >= u  by (Var) 
+
+We can thus remove the following rules:
+
+  max(X, O) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  min(O, X) >? O 
+  min(X, O) >? O 
+  dosort(cons(X, Y), F, G) >? insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >? dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >? dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {ascending!6220sort, cons, descending!6220sort, dosort, insert, max, min}, and the following precedence: ascending!6220sort > cons > descending!6220sort > dosort > insert > max > min
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  min(_|_, X) > _|_ 
+  min(X, _|_) >= _|_ 
+  dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+With these choices, we have:
+
+  1] min(_|_, X) > _|_  because [2], by definition 
+  2] min*(_|_, X) >= _|_  by (Bot) 
+
+  3] min(X, _|_) >= _|_  by (Bot) 
+
+  4] dosort(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because [5], by (Star) 
+  5] dosort*(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because dosort > insert, [6], [10], [16] and [17], by (Copy) 
+  6] dosort*(cons(X, Y), F, G) >= X  because [7], by (Select) 
+  7] cons(X, Y) >= X  because [8], by (Star) 
+  8] cons*(X, Y) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] dosort*(cons(X, Y), F, G) >= dosort(Y, F, G)  because dosort in Mul, [11], [14] and [15], by (Stat) 
+  11] cons(X, Y) > Y  because [12], by definition 
+  12] cons*(X, Y) >= Y  because [13], by (Select) 
+  13] Y >= Y  by (Meta) 
+  14] F >= F  by (Meta) 
+  15] G >= G  by (Meta) 
+  16] dosort*(cons(X, Y), F, G) >= F  because [14], by (Select) 
+  17] dosort*(cons(X, Y), F, G) >= G  because [15], by (Select) 
+
+  18] ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because [19], by (Star) 
+  19] ascending!6220sort*(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because ascending!6220sort > dosort, [20], [22] and [29], by (Copy) 
+  20] ascending!6220sort*(X) >= X  because [21], by (Select) 
+  21] X >= X  by (Meta) 
+  22] ascending!6220sort*(X) >= /\y./\z.min(y, z)  because [23], by (F-Abs) 
+  23] ascending!6220sort*(X, x) >= /\z.min(x, z)  because [24], by (F-Abs) 
+  24] ascending!6220sort*(X, x, y) >= min(x, y)  because ascending!6220sort > min, [25] and [27], by (Copy) 
+  25] ascending!6220sort*(X, x, y) >= x  because [26], by (Select) 
+  26] x >= x  by (Var) 
+  27] ascending!6220sort*(X, x, y) >= y  because [28], by (Select) 
+  28] y >= y  by (Var) 
+  29] ascending!6220sort*(X) >= /\u./\v.max(u, v)  because [30], by (F-Abs) 
+  30] ascending!6220sort*(X, z) >= /\v.max(z, v)  because [31], by (F-Abs) 
+  31] ascending!6220sort*(X, z, u) >= max(z, u)  because ascending!6220sort > max, [32] and [34], by (Copy) 
+  32] ascending!6220sort*(X, z, u) >= z  because [33], by (Select) 
+  33] z >= z  by (Var) 
+  34] ascending!6220sort*(X, z, u) >= u  because [35], by (Select) 
+  35] u >= u  by (Var) 
+
+  36] descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because [37], by (Star) 
+  37] descending!6220sort*(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because descending!6220sort > dosort, [38], [40] and [47], by (Copy) 
+  38] descending!6220sort*(X) >= X  because [39], by (Select) 
+  39] X >= X  by (Meta) 
+  40] descending!6220sort*(X) >= /\y./\z.max(y, z)  because [41], by (F-Abs) 
+  41] descending!6220sort*(X, x) >= /\z.max(x, z)  because [42], by (F-Abs) 
+  42] descending!6220sort*(X, x, y) >= max(x, y)  because descending!6220sort > max, [43] and [45], by (Copy) 
+  43] descending!6220sort*(X, x, y) >= x  because [44], by (Select) 
+  44] x >= x  by (Var) 
+  45] descending!6220sort*(X, x, y) >= y  because [46], by (Select) 
+  46] y >= y  by (Var) 
+  47] descending!6220sort*(X) >= /\u./\v.min(u, v)  because [48], by (F-Abs) 
+  48] descending!6220sort*(X, z) >= /\v.min(z, v)  because [49], by (F-Abs) 
+  49] descending!6220sort*(X, z, u) >= min(z, u)  because descending!6220sort > min, [50] and [52], by (Copy) 
+  50] descending!6220sort*(X, z, u) >= z  because [51], by (Select) 
+  51] z >= z  by (Var) 
+  52] descending!6220sort*(X, z, u) >= u  because [53], by (Select) 
+  53] u >= u  by (Var) 
+
+We can thus remove the following rules:
+
+  min(O, X) => O 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  min(X, O) >? O 
+  dosort(cons(X, Y), F, G) >? insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >? dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >? dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+
+We choose Lex = {} and Mul = {ascending!6220sort, cons, descending!6220sort, dosort, insert, max, min}, and the following precedence: ascending!6220sort > descending!6220sort > dosort > insert > cons > max > min
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  min(X, _|_) >= _|_ 
+  dosort(cons(X, Y), F, G) > insert(X, dosort(Y, F, G), F, G) 
+  ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+With these choices, we have:
+
+  1] min(X, _|_) >= _|_  by (Bot) 
+
+  2] dosort(cons(X, Y), F, G) > insert(X, dosort(Y, F, G), F, G)  because [3], by definition 
+  3] dosort*(cons(X, Y), F, G) >= insert(X, dosort(Y, F, G), F, G)  because dosort > insert, [4], [8], [14] and [15], by (Copy) 
+  4] dosort*(cons(X, Y), F, G) >= X  because [5], by (Select) 
+  5] cons(X, Y) >= X  because [6], by (Star) 
+  6] cons*(X, Y) >= X  because [7], by (Select) 
+  7] X >= X  by (Meta) 
+  8] dosort*(cons(X, Y), F, G) >= dosort(Y, F, G)  because dosort in Mul, [9], [12] and [13], by (Stat) 
+  9] cons(X, Y) > Y  because [10], by definition 
+  10] cons*(X, Y) >= Y  because [11], by (Select) 
+  11] Y >= Y  by (Meta) 
+  12] F >= F  by (Meta) 
+  13] G >= G  by (Meta) 
+  14] dosort*(cons(X, Y), F, G) >= F  because [12], by (Select) 
+  15] dosort*(cons(X, Y), F, G) >= G  because [13], by (Select) 
+
+  16] ascending!6220sort(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because [17], by (Star) 
+  17] ascending!6220sort*(X) >= dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u))  because ascending!6220sort > dosort, [18], [20] and [27], by (Copy) 
+  18] ascending!6220sort*(X) >= X  because [19], by (Select) 
+  19] X >= X  by (Meta) 
+  20] ascending!6220sort*(X) >= /\y./\z.min(y, z)  because [21], by (F-Abs) 
+  21] ascending!6220sort*(X, x) >= /\z.min(x, z)  because [22], by (F-Abs) 
+  22] ascending!6220sort*(X, x, y) >= min(x, y)  because ascending!6220sort > min, [23] and [25], by (Copy) 
+  23] ascending!6220sort*(X, x, y) >= x  because [24], by (Select) 
+  24] x >= x  by (Var) 
+  25] ascending!6220sort*(X, x, y) >= y  because [26], by (Select) 
+  26] y >= y  by (Var) 
+  27] ascending!6220sort*(X) >= /\u./\v.max(u, v)  because [28], by (F-Abs) 
+  28] ascending!6220sort*(X, z) >= /\v.max(z, v)  because [29], by (F-Abs) 
+  29] ascending!6220sort*(X, z, u) >= max(z, u)  because ascending!6220sort > max, [30] and [32], by (Copy) 
+  30] ascending!6220sort*(X, z, u) >= z  because [31], by (Select) 
+  31] z >= z  by (Var) 
+  32] ascending!6220sort*(X, z, u) >= u  because [33], by (Select) 
+  33] u >= u  by (Var) 
+
+  34] descending!6220sort(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because [35], by (Star) 
+  35] descending!6220sort*(X) >= dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u))  because descending!6220sort > dosort, [36], [38] and [45], by (Copy) 
+  36] descending!6220sort*(X) >= X  because [37], by (Select) 
+  37] X >= X  by (Meta) 
+  38] descending!6220sort*(X) >= /\y./\z.max(y, z)  because [39], by (F-Abs) 
+  39] descending!6220sort*(X, x) >= /\z.max(x, z)  because [40], by (F-Abs) 
+  40] descending!6220sort*(X, x, y) >= max(x, y)  because descending!6220sort > max, [41] and [43], by (Copy) 
+  41] descending!6220sort*(X, x, y) >= x  because [42], by (Select) 
+  42] x >= x  by (Var) 
+  43] descending!6220sort*(X, x, y) >= y  because [44], by (Select) 
+  44] y >= y  by (Var) 
+  45] descending!6220sort*(X) >= /\u./\v.min(u, v)  because [46], by (F-Abs) 
+  46] descending!6220sort*(X, z) >= /\v.min(z, v)  because [47], by (F-Abs) 
+  47] descending!6220sort*(X, z, u) >= min(z, u)  because descending!6220sort > min, [48] and [50], by (Copy) 
+  48] descending!6220sort*(X, z, u) >= z  because [49], by (Select) 
+  49] z >= z  by (Var) 
+  50] descending!6220sort*(X, z, u) >= u  because [51], by (Select) 
+  51] u >= u  by (Var) 
+
+We can thus remove the following rules:
+
+  dosort(cons(X, Y), F, G) => insert(X, dosort(Y, F, G), F, G) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  min(X, O) >? O 
+  ascending!6220sort(X) >? dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) >? dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 2 
+  ascending!6220sort = Lam[y0].3 + 3*y0 
+  descending!6220sort = Lam[y0].3 + 3*y0 
+  dosort = Lam[y0;G1;G2].y0 + G1(0,0) + G2(0,0) 
+  max = Lam[y0;y1].y0 + y1 
+  min = Lam[y0;y1].y0 + 2*y1 
+
+Using this interpretation, the requirements translate to:
+
+  [[min(_x0, O)]] = 4 + x0 > 2 = [[O]] 
+  [[ascending!6220sort(_x0)]] = 3 + 3*x0 > x0 = [[dosort(_x0, /\x./\y.min(x, y), /\z./\u.max(z, u))]] 
+  [[descending!6220sort(_x0)]] = 3 + 3*x0 > x0 = [[dosort(_x0, /\x./\y.max(x, y), /\z./\u.min(z, u))]] 
+
+We can thus remove the following rules:
+
+  min(X, O) => O 
+  ascending!6220sort(X) => dosort(X, /\x./\y.min(x, y), /\z./\u.max(z, u)) 
+  descending!6220sort(X) => dosort(X, /\x./\y.max(x, y), /\z./\u.min(z, u)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

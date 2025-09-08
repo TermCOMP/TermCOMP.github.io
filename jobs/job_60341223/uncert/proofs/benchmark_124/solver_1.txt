@@ -1,0 +1,159 @@
+YES
+We consider the system QQIuz.
+
+  Alphabet:
+
+    O : [] --> nat 
+    cons : [nat * list] --> list 
+    foldr : [nat -> nat -> nat * nat * list] --> nat 
+    length : [list] --> nat 
+    nil : [] --> list 
+    s : [nat] --> nat 
+
+  Rules:
+
+    foldr(F, X, nil) => X 
+    foldr(F, X, cons(Y, Z)) => F Y foldr(F, X, Z) 
+    length(X) => foldr(/\x./\y.s(y), O, X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldr(F, X, nil) >? X 
+  foldr(F, X, cons(Y, Z)) >? F Y foldr(F, X, Z) 
+  length(X) >? foldr(/\x./\y.s(y), O, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[s(x_1)]] = x_1 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, cons, foldr, length, nil}, and the following precedence: cons > length > foldr > @_{o -> o -> o} > @_{o -> o} > nil
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldr(F, X, nil) > X 
+  foldr(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), foldr(F, X, Z)) 
+  length(X) >= foldr(/\x./\y.y, _|_, X) 
+
+With these choices, we have:
+
+  1] foldr(F, X, nil) > X  because [2], by definition 
+  2] foldr*(F, X, nil) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] foldr(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), foldr(F, X, Z))  because [5], by (Star) 
+  5] foldr*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), foldr(F, X, Z))  because foldr > @_{o -> o}, [6] and [13], by (Copy) 
+  6] foldr*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, Y)  because foldr > @_{o -> o -> o}, [7] and [9], by (Copy) 
+  7] foldr*(F, X, cons(Y, Z)) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] foldr*(F, X, cons(Y, Z)) >= Y  because [10], by (Select) 
+  10] cons(Y, Z) >= Y  because [11], by (Star) 
+  11] cons*(Y, Z) >= Y  because [12], by (Select) 
+  12] Y >= Y  by (Meta) 
+  13] foldr*(F, X, cons(Y, Z)) >= foldr(F, X, Z)  because foldr in Mul, [14], [15] and [16], by (Stat) 
+  14] F >= F  by (Meta) 
+  15] X >= X  by (Meta) 
+  16] cons(Y, Z) > Z  because [17], by definition 
+  17] cons*(Y, Z) >= Z  because [18], by (Select) 
+  18] Z >= Z  by (Meta) 
+
+  19] length(X) >= foldr(/\x./\y.y, _|_, X)  because [20], by (Star) 
+  20] length*(X) >= foldr(/\x./\y.y, _|_, X)  because length > foldr, [21], [25] and [26], by (Copy) 
+  21] length*(X) >= /\y./\z.z  because [22], by (F-Abs) 
+  22] length*(X, x) >= /\z.z  because [23], by (F-Abs) 
+  23] length*(X, x, y) >= y  because [24], by (Select) 
+  24] y >= y  by (Var) 
+  25] length*(X) >= _|_  by (Bot) 
+  26] length*(X) >= X  because [27], by (Select) 
+  27] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  foldr(F, X, nil) => X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  foldr(F, X, cons(Y, Z)) >? F Y foldr(F, X, Z) 
+  length(X) >? foldr(/\x./\y.s(y), O, X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[s(x_1)]] = x_1 
+
+We choose Lex = {} and Mul = {@_{o -> o -> o}, @_{o -> o}, cons, foldr, length}, and the following precedence: length > foldr > @_{o -> o -> o} > @_{o -> o} > cons
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  foldr(F, X, cons(Y, Z)) > @_{o -> o}(@_{o -> o -> o}(F, Y), foldr(F, X, Z)) 
+  length(X) >= foldr(/\x./\y.y, _|_, X) 
+
+With these choices, we have:
+
+  1] foldr(F, X, cons(Y, Z)) > @_{o -> o}(@_{o -> o -> o}(F, Y), foldr(F, X, Z))  because [2], by definition 
+  2] foldr*(F, X, cons(Y, Z)) >= @_{o -> o}(@_{o -> o -> o}(F, Y), foldr(F, X, Z))  because foldr > @_{o -> o}, [3] and [10], by (Copy) 
+  3] foldr*(F, X, cons(Y, Z)) >= @_{o -> o -> o}(F, Y)  because foldr > @_{o -> o -> o}, [4] and [6], by (Copy) 
+  4] foldr*(F, X, cons(Y, Z)) >= F  because [5], by (Select) 
+  5] F >= F  by (Meta) 
+  6] foldr*(F, X, cons(Y, Z)) >= Y  because [7], by (Select) 
+  7] cons(Y, Z) >= Y  because [8], by (Star) 
+  8] cons*(Y, Z) >= Y  because [9], by (Select) 
+  9] Y >= Y  by (Meta) 
+  10] foldr*(F, X, cons(Y, Z)) >= foldr(F, X, Z)  because foldr in Mul, [11], [12] and [13], by (Stat) 
+  11] F >= F  by (Meta) 
+  12] X >= X  by (Meta) 
+  13] cons(Y, Z) > Z  because [14], by definition 
+  14] cons*(Y, Z) >= Z  because [15], by (Select) 
+  15] Z >= Z  by (Meta) 
+
+  16] length(X) >= foldr(/\x./\y.y, _|_, X)  because [17], by (Star) 
+  17] length*(X) >= foldr(/\x./\y.y, _|_, X)  because length > foldr, [18], [22] and [23], by (Copy) 
+  18] length*(X) >= /\y./\z.z  because [19], by (F-Abs) 
+  19] length*(X, x) >= /\z.z  because [20], by (F-Abs) 
+  20] length*(X, x, y) >= y  because [21], by (Select) 
+  21] y >= y  by (Var) 
+  22] length*(X) >= _|_  by (Bot) 
+  23] length*(X) >= X  because [24], by (Select) 
+  24] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  foldr(F, X, cons(Y, Z)) => F Y foldr(F, X, Z) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  length(X) >? foldr(/\x./\y.s(y), O, X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  foldr = Lam[G0;y1;y2].y1 + y2 + G0(0,0) 
+  length = Lam[y0].3 + 3*y0 
+  s = Lam[y0].y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[length(_x0)]] = 3 + 3*x0 > x0 = [[foldr(/\x./\y.s(y), O, _x0)]] 
+
+We can thus remove the following rules:
+
+  length(X) => foldr(/\x./\y.s(y), O, X) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

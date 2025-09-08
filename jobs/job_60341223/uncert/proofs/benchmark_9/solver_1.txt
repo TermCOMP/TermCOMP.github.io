@@ -1,0 +1,384 @@
+YES
+We consider the system h7mGW.
+
+  Alphabet:
+
+    id : [N] --> N 
+    plus1 : [(N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    plus2 : [(((N -> N) -> N -> N) -> (N -> N) -> N -> N) -> ((N -> N) -> N -> N) -> (N -> N) -> N -> N * (((N -> N) -> N -> N) -> (N -> N) -> N -> N) -> ((N -> N) -> N -> N) -> (N -> N) -> N -> N * ((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    succ1 : [(N -> N) -> N -> N * N -> N * N] --> N 
+    succ2 : [(((N -> N) -> N -> N) -> (N -> N) -> N -> N) -> ((N -> N) -> N -> N) -> (N -> N) -> N -> N * ((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    two1 : [N -> N * N] --> N 
+    two2 : [((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    zero1 : [N -> N * N] --> N 
+    zero2 : [((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+
+  Rules:
+
+    id(X) => X 
+    zero1(F, X) => X 
+    two1(F, X) => F (F X) 
+    succ1(F, G, X) => G (F G X) 
+    plus1(F, G, H, X) => F H (G H X) 
+    zero2(F, G, H, X) => G H X 
+    two2(F, G, H, X) => F (F G) H X 
+    succ2(F, G, H, I, X) => G (F G H) I X 
+    plus2(F, G, H, I, J, X) => F H (G H I) J X 
+
+Symbol id is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    plus1 : [(N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    plus2 : [(((N -> N) -> N -> N) -> (N -> N) -> N -> N) -> ((N -> N) -> N -> N) -> (N -> N) -> N -> N * (((N -> N) -> N -> N) -> (N -> N) -> N -> N) -> ((N -> N) -> N -> N) -> (N -> N) -> N -> N * ((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    succ1 : [(N -> N) -> N -> N * N -> N * N] --> N 
+    succ2 : [(((N -> N) -> N -> N) -> (N -> N) -> N -> N) -> ((N -> N) -> N -> N) -> (N -> N) -> N -> N * ((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    two1 : [N -> N * N] --> N 
+    two2 : [((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+    zero1 : [N -> N * N] --> N 
+    zero2 : [((N -> N) -> N -> N) -> (N -> N) -> N -> N * (N -> N) -> N -> N * N -> N * N] --> N 
+
+  Rules:
+
+    zero1(F, X) => X 
+    two1(F, X) => F (F X) 
+    succ1(F, G, X) => G (F G X) 
+    plus1(F, G, H, X) => F H (G H X) 
+    zero2(F, G, H, X) => G H X 
+    two2(F, G, H, X) => F (F G) H X 
+    succ2(F, G, H, I, X) => G (F G H) I X 
+    plus2(F, G, H, I, J, X) => F H (G H I) J X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  zero1(F, X) >? X 
+  two1(F, X) >? F (F X) 
+  succ1(F, G, X) >? G (F G X) 
+  plus1(F, G, H, X) >? F H (G H X) 
+  zero2(F, G, H, X) >? G H X 
+  two2(F, G, H, X) >? F (F G) H X 
+  succ2(F, G, H, I, X) >? G (F G H) I X 
+  plus2(F, G, H, I, J, X) >? F H (G H I) J X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{(o -> o) -> o -> o}, @_{o -> o}, plus1, plus2, succ1, succ2, two1, two2, zero1, zero2}, and the following precedence: plus2 = two1 > succ2 > plus1 > two2 > zero2 > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o} > succ1 > @_{o -> o} > @_{(o -> o) -> o -> o} > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o} > zero1
+
+With these choices, we have:
+
+  1] zero1(F, X) > X  because [2], by definition 
+  2] zero1*(F, X) >= X  because [3], by (Select) 
+  3] X >= X  by (Meta) 
+
+  4] two1(F, X) > @_{o -> o}(F, @_{o -> o}(F, X))  because [5], by definition 
+  5] two1*(F, X) >= @_{o -> o}(F, @_{o -> o}(F, X))  because two1 > @_{o -> o}, [6] and [8], by (Copy) 
+  6] two1*(F, X) >= F  because [7], by (Select) 
+  7] F >= F  by (Meta) 
+  8] two1*(F, X) >= @_{o -> o}(F, X)  because two1 > @_{o -> o}, [6] and [9], by (Copy) 
+  9] two1*(F, X) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+
+  11] succ1(F, G, X) >= @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because [12], by (Star) 
+  12] succ1*(F, G, X) >= @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because succ1 > @_{o -> o}, [13] and [15], by (Copy) 
+  13] succ1*(F, G, X) >= G  because [14], by (Select) 
+  14] G >= G  by (Meta) 
+  15] succ1*(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X)  because succ1 > @_{o -> o}, [16] and [19], by (Copy) 
+  16] succ1*(F, G, X) >= @_{(o -> o) -> o -> o}(F, G)  because succ1 > @_{(o -> o) -> o -> o}, [17] and [13], by (Copy) 
+  17] succ1*(F, G, X) >= F  because [18], by (Select) 
+  18] F >= F  by (Meta) 
+  19] succ1*(F, G, X) >= X  because [20], by (Select) 
+  20] X >= X  by (Meta) 
+
+  21] plus1(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, H), @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X))  because [22], by (Star) 
+  22] plus1*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, H), @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X))  because plus1 > @_{o -> o}, [23] and [28], by (Copy) 
+  23] plus1*(F, G, H, X) >= @_{(o -> o) -> o -> o}(F, H)  because plus1 > @_{(o -> o) -> o -> o}, [24] and [26], by (Copy) 
+  24] plus1*(F, G, H, X) >= F  because [25], by (Select) 
+  25] F >= F  by (Meta) 
+  26] plus1*(F, G, H, X) >= H  because [27], by (Select) 
+  27] H >= H  by (Meta) 
+  28] plus1*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X)  because plus1 > @_{o -> o}, [29] and [32], by (Copy) 
+  29] plus1*(F, G, H, X) >= @_{(o -> o) -> o -> o}(G, H)  because plus1 > @_{(o -> o) -> o -> o}, [30] and [26], by (Copy) 
+  30] plus1*(F, G, H, X) >= G  because [31], by (Select) 
+  31] G >= G  by (Meta) 
+  32] plus1*(F, G, H, X) >= X  because [33], by (Select) 
+  33] X >= X  by (Meta) 
+
+  34] zero2(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X)  because [35], by (Star) 
+  35] zero2*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X)  because zero2 > @_{o -> o}, [36] and [41], by (Copy) 
+  36] zero2*(F, G, H, X) >= @_{(o -> o) -> o -> o}(G, H)  because zero2 > @_{(o -> o) -> o -> o}, [37] and [39], by (Copy) 
+  37] zero2*(F, G, H, X) >= G  because [38], by (Select) 
+  38] G >= G  by (Meta) 
+  39] zero2*(F, G, H, X) >= H  because [40], by (Select) 
+  40] H >= H  by (Meta) 
+  41] zero2*(F, G, H, X) >= X  because [42], by (Select) 
+  42] X >= X  by (Meta) 
+
+  43] two2(F, G, H, X) > @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)), H), X)  because [44], by definition 
+  44] two2*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)), H), X)  because two2 > @_{o -> o}, [45] and [54], by (Copy) 
+  45] two2*(F, G, H, X) >= @_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)), H)  because two2 > @_{(o -> o) -> o -> o}, [46] and [52], by (Copy) 
+  46] two2*(F, G, H, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G))  because two2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [47] and [49], by (Copy) 
+  47] two2*(F, G, H, X) >= F  because [48], by (Select) 
+  48] F >= F  by (Meta) 
+  49] two2*(F, G, H, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)  because two2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [47] and [50], by (Copy) 
+  50] two2*(F, G, H, X) >= G  because [51], by (Select) 
+  51] G >= G  by (Meta) 
+  52] two2*(F, G, H, X) >= H  because [53], by (Select) 
+  53] H >= H  by (Meta) 
+  54] two2*(F, G, H, X) >= X  because [55], by (Select) 
+  55] X >= X  by (Meta) 
+
+  56] succ2(F, G, H, I, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I), X)  because [57], by (Star) 
+  57] succ2*(F, G, H, I, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I), X)  because succ2 > @_{o -> o}, [58] and [70], by (Copy) 
+  58] succ2*(F, G, H, I, X) >= @_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I)  because succ2 > @_{(o -> o) -> o -> o}, [59] and [68], by (Copy) 
+  59] succ2*(F, G, H, I, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H))  because succ2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [60] and [62], by (Copy) 
+  60] succ2*(F, G, H, I, X) >= G  because [61], by (Select) 
+  61] G >= G  by (Meta) 
+  62] succ2*(F, G, H, I, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)  because succ2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [63] and [66], by (Copy) 
+  63] succ2*(F, G, H, I, X) >= @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)  because succ2 > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [64] and [60], by (Copy) 
+  64] succ2*(F, G, H, I, X) >= F  because [65], by (Select) 
+  65] F >= F  by (Meta) 
+  66] succ2*(F, G, H, I, X) >= H  because [67], by (Select) 
+  67] H >= H  by (Meta) 
+  68] succ2*(F, G, H, I, X) >= I  because [69], by (Select) 
+  69] I >= I  by (Meta) 
+  70] succ2*(F, G, H, I, X) >= X  because [71], by (Select) 
+  71] X >= X  by (Meta) 
+
+  72] plus2(F, G, H, I, J, X) > @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, H), @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, H), I)), J), X)  because [73], by definition 
+  73] plus2*(F, G, H, I, J, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, H), @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, H), I)), J), X)  because plus2 > @_{o -> o}, [74] and [89], by (Copy) 
+  74] plus2*(F, G, H, I, J, X) >= @_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, H), @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, H), I)), J)  because plus2 > @_{(o -> o) -> o -> o}, [75] and [87], by (Copy) 
+  75] plus2*(F, G, H, I, J, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, H), @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, H), I))  because plus2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [76] and [81], by (Copy) 
+  76] plus2*(F, G, H, I, J, X) >= @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, H)  because plus2 > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [77] and [79], by (Copy) 
+  77] plus2*(F, G, H, I, J, X) >= F  because [78], by (Select) 
+  78] F >= F  by (Meta) 
+  79] plus2*(F, G, H, I, J, X) >= H  because [80], by (Select) 
+  80] H >= H  by (Meta) 
+  81] plus2*(F, G, H, I, J, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, H), I)  because plus2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [82] and [85], by (Copy) 
+  82] plus2*(F, G, H, I, J, X) >= @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, H)  because plus2 > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [83] and [79], by (Copy) 
+  83] plus2*(F, G, H, I, J, X) >= G  because [84], by (Select) 
+  84] G >= G  by (Meta) 
+  85] plus2*(F, G, H, I, J, X) >= I  because [86], by (Select) 
+  86] I >= I  by (Meta) 
+  87] plus2*(F, G, H, I, J, X) >= J  because [88], by (Select) 
+  88] J >= J  by (Meta) 
+  89] plus2*(F, G, H, I, J, X) >= X  because [90], by (Select) 
+  90] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  zero1(F, X) => X 
+  two1(F, X) => F (F X) 
+  two2(F, G, H, X) => F (F G) H X 
+  plus2(F, G, H, I, J, X) => F H (G H I) J X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ1(F, G, X) >? G (F G X) 
+  plus1(F, G, H, X) >? F H (G H X) 
+  zero2(F, G, H, X) >? G H X 
+  succ2(F, G, H, I, X) >? G (F G H) I X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{(o -> o) -> o -> o}, @_{o -> o}, plus1, succ1, succ2, zero2}, and the following precedence: plus1 > succ1 > succ2 > zero2 > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o} > @_{o -> o} > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o} > @_{(o -> o) -> o -> o}
+
+With these choices, we have:
+
+  1] succ1(F, G, X) >= @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because [2], by (Star) 
+  2] succ1*(F, G, X) >= @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because succ1 > @_{o -> o}, [3] and [5], by (Copy) 
+  3] succ1*(F, G, X) >= G  because [4], by (Select) 
+  4] G >= G  by (Meta) 
+  5] succ1*(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X)  because succ1 > @_{o -> o}, [6] and [9], by (Copy) 
+  6] succ1*(F, G, X) >= @_{(o -> o) -> o -> o}(F, G)  because succ1 > @_{(o -> o) -> o -> o}, [7] and [3], by (Copy) 
+  7] succ1*(F, G, X) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] succ1*(F, G, X) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+
+  11] plus1(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, H), @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X))  because [12], by (Star) 
+  12] plus1*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, H), @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X))  because plus1 > @_{o -> o}, [13] and [18], by (Copy) 
+  13] plus1*(F, G, H, X) >= @_{(o -> o) -> o -> o}(F, H)  because plus1 > @_{(o -> o) -> o -> o}, [14] and [16], by (Copy) 
+  14] plus1*(F, G, H, X) >= F  because [15], by (Select) 
+  15] F >= F  by (Meta) 
+  16] plus1*(F, G, H, X) >= H  because [17], by (Select) 
+  17] H >= H  by (Meta) 
+  18] plus1*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X)  because plus1 > @_{o -> o}, [19] and [22], by (Copy) 
+  19] plus1*(F, G, H, X) >= @_{(o -> o) -> o -> o}(G, H)  because plus1 > @_{(o -> o) -> o -> o}, [20] and [16], by (Copy) 
+  20] plus1*(F, G, H, X) >= G  because [21], by (Select) 
+  21] G >= G  by (Meta) 
+  22] plus1*(F, G, H, X) >= X  because [23], by (Select) 
+  23] X >= X  by (Meta) 
+
+  24] zero2(F, G, H, X) > @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X)  because [25], by definition 
+  25] zero2*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X)  because zero2 > @_{o -> o}, [26] and [31], by (Copy) 
+  26] zero2*(F, G, H, X) >= @_{(o -> o) -> o -> o}(G, H)  because zero2 > @_{(o -> o) -> o -> o}, [27] and [29], by (Copy) 
+  27] zero2*(F, G, H, X) >= G  because [28], by (Select) 
+  28] G >= G  by (Meta) 
+  29] zero2*(F, G, H, X) >= H  because [30], by (Select) 
+  30] H >= H  by (Meta) 
+  31] zero2*(F, G, H, X) >= X  because [32], by (Select) 
+  32] X >= X  by (Meta) 
+
+  33] succ2(F, G, H, I, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I), X)  because [34], by (Star) 
+  34] succ2*(F, G, H, I, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I), X)  because succ2 > @_{o -> o}, [35] and [47], by (Copy) 
+  35] succ2*(F, G, H, I, X) >= @_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I)  because succ2 > @_{(o -> o) -> o -> o}, [36] and [45], by (Copy) 
+  36] succ2*(F, G, H, I, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H))  because succ2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [37] and [39], by (Copy) 
+  37] succ2*(F, G, H, I, X) >= G  because [38], by (Select) 
+  38] G >= G  by (Meta) 
+  39] succ2*(F, G, H, I, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)  because succ2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [40] and [43], by (Copy) 
+  40] succ2*(F, G, H, I, X) >= @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)  because succ2 > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [41] and [37], by (Copy) 
+  41] succ2*(F, G, H, I, X) >= F  because [42], by (Select) 
+  42] F >= F  by (Meta) 
+  43] succ2*(F, G, H, I, X) >= H  because [44], by (Select) 
+  44] H >= H  by (Meta) 
+  45] succ2*(F, G, H, I, X) >= I  because [46], by (Select) 
+  46] I >= I  by (Meta) 
+  47] succ2*(F, G, H, I, X) >= X  because [48], by (Select) 
+  48] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  zero2(F, G, H, X) => G H X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ1(F, G, X) >? G (F G X) 
+  plus1(F, G, H, X) >? F H (G H X) 
+  succ2(F, G, H, I, X) >? G (F G H) I X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{(o -> o) -> o -> o}, @_{o -> o}, plus1, succ1, succ2}, and the following precedence: plus1 > succ1 > succ2 > @_{o -> o} > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o} > @_{(o -> o) -> o -> o} > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}
+
+With these choices, we have:
+
+  1] succ1(F, G, X) >= @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because [2], by (Star) 
+  2] succ1*(F, G, X) >= @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because succ1 > @_{o -> o}, [3] and [5], by (Copy) 
+  3] succ1*(F, G, X) >= G  because [4], by (Select) 
+  4] G >= G  by (Meta) 
+  5] succ1*(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X)  because succ1 > @_{o -> o}, [6] and [9], by (Copy) 
+  6] succ1*(F, G, X) >= @_{(o -> o) -> o -> o}(F, G)  because succ1 > @_{(o -> o) -> o -> o}, [7] and [3], by (Copy) 
+  7] succ1*(F, G, X) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] succ1*(F, G, X) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+
+  11] plus1(F, G, H, X) > @_{o -> o}(@_{(o -> o) -> o -> o}(F, H), @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X))  because [12], by definition 
+  12] plus1*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, H), @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X))  because plus1 > @_{o -> o}, [13] and [18], by (Copy) 
+  13] plus1*(F, G, H, X) >= @_{(o -> o) -> o -> o}(F, H)  because plus1 > @_{(o -> o) -> o -> o}, [14] and [16], by (Copy) 
+  14] plus1*(F, G, H, X) >= F  because [15], by (Select) 
+  15] F >= F  by (Meta) 
+  16] plus1*(F, G, H, X) >= H  because [17], by (Select) 
+  17] H >= H  by (Meta) 
+  18] plus1*(F, G, H, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(G, H), X)  because plus1 > @_{o -> o}, [19] and [22], by (Copy) 
+  19] plus1*(F, G, H, X) >= @_{(o -> o) -> o -> o}(G, H)  because plus1 > @_{(o -> o) -> o -> o}, [20] and [16], by (Copy) 
+  20] plus1*(F, G, H, X) >= G  because [21], by (Select) 
+  21] G >= G  by (Meta) 
+  22] plus1*(F, G, H, X) >= X  because [23], by (Select) 
+  23] X >= X  by (Meta) 
+
+  24] succ2(F, G, H, I, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I), X)  because [25], by (Star) 
+  25] succ2*(F, G, H, I, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I), X)  because succ2 > @_{o -> o}, [26] and [38], by (Copy) 
+  26] succ2*(F, G, H, I, X) >= @_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I)  because succ2 > @_{(o -> o) -> o -> o}, [27] and [36], by (Copy) 
+  27] succ2*(F, G, H, I, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H))  because succ2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [28] and [30], by (Copy) 
+  28] succ2*(F, G, H, I, X) >= G  because [29], by (Select) 
+  29] G >= G  by (Meta) 
+  30] succ2*(F, G, H, I, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)  because succ2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [31] and [34], by (Copy) 
+  31] succ2*(F, G, H, I, X) >= @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)  because succ2 > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [32] and [28], by (Copy) 
+  32] succ2*(F, G, H, I, X) >= F  because [33], by (Select) 
+  33] F >= F  by (Meta) 
+  34] succ2*(F, G, H, I, X) >= H  because [35], by (Select) 
+  35] H >= H  by (Meta) 
+  36] succ2*(F, G, H, I, X) >= I  because [37], by (Select) 
+  37] I >= I  by (Meta) 
+  38] succ2*(F, G, H, I, X) >= X  because [39], by (Select) 
+  39] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  plus1(F, G, H, X) => F H (G H X) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ1(F, G, X) >? G (F G X) 
+  succ2(F, G, H, I, X) >? G (F G H) I X 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, @_{(o -> o) -> o -> o}, @_{o -> o}, succ1, succ2}, and the following precedence: succ1 > succ2 > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o} > @_{o -> o} > @_{(o -> o) -> o -> o} > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}
+
+With these choices, we have:
+
+  1] succ1(F, G, X) >= @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because [2], by (Star) 
+  2] succ1*(F, G, X) >= @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because succ1 > @_{o -> o}, [3] and [5], by (Copy) 
+  3] succ1*(F, G, X) >= G  because [4], by (Select) 
+  4] G >= G  by (Meta) 
+  5] succ1*(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X)  because succ1 > @_{o -> o}, [6] and [9], by (Copy) 
+  6] succ1*(F, G, X) >= @_{(o -> o) -> o -> o}(F, G)  because succ1 > @_{(o -> o) -> o -> o}, [7] and [3], by (Copy) 
+  7] succ1*(F, G, X) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] succ1*(F, G, X) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+
+  11] succ2(F, G, H, I, X) > @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I), X)  because [12], by definition 
+  12] succ2*(F, G, H, I, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I), X)  because succ2 > @_{o -> o}, [13] and [25], by (Copy) 
+  13] succ2*(F, G, H, I, X) >= @_{(o -> o) -> o -> o}(@_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)), I)  because succ2 > @_{(o -> o) -> o -> o}, [14] and [23], by (Copy) 
+  14] succ2*(F, G, H, I, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(G, @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H))  because succ2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [15] and [17], by (Copy) 
+  15] succ2*(F, G, H, I, X) >= G  because [16], by (Select) 
+  16] G >= G  by (Meta) 
+  17] succ2*(F, G, H, I, X) >= @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}(@_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G), H)  because succ2 > @_{((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [18] and [21], by (Copy) 
+  18] succ2*(F, G, H, I, X) >= @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}(F, G)  because succ2 > @_{(((o -> o) -> o -> o) -> (o -> o) -> o -> o) -> ((o -> o) -> o -> o) -> (o -> o) -> o -> o}, [19] and [15], by (Copy) 
+  19] succ2*(F, G, H, I, X) >= F  because [20], by (Select) 
+  20] F >= F  by (Meta) 
+  21] succ2*(F, G, H, I, X) >= H  because [22], by (Select) 
+  22] H >= H  by (Meta) 
+  23] succ2*(F, G, H, I, X) >= I  because [24], by (Select) 
+  24] I >= I  by (Meta) 
+  25] succ2*(F, G, H, I, X) >= X  because [26], by (Select) 
+  26] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  succ2(F, G, H, I, X) => G (F G H) I X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  succ1(F, G, X) >? G (F G X) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+We choose Lex = {} and Mul = {@_{(o -> o) -> o -> o}, @_{o -> o}, succ1}, and the following precedence: succ1 > @_{(o -> o) -> o -> o} > @_{o -> o}
+
+With these choices, we have:
+
+  1] succ1(F, G, X) > @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because [2], by definition 
+  2] succ1*(F, G, X) >= @_{o -> o}(G, @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X))  because succ1 > @_{o -> o}, [3] and [5], by (Copy) 
+  3] succ1*(F, G, X) >= G  because [4], by (Select) 
+  4] G >= G  by (Meta) 
+  5] succ1*(F, G, X) >= @_{o -> o}(@_{(o -> o) -> o -> o}(F, G), X)  because succ1 > @_{o -> o}, [6] and [9], by (Copy) 
+  6] succ1*(F, G, X) >= @_{(o -> o) -> o -> o}(F, G)  because succ1 > @_{(o -> o) -> o -> o}, [7] and [3], by (Copy) 
+  7] succ1*(F, G, X) >= F  because [8], by (Select) 
+  8] F >= F  by (Meta) 
+  9] succ1*(F, G, X) >= X  because [10], by (Select) 
+  10] X >= X  by (Meta) 
+
+We can thus remove the following rules:
+
+  succ1(F, G, X) => G (F G X) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

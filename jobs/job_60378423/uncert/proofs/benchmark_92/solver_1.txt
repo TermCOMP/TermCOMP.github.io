@@ -1,0 +1,482 @@
+YES
+proof of /hpcwork/ff862203/termcomp25/benchmarks/DCNNQ.jar
+# AProVE Commit ID: 6a57d5d12fc64508e0a03bd649c96e4df8acddf2 jan-christoph 20250809 unpublished dirty
+
+
+termination of the given Bare JBC problem could be proven:
+
+(0) Bare JBC problem
+(1) BareJBCToJBCProof [EQUIVALENT, 0 ms]
+(2) JBC problem
+(3) JBCToGraph [EQUIVALENT, 224 ms]
+(4) JBCTerminationGraph
+(5) TerminationGraphToSCCProof [SOUND, 0 ms]
+(6) AND
+    (7) JBCTerminationSCC
+        (8) SCCToIRSProof [SOUND, 31 ms]
+        (9) IRSwT
+        (10) IRSFormatTransformerProof [EQUIVALENT, 0 ms]
+        (11) IRSwT
+        (12) IRSwTTerminationDigraphProof [EQUIVALENT, 0 ms]
+        (13) IRSwT
+        (14) IntTRSCompressionProof [EQUIVALENT, 0 ms]
+        (15) IRSwT
+        (16) TempFilterProof [SOUND, 8 ms]
+        (17) IntTRS
+        (18) PolynomialOrderProcessor [EQUIVALENT, 0 ms]
+        (19) YES
+    (20) JBCTerminationSCC
+        (21) SCCToQDPProof [SOUND, 158 ms]
+        (22) QDP
+        (23) MRRProof [EQUIVALENT, 0 ms]
+        (24) QDP
+        (25) PisEmptyProof [EQUIVALENT, 0 ms]
+        (26) YES
+
+
+----------------------------------------
+
+(0)
+Obligation:
+need to prove termination of the following program:
+package AlternatingGrowReduce;
+
+public class AlternatingGrowReduce {
+	AlternatingGrowReduce next;
+
+	public static void main(String[] argv) {
+		Random.args = argv;
+		AlternatingGrowReduce list = createList(Random.random());
+
+		int mode = 0;
+		while (list != null) {
+			if (mode == 0) {
+				list = list.next.next.next.next;
+			} else if (mode == 1) {
+				list = new AlternatingGrowReduce(list);
+			} else if (mode > 1) {
+				list = new AlternatingGrowReduce(new AlternatingGrowReduce(list));
+			}
+
+			mode++;
+			if (mode > 2) {
+				mode = 0;
+			}
+		}
+	}
+
+	public AlternatingGrowReduce(AlternatingGrowReduce old) {
+		this.next = old;
+	}
+
+	public static AlternatingGrowReduce createList(int length) {
+		AlternatingGrowReduce res = new AlternatingGrowReduce(null);
+		while (length > 0) {
+			res = new AlternatingGrowReduce(res);
+			length--;
+		}
+		return res;
+	}
+}
+
+
+package AlternatingGrowReduce;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(1) BareJBCToJBCProof (EQUIVALENT)
+initialized classpath
+----------------------------------------
+
+(2)
+Obligation:
+need to prove termination of the following program:
+package AlternatingGrowReduce;
+
+public class AlternatingGrowReduce {
+	AlternatingGrowReduce next;
+
+	public static void main(String[] argv) {
+		Random.args = argv;
+		AlternatingGrowReduce list = createList(Random.random());
+
+		int mode = 0;
+		while (list != null) {
+			if (mode == 0) {
+				list = list.next.next.next.next;
+			} else if (mode == 1) {
+				list = new AlternatingGrowReduce(list);
+			} else if (mode > 1) {
+				list = new AlternatingGrowReduce(new AlternatingGrowReduce(list));
+			}
+
+			mode++;
+			if (mode > 2) {
+				mode = 0;
+			}
+		}
+	}
+
+	public AlternatingGrowReduce(AlternatingGrowReduce old) {
+		this.next = old;
+	}
+
+	public static AlternatingGrowReduce createList(int length) {
+		AlternatingGrowReduce res = new AlternatingGrowReduce(null);
+		while (length > 0) {
+			res = new AlternatingGrowReduce(res);
+			length--;
+		}
+		return res;
+	}
+}
+
+
+package AlternatingGrowReduce;
+
+public class Random {
+  static String[] args;
+  static int index = 0;
+
+  public static int random() {
+    String string = args[index];
+    index++;
+    return string.length();
+  }
+}
+
+
+
+----------------------------------------
+
+(3) JBCToGraph (EQUIVALENT)
+Constructed TerminationGraph.
+----------------------------------------
+
+(4)
+Obligation:
+Termination Graph based on JBC Program:
+AlternatingGrowReduce.AlternatingGrowReduce.main([Ljava/lang/String;)V: Graph of 253 nodes with 1 SCC.
+
+
+
+AlternatingGrowReduce.AlternatingGrowReduce.createList(I)LAlternatingGrowReduce/AlternatingGrowReduce;: Graph of 34 nodes with 1 SCC.
+
+
+
+
+
+----------------------------------------
+
+(5) TerminationGraphToSCCProof (SOUND)
+Splitted TerminationGraph to 2 SCCss.
+----------------------------------------
+
+(6)
+Complex Obligation (AND)
+
+----------------------------------------
+
+(7)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: AlternatingGrowReduce.AlternatingGrowReduce.createList(I)LAlternatingGrowReduce/AlternatingGrowReduce;
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(8) SCCToIRSProof (SOUND)
+Transformed FIGraph SCCs to intTRSs. Log: 
+Generated rules. Obtained 17 IRulesP rules:
+f679_0_createList_LE(EOS(STATIC_679), i71, i71) -> f694_0_createList_LE(EOS(STATIC_694), i71, i71) :|: TRUE
+f694_0_createList_LE(EOS(STATIC_694), i71, i71) -> f697_0_createList_New(EOS(STATIC_697), i71) :|: i71 > 0
+f697_0_createList_New(EOS(STATIC_697), i71) -> f702_0_createList_Duplicate(EOS(STATIC_702), i71) :|: TRUE
+f702_0_createList_Duplicate(EOS(STATIC_702), i71) -> f706_0_createList_Load(EOS(STATIC_706), i71) :|: TRUE
+f706_0_createList_Load(EOS(STATIC_706), i71) -> f729_0_createList_InvokeMethod(EOS(STATIC_729), i71) :|: TRUE
+f729_0_createList_InvokeMethod(EOS(STATIC_729), i71) -> f762_0__init__Load(EOS(STATIC_762), i71) :|: TRUE
+f762_0__init__Load(EOS(STATIC_762), i71) -> f781_0__init__InvokeMethod(EOS(STATIC_781), i71) :|: TRUE
+f781_0__init__InvokeMethod(EOS(STATIC_781), i71) -> f788_0__init__Load(EOS(STATIC_788), i71) :|: TRUE
+f788_0__init__Load(EOS(STATIC_788), i71) -> f794_0__init__Load(EOS(STATIC_794), i71) :|: TRUE
+f794_0__init__Load(EOS(STATIC_794), i71) -> f800_0__init__FieldAccess(EOS(STATIC_800), i71) :|: TRUE
+f800_0__init__FieldAccess(EOS(STATIC_800), i71) -> f811_0__init__Return(EOS(STATIC_811), i71) :|: TRUE
+f811_0__init__Return(EOS(STATIC_811), i71) -> f817_0_createList_Store(EOS(STATIC_817), i71) :|: TRUE
+f817_0_createList_Store(EOS(STATIC_817), i71) -> f819_0_createList_Inc(EOS(STATIC_819), i71) :|: TRUE
+f819_0_createList_Inc(EOS(STATIC_819), i71) -> f821_0_createList_JMP(EOS(STATIC_821), i71 + -1) :|: TRUE
+f821_0_createList_JMP(EOS(STATIC_821), i88) -> f841_0_createList_Load(EOS(STATIC_841), i88) :|: TRUE
+f841_0_createList_Load(EOS(STATIC_841), i88) -> f672_0_createList_Load(EOS(STATIC_672), i88) :|: TRUE
+f672_0_createList_Load(EOS(STATIC_672), i66) -> f679_0_createList_LE(EOS(STATIC_679), i66, i66) :|: TRUE
+Combined rules. Obtained 1 IRulesP rules:
+f679_0_createList_LE(EOS(STATIC_679), i71:0, i71:0) -> f679_0_createList_LE(EOS(STATIC_679), i71:0 - 1, i71:0 - 1) :|: i71:0 > 0
+Filtered constant ground arguments:
+   f679_0_createList_LE(x1, x2, x3) -> f679_0_createList_LE(x2, x3)
+   EOS(x1) -> EOS
+Filtered duplicate arguments:
+   f679_0_createList_LE(x1, x2) -> f679_0_createList_LE(x2)
+Finished conversion. Obtained 1 rules.P rules:
+f679_0_createList_LE(i71:0) -> f679_0_createList_LE(i71:0 - 1) :|: i71:0 > 0
+
+----------------------------------------
+
+(9)
+Obligation:
+Rules:
+f679_0_createList_LE(i71:0) -> f679_0_createList_LE(i71:0 - 1) :|: i71:0 > 0
+
+----------------------------------------
+
+(10) IRSFormatTransformerProof (EQUIVALENT)
+Reformatted IRS to match normalized format (transformed away non-linear left-hand sides, !=, / and %).
+----------------------------------------
+
+(11)
+Obligation:
+Rules:
+f679_0_createList_LE(i71:0) -> f679_0_createList_LE(arith) :|: i71:0 > 0 && arith = i71:0 - 1
+
+----------------------------------------
+
+(12) IRSwTTerminationDigraphProof (EQUIVALENT)
+Constructed termination digraph!
+Nodes:
+(1) f679_0_createList_LE(i71:0) -> f679_0_createList_LE(arith) :|: i71:0 > 0 && arith = i71:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+----------------------------------------
+
+(13)
+Obligation:
+
+Termination digraph:
+Nodes:
+(1) f679_0_createList_LE(i71:0) -> f679_0_createList_LE(arith) :|: i71:0 > 0 && arith = i71:0 - 1
+
+Arcs:
+(1) -> (1)
+
+This digraph is fully evaluated!
+
+----------------------------------------
+
+(14) IntTRSCompressionProof (EQUIVALENT)
+Compressed rules.
+----------------------------------------
+
+(15)
+Obligation:
+Rules:
+f679_0_createList_LE(i71:0:0) -> f679_0_createList_LE(i71:0:0 - 1) :|: i71:0:0 > 0
+
+----------------------------------------
+
+(16) TempFilterProof (SOUND)
+Used the following sort dictionary for filtering: 
+f679_0_createList_LE(INTEGER)
+Replaced non-predefined constructor symbols by 0.
+----------------------------------------
+
+(17)
+Obligation:
+Rules:
+f679_0_createList_LE(i71:0:0) -> f679_0_createList_LE(c) :|: c = i71:0:0 - 1 && i71:0:0 > 0
+
+----------------------------------------
+
+(18) PolynomialOrderProcessor (EQUIVALENT)
+Found the following polynomial interpretation:
+[f679_0_createList_LE(x)] = x
+
+The following rules are decreasing:
+f679_0_createList_LE(i71:0:0) -> f679_0_createList_LE(c) :|: c = i71:0:0 - 1 && i71:0:0 > 0
+The following rules are bounded:
+f679_0_createList_LE(i71:0:0) -> f679_0_createList_LE(c) :|: c = i71:0:0 - 1 && i71:0:0 > 0
+
+----------------------------------------
+
+(19)
+YES
+
+----------------------------------------
+
+(20)
+Obligation:
+SCC of termination graph based on JBC Program.
+SCC contains nodes from the following methods: AlternatingGrowReduce.AlternatingGrowReduce.main([Ljava/lang/String;)V
+SCC calls the following helper methods: 
+Performed SCC analyses:
+*Used field analysis yielded the following read fields:
+*AlternatingGrowReduce.AlternatingGrowReduce: [next]
+*Marker field analysis yielded the following relations that could be markers:
+
+----------------------------------------
+
+(21) SCCToQDPProof (SOUND)
+Transformed TerminationGraph SCC to QDP. Log: 
+Generated rules. Obtained 81 IRulesP rules:
+f1238_0_main_NULL(EOS(STATIC_1238), java.lang.Object(o217sub), i124, java.lang.Object(o217sub)) -> f1239_0_main_NULL(EOS(STATIC_1239), java.lang.Object(o217sub), i124, java.lang.Object(o217sub)) :|: TRUE
+f1239_0_main_NULL(EOS(STATIC_1239), java.lang.Object(o217sub), i124, java.lang.Object(o217sub)) -> f1241_0_main_Load(EOS(STATIC_1241), java.lang.Object(o217sub), i124) :|: TRUE
+f1241_0_main_Load(EOS(STATIC_1241), java.lang.Object(o217sub), i124) -> f1243_0_main_NE(EOS(STATIC_1243), java.lang.Object(o217sub), i124, i124) :|: TRUE
+f1243_0_main_NE(EOS(STATIC_1243), java.lang.Object(o217sub), i126, i126) -> f1246_0_main_NE(EOS(STATIC_1246), java.lang.Object(o217sub), i126, i126) :|: TRUE
+f1243_0_main_NE(EOS(STATIC_1243), java.lang.Object(o217sub), matching1, matching2) -> f1247_0_main_NE(EOS(STATIC_1247), java.lang.Object(o217sub), 0, 0) :|: TRUE && matching1 = 0 && matching2 = 0
+f1246_0_main_NE(EOS(STATIC_1246), java.lang.Object(o217sub), i126, i126) -> f1248_0_main_Load(EOS(STATIC_1248), java.lang.Object(o217sub), i126) :|: i126 > 0
+f1248_0_main_Load(EOS(STATIC_1248), java.lang.Object(o217sub), i126) -> f1250_0_main_ConstantStackPush(EOS(STATIC_1250), java.lang.Object(o217sub), i126, i126) :|: TRUE
+f1250_0_main_ConstantStackPush(EOS(STATIC_1250), java.lang.Object(o217sub), i126, i126) -> f1253_0_main_NE(EOS(STATIC_1253), java.lang.Object(o217sub), i126, i126, 1) :|: TRUE
+f1253_0_main_NE(EOS(STATIC_1253), java.lang.Object(o217sub), matching1, matching2, matching3) -> f1275_0_main_NE(EOS(STATIC_1275), java.lang.Object(o217sub), 1, 1, 1) :|: i126 = 1 && matching1 = 1 && matching2 = 1 && matching3 = 1
+f1253_0_main_NE(EOS(STATIC_1253), java.lang.Object(o217sub), matching1, matching2, matching3) -> f1276_0_main_NE(EOS(STATIC_1276), java.lang.Object(o217sub), 2, 2, 1) :|: i126 = 2 && matching1 = 2 && matching2 = 2 && matching3 = 1
+f1275_0_main_NE(EOS(STATIC_1275), java.lang.Object(o217sub), matching1, matching2, matching3) -> f1289_0_main_New(EOS(STATIC_1289), java.lang.Object(o217sub), 1) :|: TRUE && matching1 = 1 && matching2 = 1 && matching3 = 1
+f1289_0_main_New(EOS(STATIC_1289), java.lang.Object(o217sub), matching1) -> f1298_0_main_Duplicate(EOS(STATIC_1298), java.lang.Object(o217sub), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 1
+f1298_0_main_Duplicate(EOS(STATIC_1298), java.lang.Object(o217sub), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1309_0_main_Load(EOS(STATIC_1309), java.lang.Object(o217sub), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 1
+f1309_0_main_Load(EOS(STATIC_1309), java.lang.Object(o217sub), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1316_0_main_InvokeMethod(EOS(STATIC_1316), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) :|: TRUE && matching1 = 1
+f1316_0_main_InvokeMethod(EOS(STATIC_1316), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) -> f1327_0__init__Load(EOS(STATIC_1327), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) :|: TRUE && matching1 = 1
+f1327_0__init__Load(EOS(STATIC_1327), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) -> f1335_0__init__InvokeMethod(EOS(STATIC_1335), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 1
+f1335_0__init__InvokeMethod(EOS(STATIC_1335), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1345_0__init__Load(EOS(STATIC_1345), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) :|: TRUE && matching1 = 1
+f1345_0__init__Load(EOS(STATIC_1345), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) -> f1357_0__init__Load(EOS(STATIC_1357), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 1
+f1357_0__init__Load(EOS(STATIC_1357), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1362_0__init__FieldAccess(EOS(STATIC_1362), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) :|: TRUE && matching1 = 1
+f1362_0__init__FieldAccess(EOS(STATIC_1362), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) -> f1375_0__init__Return(EOS(STATIC_1375), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) :|: TRUE && matching1 = 1
+f1375_0__init__Return(EOS(STATIC_1375), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) -> f1385_0_main_Store(EOS(STATIC_1385), 1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) :|: TRUE && matching1 = 1
+f1385_0_main_Store(EOS(STATIC_1385), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) -> f1395_0_main_JMP(EOS(STATIC_1395), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), 1) :|: TRUE && matching1 = 1
+f1395_0_main_JMP(EOS(STATIC_1395), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), matching1) -> f1422_0_main_Inc(EOS(STATIC_1422), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), 1) :|: TRUE && matching1 = 1
+f1422_0_main_Inc(EOS(STATIC_1422), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), matching1) -> f1439_0_main_Load(EOS(STATIC_1439), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), 2) :|: TRUE && matching1 = 1
+f1439_0_main_Load(EOS(STATIC_1439), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), matching1) -> f1518_0_main_ConstantStackPush(EOS(STATIC_1518), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), 2, 2) :|: TRUE && matching1 = 2
+f1518_0_main_ConstantStackPush(EOS(STATIC_1518), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), matching1, matching2) -> f1529_0_main_LE(EOS(STATIC_1529), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), 2, 2, 2) :|: TRUE && matching1 = 2 && matching2 = 2
+f1529_0_main_LE(EOS(STATIC_1529), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), matching1, matching2, matching3) -> f1551_0_main_Load(EOS(STATIC_1551), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), 2) :|: TRUE && matching1 = 2 && matching2 = 2 && matching3 = 2
+f1551_0_main_Load(EOS(STATIC_1551), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), matching1) -> f1234_0_main_Load(EOS(STATIC_1234), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), 2) :|: TRUE && matching1 = 2
+f1234_0_main_Load(EOS(STATIC_1234), o213, i124) -> f1238_0_main_NULL(EOS(STATIC_1238), o213, i124, o213) :|: TRUE
+f1276_0_main_NE(EOS(STATIC_1276), java.lang.Object(o217sub), matching1, matching2, matching3) -> f1291_0_main_Load(EOS(STATIC_1291), java.lang.Object(o217sub), 2) :|: TRUE && matching1 = 2 && matching2 = 2 && matching3 = 1
+f1291_0_main_Load(EOS(STATIC_1291), java.lang.Object(o217sub), matching1) -> f1300_0_main_ConstantStackPush(EOS(STATIC_1300), java.lang.Object(o217sub), 2, 2) :|: TRUE && matching1 = 2
+f1300_0_main_ConstantStackPush(EOS(STATIC_1300), java.lang.Object(o217sub), matching1, matching2) -> f1311_0_main_LE(EOS(STATIC_1311), java.lang.Object(o217sub), 2, 2) :|: TRUE && matching1 = 2 && matching2 = 2
+f1311_0_main_LE(EOS(STATIC_1311), java.lang.Object(o217sub), matching1, matching2) -> f1322_0_main_New(EOS(STATIC_1322), java.lang.Object(o217sub), 2) :|: TRUE && matching1 = 2 && matching2 = 2
+f1322_0_main_New(EOS(STATIC_1322), java.lang.Object(o217sub), matching1) -> f1328_0_main_Duplicate(EOS(STATIC_1328), java.lang.Object(o217sub), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 2
+f1328_0_main_Duplicate(EOS(STATIC_1328), java.lang.Object(o217sub), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1332_0_main_New(EOS(STATIC_1332), java.lang.Object(o217sub), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 2
+f1332_0_main_New(EOS(STATIC_1332), java.lang.Object(o217sub), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1337_0_main_Duplicate(EOS(STATIC_1337), java.lang.Object(o217sub), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 2
+f1337_0_main_Duplicate(EOS(STATIC_1337), java.lang.Object(o217sub), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1347_0_main_Load(EOS(STATIC_1347), java.lang.Object(o217sub), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 2
+f1347_0_main_Load(EOS(STATIC_1347), java.lang.Object(o217sub), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1360_0_main_InvokeMethod(EOS(STATIC_1360), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) :|: TRUE && matching1 = 2
+f1360_0_main_InvokeMethod(EOS(STATIC_1360), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) -> f1363_0__init__Load(EOS(STATIC_1363), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) :|: TRUE && matching1 = 2
+f1363_0__init__Load(EOS(STATIC_1363), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) -> f1387_0__init__InvokeMethod(EOS(STATIC_1387), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 2
+f1387_0__init__InvokeMethod(EOS(STATIC_1387), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1397_0__init__Load(EOS(STATIC_1397), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) :|: TRUE && matching1 = 2
+f1397_0__init__Load(EOS(STATIC_1397), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) -> f1423_0__init__Load(EOS(STATIC_1423), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 2
+f1423_0__init__Load(EOS(STATIC_1423), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1444_0__init__FieldAccess(EOS(STATIC_1444), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) :|: TRUE && matching1 = 2
+f1444_0__init__FieldAccess(EOS(STATIC_1444), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(o217sub)) -> f1522_0__init__Return(EOS(STATIC_1522), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) :|: TRUE && matching1 = 2
+f1522_0__init__Return(EOS(STATIC_1522), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) -> f1530_0_main_InvokeMethod(EOS(STATIC_1530), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) :|: TRUE && matching1 = 2
+f1530_0_main_InvokeMethod(EOS(STATIC_1530), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) -> f1554_0__init__Load(EOS(STATIC_1554), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) :|: TRUE && matching1 = 2
+f1554_0__init__Load(EOS(STATIC_1554), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) -> f1582_0__init__InvokeMethod(EOS(STATIC_1582), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 2
+f1582_0__init__InvokeMethod(EOS(STATIC_1582), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1619_0__init__Load(EOS(STATIC_1619), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) :|: TRUE && matching1 = 2
+f1619_0__init__Load(EOS(STATIC_1619), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) -> f1634_0__init__Load(EOS(STATIC_1634), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) :|: TRUE && matching1 = 2
+f1634_0__init__Load(EOS(STATIC_1634), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL))) -> f1642_0__init__FieldAccess(EOS(STATIC_1642), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) :|: TRUE && matching1 = 2
+f1642_0__init__FieldAccess(EOS(STATIC_1642), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, NULL)), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))) -> f1674_0__init__Return(EOS(STATIC_1674), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) :|: TRUE && matching1 = 2
+f1674_0__init__Return(EOS(STATIC_1674), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) -> f1693_0_main_Store(EOS(STATIC_1693), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) :|: TRUE && matching1 = 2
+f1693_0_main_Store(EOS(STATIC_1693), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) -> f1721_0_main_Inc(EOS(STATIC_1721), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))))), 2) :|: TRUE && matching1 = 2
+f1721_0_main_Inc(EOS(STATIC_1721), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))))), matching1) -> f1725_0_main_Load(EOS(STATIC_1725), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) :|: TRUE && matching1 = 2
+f1725_0_main_Load(EOS(STATIC_1725), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) -> f1730_0_main_ConstantStackPush(EOS(STATIC_1730), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) :|: TRUE
+f1730_0_main_ConstantStackPush(EOS(STATIC_1730), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) -> f1740_0_main_LE(EOS(STATIC_1740), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) :|: TRUE
+f1740_0_main_LE(EOS(STATIC_1740), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) -> f1749_0_main_ConstantStackPush(EOS(STATIC_1749), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) :|: TRUE
+f1749_0_main_ConstantStackPush(EOS(STATIC_1749), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub)))))) -> f1752_0_main_Store(EOS(STATIC_1752), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))))), 0) :|: TRUE
+f1752_0_main_Store(EOS(STATIC_1752), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))))), matching1) -> f1757_0_main_JMP(EOS(STATIC_1757), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))))), 0) :|: TRUE && matching1 = 0
+f1757_0_main_JMP(EOS(STATIC_1757), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))))), matching1) -> f1785_0_main_Load(EOS(STATIC_1785), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))))), 0) :|: TRUE && matching1 = 0
+f1785_0_main_Load(EOS(STATIC_1785), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))))), matching1) -> f1234_0_main_Load(EOS(STATIC_1234), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub))))), 0) :|: TRUE && matching1 = 0
+f1247_0_main_NE(EOS(STATIC_1247), java.lang.Object(o217sub), matching1, matching2) -> f1249_0_main_Load(EOS(STATIC_1249), java.lang.Object(o217sub), 0) :|: TRUE && matching1 = 0 && matching2 = 0
+f1249_0_main_Load(EOS(STATIC_1249), java.lang.Object(o217sub), matching1) -> f1251_0_main_FieldAccess(EOS(STATIC_1251), 0, java.lang.Object(o217sub)) :|: TRUE && matching1 = 0
+f1251_0_main_FieldAccess(EOS(STATIC_1251), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o219))) -> f1257_0_main_FieldAccess(EOS(STATIC_1257), 0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o219))) :|: TRUE && matching1 = 0
+f1257_0_main_FieldAccess(EOS(STATIC_1257), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o219))) -> f1277_0_main_FieldAccess(EOS(STATIC_1277), 0, o219) :|: TRUE && matching1 = 0
+f1277_0_main_FieldAccess(EOS(STATIC_1277), matching1, java.lang.Object(o223sub)) -> f1294_0_main_FieldAccess(EOS(STATIC_1294), 0, java.lang.Object(o223sub)) :|: TRUE && matching1 = 0
+f1294_0_main_FieldAccess(EOS(STATIC_1294), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o226))) -> f1304_0_main_FieldAccess(EOS(STATIC_1304), 0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o226))) :|: TRUE && matching1 = 0
+f1304_0_main_FieldAccess(EOS(STATIC_1304), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o226))) -> f1314_0_main_FieldAccess(EOS(STATIC_1314), 0, o226) :|: TRUE && matching1 = 0
+f1314_0_main_FieldAccess(EOS(STATIC_1314), matching1, java.lang.Object(o228sub)) -> f1323_0_main_FieldAccess(EOS(STATIC_1323), 0, java.lang.Object(o228sub)) :|: TRUE && matching1 = 0
+f1323_0_main_FieldAccess(EOS(STATIC_1323), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o231))) -> f1329_0_main_FieldAccess(EOS(STATIC_1329), 0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o231))) :|: TRUE && matching1 = 0
+f1329_0_main_FieldAccess(EOS(STATIC_1329), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o231))) -> f1333_0_main_FieldAccess(EOS(STATIC_1333), 0, o231) :|: TRUE && matching1 = 0
+f1333_0_main_FieldAccess(EOS(STATIC_1333), matching1, java.lang.Object(o234sub)) -> f1338_0_main_FieldAccess(EOS(STATIC_1338), 0, java.lang.Object(o234sub)) :|: TRUE && matching1 = 0
+f1338_0_main_FieldAccess(EOS(STATIC_1338), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o237))) -> f1350_0_main_FieldAccess(EOS(STATIC_1350), 0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o237))) :|: TRUE && matching1 = 0
+f1350_0_main_FieldAccess(EOS(STATIC_1350), matching1, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o237))) -> f1361_0_main_Store(EOS(STATIC_1361), 0, o237) :|: TRUE && matching1 = 0
+f1361_0_main_Store(EOS(STATIC_1361), matching1, o237) -> f1364_0_main_JMP(EOS(STATIC_1364), o237, 0) :|: TRUE && matching1 = 0
+f1364_0_main_JMP(EOS(STATIC_1364), o237, matching1) -> f1377_0_main_Inc(EOS(STATIC_1377), o237, 0) :|: TRUE && matching1 = 0
+f1377_0_main_Inc(EOS(STATIC_1377), o237, matching1) -> f1391_0_main_Load(EOS(STATIC_1391), o237, 1) :|: TRUE && matching1 = 0
+f1391_0_main_Load(EOS(STATIC_1391), o237, matching1) -> f1401_0_main_ConstantStackPush(EOS(STATIC_1401), o237, 1, 1) :|: TRUE && matching1 = 1
+f1401_0_main_ConstantStackPush(EOS(STATIC_1401), o237, matching1, matching2) -> f1427_0_main_LE(EOS(STATIC_1427), o237, 1, 1) :|: TRUE && matching1 = 1 && matching2 = 1
+f1427_0_main_LE(EOS(STATIC_1427), o237, matching1, matching2) -> f1508_0_main_Load(EOS(STATIC_1508), o237, 1) :|: TRUE && matching1 = 1 && matching2 = 1
+f1508_0_main_Load(EOS(STATIC_1508), o237, matching1) -> f1234_0_main_Load(EOS(STATIC_1234), o237, 1) :|: TRUE && matching1 = 1
+Combined rules. Obtained 3 IRulesP rules:
+f1238_0_main_NULL(EOS(STATIC_1238), java.lang.Object(o217sub:0), 2, java.lang.Object(o217sub:0)) -> f1238_0_main_NULL(EOS(STATIC_1238), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub:0))))), 0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub:0)))))) :|: TRUE
+f1238_0_main_NULL(EOS(STATIC_1238), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o237:0)))))))), 0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, o237:0))))))))) -> f1238_0_main_NULL(EOS(STATIC_1238), o237:0, 1, o237:0) :|: TRUE
+f1238_0_main_NULL(EOS(STATIC_1238), java.lang.Object(o217sub:0), 1, java.lang.Object(o217sub:0)) -> f1238_0_main_NULL(EOS(STATIC_1238), java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub:0))), 2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(EOC, java.lang.Object(o217sub:0)))) :|: TRUE
+Filtered constant ground arguments:
+   f1238_0_main_NULL(x1, x2, x3, x4) -> f1238_0_main_NULL(x2, x3, x4)
+   EOS(x1) -> EOS
+   AlternatingGrowReduce.AlternatingGrowReduce(x1, x2) -> AlternatingGrowReduce.AlternatingGrowReduce(x2)
+Filtered duplicate arguments:
+   f1238_0_main_NULL(x1, x2, x3) -> f1238_0_main_NULL(x2, x3)
+
+----------------------------------------
+
+(22)
+Obligation:
+Q DP problem:
+The TRS P consists of the following rules:
+
+   f1238_0_main_NULL(2, java.lang.Object(o217sub:0)) -> f1238_0_main_NULL(0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(o217sub:0))))))
+   f1238_0_main_NULL(0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(o237:0))))))))) -> f1238_0_main_NULL(1, o237:0)
+   f1238_0_main_NULL(1, java.lang.Object(o217sub:0)) -> f1238_0_main_NULL(2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(o217sub:0))))
+
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(23) MRRProof (EQUIVALENT)
+By using the rule removal processor [LPAR04] with the following ordering, at least one Dependency Pair or term rewrite system rule of this QDP problem can be strictly oriented.
+
+Strictly oriented dependency pairs:
+
+   f1238_0_main_NULL(2, java.lang.Object(o217sub:0)) -> f1238_0_main_NULL(0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(o217sub:0))))))
+   f1238_0_main_NULL(0, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(o237:0))))))))) -> f1238_0_main_NULL(1, o237:0)
+   f1238_0_main_NULL(1, java.lang.Object(o217sub:0)) -> f1238_0_main_NULL(2, java.lang.Object(AlternatingGrowReduce.AlternatingGrowReduce(java.lang.Object(o217sub:0))))
+
+
+Used ordering: Knuth-Bendix order [KBO] with precedence:1 > 0 > AlternatingGrowReduce.AlternatingGrowReduce_1 > java.lang.Object_1 > 2 > f1238_0_main_NULL_2
+
+and weight map:
+
+   2=5
+   0=1
+   1=8
+   java.lang.Object_1=1
+   AlternatingGrowReduce.AlternatingGrowReduce_1=1
+   f1238_0_main_NULL_2=0
+
+The variable weight is 1
+
+----------------------------------------
+
+(24)
+Obligation:
+Q DP problem:
+P is empty.
+R is empty.
+Q is empty.
+We have to consider all minimal (P,Q,R)-chains.
+----------------------------------------
+
+(25) PisEmptyProof (EQUIVALENT)
+The TRS P is empty. Hence, there is no (P,Q,R) chain.
+----------------------------------------
+
+(26)
+YES

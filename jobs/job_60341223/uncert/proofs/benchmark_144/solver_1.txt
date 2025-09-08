@@ -1,0 +1,114 @@
+YES
+We consider the system NA6Io.
+
+  Alphabet:
+
+    and : [form * form] --> form 
+    exists : [term -> form] --> form 
+    forall : [term -> form] --> form 
+    not : [form] --> form 
+    or : [form * form] --> form 
+
+  Rules:
+
+    and(X, forall(F)) => forall(/\x.and(X, F x)) 
+    and(forall(F), X) => forall(/\x.and(F x, X)) 
+    and(X, exists(F)) => exists(/\x.and(X, F x)) 
+    and(exists(F), X) => exists(/\x.and(F x, X)) 
+    or(X, forall(F)) => forall(/\x.or(X, F x)) 
+    or(forall(F), X) => forall(/\x.or(F x, X)) 
+    or(X, exists(F)) => exists(/\x.or(X, F x)) 
+    or(exists(F), X) => exists(/\x.or(F x, X)) 
+    not(forall(F)) => exists(/\x.not(F x)) 
+    not(exists(F)) => forall(/\x.not(F x)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  and(X, forall(F)) >? forall(/\x.and(X, F x)) 
+  and(forall(F), X) >? forall(/\x.and(F x, X)) 
+  and(X, exists(F)) >? exists(/\x.and(X, F x)) 
+  and(exists(F), X) >? exists(/\x.and(F x, X)) 
+  or(X, forall(F)) >? forall(/\x.or(X, F x)) 
+  or(forall(F), X) >? forall(/\x.or(F x, X)) 
+  or(X, exists(F)) >? exists(/\x.or(X, F x)) 
+  or(exists(F), X) >? exists(/\x.or(F x, X)) 
+  not(forall(F)) >? exists(/\x.not(F x)) 
+  not(exists(F)) >? forall(/\x.not(F x)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  and = Lam[y0;y1].y0 + 2*y1 
+  exists = Lam[G0].1 + G0(0) 
+  forall = Lam[G0].1 + G0(0) 
+  not = Lam[y0].y0 
+  or = Lam[y0;y1].y0 + 2*y1 
+
+Using this interpretation, the requirements translate to:
+
+  [[and(_x0, forall(_F1))]] = 2 + x0 + 2*F1(0) > 1 + x0 + 2*F1(0) = [[forall(/\x.and(_x0, _F1 x))]] 
+  [[and(forall(_F0), _x1)]] = 1 + 2*x1 + F0(0) >= 1 + 2*x1 + F0(0) = [[forall(/\x.and(_F0 x, _x1))]] 
+  [[and(_x0, exists(_F1))]] = 2 + x0 + 2*F1(0) > 1 + x0 + 2*F1(0) = [[exists(/\x.and(_x0, _F1 x))]] 
+  [[and(exists(_F0), _x1)]] = 1 + 2*x1 + F0(0) >= 1 + 2*x1 + F0(0) = [[exists(/\x.and(_F0 x, _x1))]] 
+  [[or(_x0, forall(_F1))]] = 2 + x0 + 2*F1(0) > 1 + x0 + 2*F1(0) = [[forall(/\x.or(_x0, _F1 x))]] 
+  [[or(forall(_F0), _x1)]] = 1 + 2*x1 + F0(0) >= 1 + 2*x1 + F0(0) = [[forall(/\x.or(_F0 x, _x1))]] 
+  [[or(_x0, exists(_F1))]] = 2 + x0 + 2*F1(0) > 1 + x0 + 2*F1(0) = [[exists(/\x.or(_x0, _F1 x))]] 
+  [[or(exists(_F0), _x1)]] = 1 + 2*x1 + F0(0) >= 1 + 2*x1 + F0(0) = [[exists(/\x.or(_F0 x, _x1))]] 
+  [[not(forall(_F0))]] = 1 + F0(0) >= 1 + F0(0) = [[exists(/\x.not(_F0 x))]] 
+  [[not(exists(_F0))]] = 1 + F0(0) >= 1 + F0(0) = [[forall(/\x.not(_F0 x))]] 
+
+We can thus remove the following rules:
+
+  and(X, forall(F)) => forall(/\x.and(X, F x)) 
+  and(X, exists(F)) => exists(/\x.and(X, F x)) 
+  or(X, forall(F)) => forall(/\x.or(X, F x)) 
+  or(X, exists(F)) => exists(/\x.or(X, F x)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  and(forall(F), X) >? forall(/\x.and(F x, X)) 
+  and(exists(F), X) >? exists(/\x.and(F x, X)) 
+  or(forall(F), X) >? forall(/\x.or(F x, X)) 
+  or(exists(F), X) >? exists(/\x.or(F x, X)) 
+  not(forall(F)) >? exists(/\x.not(F x)) 
+  not(exists(F)) >? forall(/\x.not(F x)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  and = Lam[y0;y1].2 + y1 + 3*y0 
+  exists = Lam[G0].3 + G0(0) 
+  forall = Lam[G0].3 + G0(0) 
+  not = Lam[y0].3*y0 
+  or = Lam[y0;y1].2 + y1 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[and(forall(_F0), _x1)]] = 11 + x1 + 3*F0(0) > 5 + x1 + 3*F0(0) = [[forall(/\x.and(_F0 x, _x1))]] 
+  [[and(exists(_F0), _x1)]] = 11 + x1 + 3*F0(0) > 5 + x1 + 3*F0(0) = [[exists(/\x.and(_F0 x, _x1))]] 
+  [[or(forall(_F0), _x1)]] = 11 + x1 + 3*F0(0) > 5 + x1 + 3*F0(0) = [[forall(/\x.or(_F0 x, _x1))]] 
+  [[or(exists(_F0), _x1)]] = 11 + x1 + 3*F0(0) > 5 + x1 + 3*F0(0) = [[exists(/\x.or(_F0 x, _x1))]] 
+  [[not(forall(_F0))]] = 9 + 3*F0(0) > 3 + 3*F0(0) = [[exists(/\x.not(_F0 x))]] 
+  [[not(exists(_F0))]] = 9 + 3*F0(0) > 3 + 3*F0(0) = [[forall(/\x.not(_F0 x))]] 
+
+We can thus remove the following rules:
+
+  and(forall(F), X) => forall(/\x.and(F x, X)) 
+  and(exists(F), X) => exists(/\x.and(F x, X)) 
+  or(forall(F), X) => forall(/\x.or(F x, X)) 
+  or(exists(F), X) => exists(/\x.or(F x, X)) 
+  not(forall(F)) => exists(/\x.not(F x)) 
+  not(exists(F)) => forall(/\x.not(F x)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

@@ -1,0 +1,222 @@
+YES
+We consider the system rhRwz.
+
+  Alphabet:
+
+    O : [] --> a 
+    ack : [a * a] --> a 
+    cons : [c * d] --> d 
+    false : [] --> b 
+    filter : [c -> b * d] --> d 
+    filter2 : [b * c -> b * c * d] --> d 
+    map : [c -> c * d] --> d 
+    nil : [] --> d 
+    succ : [a] --> a 
+    true : [] --> b 
+
+  Rules:
+
+    ack(O, X) => succ(X) 
+    ack(succ(X), Y) => ack(X, succ(O)) 
+    ack(succ(X), succ(Y)) => ack(X, ack(succ(X), Y)) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    filter(F, nil) => nil 
+    filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+    filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+    filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  ack(O, X) >? succ(X) 
+  ack(succ(X), Y) >? ack(X, succ(O)) 
+  ack(succ(X), succ(Y)) >? ack(X, ack(succ(X), Y)) 
+  map(F, nil) >? nil 
+  map(F, cons(X, Y)) >? cons(F X, map(F, Y)) 
+  filter(F, nil) >? nil 
+  filter(F, cons(X, Y)) >? filter2(F X, F, X, Y) 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) >? filter(F, Y) 
+
+We use a recursive path ordering as defined in [Kop12, Chapter 5].
+
+Argument functions:
+
+  [[O]] = _|_ 
+  [[filter(x_1, x_2)]] = filter(x_2, x_1) 
+  [[filter2(x_1, x_2, x_3, x_4)]] = filter2(x_4, x_2, x_1, x_3) 
+  [[nil]] = _|_ 
+
+We choose Lex = {ack, filter, filter2} and Mul = {@_{o -> o}, cons, false, map, succ, true}, and the following precedence: map > filter = filter2 > @_{o -> o} > cons > ack > succ > false > true
+
+Taking the argument function into account, and fixing the greater / greater equal choices, the constraints can be denoted as follows:
+
+  ack(_|_, X) > succ(X) 
+  ack(succ(X), Y) >= ack(X, succ(_|_)) 
+  ack(succ(X), succ(Y)) > ack(X, ack(succ(X), Y)) 
+  map(F, _|_) >= _|_ 
+  map(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map(F, Y)) 
+  filter(F, _|_) >= _|_ 
+  filter(F, cons(X, Y)) > filter2(@_{o -> o}(F, X), F, X, Y) 
+  filter2(true, F, X, Y) >= cons(X, filter(F, Y)) 
+  filter2(false, F, X, Y) > filter(F, Y) 
+
+With these choices, we have:
+
+  1] ack(_|_, X) > succ(X)  because [2], by definition 
+  2] ack*(_|_, X) >= succ(X)  because ack > succ and [3], by (Copy) 
+  3] ack*(_|_, X) >= X  because [4], by (Select) 
+  4] X >= X  by (Meta) 
+
+  5] ack(succ(X), Y) >= ack(X, succ(_|_))  because [6], by (Star) 
+  6] ack*(succ(X), Y) >= ack(X, succ(_|_))  because ack in Lex, [7], [10] and [12], by (Stat) 
+  7] succ(X) > X  because [8], by definition 
+  8] succ*(X) >= X  because [9], by (Select) 
+  9] X >= X  by (Meta) 
+  10] ack*(succ(X), Y) >= X  because [11], by (Select) 
+  11] succ(X) >= X  because [8], by (Star) 
+  12] ack*(succ(X), Y) >= succ(_|_)  because ack > succ and [13], by (Copy) 
+  13] ack*(succ(X), Y) >= _|_  by (Bot) 
+
+  14] ack(succ(X), succ(Y)) > ack(X, ack(succ(X), Y))  because [15], by definition 
+  15] ack*(succ(X), succ(Y)) >= ack(X, ack(succ(X), Y))  because ack in Lex, [16], [19] and [21], by (Stat) 
+  16] succ(X) > X  because [17], by definition 
+  17] succ*(X) >= X  because [18], by (Select) 
+  18] X >= X  by (Meta) 
+  19] ack*(succ(X), succ(Y)) >= X  because [20], by (Select) 
+  20] succ(X) >= X  because [17], by (Star) 
+  21] ack*(succ(X), succ(Y)) >= ack(succ(X), Y)  because ack in Lex, [22], [24], [27] and [28], by (Stat) 
+  22] succ(X) >= succ(X)  because succ in Mul and [23], by (Fun) 
+  23] X >= X  by (Meta) 
+  24] succ(Y) > Y  because [25], by definition 
+  25] succ*(Y) >= Y  because [26], by (Select) 
+  26] Y >= Y  by (Meta) 
+  27] ack*(succ(X), succ(Y)) >= succ(X)  because ack > succ and [19], by (Copy) 
+  28] ack*(succ(X), succ(Y)) >= Y  because [29], by (Select) 
+  29] succ(Y) >= Y  because [25], by (Star) 
+
+  30] map(F, _|_) >= _|_  by (Bot) 
+
+  31] map(F, cons(X, Y)) > cons(@_{o -> o}(F, X), map(F, Y))  because [32], by definition 
+  32] map*(F, cons(X, Y)) >= cons(@_{o -> o}(F, X), map(F, Y))  because map > cons, [33] and [40], by (Copy) 
+  33] map*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because map > @_{o -> o}, [34] and [36], by (Copy) 
+  34] map*(F, cons(X, Y)) >= F  because [35], by (Select) 
+  35] F >= F  by (Meta) 
+  36] map*(F, cons(X, Y)) >= X  because [37], by (Select) 
+  37] cons(X, Y) >= X  because [38], by (Star) 
+  38] cons*(X, Y) >= X  because [39], by (Select) 
+  39] X >= X  by (Meta) 
+  40] map*(F, cons(X, Y)) >= map(F, Y)  because map in Mul, [41] and [42], by (Stat) 
+  41] F >= F  by (Meta) 
+  42] cons(X, Y) > Y  because [43], by definition 
+  43] cons*(X, Y) >= Y  because [44], by (Select) 
+  44] Y >= Y  by (Meta) 
+
+  45] filter(F, _|_) >= _|_  by (Bot) 
+
+  46] filter(F, cons(X, Y)) > filter2(@_{o -> o}(F, X), F, X, Y)  because [47], by definition 
+  47] filter*(F, cons(X, Y)) >= filter2(@_{o -> o}(F, X), F, X, Y)  because filter = filter2, filter in Lex, [48], [51], [52], [54] and [58], by (Stat) 
+  48] cons(X, Y) > Y  because [49], by definition 
+  49] cons*(X, Y) >= Y  because [50], by (Select) 
+  50] Y >= Y  by (Meta) 
+  51] filter*(F, cons(X, Y)) >= @_{o -> o}(F, X)  because filter > @_{o -> o}, [52] and [54], by (Copy) 
+  52] filter*(F, cons(X, Y)) >= F  because [53], by (Select) 
+  53] F >= F  by (Meta) 
+  54] filter*(F, cons(X, Y)) >= X  because [55], by (Select) 
+  55] cons(X, Y) >= X  because [56], by (Star) 
+  56] cons*(X, Y) >= X  because [57], by (Select) 
+  57] X >= X  by (Meta) 
+  58] filter*(F, cons(X, Y)) >= Y  because [59], by (Select) 
+  59] cons(X, Y) >= Y  because [49], by (Star) 
+
+  60] filter2(true, F, X, Y) >= cons(X, filter(F, Y))  because [61], by (Star) 
+  61] filter2*(true, F, X, Y) >= cons(X, filter(F, Y))  because filter2 > cons, [62] and [64], by (Copy) 
+  62] filter2*(true, F, X, Y) >= X  because [63], by (Select) 
+  63] X >= X  by (Meta) 
+  64] filter2*(true, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [65], [66], [67] and [68], by (Stat) 
+  65] F >= F  by (Meta) 
+  66] Y >= Y  by (Meta) 
+  67] filter2*(true, F, X, Y) >= F  because [65], by (Select) 
+  68] filter2*(true, F, X, Y) >= Y  because [66], by (Select) 
+
+  69] filter2(false, F, X, Y) > filter(F, Y)  because [70], by definition 
+  70] filter2*(false, F, X, Y) >= filter(F, Y)  because filter2 = filter, filter2 in Lex, [71], [72], [73] and [74], by (Stat) 
+  71] F >= F  by (Meta) 
+  72] Y >= Y  by (Meta) 
+  73] filter2*(false, F, X, Y) >= F  because [71], by (Select) 
+  74] filter2*(false, F, X, Y) >= Y  because [72], by (Select) 
+
+We can thus remove the following rules:
+
+  ack(O, X) => succ(X) 
+  ack(succ(X), succ(Y)) => ack(X, ack(succ(X), Y)) 
+  map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+  filter(F, cons(X, Y)) => filter2(F X, F, X, Y) 
+  filter2(false, F, X, Y) => filter(F, Y) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  ack(succ(X), Y) >? ack(X, succ(O)) 
+  map(F, nil) >? nil 
+  filter(F, nil) >? nil 
+  filter2(true, F, X, Y) >? cons(X, filter(F, Y)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  ack = Lam[y0;y1].y1 + 3*y0 
+  cons = Lam[y0;y1].y0 + y1 
+  filter = Lam[G0;y1].2 + 3*y1 + G0(0) 
+  filter2 = Lam[y0;G1;y2;y3].3 + 3*y0 + 3*y2 + 3*y3 + 2*G1(0) + 2*G1(y0) + 2*G1(y2) + 2*G1(y3) + 3*y0*G1(y0) 
+  map = Lam[G0;y1].3 + 3*y1 + G0(0) 
+  nil = 0 
+  succ = Lam[y0].3*y0 
+  true = 3 
+
+Using this interpretation, the requirements translate to:
+
+  [[ack(succ(_x0), _x1)]] = x1 + 9*x0 >= 3*x0 = [[ack(_x0, succ(O))]] 
+  [[map(_F0, nil)]] = 3 + F0(0) > 0 = [[nil]] 
+  [[filter(_F0, nil)]] = 2 + F0(0) > 0 = [[nil]] 
+  [[filter2(true, _F0, _x1, _x2)]] = 12 + 3*x1 + 3*x2 + 2*F0(0) + 2*F0(x1) + 2*F0(x2) + 11*F0(3) > 2 + x1 + 3*x2 + F0(0) = [[cons(_x1, filter(_F0, _x2))]] 
+
+We can thus remove the following rules:
+
+  map(F, nil) => nil 
+  filter(F, nil) => nil 
+  filter2(true, F, X, Y) => cons(X, filter(F, Y)) 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  ack(succ(X), Y) >? ack(X, succ(O)) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  O = 0 
+  ack = Lam[y0;y1].y1 + 3*y0 
+  succ = Lam[y0].2 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[ack(succ(_x0), _x1)]] = 6 + x1 + 9*x0 > 2 + 3*x0 = [[ack(_x0, succ(O))]] 
+
+We can thus remove the following rules:
+
+  ack(succ(X), Y) => ack(X, succ(O)) 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

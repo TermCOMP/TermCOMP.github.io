@@ -1,0 +1,57 @@
+YES
+We consider the system 8Wnhf.
+
+  Alphabet:
+
+    !2801 : [a -> b -> c * a] --> b -> c 
+    !2802 : [b -> c * b] --> c 
+    f : [] --> a -> b -> c 
+    f1 : [a] --> b -> c 
+    f2 : [a * b] --> c 
+
+  Rules:
+
+    !2801(f, X) => f1(X) 
+    !2802(f1(X), Y) => f2(X, Y) 
+    !2801(F, X) => F X 
+    !2802(F, X) => F X 
+
+We use rule removal, following [Kop12, Theorem 2.23].
+
+This gives the following requirements (possibly using Theorems 2.25 and 2.26 in [Kop12]):
+
+  !2801(f, X) >? f1(X) 
+  !2802(f1(X), Y) >? f2(X, Y) 
+  !2801(F, X) >? F X 
+  !2802(F, X) >? F X 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  !2801 = Lam[G0;y1;y2].3 + 3*y1 + 3*y2 + G0(y1,y2) 
+  !2802 = Lam[G0;y1].3 + 3*y1 + G0(0) + G0(y1) 
+  f = Lam[y0;y1].3 + 3*y0 + 3*y1 
+  f1 = Lam[y0;y1].y0 
+  f2 = Lam[y0;y1].y0 + y1 
+
+Using this interpretation, the requirements translate to:
+
+  [[!2801(f, _x0)]] = Lam[y0].6 + 6*y0 + 6*x0 > Lam[y0].x0 = [[f1(_x0)]] 
+  [[!2802(f1(_x0), _x1)]] = 3 + 2*x0 + 3*x1 > x0 + x1 = [[f2(_x0, _x1)]] 
+  [[!2801(_F0, _x1)]] = Lam[y0].3 + 3*y0 + 3*x1 + F0(x1,y0) > Lam[y0].x1 + F0(x1,y0) = [[_F0 _x1]] 
+  [[!2802(_F0, _x1)]] = 3 + 3*x1 + F0(0) + F0(x1) > x1 + F0(x1) = [[_F0 _x1]] 
+
+We can thus remove the following rules:
+
+  !2801(f, X) => f1(X) 
+  !2802(f1(X), Y) => f2(X, Y) 
+  !2801(F, X) => F X 
+  !2802(F, X) => F X 
+
+All rules were succesfully removed.  Thus, termination of the original system has been reduced to termination of the beta-rule, which is well-known to hold.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.

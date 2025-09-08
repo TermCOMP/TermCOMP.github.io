@@ -1,0 +1,536 @@
+YES
+We consider the system vxrzi.
+
+  Alphabet:
+
+    O : [] --> A 
+    afterNth : [A * A] --> A 
+    app : [A -> A * A] --> A 
+    axxafterNth : [A * A] --> A 
+    axxfst : [A] --> A 
+    axxhead : [A] --> A 
+    axxnatsFrom : [A] --> A 
+    axxsel : [A * A] --> A 
+    axxsnd : [A] --> A 
+    axxsplitAt : [A * A] --> A 
+    axxtail : [A] --> A 
+    axxtake : [A * A] --> A 
+    axxu : [A * A * A * A] --> A 
+    cons : [A * A] --> A 
+    fst : [A] --> A 
+    head : [A] --> A 
+    map : [A -> A * A] --> A 
+    mark : [A] --> A 
+    natsFrom : [A] --> A 
+    nil : [] --> A 
+    pair : [A * A] --> A 
+    s : [A] --> A 
+    sel : [A * A] --> A 
+    snd : [A] --> A 
+    splitAt : [A * A] --> A 
+    tail : [A] --> A 
+    take : [A * A] --> A 
+    u : [A * A * A * A] --> A 
+
+  Rules:
+
+    axxnatsFrom(X) => cons(mark(X), natsFrom(s(X))) 
+    axxfst(pair(X, Y)) => mark(X) 
+    axxsnd(pair(X, Y)) => mark(Y) 
+    axxsplitAt(O, X) => pair(nil, mark(X)) 
+    axxsplitAt(s(X), cons(Y, Z)) => axxu(axxsplitAt(mark(X), mark(Z)), X, Y, Z) 
+    axxu(pair(X, Y), Z, U, V) => pair(cons(mark(U), X), mark(Y)) 
+    axxhead(cons(X, Y)) => mark(X) 
+    axxtail(cons(X, Y)) => mark(Y) 
+    axxsel(X, Y) => axxhead(axxafterNth(mark(X), mark(Y))) 
+    axxtake(X, Y) => axxfst(axxsplitAt(mark(X), mark(Y))) 
+    axxafterNth(X, Y) => axxsnd(axxsplitAt(mark(X), mark(Y))) 
+    mark(natsFrom(X)) => axxnatsFrom(mark(X)) 
+    mark(fst(X)) => axxfst(mark(X)) 
+    mark(snd(X)) => axxsnd(mark(X)) 
+    mark(splitAt(X, Y)) => axxsplitAt(mark(X), mark(Y)) 
+    mark(u(X, Y, Z, U)) => axxu(mark(X), Y, Z, U) 
+    mark(head(X)) => axxhead(mark(X)) 
+    mark(tail(X)) => axxtail(mark(X)) 
+    mark(sel(X, Y)) => axxsel(mark(X), mark(Y)) 
+    mark(afterNth(X, Y)) => axxafterNth(mark(X), mark(Y)) 
+    mark(take(X, Y)) => axxtake(mark(X), mark(Y)) 
+    mark(cons(X, Y)) => cons(mark(X), Y) 
+    mark(s(X)) => s(mark(X)) 
+    mark(pair(X, Y)) => pair(mark(X), mark(Y)) 
+    mark(O) => O 
+    mark(nil) => nil 
+    axxnatsFrom(X) => natsFrom(X) 
+    axxfst(X) => fst(X) 
+    axxsnd(X) => snd(X) 
+    axxsplitAt(X, Y) => splitAt(X, Y) 
+    axxu(X, Y, Z, U) => u(X, Y, Z, U) 
+    axxhead(X) => head(X) 
+    axxtail(X) => tail(X) 
+    axxsel(X, Y) => sel(X, Y) 
+    axxafterNth(X, Y) => afterNth(X, Y) 
+    axxtake(X, Y) => take(X, Y) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    app(F, X) => F X 
+
+Symbol app is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    O : [] --> A 
+    afterNth : [A * A] --> A 
+    axxafterNth : [A * A] --> A 
+    axxfst : [A] --> A 
+    axxhead : [A] --> A 
+    axxnatsFrom : [A] --> A 
+    axxsel : [A * A] --> A 
+    axxsnd : [A] --> A 
+    axxsplitAt : [A * A] --> A 
+    axxtail : [A] --> A 
+    axxtake : [A * A] --> A 
+    axxu : [A * A * A * A] --> A 
+    cons : [A * A] --> A 
+    fst : [A] --> A 
+    head : [A] --> A 
+    map : [A -> A * A] --> A 
+    mark : [A] --> A 
+    natsFrom : [A] --> A 
+    nil : [] --> A 
+    pair : [A * A] --> A 
+    s : [A] --> A 
+    sel : [A * A] --> A 
+    snd : [A] --> A 
+    splitAt : [A * A] --> A 
+    tail : [A] --> A 
+    take : [A * A] --> A 
+    u : [A * A * A * A] --> A 
+
+  Rules:
+
+    axxnatsFrom(X) => cons(mark(X), natsFrom(s(X))) 
+    axxfst(pair(X, Y)) => mark(X) 
+    axxsnd(pair(X, Y)) => mark(Y) 
+    axxsplitAt(O, X) => pair(nil, mark(X)) 
+    axxsplitAt(s(X), cons(Y, Z)) => axxu(axxsplitAt(mark(X), mark(Z)), X, Y, Z) 
+    axxu(pair(X, Y), Z, U, V) => pair(cons(mark(U), X), mark(Y)) 
+    axxhead(cons(X, Y)) => mark(X) 
+    axxtail(cons(X, Y)) => mark(Y) 
+    axxsel(X, Y) => axxhead(axxafterNth(mark(X), mark(Y))) 
+    axxtake(X, Y) => axxfst(axxsplitAt(mark(X), mark(Y))) 
+    axxafterNth(X, Y) => axxsnd(axxsplitAt(mark(X), mark(Y))) 
+    mark(natsFrom(X)) => axxnatsFrom(mark(X)) 
+    mark(fst(X)) => axxfst(mark(X)) 
+    mark(snd(X)) => axxsnd(mark(X)) 
+    mark(splitAt(X, Y)) => axxsplitAt(mark(X), mark(Y)) 
+    mark(u(X, Y, Z, U)) => axxu(mark(X), Y, Z, U) 
+    mark(head(X)) => axxhead(mark(X)) 
+    mark(tail(X)) => axxtail(mark(X)) 
+    mark(sel(X, Y)) => axxsel(mark(X), mark(Y)) 
+    mark(afterNth(X, Y)) => axxafterNth(mark(X), mark(Y)) 
+    mark(take(X, Y)) => axxtake(mark(X), mark(Y)) 
+    mark(cons(X, Y)) => cons(mark(X), Y) 
+    mark(s(X)) => s(mark(X)) 
+    mark(pair(X, Y)) => pair(mark(X), mark(Y)) 
+    mark(O) => O 
+    mark(nil) => nil 
+    axxnatsFrom(X) => natsFrom(X) 
+    axxfst(X) => fst(X) 
+    axxsnd(X) => snd(X) 
+    axxsplitAt(X, Y) => splitAt(X, Y) 
+    axxu(X, Y, Z, U) => u(X, Y, Z, U) 
+    axxhead(X) => head(X) 
+    axxtail(X) => tail(X) 
+    axxsel(X, Y) => sel(X, Y) 
+    axxafterNth(X, Y) => afterNth(X, Y) 
+    axxtake(X, Y) => take(X, Y) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+We observe that the rules contain a first-order subset:
+
+  axxnatsFrom(X) => cons(mark(X), natsFrom(s(X))) 
+  axxfst(pair(X, Y)) => mark(X) 
+  axxsnd(pair(X, Y)) => mark(Y) 
+  axxsplitAt(O, X) => pair(nil, mark(X)) 
+  axxsplitAt(s(X), cons(Y, Z)) => axxu(axxsplitAt(mark(X), mark(Z)), X, Y, Z) 
+  axxu(pair(X, Y), Z, U, V) => pair(cons(mark(U), X), mark(Y)) 
+  axxhead(cons(X, Y)) => mark(X) 
+  axxtail(cons(X, Y)) => mark(Y) 
+  axxsel(X, Y) => axxhead(axxafterNth(mark(X), mark(Y))) 
+  axxtake(X, Y) => axxfst(axxsplitAt(mark(X), mark(Y))) 
+  axxafterNth(X, Y) => axxsnd(axxsplitAt(mark(X), mark(Y))) 
+  mark(natsFrom(X)) => axxnatsFrom(mark(X)) 
+  mark(fst(X)) => axxfst(mark(X)) 
+  mark(snd(X)) => axxsnd(mark(X)) 
+  mark(splitAt(X, Y)) => axxsplitAt(mark(X), mark(Y)) 
+  mark(u(X, Y, Z, U)) => axxu(mark(X), Y, Z, U) 
+  mark(head(X)) => axxhead(mark(X)) 
+  mark(tail(X)) => axxtail(mark(X)) 
+  mark(sel(X, Y)) => axxsel(mark(X), mark(Y)) 
+  mark(afterNth(X, Y)) => axxafterNth(mark(X), mark(Y)) 
+  mark(take(X, Y)) => axxtake(mark(X), mark(Y)) 
+  mark(cons(X, Y)) => cons(mark(X), Y) 
+  mark(s(X)) => s(mark(X)) 
+  mark(pair(X, Y)) => pair(mark(X), mark(Y)) 
+  mark(O) => O 
+  mark(nil) => nil 
+  axxnatsFrom(X) => natsFrom(X) 
+  axxfst(X) => fst(X) 
+  axxsnd(X) => snd(X) 
+  axxsplitAt(X, Y) => splitAt(X, Y) 
+  axxu(X, Y, Z, U) => u(X, Y, Z, U) 
+  axxhead(X) => head(X) 
+  axxtail(X) => tail(X) 
+  axxsel(X, Y) => sel(X, Y) 
+  axxafterNth(X, Y) => afterNth(X, Y) 
+  axxtake(X, Y) => take(X, Y) 
+
+Moreover, the system is finitely branching.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is Ce-terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed Ce-terminating:
+
+ || Input TRS:
+ ||     1: axxnatsFrom(PeRCenTX) -> cons(mark(PeRCenTX),natsFrom(s(PeRCenTX)))
+ ||     2: axxfst(pair(PeRCenTX,PeRCenTY)) -> mark(PeRCenTX)
+ ||     3: axxsnd(pair(PeRCenTX,PeRCenTY)) -> mark(PeRCenTY)
+ ||     4: axxsplitAt(O(),PeRCenTX) -> pair(nil(),mark(PeRCenTX))
+ ||     5: axxsplitAt(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ)) -> axxu(axxsplitAt(mark(PeRCenTX),mark(PeRCenTZ)),PeRCenTX,PeRCenTY,PeRCenTZ)
+ ||     6: axxu(pair(PeRCenTX,PeRCenTY),PeRCenTZ,PeRCenTU,PeRCenTV) -> pair(cons(mark(PeRCenTU),PeRCenTX),mark(PeRCenTY))
+ ||     7: axxhead(cons(PeRCenTX,PeRCenTY)) -> mark(PeRCenTX)
+ ||     8: axxtail(cons(PeRCenTX,PeRCenTY)) -> mark(PeRCenTY)
+ ||     9: axxsel(PeRCenTX,PeRCenTY) -> axxhead(axxafterNth(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     10: axxtake(PeRCenTX,PeRCenTY) -> axxfst(axxsplitAt(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     11: axxafterNth(PeRCenTX,PeRCenTY) -> axxsnd(axxsplitAt(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     12: mark(natsFrom(PeRCenTX)) -> axxnatsFrom(mark(PeRCenTX))
+ ||     13: mark(fst(PeRCenTX)) -> axxfst(mark(PeRCenTX))
+ ||     14: mark(snd(PeRCenTX)) -> axxsnd(mark(PeRCenTX))
+ ||     15: mark(splitAt(PeRCenTX,PeRCenTY)) -> axxsplitAt(mark(PeRCenTX),mark(PeRCenTY))
+ ||     16: mark(u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)) -> axxu(mark(PeRCenTX),PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     17: mark(head(PeRCenTX)) -> axxhead(mark(PeRCenTX))
+ ||     18: mark(tail(PeRCenTX)) -> axxtail(mark(PeRCenTX))
+ ||     19: mark(sel(PeRCenTX,PeRCenTY)) -> axxsel(mark(PeRCenTX),mark(PeRCenTY))
+ ||     20: mark(afterNth(PeRCenTX,PeRCenTY)) -> axxafterNth(mark(PeRCenTX),mark(PeRCenTY))
+ ||     21: mark(take(PeRCenTX,PeRCenTY)) -> axxtake(mark(PeRCenTX),mark(PeRCenTY))
+ ||     22: mark(cons(PeRCenTX,PeRCenTY)) -> cons(mark(PeRCenTX),PeRCenTY)
+ ||     23: mark(s(PeRCenTX)) -> s(mark(PeRCenTX))
+ ||     24: mark(pair(PeRCenTX,PeRCenTY)) -> pair(mark(PeRCenTX),mark(PeRCenTY))
+ ||     25: mark(O()) -> O()
+ ||     26: mark(nil()) -> nil()
+ ||     27: axxnatsFrom(PeRCenTX) -> natsFrom(PeRCenTX)
+ ||     28: axxfst(PeRCenTX) -> fst(PeRCenTX)
+ ||     29: axxsnd(PeRCenTX) -> snd(PeRCenTX)
+ ||     30: axxsplitAt(PeRCenTX,PeRCenTY) -> splitAt(PeRCenTX,PeRCenTY)
+ ||     31: axxu(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU) -> u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     32: axxhead(PeRCenTX) -> head(PeRCenTX)
+ ||     33: axxtail(PeRCenTX) -> tail(PeRCenTX)
+ ||     34: axxsel(PeRCenTX,PeRCenTY) -> sel(PeRCenTX,PeRCenTY)
+ ||     35: axxafterNth(PeRCenTX,PeRCenTY) -> afterNth(PeRCenTX,PeRCenTY)
+ ||     36: axxtake(PeRCenTX,PeRCenTY) -> take(PeRCenTX,PeRCenTY)
+ ||     37: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     38: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 38
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #axxfst(pair(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #2: #axxu(pair(PeRCenTX,PeRCenTY),PeRCenTZ,PeRCenTU,PeRCenTV) -> #mark(PeRCenTU)
+ ||    #3: #axxu(pair(PeRCenTX,PeRCenTY),PeRCenTZ,PeRCenTU,PeRCenTV) -> #mark(PeRCenTY)
+ ||    #4: #mark(fst(PeRCenTX)) -> #axxfst(mark(PeRCenTX))
+ ||    #5: #mark(fst(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #6: #axxsel(PeRCenTX,PeRCenTY) -> #axxhead(axxafterNth(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #7: #axxsel(PeRCenTX,PeRCenTY) -> #axxafterNth(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #8: #axxsel(PeRCenTX,PeRCenTY) -> #mark(PeRCenTX)
+ ||    #9: #axxsel(PeRCenTX,PeRCenTY) -> #mark(PeRCenTY)
+ ||    #10: #axxafterNth(PeRCenTX,PeRCenTY) -> #axxsnd(axxsplitAt(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #11: #axxafterNth(PeRCenTX,PeRCenTY) -> #axxsplitAt(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #12: #axxafterNth(PeRCenTX,PeRCenTY) -> #mark(PeRCenTX)
+ ||    #13: #axxafterNth(PeRCenTX,PeRCenTY) -> #mark(PeRCenTY)
+ ||    #14: #mark(pair(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #15: #mark(pair(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #16: #mark(s(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #17: #mark(natsFrom(PeRCenTX)) -> #axxnatsFrom(mark(PeRCenTX))
+ ||    #18: #mark(natsFrom(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #19: #mark(snd(PeRCenTX)) -> #axxsnd(mark(PeRCenTX))
+ ||    #20: #mark(snd(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #21: #mark(afterNth(PeRCenTX,PeRCenTY)) -> #axxafterNth(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #22: #mark(afterNth(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #23: #mark(afterNth(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #24: #axxhead(cons(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #25: #axxtake(PeRCenTX,PeRCenTY) -> #axxfst(axxsplitAt(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #26: #axxtake(PeRCenTX,PeRCenTY) -> #axxsplitAt(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #27: #axxtake(PeRCenTX,PeRCenTY) -> #mark(PeRCenTX)
+ ||    #28: #axxtake(PeRCenTX,PeRCenTY) -> #mark(PeRCenTY)
+ ||    #29: #axxsplitAt(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ)) -> #axxu(axxsplitAt(mark(PeRCenTX),mark(PeRCenTZ)),PeRCenTX,PeRCenTY,PeRCenTZ)
+ ||    #30: #axxsplitAt(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ)) -> #axxsplitAt(mark(PeRCenTX),mark(PeRCenTZ))
+ ||    #31: #axxsplitAt(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ)) -> #mark(PeRCenTX)
+ ||    #32: #axxsplitAt(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ)) -> #mark(PeRCenTZ)
+ ||    #33: #mark(cons(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #34: #mark(head(PeRCenTX)) -> #axxhead(mark(PeRCenTX))
+ ||    #35: #mark(head(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #36: #mark(sel(PeRCenTX,PeRCenTY)) -> #axxsel(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #37: #mark(sel(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #38: #mark(sel(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #39: #mark(take(PeRCenTX,PeRCenTY)) -> #axxtake(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #40: #mark(take(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #41: #mark(take(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #42: #mark(u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)) -> #axxu(mark(PeRCenTX),PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #43: #mark(u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)) -> #mark(PeRCenTX)
+ ||    #44: #axxsnd(pair(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #45: #axxnatsFrom(PeRCenTX) -> #mark(PeRCenTX)
+ ||    #46: #axxtail(cons(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #47: #mark(splitAt(PeRCenTX,PeRCenTY)) -> #axxsplitAt(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #48: #mark(splitAt(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #49: #mark(splitAt(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #50: #axxsplitAt(O(),PeRCenTX) -> #mark(PeRCenTX)
+ ||    #51: #mark(tail(PeRCenTX)) -> #axxtail(mark(PeRCenTX))
+ ||    #52: #mark(tail(PeRCenTX)) -> #mark(PeRCenTX)
+ || Number of SCCs: 1, DPs: 52
+ ||   SCC { #1..52 }
+ || POLO(Sum)... POLO(max)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       s 	w: x1
+ ||       axxsnd	w: x1
+ ||       u 	w: max(x1, x2 + 13, x3 + 12, x4 + 3)
+ ||       #axxu	w: max(x1 + 1, x3 + 11)
+ ||       take	w: max(x1 + 21, x2 + 20)
+ ||       axxsplitAt	w: max(x1 + 21, x2 + 14)
+ ||       pair	w: max(x1 + 6, x2 + 14)
+ ||       fst	w: x1
+ ||       natsFrom	w: x1 + 6
+ ||       splitAt	w: max(x1 + 21, x2 + 14)
+ ||       O 	w: 1
+ ||       #axxsplitAt	w: max(x1 + 28, x2 + 23)
+ ||       axxnatsFrom	w: x1 + 6
+ ||       tail	w: x1
+ ||       #axxafterNth	w: max(x1 + 29, x2 + 27)
+ ||       #mark	w: x1 + 10
+ ||       #axxtail	w: x1 + 10
+ ||       #axxnatsFrom	w: x1 + 11
+ ||       sel	w: max(x1 + 21, x2 + 18)
+ ||       afterNth	w: max(x1 + 21, x2 + 18)
+ ||       nil	w: 9
+ ||       #axxsnd	w: x1 + 5
+ ||       #TIlDePAIR	w: 0
+ ||       axxafterNth	w: max(x1 + 21, x2 + 18)
+ ||       mark	w: x1
+ ||       axxsel	w: max(x1 + 21, x2 + 18)
+ ||       axxfst	w: x1
+ ||       #axxsel	w: max(x1 + 30, x2 + 27)
+ ||       head	w: x1
+ ||       cons	w: max(x1 + 6, x2)
+ ||       snd	w: x1
+ ||       axxtail	w: x1
+ ||       axxtake	w: max(x1 + 21, x2 + 20)
+ ||       #axxfst	w: x1 + 5
+ ||       axxu	w: max(x1, x2 + 13, x3 + 12, x4 + 3)
+ ||       #axxtake	w: max(x1 + 29, x2 + 29)
+ ||       #axxhead	w: x1 + 5
+ ||       axxhead	w: x1
+ ||     USABLE RULES: { 1..36 }
+ ||     Removed DPs: #1..4 #6 #8..15 #17..19 #21..29 #31..34 #36..42 #44 #45 #47..50
+ || Number of SCCs: 2, DPs: 9
+ ||   SCC { #30 }
+ || POLO(Sum)... POLO(max)... QLPOS... POLO(mSum)... succeeded.
+ ||       TIlDePAIR	w: max(x1 - 1, 0)
+ ||       s 	w: max(x1 + 4, 0)
+ ||       axxsnd	w: max(x1 + 1, 0)
+ ||       u 	w: max(x1, x3 + 9, 0)
+ ||       #axxu	w: max(x3 - 1, 0)
+ ||       take	w: max(x1 + x2 + 1, 0)
+ ||       axxsplitAt	w: max(x1 + x2 + 4, 0)
+ ||       pair	w: max(x1 + 6, x2 + 1, 0)
+ ||       fst	w: max(x1 - 3, 0)
+ ||       natsFrom	w: max(x1 + 5, 0)
+ ||       splitAt	w: max(x1 + x2 + 4, 0)
+ ||       O 	w: 3
+ ||       #axxsplitAt	w: max(x1 - 3, 0)
+ ||       axxnatsFrom	w: max(x1 + 5, 0)
+ ||       tail	w: max(x1 + 4, 0)
+ ||       #axxafterNth	w: max(x1 - 1, 0)
+ ||       #mark	w: max(x1 - 1, 0)
+ ||       #axxtail	w: max(x1 - 1, 0)
+ ||       #axxnatsFrom	w: max(x1 - 1, 0)
+ ||       sel	w: max(x1 + x2 + 6, 0)
+ ||       afterNth	w: max(x1 + x2 + 5, 0)
+ ||       nil	w: 1
+ ||       #axxsnd	w: max(x1 - 1, 0)
+ ||       #TIlDePAIR	w: max(x1 - 1, 0)
+ ||       axxafterNth	w: max(x1 + x2 + 5, 0)
+ ||       mark	w: max(x1, 0)
+ ||       axxsel	w: max(x1 + x2 + 6, 0)
+ ||       axxfst	w: max(x1 - 3, 0)
+ ||       #axxsel	w: max(x2 - 1, 0)
+ ||       head	w: max(x1 + 1, 0)
+ ||       cons	w: max(x1 + 1, x2 - 4, 0)
+ ||       snd	w: max(x1 + 1, 0)
+ ||       axxtail	w: max(x1 + 4, 0)
+ ||       axxtake	w: max(x1 + x2 + 1, 0)
+ ||       #axxfst	w: max(x1 - 1, 0)
+ ||       axxu	w: max(x1, x3 + 9, 0)
+ ||       #axxtake	w: max(x1 - 1, 0)
+ ||       #axxhead	w: max(x1 - 1, 0)
+ ||       axxhead	w: max(x1 + 1, 0)
+ ||     USABLE RULES: { 1..36 }
+ ||     Removed DPs: #30
+ || Number of SCCs: 1, DPs: 8
+ ||   SCC { #5 #16 #20 #35 #43 #46 #51 #52 }
+ || POLO(Sum)... POLO(max)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       s 	w: x1
+ ||       axxsnd	w: x1 + 1
+ ||       u 	w: max(x1, x2 + 2, x3 + 2, x4 + 2)
+ ||       #axxu	w: 0
+ ||       take	w: max(x1 + 4, x2 + 4)
+ ||       axxsplitAt	w: max(x1 + 2, x2 + 3)
+ ||       pair	w: max(x1 + 1, x2 + 2)
+ ||       fst	w: x1 + 1
+ ||       natsFrom	w: x1 + 1
+ ||       splitAt	w: max(x1 + 2, x2 + 3)
+ ||       O 	w: 0
+ ||       #axxsplitAt	w: 0
+ ||       axxnatsFrom	w: x1 + 1
+ ||       tail	w: x1 + 2
+ ||       #axxafterNth	w: 0
+ ||       #mark	w: x1 + 9
+ ||       #axxtail	w: x1 + 10
+ ||       #axxnatsFrom	w: 11
+ ||       sel	w: max(x1 + 6, x2 + 7)
+ ||       afterNth	w: max(x1 + 5, x2 + 4)
+ ||       nil	w: 1
+ ||       #axxsnd	w: 5
+ ||       #TIlDePAIR	w: 0
+ ||       axxafterNth	w: max(x1 + 5, x2 + 4)
+ ||       mark	w: x1
+ ||       axxsel	w: max(x1 + 6, x2 + 7)
+ ||       axxfst	w: x1 + 1
+ ||       #axxsel	w: 0
+ ||       head	w: x1 + 1
+ ||       cons	w: max(x1 + 1, x2)
+ ||       snd	w: x1 + 1
+ ||       axxtail	w: x1 + 2
+ ||       axxtake	w: max(x1 + 4, x2 + 4)
+ ||       #axxfst	w: 5
+ ||       axxu	w: max(x1, x2 + 2, x3 + 2, x4 + 2)
+ ||       #axxtake	w: 0
+ ||       #axxhead	w: 5
+ ||       axxhead	w: x1 + 1
+ ||     USABLE RULES: { 1..36 }
+ ||     Removed DPs: #5 #20 #35 #46 #51 #52
+ || Number of SCCs: 1, DPs: 2
+ ||   SCC { #16 #43 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       s 	w: x1 + 1
+ ||       axxsnd	w: 2
+ ||       u 	w: x1 + x2 + x4 + 6
+ ||       #axxu	w: 1
+ ||       take	w: 0
+ ||       axxsplitAt	w: 4
+ ||       pair	w: x1 + 5
+ ||       fst	w: 2
+ ||       natsFrom	w: 1
+ ||       splitAt	w: x1 + x2 + 5
+ ||       O 	w: 4
+ ||       #axxsplitAt	w: 1
+ ||       axxnatsFrom	w: 6
+ ||       tail	w: 3
+ ||       #axxafterNth	w: 1
+ ||       #mark	w: x1 + 2
+ ||       #axxtail	w: 1
+ ||       #axxnatsFrom	w: 1
+ ||       sel	w: 9
+ ||       afterNth	w: 2
+ ||       nil	w: 0
+ ||       #axxsnd	w: 1
+ ||       #TIlDePAIR	w: 0
+ ||       axxafterNth	w: x1 + x2 + 1
+ ||       mark	w: 3
+ ||       axxsel	w: x2 + 8
+ ||       axxfst	w: x1 + 1
+ ||       #axxsel	w: 1
+ ||       head	w: 3
+ ||       cons	w: x1 + 1
+ ||       snd	w: 3
+ ||       axxtail	w: x1 + 2
+ ||       axxtake	w: x2
+ ||       #axxfst	w: 1
+ ||       axxu	w: 5
+ ||       #axxtake	w: 1
+ ||       #axxhead	w: 1
+ ||       axxhead	w: x1 + 2
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #16 #43
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] map#(F, cons(X, Y)) =#> map#(F, Y)   
+
+  Rules R_0:
+
+    axxnatsFrom(X) => cons(mark(X), natsFrom(s(X))) 
+    axxfst(pair(X, Y)) => mark(X) 
+    axxsnd(pair(X, Y)) => mark(Y) 
+    axxsplitAt(O, X) => pair(nil, mark(X)) 
+    axxsplitAt(s(X), cons(Y, Z)) => axxu(axxsplitAt(mark(X), mark(Z)), X, Y, Z) 
+    axxu(pair(X, Y), Z, U, V) => pair(cons(mark(U), X), mark(Y)) 
+    axxhead(cons(X, Y)) => mark(X) 
+    axxtail(cons(X, Y)) => mark(Y) 
+    axxsel(X, Y) => axxhead(axxafterNth(mark(X), mark(Y))) 
+    axxtake(X, Y) => axxfst(axxsplitAt(mark(X), mark(Y))) 
+    axxafterNth(X, Y) => axxsnd(axxsplitAt(mark(X), mark(Y))) 
+    mark(natsFrom(X)) => axxnatsFrom(mark(X)) 
+    mark(fst(X)) => axxfst(mark(X)) 
+    mark(snd(X)) => axxsnd(mark(X)) 
+    mark(splitAt(X, Y)) => axxsplitAt(mark(X), mark(Y)) 
+    mark(u(X, Y, Z, U)) => axxu(mark(X), Y, Z, U) 
+    mark(head(X)) => axxhead(mark(X)) 
+    mark(tail(X)) => axxtail(mark(X)) 
+    mark(sel(X, Y)) => axxsel(mark(X), mark(Y)) 
+    mark(afterNth(X, Y)) => axxafterNth(mark(X), mark(Y)) 
+    mark(take(X, Y)) => axxtake(mark(X), mark(Y)) 
+    mark(cons(X, Y)) => cons(mark(X), Y) 
+    mark(s(X)) => s(mark(X)) 
+    mark(pair(X, Y)) => pair(mark(X), mark(Y)) 
+    mark(O) => O 
+    mark(nil) => nil 
+    axxnatsFrom(X) => natsFrom(X) 
+    axxfst(X) => fst(X) 
+    axxsnd(X) => snd(X) 
+    axxsplitAt(X, Y) => splitAt(X, Y) 
+    axxu(X, Y, Z, U) => u(X, Y, Z, U) 
+    axxhead(X) => head(X) 
+    axxtail(X) => tail(X) 
+    axxsel(X, Y) => sel(X, Y) 
+    axxafterNth(X, Y) => afterNth(X, Y) 
+    axxtake(X, Y) => take(X, Y) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(map#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(map#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(map#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_0, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

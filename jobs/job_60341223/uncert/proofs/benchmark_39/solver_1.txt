@@ -1,0 +1,835 @@
+YES
+We consider the system qVBQv.
+
+  Alphabet:
+
+    O : [] --> A 
+    active : [A] --> A 
+    app : [A -> A * A] --> A 
+    cons : [A * A] --> A 
+    from : [A] --> A 
+    map : [A -> A * A] --> A 
+    mark : [A] --> A 
+    minus : [A * A] --> A 
+    nil : [] --> A 
+    quot : [A * A] --> A 
+    s : [A] --> A 
+    sel : [A * A] --> A 
+    zWquot : [A * A] --> A 
+
+  Rules:
+
+    active(from(X)) => mark(cons(X, from(s(X)))) 
+    active(sel(O, cons(X, Y))) => mark(X) 
+    active(sel(s(X), cons(Y, Z))) => mark(sel(X, Z)) 
+    active(minus(X, O)) => mark(O) 
+    active(minus(s(X), s(Y))) => mark(minus(X, Y)) 
+    active(quot(O, s(X))) => mark(O) 
+    active(quot(s(X), s(Y))) => mark(s(quot(minus(X, Y), s(Y)))) 
+    active(zWquot(X, nil)) => mark(nil) 
+    active(zWquot(nil, X)) => mark(nil) 
+    active(zWquot(cons(X, Y), cons(Z, U))) => mark(cons(quot(X, Z), zWquot(Y, U))) 
+    mark(from(X)) => active(from(mark(X))) 
+    mark(cons(X, Y)) => active(cons(mark(X), Y)) 
+    mark(s(X)) => active(s(mark(X))) 
+    mark(sel(X, Y)) => active(sel(mark(X), mark(Y))) 
+    mark(O) => active(O) 
+    mark(minus(X, Y)) => active(minus(mark(X), mark(Y))) 
+    mark(quot(X, Y)) => active(quot(mark(X), mark(Y))) 
+    mark(zWquot(X, Y)) => active(zWquot(mark(X), mark(Y))) 
+    mark(nil) => active(nil) 
+    from(mark(X)) => from(X) 
+    from(active(X)) => from(X) 
+    cons(mark(X), Y) => cons(X, Y) 
+    cons(X, mark(Y)) => cons(X, Y) 
+    cons(active(X), Y) => cons(X, Y) 
+    cons(X, active(Y)) => cons(X, Y) 
+    s(mark(X)) => s(X) 
+    s(active(X)) => s(X) 
+    sel(mark(X), Y) => sel(X, Y) 
+    sel(X, mark(Y)) => sel(X, Y) 
+    sel(active(X), Y) => sel(X, Y) 
+    sel(X, active(Y)) => sel(X, Y) 
+    minus(mark(X), Y) => minus(X, Y) 
+    minus(X, mark(Y)) => minus(X, Y) 
+    minus(active(X), Y) => minus(X, Y) 
+    minus(X, active(Y)) => minus(X, Y) 
+    quot(mark(X), Y) => quot(X, Y) 
+    quot(X, mark(Y)) => quot(X, Y) 
+    quot(active(X), Y) => quot(X, Y) 
+    quot(X, active(Y)) => quot(X, Y) 
+    zWquot(mark(X), Y) => zWquot(X, Y) 
+    zWquot(X, mark(Y)) => zWquot(X, Y) 
+    zWquot(active(X), Y) => zWquot(X, Y) 
+    zWquot(X, active(Y)) => zWquot(X, Y) 
+    map(F, nil) => nil 
+    app(F, X) => F X 
+
+Symbol app is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    O : [] --> A 
+    active : [A] --> A 
+    cons : [A * A] --> A 
+    from : [A] --> A 
+    map : [A -> A * A] --> A 
+    mark : [A] --> A 
+    minus : [A * A] --> A 
+    nil : [] --> A 
+    quot : [A * A] --> A 
+    s : [A] --> A 
+    sel : [A * A] --> A 
+    zWquot : [A * A] --> A 
+
+  Rules:
+
+    active(from(X)) => mark(cons(X, from(s(X)))) 
+    active(sel(O, cons(X, Y))) => mark(X) 
+    active(sel(s(X), cons(Y, Z))) => mark(sel(X, Z)) 
+    active(minus(X, O)) => mark(O) 
+    active(minus(s(X), s(Y))) => mark(minus(X, Y)) 
+    active(quot(O, s(X))) => mark(O) 
+    active(quot(s(X), s(Y))) => mark(s(quot(minus(X, Y), s(Y)))) 
+    active(zWquot(X, nil)) => mark(nil) 
+    active(zWquot(nil, X)) => mark(nil) 
+    active(zWquot(cons(X, Y), cons(Z, U))) => mark(cons(quot(X, Z), zWquot(Y, U))) 
+    mark(from(X)) => active(from(mark(X))) 
+    mark(cons(X, Y)) => active(cons(mark(X), Y)) 
+    mark(s(X)) => active(s(mark(X))) 
+    mark(sel(X, Y)) => active(sel(mark(X), mark(Y))) 
+    mark(O) => active(O) 
+    mark(minus(X, Y)) => active(minus(mark(X), mark(Y))) 
+    mark(quot(X, Y)) => active(quot(mark(X), mark(Y))) 
+    mark(zWquot(X, Y)) => active(zWquot(mark(X), mark(Y))) 
+    mark(nil) => active(nil) 
+    from(mark(X)) => from(X) 
+    from(active(X)) => from(X) 
+    cons(mark(X), Y) => cons(X, Y) 
+    cons(X, mark(Y)) => cons(X, Y) 
+    cons(active(X), Y) => cons(X, Y) 
+    cons(X, active(Y)) => cons(X, Y) 
+    s(mark(X)) => s(X) 
+    s(active(X)) => s(X) 
+    sel(mark(X), Y) => sel(X, Y) 
+    sel(X, mark(Y)) => sel(X, Y) 
+    sel(active(X), Y) => sel(X, Y) 
+    sel(X, active(Y)) => sel(X, Y) 
+    minus(mark(X), Y) => minus(X, Y) 
+    minus(X, mark(Y)) => minus(X, Y) 
+    minus(active(X), Y) => minus(X, Y) 
+    minus(X, active(Y)) => minus(X, Y) 
+    quot(mark(X), Y) => quot(X, Y) 
+    quot(X, mark(Y)) => quot(X, Y) 
+    quot(active(X), Y) => quot(X, Y) 
+    quot(X, active(Y)) => quot(X, Y) 
+    zWquot(mark(X), Y) => zWquot(X, Y) 
+    zWquot(X, mark(Y)) => zWquot(X, Y) 
+    zWquot(active(X), Y) => zWquot(X, Y) 
+    zWquot(X, active(Y)) => zWquot(X, Y) 
+    map(F, nil) => nil 
+
+We observe that the rules contain a first-order subset:
+
+  active(from(X)) => mark(cons(X, from(s(X)))) 
+  active(sel(O, cons(X, Y))) => mark(X) 
+  active(sel(s(X), cons(Y, Z))) => mark(sel(X, Z)) 
+  active(minus(X, O)) => mark(O) 
+  active(minus(s(X), s(Y))) => mark(minus(X, Y)) 
+  active(quot(O, s(X))) => mark(O) 
+  active(quot(s(X), s(Y))) => mark(s(quot(minus(X, Y), s(Y)))) 
+  active(zWquot(X, nil)) => mark(nil) 
+  active(zWquot(nil, X)) => mark(nil) 
+  active(zWquot(cons(X, Y), cons(Z, U))) => mark(cons(quot(X, Z), zWquot(Y, U))) 
+  mark(from(X)) => active(from(mark(X))) 
+  mark(cons(X, Y)) => active(cons(mark(X), Y)) 
+  mark(s(X)) => active(s(mark(X))) 
+  mark(sel(X, Y)) => active(sel(mark(X), mark(Y))) 
+  mark(O) => active(O) 
+  mark(minus(X, Y)) => active(minus(mark(X), mark(Y))) 
+  mark(quot(X, Y)) => active(quot(mark(X), mark(Y))) 
+  mark(zWquot(X, Y)) => active(zWquot(mark(X), mark(Y))) 
+  mark(nil) => active(nil) 
+  from(mark(X)) => from(X) 
+  from(active(X)) => from(X) 
+  cons(mark(X), Y) => cons(X, Y) 
+  cons(X, mark(Y)) => cons(X, Y) 
+  cons(active(X), Y) => cons(X, Y) 
+  cons(X, active(Y)) => cons(X, Y) 
+  s(mark(X)) => s(X) 
+  s(active(X)) => s(X) 
+  sel(mark(X), Y) => sel(X, Y) 
+  sel(X, mark(Y)) => sel(X, Y) 
+  sel(active(X), Y) => sel(X, Y) 
+  sel(X, active(Y)) => sel(X, Y) 
+  minus(mark(X), Y) => minus(X, Y) 
+  minus(X, mark(Y)) => minus(X, Y) 
+  minus(active(X), Y) => minus(X, Y) 
+  minus(X, active(Y)) => minus(X, Y) 
+  quot(mark(X), Y) => quot(X, Y) 
+  quot(X, mark(Y)) => quot(X, Y) 
+  quot(active(X), Y) => quot(X, Y) 
+  quot(X, active(Y)) => quot(X, Y) 
+  zWquot(mark(X), Y) => zWquot(X, Y) 
+  zWquot(X, mark(Y)) => zWquot(X, Y) 
+  zWquot(active(X), Y) => zWquot(X, Y) 
+  zWquot(X, active(Y)) => zWquot(X, Y) 
+
+Moreover, the system is finitely branching.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is Ce-terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed Ce-terminating:
+
+ || Input TRS:
+ ||     1: active(from(PeRCenTX)) -> mark(cons(PeRCenTX,from(s(PeRCenTX))))
+ ||     2: active(sel(O(),cons(PeRCenTX,PeRCenTY))) -> mark(PeRCenTX)
+ ||     3: active(sel(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ))) -> mark(sel(PeRCenTX,PeRCenTZ))
+ ||     4: active(minus(PeRCenTX,O())) -> mark(O())
+ ||     5: active(minus(s(PeRCenTX),s(PeRCenTY))) -> mark(minus(PeRCenTX,PeRCenTY))
+ ||     6: active(quot(O(),s(PeRCenTX))) -> mark(O())
+ ||     7: active(quot(s(PeRCenTX),s(PeRCenTY))) -> mark(s(quot(minus(PeRCenTX,PeRCenTY),s(PeRCenTY))))
+ ||     8: active(zWquot(PeRCenTX,nil())) -> mark(nil())
+ ||     9: active(zWquot(nil(),PeRCenTX)) -> mark(nil())
+ ||     10: active(zWquot(cons(PeRCenTX,PeRCenTY),cons(PeRCenTZ,PeRCenTU))) -> mark(cons(quot(PeRCenTX,PeRCenTZ),zWquot(PeRCenTY,PeRCenTU)))
+ ||     11: mark(from(PeRCenTX)) -> active(from(mark(PeRCenTX)))
+ ||     12: mark(cons(PeRCenTX,PeRCenTY)) -> active(cons(mark(PeRCenTX),PeRCenTY))
+ ||     13: mark(s(PeRCenTX)) -> active(s(mark(PeRCenTX)))
+ ||     14: mark(sel(PeRCenTX,PeRCenTY)) -> active(sel(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     15: mark(O()) -> active(O())
+ ||     16: mark(minus(PeRCenTX,PeRCenTY)) -> active(minus(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     17: mark(quot(PeRCenTX,PeRCenTY)) -> active(quot(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     18: mark(zWquot(PeRCenTX,PeRCenTY)) -> active(zWquot(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     19: mark(nil()) -> active(nil())
+ ||     20: from(mark(PeRCenTX)) -> from(PeRCenTX)
+ ||     21: from(active(PeRCenTX)) -> from(PeRCenTX)
+ ||     22: cons(mark(PeRCenTX),PeRCenTY) -> cons(PeRCenTX,PeRCenTY)
+ ||     23: cons(PeRCenTX,mark(PeRCenTY)) -> cons(PeRCenTX,PeRCenTY)
+ ||     24: cons(active(PeRCenTX),PeRCenTY) -> cons(PeRCenTX,PeRCenTY)
+ ||     25: cons(PeRCenTX,active(PeRCenTY)) -> cons(PeRCenTX,PeRCenTY)
+ ||     26: s(mark(PeRCenTX)) -> s(PeRCenTX)
+ ||     27: s(active(PeRCenTX)) -> s(PeRCenTX)
+ ||     28: sel(mark(PeRCenTX),PeRCenTY) -> sel(PeRCenTX,PeRCenTY)
+ ||     29: sel(PeRCenTX,mark(PeRCenTY)) -> sel(PeRCenTX,PeRCenTY)
+ ||     30: sel(active(PeRCenTX),PeRCenTY) -> sel(PeRCenTX,PeRCenTY)
+ ||     31: sel(PeRCenTX,active(PeRCenTY)) -> sel(PeRCenTX,PeRCenTY)
+ ||     32: minus(mark(PeRCenTX),PeRCenTY) -> minus(PeRCenTX,PeRCenTY)
+ ||     33: minus(PeRCenTX,mark(PeRCenTY)) -> minus(PeRCenTX,PeRCenTY)
+ ||     34: minus(active(PeRCenTX),PeRCenTY) -> minus(PeRCenTX,PeRCenTY)
+ ||     35: minus(PeRCenTX,active(PeRCenTY)) -> minus(PeRCenTX,PeRCenTY)
+ ||     36: quot(mark(PeRCenTX),PeRCenTY) -> quot(PeRCenTX,PeRCenTY)
+ ||     37: quot(PeRCenTX,mark(PeRCenTY)) -> quot(PeRCenTX,PeRCenTY)
+ ||     38: quot(active(PeRCenTX),PeRCenTY) -> quot(PeRCenTX,PeRCenTY)
+ ||     39: quot(PeRCenTX,active(PeRCenTY)) -> quot(PeRCenTX,PeRCenTY)
+ ||     40: zWquot(mark(PeRCenTX),PeRCenTY) -> zWquot(PeRCenTX,PeRCenTY)
+ ||     41: zWquot(PeRCenTX,mark(PeRCenTY)) -> zWquot(PeRCenTX,PeRCenTY)
+ ||     42: zWquot(active(PeRCenTX),PeRCenTY) -> zWquot(PeRCenTX,PeRCenTY)
+ ||     43: zWquot(PeRCenTX,active(PeRCenTY)) -> zWquot(PeRCenTX,PeRCenTY)
+ ||     44: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     45: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 45
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #active(sel(O(),cons(PeRCenTX,PeRCenTY))) -> #mark(PeRCenTX)
+ ||    #2: #zWquot(PeRCenTX,active(PeRCenTY)) -> #zWquot(PeRCenTX,PeRCenTY)
+ ||    #3: #sel(PeRCenTX,mark(PeRCenTY)) -> #sel(PeRCenTX,PeRCenTY)
+ ||    #4: #minus(PeRCenTX,active(PeRCenTY)) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #5: #zWquot(active(PeRCenTX),PeRCenTY) -> #zWquot(PeRCenTX,PeRCenTY)
+ ||    #6: #zWquot(PeRCenTX,mark(PeRCenTY)) -> #zWquot(PeRCenTX,PeRCenTY)
+ ||    #7: #quot(PeRCenTX,mark(PeRCenTY)) -> #quot(PeRCenTX,PeRCenTY)
+ ||    #8: #quot(active(PeRCenTX),PeRCenTY) -> #quot(PeRCenTX,PeRCenTY)
+ ||    #9: #active(quot(O(),s(PeRCenTX))) -> #mark(O())
+ ||    #10: #zWquot(mark(PeRCenTX),PeRCenTY) -> #zWquot(PeRCenTX,PeRCenTY)
+ ||    #11: #mark(s(PeRCenTX)) -> #active(s(mark(PeRCenTX)))
+ ||    #12: #mark(s(PeRCenTX)) -> #s(mark(PeRCenTX))
+ ||    #13: #mark(s(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #14: #active(zWquot(nil(),PeRCenTX)) -> #mark(nil())
+ ||    #15: #mark(from(PeRCenTX)) -> #active(from(mark(PeRCenTX)))
+ ||    #16: #mark(from(PeRCenTX)) -> #from(mark(PeRCenTX))
+ ||    #17: #mark(from(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #18: #cons(active(PeRCenTX),PeRCenTY) -> #cons(PeRCenTX,PeRCenTY)
+ ||    #19: #cons(PeRCenTX,mark(PeRCenTY)) -> #cons(PeRCenTX,PeRCenTY)
+ ||    #20: #mark(cons(PeRCenTX,PeRCenTY)) -> #active(cons(mark(PeRCenTX),PeRCenTY))
+ ||    #21: #mark(cons(PeRCenTX,PeRCenTY)) -> #cons(mark(PeRCenTX),PeRCenTY)
+ ||    #22: #mark(cons(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #23: #sel(PeRCenTX,active(PeRCenTY)) -> #sel(PeRCenTX,PeRCenTY)
+ ||    #24: #mark(sel(PeRCenTX,PeRCenTY)) -> #active(sel(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #25: #mark(sel(PeRCenTX,PeRCenTY)) -> #sel(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #26: #mark(sel(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #27: #mark(sel(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #28: #sel(active(PeRCenTX),PeRCenTY) -> #sel(PeRCenTX,PeRCenTY)
+ ||    #29: #cons(PeRCenTX,active(PeRCenTY)) -> #cons(PeRCenTX,PeRCenTY)
+ ||    #30: #from(mark(PeRCenTX)) -> #from(PeRCenTX)
+ ||    #31: #active(quot(s(PeRCenTX),s(PeRCenTY))) -> #mark(s(quot(minus(PeRCenTX,PeRCenTY),s(PeRCenTY))))
+ ||    #32: #active(quot(s(PeRCenTX),s(PeRCenTY))) -> #s(quot(minus(PeRCenTX,PeRCenTY),s(PeRCenTY)))
+ ||    #33: #active(quot(s(PeRCenTX),s(PeRCenTY))) -> #quot(minus(PeRCenTX,PeRCenTY),s(PeRCenTY))
+ ||    #34: #active(quot(s(PeRCenTX),s(PeRCenTY))) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #35: #quot(PeRCenTX,active(PeRCenTY)) -> #quot(PeRCenTX,PeRCenTY)
+ ||    #36: #active(zWquot(cons(PeRCenTX,PeRCenTY),cons(PeRCenTZ,PeRCenTU))) -> #mark(cons(quot(PeRCenTX,PeRCenTZ),zWquot(PeRCenTY,PeRCenTU)))
+ ||    #37: #active(zWquot(cons(PeRCenTX,PeRCenTY),cons(PeRCenTZ,PeRCenTU))) -> #cons(quot(PeRCenTX,PeRCenTZ),zWquot(PeRCenTY,PeRCenTU))
+ ||    #38: #active(zWquot(cons(PeRCenTX,PeRCenTY),cons(PeRCenTZ,PeRCenTU))) -> #quot(PeRCenTX,PeRCenTZ)
+ ||    #39: #active(zWquot(cons(PeRCenTX,PeRCenTY),cons(PeRCenTZ,PeRCenTU))) -> #zWquot(PeRCenTY,PeRCenTU)
+ ||    #40: #minus(PeRCenTX,mark(PeRCenTY)) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #41: #active(minus(s(PeRCenTX),s(PeRCenTY))) -> #mark(minus(PeRCenTX,PeRCenTY))
+ ||    #42: #active(minus(s(PeRCenTX),s(PeRCenTY))) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #43: #sel(mark(PeRCenTX),PeRCenTY) -> #sel(PeRCenTX,PeRCenTY)
+ ||    #44: #cons(mark(PeRCenTX),PeRCenTY) -> #cons(PeRCenTX,PeRCenTY)
+ ||    #45: #minus(active(PeRCenTX),PeRCenTY) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #46: #s(active(PeRCenTX)) -> #s(PeRCenTX)
+ ||    #47: #mark(quot(PeRCenTX,PeRCenTY)) -> #active(quot(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #48: #mark(quot(PeRCenTX,PeRCenTY)) -> #quot(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #49: #mark(quot(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #50: #mark(quot(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #51: #minus(mark(PeRCenTX),PeRCenTY) -> #minus(PeRCenTX,PeRCenTY)
+ ||    #52: #mark(nil()) -> #active(nil())
+ ||    #53: #s(mark(PeRCenTX)) -> #s(PeRCenTX)
+ ||    #54: #quot(mark(PeRCenTX),PeRCenTY) -> #quot(PeRCenTX,PeRCenTY)
+ ||    #55: #from(active(PeRCenTX)) -> #from(PeRCenTX)
+ ||    #56: #mark(minus(PeRCenTX,PeRCenTY)) -> #active(minus(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #57: #mark(minus(PeRCenTX,PeRCenTY)) -> #minus(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #58: #mark(minus(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #59: #mark(minus(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #60: #active(sel(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ))) -> #mark(sel(PeRCenTX,PeRCenTZ))
+ ||    #61: #active(sel(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ))) -> #sel(PeRCenTX,PeRCenTZ)
+ ||    #62: #active(from(PeRCenTX)) -> #mark(cons(PeRCenTX,from(s(PeRCenTX))))
+ ||    #63: #active(from(PeRCenTX)) -> #cons(PeRCenTX,from(s(PeRCenTX)))
+ ||    #64: #active(from(PeRCenTX)) -> #from(s(PeRCenTX))
+ ||    #65: #active(from(PeRCenTX)) -> #s(PeRCenTX)
+ ||    #66: #active(zWquot(PeRCenTX,nil())) -> #mark(nil())
+ ||    #67: #mark(O()) -> #active(O())
+ ||    #68: #active(minus(PeRCenTX,O())) -> #mark(O())
+ ||    #69: #mark(zWquot(PeRCenTX,PeRCenTY)) -> #active(zWquot(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #70: #mark(zWquot(PeRCenTX,PeRCenTY)) -> #zWquot(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #71: #mark(zWquot(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #72: #mark(zWquot(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ || Number of SCCs: 8, DPs: 46
+ ||   SCC { #30 #55 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: x1
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #30 #55
+ || Number of SCCs: 7, DPs: 44
+ ||   SCC { #46 #53 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: x1
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #46 #53
+ || Number of SCCs: 6, DPs: 42
+ ||   SCC { #4 #40 #45 #51 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: x1
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #45 #51
+ || Number of SCCs: 6, DPs: 40
+ ||   SCC { #4 #40 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: x2
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #4 #40
+ || Number of SCCs: 5, DPs: 38
+ ||   SCC { #7 #8 #35 #54 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: x1
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #8 #54
+ || Number of SCCs: 5, DPs: 36
+ ||   SCC { #7 #35 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: x2
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #7 #35
+ || Number of SCCs: 4, DPs: 34
+ ||   SCC { #18 #19 #29 #44 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: x1
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #18 #44
+ || Number of SCCs: 4, DPs: 32
+ ||   SCC { #19 #29 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: x2
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #19 #29
+ || Number of SCCs: 3, DPs: 30
+ ||   SCC { #3 #23 #28 #43 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: x2
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #3 #23
+ || Number of SCCs: 3, DPs: 28
+ ||   SCC { #28 #43 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: 0
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: x1
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #28 #43
+ || Number of SCCs: 2, DPs: 26
+ ||   SCC { #2 #5 #6 #10 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: x1
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #5 #10
+ || Number of SCCs: 2, DPs: 24
+ ||   SCC { #2 #6 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #zWquot	w: x2
+ ||       minus	w: 0
+ ||       zWquot	w: 0
+ ||       O 	w: 0
+ ||       #mark	w: 0
+ ||       quot	w: 0
+ ||       #sel	w: 0
+ ||       from	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1 + 1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1 + 1
+ ||       cons	w: 0
+ ||       #active	w: 0
+ ||       #quot	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #2 #6
+ || Number of SCCs: 1, DPs: 22
+ ||   SCC { #1 #13 #15 #17 #22 #24 #26 #27 #31 #36 #41 #47 #49 #50 #56 #58..60 #62 #69 #71 #72 }
+ || POLO(Sum)... POLO(max)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: x1
+ ||       #zWquot	w: 0
+ ||       minus	w: max(x1, x2 + 1)
+ ||       zWquot	w: max(x1 + 5, x2 + 7)
+ ||       O 	w: 4
+ ||       #mark	w: x1 + 1
+ ||       quot	w: max(x1 + 1, x2 + 3)
+ ||       #sel	w: 0
+ ||       from	w: x1 + 2
+ ||       sel	w: max(x1 + 3, x2 + 1)
+ ||       #s 	w: 0
+ ||       nil	w: 8
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1
+ ||       cons	w: max(x1 + 1, x2)
+ ||       #active	w: x1 + 1
+ ||       #quot	w: 0
+ ||     USABLE RULES: { 1..43 }
+ ||     Removed DPs: #1 #17 #22 #26 #27 #49 #50 #59 #71 #72
+ || Number of SCCs: 2, DPs: 8
+ ||   SCC { #24 #60 }
+ || POLO(Sum)... POLO(max)... QLPOS... POLO(mSum)... QWPOpS(mSum)... succeeded.
+ ||       TIlDePAIR	s: []	p: 0	w: 1
+ ||       #cons	s: []	p: 0	w: max(x2 + 1)
+ ||       s 	s: [1]	p: 0	w: x1
+ ||       #zWquot	s: []	p: 0	w: x2
+ ||       minus	s: []	p: 0	w: 0
+ ||       zWquot	s: [2,1]	p: 2	w: x1 + x2 + 1
+ ||       O 	s: []	p: 0	w: 0
+ ||       #mark	s: 1
+ ||       quot	s: [1]	p: 1	w: max(x1, x2 + 2)
+ ||       #sel	s: []	p: 0	w: 0
+ ||       from	s: [1]	p: 0	w: x1 + 1
+ ||       sel	s: [1]	p: 0	w: x1 + x2 + 2
+ ||       #s 	s: []	p: 0	w: 0
+ ||       nil	s: []	p: 3	w: 1
+ ||       #TIlDePAIR	s: []	p: 0	w: x1
+ ||       mark	s: 1
+ ||       #minus	s: [2,1]	p: 0	w: max(x1 + 1, x2)
+ ||       #from	s: []	p: 0	w: 0
+ ||       active	s: 1
+ ||       cons	s: []	p: 0	w: max(x1 + 1, x2)
+ ||       #active	s: 1
+ ||       #quot	s: [1]	p: 0	w: max(x1)
+ ||     USABLE RULES: { 1..43 }
+ ||     Removed DPs: #60
+ || Number of SCCs: 1, DPs: 6
+ ||   SCC { #13 #31 #41 #47 #56 #58 }
+ || POLO(Sum)... POLO(max)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: x1
+ ||       #zWquot	w: 0
+ ||       minus	w: max(x1 + 1, x2 + 5)
+ ||       zWquot	w: max(x1 + 1, x2 + 1)
+ ||       O 	w: 1
+ ||       #mark	w: x1 + 1
+ ||       quot	w: max(x2 + 1)
+ ||       #sel	w: 0
+ ||       from	w: x1 + 1
+ ||       sel	w: max(x2 + 1)
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       mark	w: x1
+ ||       #minus	w: 0
+ ||       #from	w: 0
+ ||       active	w: x1
+ ||       cons	w: max(x1, x2)
+ ||       #active	w: x1 + 1
+ ||       #quot	w: 0
+ ||     USABLE RULES: { 1..43 }
+ ||     Removed DPs: #58
+ || Number of SCCs: 2, DPs: 5
+ ||   SCC { #41 #56 }
+ || POLO(Sum)... POLO(max)... QLPOS... POLO(mSum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: max(x1 + 5, 0)
+ ||       #zWquot	w: max(x2 - 1, 0)
+ ||       minus	w: max(x1 - 2, 0)
+ ||       zWquot	w: max(x1 + 1, 0)
+ ||       O 	w: 0
+ ||       #mark	w: max(x1 - 1, 0)
+ ||       quot	w: max(x1, 0)
+ ||       #sel	w: max(x1 - 1, 0)
+ ||       from	w: max(x1, 0)
+ ||       sel	w: max(x1 + x2 + 6, 0)
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: max(x1 - 1, 0)
+ ||       mark	w: max(x1, 0)
+ ||       #minus	w: 0
+ ||       #from	w: max(x1 - 1, 0)
+ ||       active	w: max(x1, 0)
+ ||       cons	w: max(x1, x2 - 5, 0)
+ ||       #active	w: max(x1 - 2, 0)
+ ||       #quot	w: 0
+ ||     USABLE RULES: { 1..43 }
+ ||     Removed DPs: #41
+ || Number of SCCs: 1, DPs: 3
+ ||   SCC { #13 #31 #47 }
+ || POLO(Sum)... POLO(max)... QLPOS... POLO(mSum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: max(x1 + 5, 0)
+ ||       #zWquot	w: max(x2 - 1, 0)
+ ||       minus	w: max(x1 - 6, 0)
+ ||       zWquot	w: max(x1 + 1, 0)
+ ||       O 	w: 0
+ ||       #mark	w: max(x1 - 4, 0)
+ ||       quot	w: max(x1, 0)
+ ||       #sel	w: max(x1 - 1, 0)
+ ||       from	w: max(x1, 0)
+ ||       sel	w: max(x1 + x2 + 6, 0)
+ ||       #s 	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: max(x1 - 1, 0)
+ ||       mark	w: max(x1, 0)
+ ||       #minus	w: 0
+ ||       #from	w: max(x1 - 1, 0)
+ ||       active	w: max(x1, 0)
+ ||       cons	w: max(x1, x2 - 5, 0)
+ ||       #active	w: max(x1 - 4, 0)
+ ||       #quot	w: 0
+ ||     USABLE RULES: { 1..43 }
+ ||     Removed DPs: #13
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+
+  Rules R_0:
+
+    active(from(X)) => mark(cons(X, from(s(X)))) 
+    active(sel(O, cons(X, Y))) => mark(X) 
+    active(sel(s(X), cons(Y, Z))) => mark(sel(X, Z)) 
+    active(minus(X, O)) => mark(O) 
+    active(minus(s(X), s(Y))) => mark(minus(X, Y)) 
+    active(quot(O, s(X))) => mark(O) 
+    active(quot(s(X), s(Y))) => mark(s(quot(minus(X, Y), s(Y)))) 
+    active(zWquot(X, nil)) => mark(nil) 
+    active(zWquot(nil, X)) => mark(nil) 
+    active(zWquot(cons(X, Y), cons(Z, U))) => mark(cons(quot(X, Z), zWquot(Y, U))) 
+    mark(from(X)) => active(from(mark(X))) 
+    mark(cons(X, Y)) => active(cons(mark(X), Y)) 
+    mark(s(X)) => active(s(mark(X))) 
+    mark(sel(X, Y)) => active(sel(mark(X), mark(Y))) 
+    mark(O) => active(O) 
+    mark(minus(X, Y)) => active(minus(mark(X), mark(Y))) 
+    mark(quot(X, Y)) => active(quot(mark(X), mark(Y))) 
+    mark(zWquot(X, Y)) => active(zWquot(mark(X), mark(Y))) 
+    mark(nil) => active(nil) 
+    from(mark(X)) => from(X) 
+    from(active(X)) => from(X) 
+    cons(mark(X), Y) => cons(X, Y) 
+    cons(X, mark(Y)) => cons(X, Y) 
+    cons(active(X), Y) => cons(X, Y) 
+    cons(X, active(Y)) => cons(X, Y) 
+    s(mark(X)) => s(X) 
+    s(active(X)) => s(X) 
+    sel(mark(X), Y) => sel(X, Y) 
+    sel(X, mark(Y)) => sel(X, Y) 
+    sel(active(X), Y) => sel(X, Y) 
+    sel(X, active(Y)) => sel(X, Y) 
+    minus(mark(X), Y) => minus(X, Y) 
+    minus(X, mark(Y)) => minus(X, Y) 
+    minus(active(X), Y) => minus(X, Y) 
+    minus(X, active(Y)) => minus(X, Y) 
+    quot(mark(X), Y) => quot(X, Y) 
+    quot(X, mark(Y)) => quot(X, Y) 
+    quot(active(X), Y) => quot(X, Y) 
+    quot(X, active(Y)) => quot(X, Y) 
+    zWquot(mark(X), Y) => zWquot(X, Y) 
+    zWquot(X, mark(Y)) => zWquot(X, Y) 
+    zWquot(active(X), Y) => zWquot(X, Y) 
+    zWquot(X, active(Y)) => zWquot(X, Y) 
+    map(F, nil) => nil 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+
+This graph has no strongly connected components.  By [Kop12, Thm. 7.31], this implies finiteness of the dependency pair problem.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

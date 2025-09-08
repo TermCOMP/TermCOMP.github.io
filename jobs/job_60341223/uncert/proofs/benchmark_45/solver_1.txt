@@ -1,0 +1,1518 @@
+YES
+We consider the system Qjurj.
+
+  Alphabet:
+
+    O : [] --> A 
+    active : [A] --> A 
+    afterNth : [A * A] --> A 
+    app : [A -> A * A] --> A 
+    cons : [A * A] --> A 
+    foldr : [A -> A -> A * A * A] --> A 
+    fst : [A] --> A 
+    head : [A] --> A 
+    map : [A -> A * A] --> A 
+    mark : [A] --> A 
+    natsFrom : [A] --> A 
+    nil : [] --> A 
+    pair : [A * A] --> A 
+    s : [A] --> A 
+    sel : [A * A] --> A 
+    snd : [A] --> A 
+    splitAt : [A * A] --> A 
+    tail : [A] --> A 
+    take : [A * A] --> A 
+    u : [A * A * A * A] --> A 
+
+  Rules:
+
+    active(natsFrom(X)) => mark(cons(X, natsFrom(s(X)))) 
+    active(fst(pair(X, Y))) => mark(X) 
+    active(snd(pair(X, Y))) => mark(Y) 
+    active(splitAt(O, X)) => mark(pair(nil, X)) 
+    active(splitAt(s(X), cons(Y, Z))) => mark(u(splitAt(X, Z), X, Y, Z)) 
+    active(u(pair(X, Y), Z, U, V)) => mark(pair(cons(U, X), Y)) 
+    active(head(cons(X, Y))) => mark(X) 
+    active(tail(cons(X, Y))) => mark(Y) 
+    active(sel(X, Y)) => mark(head(afterNth(X, Y))) 
+    active(take(X, Y)) => mark(fst(splitAt(X, Y))) 
+    active(afterNth(X, Y)) => mark(snd(splitAt(X, Y))) 
+    mark(natsFrom(X)) => active(natsFrom(mark(X))) 
+    mark(cons(X, Y)) => active(cons(mark(X), Y)) 
+    mark(s(X)) => active(s(mark(X))) 
+    mark(fst(X)) => active(fst(mark(X))) 
+    mark(pair(X, Y)) => active(pair(mark(X), mark(Y))) 
+    mark(snd(X)) => active(snd(mark(X))) 
+    mark(splitAt(X, Y)) => active(splitAt(mark(X), mark(Y))) 
+    mark(O) => active(O) 
+    mark(nil) => active(nil) 
+    mark(u(X, Y, Z, U)) => active(u(mark(X), Y, Z, U)) 
+    mark(head(X)) => active(head(mark(X))) 
+    mark(tail(X)) => active(tail(mark(X))) 
+    mark(sel(X, Y)) => active(sel(mark(X), mark(Y))) 
+    mark(afterNth(X, Y)) => active(afterNth(mark(X), mark(Y))) 
+    mark(take(X, Y)) => active(take(mark(X), mark(Y))) 
+    natsFrom(mark(X)) => natsFrom(X) 
+    natsFrom(active(X)) => natsFrom(X) 
+    cons(mark(X), Y) => cons(X, Y) 
+    cons(X, mark(Y)) => cons(X, Y) 
+    cons(active(X), Y) => cons(X, Y) 
+    cons(X, active(Y)) => cons(X, Y) 
+    s(mark(X)) => s(X) 
+    s(active(X)) => s(X) 
+    fst(mark(X)) => fst(X) 
+    fst(active(X)) => fst(X) 
+    pair(mark(X), Y) => pair(X, Y) 
+    pair(X, mark(Y)) => pair(X, Y) 
+    pair(active(X), Y) => pair(X, Y) 
+    pair(X, active(Y)) => pair(X, Y) 
+    snd(mark(X)) => snd(X) 
+    snd(active(X)) => snd(X) 
+    splitAt(mark(X), Y) => splitAt(X, Y) 
+    splitAt(X, mark(Y)) => splitAt(X, Y) 
+    splitAt(active(X), Y) => splitAt(X, Y) 
+    splitAt(X, active(Y)) => splitAt(X, Y) 
+    u(mark(X), Y, Z, U) => u(X, Y, Z, U) 
+    u(X, mark(Y), Z, U) => u(X, Y, Z, U) 
+    u(X, Y, mark(Z), U) => u(X, Y, Z, U) 
+    u(X, Y, Z, mark(U)) => u(X, Y, Z, U) 
+    u(active(X), Y, Z, U) => u(X, Y, Z, U) 
+    u(X, active(Y), Z, U) => u(X, Y, Z, U) 
+    u(X, Y, active(Z), U) => u(X, Y, Z, U) 
+    u(X, Y, Z, active(U)) => u(X, Y, Z, U) 
+    head(mark(X)) => head(X) 
+    head(active(X)) => head(X) 
+    tail(mark(X)) => tail(X) 
+    tail(active(X)) => tail(X) 
+    sel(mark(X), Y) => sel(X, Y) 
+    sel(X, mark(Y)) => sel(X, Y) 
+    sel(active(X), Y) => sel(X, Y) 
+    sel(X, active(Y)) => sel(X, Y) 
+    afterNth(mark(X), Y) => afterNth(X, Y) 
+    afterNth(X, mark(Y)) => afterNth(X, Y) 
+    afterNth(active(X), Y) => afterNth(X, Y) 
+    afterNth(X, active(Y)) => afterNth(X, Y) 
+    take(mark(X), Y) => take(X, Y) 
+    take(X, mark(Y)) => take(X, Y) 
+    take(active(X), Y) => take(X, Y) 
+    take(X, active(Y)) => take(X, Y) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    app(F, X) => F X 
+    foldr(F, X, nil) => X 
+    foldr(F, X, cons(Y, Z)) => F Y foldr(F, X, Z) 
+
+Symbol app is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    O : [] --> A 
+    active : [A] --> A 
+    afterNth : [A * A] --> A 
+    cons : [A * A] --> A 
+    foldr : [A -> A -> A * A * A] --> A 
+    fst : [A] --> A 
+    head : [A] --> A 
+    map : [A -> A * A] --> A 
+    mark : [A] --> A 
+    natsFrom : [A] --> A 
+    nil : [] --> A 
+    pair : [A * A] --> A 
+    s : [A] --> A 
+    sel : [A * A] --> A 
+    snd : [A] --> A 
+    splitAt : [A * A] --> A 
+    tail : [A] --> A 
+    take : [A * A] --> A 
+    u : [A * A * A * A] --> A 
+
+  Rules:
+
+    active(natsFrom(X)) => mark(cons(X, natsFrom(s(X)))) 
+    active(fst(pair(X, Y))) => mark(X) 
+    active(snd(pair(X, Y))) => mark(Y) 
+    active(splitAt(O, X)) => mark(pair(nil, X)) 
+    active(splitAt(s(X), cons(Y, Z))) => mark(u(splitAt(X, Z), X, Y, Z)) 
+    active(u(pair(X, Y), Z, U, V)) => mark(pair(cons(U, X), Y)) 
+    active(head(cons(X, Y))) => mark(X) 
+    active(tail(cons(X, Y))) => mark(Y) 
+    active(sel(X, Y)) => mark(head(afterNth(X, Y))) 
+    active(take(X, Y)) => mark(fst(splitAt(X, Y))) 
+    active(afterNth(X, Y)) => mark(snd(splitAt(X, Y))) 
+    mark(natsFrom(X)) => active(natsFrom(mark(X))) 
+    mark(cons(X, Y)) => active(cons(mark(X), Y)) 
+    mark(s(X)) => active(s(mark(X))) 
+    mark(fst(X)) => active(fst(mark(X))) 
+    mark(pair(X, Y)) => active(pair(mark(X), mark(Y))) 
+    mark(snd(X)) => active(snd(mark(X))) 
+    mark(splitAt(X, Y)) => active(splitAt(mark(X), mark(Y))) 
+    mark(O) => active(O) 
+    mark(nil) => active(nil) 
+    mark(u(X, Y, Z, U)) => active(u(mark(X), Y, Z, U)) 
+    mark(head(X)) => active(head(mark(X))) 
+    mark(tail(X)) => active(tail(mark(X))) 
+    mark(sel(X, Y)) => active(sel(mark(X), mark(Y))) 
+    mark(afterNth(X, Y)) => active(afterNth(mark(X), mark(Y))) 
+    mark(take(X, Y)) => active(take(mark(X), mark(Y))) 
+    natsFrom(mark(X)) => natsFrom(X) 
+    natsFrom(active(X)) => natsFrom(X) 
+    cons(mark(X), Y) => cons(X, Y) 
+    cons(X, mark(Y)) => cons(X, Y) 
+    cons(active(X), Y) => cons(X, Y) 
+    cons(X, active(Y)) => cons(X, Y) 
+    s(mark(X)) => s(X) 
+    s(active(X)) => s(X) 
+    fst(mark(X)) => fst(X) 
+    fst(active(X)) => fst(X) 
+    pair(mark(X), Y) => pair(X, Y) 
+    pair(X, mark(Y)) => pair(X, Y) 
+    pair(active(X), Y) => pair(X, Y) 
+    pair(X, active(Y)) => pair(X, Y) 
+    snd(mark(X)) => snd(X) 
+    snd(active(X)) => snd(X) 
+    splitAt(mark(X), Y) => splitAt(X, Y) 
+    splitAt(X, mark(Y)) => splitAt(X, Y) 
+    splitAt(active(X), Y) => splitAt(X, Y) 
+    splitAt(X, active(Y)) => splitAt(X, Y) 
+    u(mark(X), Y, Z, U) => u(X, Y, Z, U) 
+    u(X, mark(Y), Z, U) => u(X, Y, Z, U) 
+    u(X, Y, mark(Z), U) => u(X, Y, Z, U) 
+    u(X, Y, Z, mark(U)) => u(X, Y, Z, U) 
+    u(active(X), Y, Z, U) => u(X, Y, Z, U) 
+    u(X, active(Y), Z, U) => u(X, Y, Z, U) 
+    u(X, Y, active(Z), U) => u(X, Y, Z, U) 
+    u(X, Y, Z, active(U)) => u(X, Y, Z, U) 
+    head(mark(X)) => head(X) 
+    head(active(X)) => head(X) 
+    tail(mark(X)) => tail(X) 
+    tail(active(X)) => tail(X) 
+    sel(mark(X), Y) => sel(X, Y) 
+    sel(X, mark(Y)) => sel(X, Y) 
+    sel(active(X), Y) => sel(X, Y) 
+    sel(X, active(Y)) => sel(X, Y) 
+    afterNth(mark(X), Y) => afterNth(X, Y) 
+    afterNth(X, mark(Y)) => afterNth(X, Y) 
+    afterNth(active(X), Y) => afterNth(X, Y) 
+    afterNth(X, active(Y)) => afterNth(X, Y) 
+    take(mark(X), Y) => take(X, Y) 
+    take(X, mark(Y)) => take(X, Y) 
+    take(active(X), Y) => take(X, Y) 
+    take(X, active(Y)) => take(X, Y) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    foldr(F, X, nil) => X 
+    foldr(F, X, cons(Y, Z)) => F Y foldr(F, X, Z) 
+
+We observe that the rules contain a first-order subset:
+
+  active(natsFrom(X)) => mark(cons(X, natsFrom(s(X)))) 
+  active(fst(pair(X, Y))) => mark(X) 
+  active(snd(pair(X, Y))) => mark(Y) 
+  active(splitAt(O, X)) => mark(pair(nil, X)) 
+  active(splitAt(s(X), cons(Y, Z))) => mark(u(splitAt(X, Z), X, Y, Z)) 
+  active(u(pair(X, Y), Z, U, V)) => mark(pair(cons(U, X), Y)) 
+  active(head(cons(X, Y))) => mark(X) 
+  active(tail(cons(X, Y))) => mark(Y) 
+  active(sel(X, Y)) => mark(head(afterNth(X, Y))) 
+  active(take(X, Y)) => mark(fst(splitAt(X, Y))) 
+  active(afterNth(X, Y)) => mark(snd(splitAt(X, Y))) 
+  mark(natsFrom(X)) => active(natsFrom(mark(X))) 
+  mark(cons(X, Y)) => active(cons(mark(X), Y)) 
+  mark(s(X)) => active(s(mark(X))) 
+  mark(fst(X)) => active(fst(mark(X))) 
+  mark(pair(X, Y)) => active(pair(mark(X), mark(Y))) 
+  mark(snd(X)) => active(snd(mark(X))) 
+  mark(splitAt(X, Y)) => active(splitAt(mark(X), mark(Y))) 
+  mark(O) => active(O) 
+  mark(nil) => active(nil) 
+  mark(u(X, Y, Z, U)) => active(u(mark(X), Y, Z, U)) 
+  mark(head(X)) => active(head(mark(X))) 
+  mark(tail(X)) => active(tail(mark(X))) 
+  mark(sel(X, Y)) => active(sel(mark(X), mark(Y))) 
+  mark(afterNth(X, Y)) => active(afterNth(mark(X), mark(Y))) 
+  mark(take(X, Y)) => active(take(mark(X), mark(Y))) 
+  natsFrom(mark(X)) => natsFrom(X) 
+  natsFrom(active(X)) => natsFrom(X) 
+  cons(mark(X), Y) => cons(X, Y) 
+  cons(X, mark(Y)) => cons(X, Y) 
+  cons(active(X), Y) => cons(X, Y) 
+  cons(X, active(Y)) => cons(X, Y) 
+  s(mark(X)) => s(X) 
+  s(active(X)) => s(X) 
+  fst(mark(X)) => fst(X) 
+  fst(active(X)) => fst(X) 
+  pair(mark(X), Y) => pair(X, Y) 
+  pair(X, mark(Y)) => pair(X, Y) 
+  pair(active(X), Y) => pair(X, Y) 
+  pair(X, active(Y)) => pair(X, Y) 
+  snd(mark(X)) => snd(X) 
+  snd(active(X)) => snd(X) 
+  splitAt(mark(X), Y) => splitAt(X, Y) 
+  splitAt(X, mark(Y)) => splitAt(X, Y) 
+  splitAt(active(X), Y) => splitAt(X, Y) 
+  splitAt(X, active(Y)) => splitAt(X, Y) 
+  u(mark(X), Y, Z, U) => u(X, Y, Z, U) 
+  u(X, mark(Y), Z, U) => u(X, Y, Z, U) 
+  u(X, Y, mark(Z), U) => u(X, Y, Z, U) 
+  u(X, Y, Z, mark(U)) => u(X, Y, Z, U) 
+  u(active(X), Y, Z, U) => u(X, Y, Z, U) 
+  u(X, active(Y), Z, U) => u(X, Y, Z, U) 
+  u(X, Y, active(Z), U) => u(X, Y, Z, U) 
+  u(X, Y, Z, active(U)) => u(X, Y, Z, U) 
+  head(mark(X)) => head(X) 
+  head(active(X)) => head(X) 
+  tail(mark(X)) => tail(X) 
+  tail(active(X)) => tail(X) 
+  sel(mark(X), Y) => sel(X, Y) 
+  sel(X, mark(Y)) => sel(X, Y) 
+  sel(active(X), Y) => sel(X, Y) 
+  sel(X, active(Y)) => sel(X, Y) 
+  afterNth(mark(X), Y) => afterNth(X, Y) 
+  afterNth(X, mark(Y)) => afterNth(X, Y) 
+  afterNth(active(X), Y) => afterNth(X, Y) 
+  afterNth(X, active(Y)) => afterNth(X, Y) 
+  take(mark(X), Y) => take(X, Y) 
+  take(X, mark(Y)) => take(X, Y) 
+  take(active(X), Y) => take(X, Y) 
+  take(X, active(Y)) => take(X, Y) 
+
+Moreover, the system is finitely branching.  Thus, by [Kop12, Thm. 7.55], we may omit all first-order dependency pairs from the dependency pair problem (DP(R), R) if this first-order part is Ce-terminating when seen as a many-sorted first-order TRS.
+
+According to the external first-order termination prover, this system is indeed Ce-terminating:
+
+ || Input TRS:
+ ||     1: active(natsFrom(PeRCenTX)) -> mark(cons(PeRCenTX,natsFrom(s(PeRCenTX))))
+ ||     2: active(fst(pair(PeRCenTX,PeRCenTY))) -> mark(PeRCenTX)
+ ||     3: active(snd(pair(PeRCenTX,PeRCenTY))) -> mark(PeRCenTY)
+ ||     4: active(splitAt(O(),PeRCenTX)) -> mark(pair(nil(),PeRCenTX))
+ ||     5: active(splitAt(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ))) -> mark(u(splitAt(PeRCenTX,PeRCenTZ),PeRCenTX,PeRCenTY,PeRCenTZ))
+ ||     6: active(u(pair(PeRCenTX,PeRCenTY),PeRCenTZ,PeRCenTU,PeRCenTV)) -> mark(pair(cons(PeRCenTU,PeRCenTX),PeRCenTY))
+ ||     7: active(head(cons(PeRCenTX,PeRCenTY))) -> mark(PeRCenTX)
+ ||     8: active(tail(cons(PeRCenTX,PeRCenTY))) -> mark(PeRCenTY)
+ ||     9: active(sel(PeRCenTX,PeRCenTY)) -> mark(head(afterNth(PeRCenTX,PeRCenTY)))
+ ||     10: active(take(PeRCenTX,PeRCenTY)) -> mark(fst(splitAt(PeRCenTX,PeRCenTY)))
+ ||     11: active(afterNth(PeRCenTX,PeRCenTY)) -> mark(snd(splitAt(PeRCenTX,PeRCenTY)))
+ ||     12: mark(natsFrom(PeRCenTX)) -> active(natsFrom(mark(PeRCenTX)))
+ ||     13: mark(cons(PeRCenTX,PeRCenTY)) -> active(cons(mark(PeRCenTX),PeRCenTY))
+ ||     14: mark(s(PeRCenTX)) -> active(s(mark(PeRCenTX)))
+ ||     15: mark(fst(PeRCenTX)) -> active(fst(mark(PeRCenTX)))
+ ||     16: mark(pair(PeRCenTX,PeRCenTY)) -> active(pair(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     17: mark(snd(PeRCenTX)) -> active(snd(mark(PeRCenTX)))
+ ||     18: mark(splitAt(PeRCenTX,PeRCenTY)) -> active(splitAt(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     19: mark(O()) -> active(O())
+ ||     20: mark(nil()) -> active(nil())
+ ||     21: mark(u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)) -> active(u(mark(PeRCenTX),PeRCenTY,PeRCenTZ,PeRCenTU))
+ ||     22: mark(head(PeRCenTX)) -> active(head(mark(PeRCenTX)))
+ ||     23: mark(tail(PeRCenTX)) -> active(tail(mark(PeRCenTX)))
+ ||     24: mark(sel(PeRCenTX,PeRCenTY)) -> active(sel(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     25: mark(afterNth(PeRCenTX,PeRCenTY)) -> active(afterNth(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     26: mark(take(PeRCenTX,PeRCenTY)) -> active(take(mark(PeRCenTX),mark(PeRCenTY)))
+ ||     27: natsFrom(mark(PeRCenTX)) -> natsFrom(PeRCenTX)
+ ||     28: natsFrom(active(PeRCenTX)) -> natsFrom(PeRCenTX)
+ ||     29: cons(mark(PeRCenTX),PeRCenTY) -> cons(PeRCenTX,PeRCenTY)
+ ||     30: cons(PeRCenTX,mark(PeRCenTY)) -> cons(PeRCenTX,PeRCenTY)
+ ||     31: cons(active(PeRCenTX),PeRCenTY) -> cons(PeRCenTX,PeRCenTY)
+ ||     32: cons(PeRCenTX,active(PeRCenTY)) -> cons(PeRCenTX,PeRCenTY)
+ ||     33: s(mark(PeRCenTX)) -> s(PeRCenTX)
+ ||     34: s(active(PeRCenTX)) -> s(PeRCenTX)
+ ||     35: fst(mark(PeRCenTX)) -> fst(PeRCenTX)
+ ||     36: fst(active(PeRCenTX)) -> fst(PeRCenTX)
+ ||     37: pair(mark(PeRCenTX),PeRCenTY) -> pair(PeRCenTX,PeRCenTY)
+ ||     38: pair(PeRCenTX,mark(PeRCenTY)) -> pair(PeRCenTX,PeRCenTY)
+ ||     39: pair(active(PeRCenTX),PeRCenTY) -> pair(PeRCenTX,PeRCenTY)
+ ||     40: pair(PeRCenTX,active(PeRCenTY)) -> pair(PeRCenTX,PeRCenTY)
+ ||     41: snd(mark(PeRCenTX)) -> snd(PeRCenTX)
+ ||     42: snd(active(PeRCenTX)) -> snd(PeRCenTX)
+ ||     43: splitAt(mark(PeRCenTX),PeRCenTY) -> splitAt(PeRCenTX,PeRCenTY)
+ ||     44: splitAt(PeRCenTX,mark(PeRCenTY)) -> splitAt(PeRCenTX,PeRCenTY)
+ ||     45: splitAt(active(PeRCenTX),PeRCenTY) -> splitAt(PeRCenTX,PeRCenTY)
+ ||     46: splitAt(PeRCenTX,active(PeRCenTY)) -> splitAt(PeRCenTX,PeRCenTY)
+ ||     47: u(mark(PeRCenTX),PeRCenTY,PeRCenTZ,PeRCenTU) -> u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     48: u(PeRCenTX,mark(PeRCenTY),PeRCenTZ,PeRCenTU) -> u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     49: u(PeRCenTX,PeRCenTY,mark(PeRCenTZ),PeRCenTU) -> u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     50: u(PeRCenTX,PeRCenTY,PeRCenTZ,mark(PeRCenTU)) -> u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     51: u(active(PeRCenTX),PeRCenTY,PeRCenTZ,PeRCenTU) -> u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     52: u(PeRCenTX,active(PeRCenTY),PeRCenTZ,PeRCenTU) -> u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     53: u(PeRCenTX,PeRCenTY,active(PeRCenTZ),PeRCenTU) -> u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     54: u(PeRCenTX,PeRCenTY,PeRCenTZ,active(PeRCenTU)) -> u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||     55: head(mark(PeRCenTX)) -> head(PeRCenTX)
+ ||     56: head(active(PeRCenTX)) -> head(PeRCenTX)
+ ||     57: tail(mark(PeRCenTX)) -> tail(PeRCenTX)
+ ||     58: tail(active(PeRCenTX)) -> tail(PeRCenTX)
+ ||     59: sel(mark(PeRCenTX),PeRCenTY) -> sel(PeRCenTX,PeRCenTY)
+ ||     60: sel(PeRCenTX,mark(PeRCenTY)) -> sel(PeRCenTX,PeRCenTY)
+ ||     61: sel(active(PeRCenTX),PeRCenTY) -> sel(PeRCenTX,PeRCenTY)
+ ||     62: sel(PeRCenTX,active(PeRCenTY)) -> sel(PeRCenTX,PeRCenTY)
+ ||     63: afterNth(mark(PeRCenTX),PeRCenTY) -> afterNth(PeRCenTX,PeRCenTY)
+ ||     64: afterNth(PeRCenTX,mark(PeRCenTY)) -> afterNth(PeRCenTX,PeRCenTY)
+ ||     65: afterNth(active(PeRCenTX),PeRCenTY) -> afterNth(PeRCenTX,PeRCenTY)
+ ||     66: afterNth(PeRCenTX,active(PeRCenTY)) -> afterNth(PeRCenTX,PeRCenTY)
+ ||     67: take(mark(PeRCenTX),PeRCenTY) -> take(PeRCenTX,PeRCenTY)
+ ||     68: take(PeRCenTX,mark(PeRCenTY)) -> take(PeRCenTX,PeRCenTY)
+ ||     69: take(active(PeRCenTX),PeRCenTY) -> take(PeRCenTX,PeRCenTY)
+ ||     70: take(PeRCenTX,active(PeRCenTY)) -> take(PeRCenTX,PeRCenTY)
+ ||     71: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTX
+ ||     72: TIlDePAIR(PeRCenTX,PeRCenTY) -> PeRCenTY
+ || Number of strict rules: 72
+ || Direct POLO(bPol) ... failed.
+ || Uncurrying ... failed.
+ || Dependency Pairs:
+ ||    #1: #active(fst(pair(PeRCenTX,PeRCenTY))) -> #mark(PeRCenTX)
+ ||    #2: #splitAt(mark(PeRCenTX),PeRCenTY) -> #splitAt(PeRCenTX,PeRCenTY)
+ ||    #3: #cons(mark(PeRCenTX),PeRCenTY) -> #cons(PeRCenTX,PeRCenTY)
+ ||    #4: #fst(mark(PeRCenTX)) -> #fst(PeRCenTX)
+ ||    #5: #afterNth(PeRCenTX,active(PeRCenTY)) -> #afterNth(PeRCenTX,PeRCenTY)
+ ||    #6: #splitAt(PeRCenTX,active(PeRCenTY)) -> #splitAt(PeRCenTX,PeRCenTY)
+ ||    #7: #snd(active(PeRCenTX)) -> #snd(PeRCenTX)
+ ||    #8: #snd(mark(PeRCenTX)) -> #snd(PeRCenTX)
+ ||    #9: #pair(mark(PeRCenTX),PeRCenTY) -> #pair(PeRCenTX,PeRCenTY)
+ ||    #10: #u(mark(PeRCenTX),PeRCenTY,PeRCenTZ,PeRCenTU) -> #u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #11: #u(PeRCenTX,PeRCenTY,active(PeRCenTZ),PeRCenTU) -> #u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #12: #u(PeRCenTX,mark(PeRCenTY),PeRCenTZ,PeRCenTU) -> #u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #13: #tail(active(PeRCenTX)) -> #tail(PeRCenTX)
+ ||    #14: #sel(active(PeRCenTX),PeRCenTY) -> #sel(PeRCenTX,PeRCenTY)
+ ||    #15: #pair(PeRCenTX,mark(PeRCenTY)) -> #pair(PeRCenTX,PeRCenTY)
+ ||    #16: #active(u(pair(PeRCenTX,PeRCenTY),PeRCenTZ,PeRCenTU,PeRCenTV)) -> #mark(pair(cons(PeRCenTU,PeRCenTX),PeRCenTY))
+ ||    #17: #active(u(pair(PeRCenTX,PeRCenTY),PeRCenTZ,PeRCenTU,PeRCenTV)) -> #pair(cons(PeRCenTU,PeRCenTX),PeRCenTY)
+ ||    #18: #active(u(pair(PeRCenTX,PeRCenTY),PeRCenTZ,PeRCenTU,PeRCenTV)) -> #cons(PeRCenTU,PeRCenTX)
+ ||    #19: #sel(mark(PeRCenTX),PeRCenTY) -> #sel(PeRCenTX,PeRCenTY)
+ ||    #20: #head(mark(PeRCenTX)) -> #head(PeRCenTX)
+ ||    #21: #take(mark(PeRCenTX),PeRCenTY) -> #take(PeRCenTX,PeRCenTY)
+ ||    #22: #pair(PeRCenTX,active(PeRCenTY)) -> #pair(PeRCenTX,PeRCenTY)
+ ||    #23: #u(active(PeRCenTX),PeRCenTY,PeRCenTZ,PeRCenTU) -> #u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #24: #mark(cons(PeRCenTX,PeRCenTY)) -> #active(cons(mark(PeRCenTX),PeRCenTY))
+ ||    #25: #mark(cons(PeRCenTX,PeRCenTY)) -> #cons(mark(PeRCenTX),PeRCenTY)
+ ||    #26: #mark(cons(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #27: #active(sel(PeRCenTX,PeRCenTY)) -> #mark(head(afterNth(PeRCenTX,PeRCenTY)))
+ ||    #28: #active(sel(PeRCenTX,PeRCenTY)) -> #head(afterNth(PeRCenTX,PeRCenTY))
+ ||    #29: #active(sel(PeRCenTX,PeRCenTY)) -> #afterNth(PeRCenTX,PeRCenTY)
+ ||    #30: #active(afterNth(PeRCenTX,PeRCenTY)) -> #mark(snd(splitAt(PeRCenTX,PeRCenTY)))
+ ||    #31: #active(afterNth(PeRCenTX,PeRCenTY)) -> #snd(splitAt(PeRCenTX,PeRCenTY))
+ ||    #32: #active(afterNth(PeRCenTX,PeRCenTY)) -> #splitAt(PeRCenTX,PeRCenTY)
+ ||    #33: #tail(mark(PeRCenTX)) -> #tail(PeRCenTX)
+ ||    #34: #mark(sel(PeRCenTX,PeRCenTY)) -> #active(sel(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #35: #mark(sel(PeRCenTX,PeRCenTY)) -> #sel(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #36: #mark(sel(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #37: #mark(sel(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #38: #take(PeRCenTX,active(PeRCenTY)) -> #take(PeRCenTX,PeRCenTY)
+ ||    #39: #mark(tail(PeRCenTX)) -> #active(tail(mark(PeRCenTX)))
+ ||    #40: #mark(tail(PeRCenTX)) -> #tail(mark(PeRCenTX))
+ ||    #41: #mark(tail(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #42: #splitAt(active(PeRCenTX),PeRCenTY) -> #splitAt(PeRCenTX,PeRCenTY)
+ ||    #43: #take(active(PeRCenTX),PeRCenTY) -> #take(PeRCenTX,PeRCenTY)
+ ||    #44: #mark(natsFrom(PeRCenTX)) -> #active(natsFrom(mark(PeRCenTX)))
+ ||    #45: #mark(natsFrom(PeRCenTX)) -> #natsFrom(mark(PeRCenTX))
+ ||    #46: #mark(natsFrom(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #47: #cons(active(PeRCenTX),PeRCenTY) -> #cons(PeRCenTX,PeRCenTY)
+ ||    #48: #head(active(PeRCenTX)) -> #head(PeRCenTX)
+ ||    #49: #mark(s(PeRCenTX)) -> #active(s(mark(PeRCenTX)))
+ ||    #50: #mark(s(PeRCenTX)) -> #s(mark(PeRCenTX))
+ ||    #51: #mark(s(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #52: #sel(PeRCenTX,active(PeRCenTY)) -> #sel(PeRCenTX,PeRCenTY)
+ ||    #53: #cons(PeRCenTX,mark(PeRCenTY)) -> #cons(PeRCenTX,PeRCenTY)
+ ||    #54: #u(PeRCenTX,active(PeRCenTY),PeRCenTZ,PeRCenTU) -> #u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #55: #u(PeRCenTX,PeRCenTY,mark(PeRCenTZ),PeRCenTU) -> #u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #56: #mark(afterNth(PeRCenTX,PeRCenTY)) -> #active(afterNth(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #57: #mark(afterNth(PeRCenTX,PeRCenTY)) -> #afterNth(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #58: #mark(afterNth(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #59: #mark(afterNth(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #60: #mark(nil()) -> #active(nil())
+ ||    #61: #active(head(cons(PeRCenTX,PeRCenTY))) -> #mark(PeRCenTX)
+ ||    #62: #pair(active(PeRCenTX),PeRCenTY) -> #pair(PeRCenTX,PeRCenTY)
+ ||    #63: #active(take(PeRCenTX,PeRCenTY)) -> #mark(fst(splitAt(PeRCenTX,PeRCenTY)))
+ ||    #64: #active(take(PeRCenTX,PeRCenTY)) -> #fst(splitAt(PeRCenTX,PeRCenTY))
+ ||    #65: #active(take(PeRCenTX,PeRCenTY)) -> #splitAt(PeRCenTX,PeRCenTY)
+ ||    #66: #afterNth(PeRCenTX,mark(PeRCenTY)) -> #afterNth(PeRCenTX,PeRCenTY)
+ ||    #67: #s(mark(PeRCenTX)) -> #s(PeRCenTX)
+ ||    #68: #active(splitAt(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ))) -> #mark(u(splitAt(PeRCenTX,PeRCenTZ),PeRCenTX,PeRCenTY,PeRCenTZ))
+ ||    #69: #active(splitAt(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ))) -> #u(splitAt(PeRCenTX,PeRCenTZ),PeRCenTX,PeRCenTY,PeRCenTZ)
+ ||    #70: #active(splitAt(s(PeRCenTX),cons(PeRCenTY,PeRCenTZ))) -> #splitAt(PeRCenTX,PeRCenTZ)
+ ||    #71: #splitAt(PeRCenTX,mark(PeRCenTY)) -> #splitAt(PeRCenTX,PeRCenTY)
+ ||    #72: #afterNth(active(PeRCenTX),PeRCenTY) -> #afterNth(PeRCenTX,PeRCenTY)
+ ||    #73: #natsFrom(active(PeRCenTX)) -> #natsFrom(PeRCenTX)
+ ||    #74: #mark(head(PeRCenTX)) -> #active(head(mark(PeRCenTX)))
+ ||    #75: #mark(head(PeRCenTX)) -> #head(mark(PeRCenTX))
+ ||    #76: #mark(head(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #77: #s(active(PeRCenTX)) -> #s(PeRCenTX)
+ ||    #78: #natsFrom(mark(PeRCenTX)) -> #natsFrom(PeRCenTX)
+ ||    #79: #sel(PeRCenTX,mark(PeRCenTY)) -> #sel(PeRCenTX,PeRCenTY)
+ ||    #80: #mark(snd(PeRCenTX)) -> #active(snd(mark(PeRCenTX)))
+ ||    #81: #mark(snd(PeRCenTX)) -> #snd(mark(PeRCenTX))
+ ||    #82: #mark(snd(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #83: #cons(PeRCenTX,active(PeRCenTY)) -> #cons(PeRCenTX,PeRCenTY)
+ ||    #84: #mark(O()) -> #active(O())
+ ||    #85: #afterNth(mark(PeRCenTX),PeRCenTY) -> #afterNth(PeRCenTX,PeRCenTY)
+ ||    #86: #mark(take(PeRCenTX,PeRCenTY)) -> #active(take(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #87: #mark(take(PeRCenTX,PeRCenTY)) -> #take(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #88: #mark(take(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #89: #mark(take(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #90: #take(PeRCenTX,mark(PeRCenTY)) -> #take(PeRCenTX,PeRCenTY)
+ ||    #91: #fst(active(PeRCenTX)) -> #fst(PeRCenTX)
+ ||    #92: #mark(u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)) -> #active(u(mark(PeRCenTX),PeRCenTY,PeRCenTZ,PeRCenTU))
+ ||    #93: #mark(u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)) -> #u(mark(PeRCenTX),PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #94: #mark(u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)) -> #mark(PeRCenTX)
+ ||    #95: #mark(pair(PeRCenTX,PeRCenTY)) -> #active(pair(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #96: #mark(pair(PeRCenTX,PeRCenTY)) -> #pair(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #97: #mark(pair(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #98: #mark(pair(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ ||    #99: #active(snd(pair(PeRCenTX,PeRCenTY))) -> #mark(PeRCenTY)
+ ||    #100: #active(natsFrom(PeRCenTX)) -> #mark(cons(PeRCenTX,natsFrom(s(PeRCenTX))))
+ ||    #101: #active(natsFrom(PeRCenTX)) -> #cons(PeRCenTX,natsFrom(s(PeRCenTX)))
+ ||    #102: #active(natsFrom(PeRCenTX)) -> #natsFrom(s(PeRCenTX))
+ ||    #103: #active(natsFrom(PeRCenTX)) -> #s(PeRCenTX)
+ ||    #104: #u(PeRCenTX,PeRCenTY,PeRCenTZ,active(PeRCenTU)) -> #u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #105: #active(tail(cons(PeRCenTX,PeRCenTY))) -> #mark(PeRCenTY)
+ ||    #106: #mark(fst(PeRCenTX)) -> #active(fst(mark(PeRCenTX)))
+ ||    #107: #mark(fst(PeRCenTX)) -> #fst(mark(PeRCenTX))
+ ||    #108: #mark(fst(PeRCenTX)) -> #mark(PeRCenTX)
+ ||    #109: #active(splitAt(O(),PeRCenTX)) -> #mark(pair(nil(),PeRCenTX))
+ ||    #110: #active(splitAt(O(),PeRCenTX)) -> #pair(nil(),PeRCenTX)
+ ||    #111: #u(PeRCenTX,PeRCenTY,PeRCenTZ,mark(PeRCenTU)) -> #u(PeRCenTX,PeRCenTY,PeRCenTZ,PeRCenTU)
+ ||    #112: #mark(splitAt(PeRCenTX,PeRCenTY)) -> #active(splitAt(mark(PeRCenTX),mark(PeRCenTY)))
+ ||    #113: #mark(splitAt(PeRCenTX,PeRCenTY)) -> #splitAt(mark(PeRCenTX),mark(PeRCenTY))
+ ||    #114: #mark(splitAt(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTX)
+ ||    #115: #mark(splitAt(PeRCenTX,PeRCenTY)) -> #mark(PeRCenTY)
+ || Number of SCCs: 14, DPs: 83
+ ||   SCC { #13 #33 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: x1
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #13 #33
+ || Number of SCCs: 13, DPs: 81
+ ||   SCC { #73 #78 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: x1
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #73 #78
+ || Number of SCCs: 12, DPs: 79
+ ||   SCC { #67 #77 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: x1
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #67 #77
+ || Number of SCCs: 11, DPs: 77
+ ||   SCC { #7 #8 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: x1
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #7 #8
+ || Number of SCCs: 10, DPs: 75
+ ||   SCC { #4 #91 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: x1
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #4 #91
+ || Number of SCCs: 9, DPs: 73
+ ||   SCC { #20 #48 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: x1
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #20 #48
+ || Number of SCCs: 8, DPs: 71
+ ||   SCC { #14 #19 #52 #79 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: x2
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #52 #79
+ || Number of SCCs: 8, DPs: 69
+ ||   SCC { #14 #19 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: x1
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #14 #19
+ || Number of SCCs: 7, DPs: 67
+ ||   SCC { #5 #66 #72 #85 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: x1
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #72 #85
+ || Number of SCCs: 7, DPs: 65
+ ||   SCC { #5 #66 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: x2
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #5 #66
+ || Number of SCCs: 6, DPs: 63
+ ||   SCC { #3 #47 #53 #83 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: x1
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #3 #47
+ || Number of SCCs: 6, DPs: 61
+ ||   SCC { #53 #83 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: x2
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #53 #83
+ || Number of SCCs: 5, DPs: 59
+ ||   SCC { #9 #15 #22 #62 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: x1
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #9 #62
+ || Number of SCCs: 5, DPs: 57
+ ||   SCC { #15 #22 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: x2
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #15 #22
+ || Number of SCCs: 4, DPs: 55
+ ||   SCC { #21 #38 #43 #90 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: x2
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #38 #90
+ || Number of SCCs: 4, DPs: 53
+ ||   SCC { #21 #43 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: x1
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #21 #43
+ || Number of SCCs: 3, DPs: 51
+ ||   SCC { #2 #6 #42 #71 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: x2
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #6 #71
+ || Number of SCCs: 3, DPs: 49
+ ||   SCC { #2 #42 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: 0
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: x1
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #2 #42
+ || Number of SCCs: 2, DPs: 47
+ ||   SCC { #10..12 #23 #54 #55 #104 #111 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: x2 + x3 + x4
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #11 #12 #54 #55 #104 #111
+ || Number of SCCs: 2, DPs: 41
+ ||   SCC { #10 #23 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: 0
+ ||       #take	w: 0
+ ||       u 	w: 0
+ ||       take	w: 0
+ ||       #u 	w: x1
+ ||       pair	w: 0
+ ||       fst	w: 0
+ ||       natsFrom	w: 0
+ ||       #head	w: 0
+ ||       splitAt	w: 0
+ ||       #fst	w: 0
+ ||       O 	w: 0
+ ||       tail	w: 0
+ ||       #mark	w: 0
+ ||       #sel	w: 0
+ ||       sel	w: 0
+ ||       #s 	w: 0
+ ||       afterNth	w: 0
+ ||       nil	w: 0
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 1
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: 0
+ ||       #snd	w: 0
+ ||       cons	w: 0
+ ||       #natsFrom	w: 0
+ ||       #active	w: 0
+ ||       snd	w: 0
+ ||       #pair	w: 0
+ ||     USABLE RULES: { }
+ ||     Removed DPs: #10 #23
+ || Number of SCCs: 1, DPs: 39
+ ||   SCC { #1 #16 #26 #27 #30 #34 #36 #37 #39 #41 #44 #46 #51 #56 #58 #59 #61 #63 #68 #74 #76 #80 #82 #86 #88 #89 #92 #94 #97..100 #105 #106 #108 #109 #112 #114 #115 }
+ || POLO(Sum)... POLO(max)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: x1
+ ||       #take	w: 0
+ ||       u 	w: max(x1, x2 + 6, x3 + 5, x4 + 4)
+ ||       take	w: max(x1 + 9, x2 + 8)
+ ||       #u 	w: 0
+ ||       pair	w: max(x1 + 2, x2 + 1)
+ ||       fst	w: x1 + 1
+ ||       natsFrom	w: x1 + 2
+ ||       #head	w: 0
+ ||       splitAt	w: max(x1 + 6, x2 + 4)
+ ||       #fst	w: 0
+ ||       O 	w: 1
+ ||       tail	w: x1 + 1
+ ||       #mark	w: x1
+ ||       #sel	w: 0
+ ||       sel	w: max(x1 + 12, x2 + 10)
+ ||       #s 	w: 0
+ ||       afterNth	w: max(x1 + 10, x2 + 8)
+ ||       nil	w: 1
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1
+ ||       #afterNth	w: 0
+ ||       active	w: x1
+ ||       head	w: x1 + 1
+ ||       #snd	w: 0
+ ||       cons	w: max(x1 + 1, x2)
+ ||       #natsFrom	w: 0
+ ||       #active	w: x1
+ ||       snd	w: x1 + 1
+ ||       #pair	w: 0
+ ||     USABLE RULES: { 1..70 }
+ ||     Removed DPs: #1 #26 #27 #30 #36 #37 #41 #46 #58 #59 #61 #63 #76 #82 #88 #89 #97..99 #105 #108 #109 #114 #115
+ || Number of SCCs: 1, DPs: 4
+ ||   SCC { #51 #68 #94 #112 }
+ || POLO(Sum)... succeeded.
+ ||       TIlDePAIR	w: 0
+ ||       #cons	w: 0
+ ||       s 	w: x1 + 1
+ ||       #take	w: 0
+ ||       u 	w: x1
+ ||       take	w: x1 + 6
+ ||       #u 	w: 0
+ ||       pair	w: x1 + x2 + 1
+ ||       fst	w: x1 + 2
+ ||       natsFrom	w: x1 + 4
+ ||       #head	w: 0
+ ||       splitAt	w: 1
+ ||       #fst	w: 0
+ ||       O 	w: 1
+ ||       tail	w: 1
+ ||       #mark	w: x1
+ ||       #sel	w: 0
+ ||       sel	w: x2 + 1
+ ||       #s 	w: 0
+ ||       afterNth	w: 1
+ ||       nil	w: 1
+ ||       #TIlDePAIR	w: 0
+ ||       #tail	w: 0
+ ||       #splitAt	w: 0
+ ||       mark	w: x1 + 4
+ ||       #afterNth	w: 0
+ ||       active	w: x1 + 1
+ ||       head	w: x1 + 1
+ ||       #snd	w: 0
+ ||       cons	w: 1
+ ||       #natsFrom	w: 0
+ ||       #active	w: 1
+ ||       snd	w: 1
+ ||       #pair	w: 0
+ ||     USABLE RULES: { 13 29..32 37..54 57 58 63..66 }
+ ||     Removed DPs: #51
+ || Number of SCCs: 1, DPs: 3
+ ||   SCC { #68 #94 #112 }
+ || POLO(Sum)... POLO(max)... QLPOS... POLO(mSum)... QWPOpS(mSum)... succeeded.
+ ||       TIlDePAIR	s: []	p: 0	w: 1
+ ||       #cons	s: []	p: 0	w: 0
+ ||       s 	s: [1]	p: 4	w: x1
+ ||       #take	s: []	p: 0	w: x2 + 1
+ ||       u 	s: [1]	p: 2	w: max(x1, x2 + 9, x3 + 10, x4 + 7)
+ ||       take	s: [2,1]	p: 6	w: x1 + x2 + 9
+ ||       #u 	s: [4,3,2,1]	p: 0	w: max(x1 + 1, x2 + 1, x3, x4 + 1)
+ ||       pair	s: [2,1]	p: 1	w: max(x1 + 5, x2 + 4)
+ ||       fst	s: []	p: 4	w: x1 + 1
+ ||       natsFrom	s: []	p: 0	w: x1 + 4
+ ||       #head	s: []	p: 0	w: 0
+ ||       splitAt	s: [1]	p: 7	w: x1 + x2 + 7
+ ||       #fst	s: []	p: 0	w: 1
+ ||       O 	s: []	p: 0	w: 2
+ ||       tail	s: [1]	p: 5	w: x1 + 1
+ ||       #mark	s: [1]	p: 3	w: x1
+ ||       #sel	s: []	p: 0	w: 1
+ ||       sel	s: []	p: 9	w: x1 + x2 + 10
+ ||       #s 	s: []	p: 0	w: 0
+ ||       afterNth	s: [2]	p: 8	w: x1 + x2 + 9
+ ||       nil	s: []	p: 7	w: 1
+ ||       #TIlDePAIR	s: [2]	p: 0	w: x2 + 1
+ ||       #tail	s: []	p: 0	w: 0
+ ||       #splitAt	s: [1,2]	p: 0	w: x1 + x2
+ ||       mark	s: 1
+ ||       #afterNth	s: [2,1]	p: 0	w: x1 + x2 + 1
+ ||       active	s: 1
+ ||       head	s: []	p: 1	w: x1
+ ||       #snd	s: []	p: 0	w: 0
+ ||       cons	s: []	p: 0	w: max(x1 + 3, x2)
+ ||       #natsFrom	s: []	p: 0	w: 0
+ ||       #active	s: [1]	p: 3	w: x1
+ ||       snd	s: []	p: 7	w: x1 + 1
+ ||       #pair	s: [1]	p: 0	w: max(x1)
+ ||     USABLE RULES: { 1..70 }
+ ||     Removed DPs: #68 #94
+ || Number of SCCs: 0, DPs: 0
+ || 
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with static dependency pairs (see [KusIsoSakBla09] and the adaptation for AFSMs and accessible arguments in [FuhKop19]).
+
+We thus obtain the following dependency pair problem (P_0, R_0, computable, formative):
+
+  Dependency Pairs P_0:
+
+    0] map#(F, cons(X, Y)) =#> cons#(F X, map(F, Y))   
+    1] map#(F, cons(X, Y)) =#> map#(F, Y)   
+    2] foldr#(F, X, cons(Y, Z)) =#> foldr#(F, X, Z)   
+
+  Rules R_0:
+
+    active(natsFrom(X)) => mark(cons(X, natsFrom(s(X)))) 
+    active(fst(pair(X, Y))) => mark(X) 
+    active(snd(pair(X, Y))) => mark(Y) 
+    active(splitAt(O, X)) => mark(pair(nil, X)) 
+    active(splitAt(s(X), cons(Y, Z))) => mark(u(splitAt(X, Z), X, Y, Z)) 
+    active(u(pair(X, Y), Z, U, V)) => mark(pair(cons(U, X), Y)) 
+    active(head(cons(X, Y))) => mark(X) 
+    active(tail(cons(X, Y))) => mark(Y) 
+    active(sel(X, Y)) => mark(head(afterNth(X, Y))) 
+    active(take(X, Y)) => mark(fst(splitAt(X, Y))) 
+    active(afterNth(X, Y)) => mark(snd(splitAt(X, Y))) 
+    mark(natsFrom(X)) => active(natsFrom(mark(X))) 
+    mark(cons(X, Y)) => active(cons(mark(X), Y)) 
+    mark(s(X)) => active(s(mark(X))) 
+    mark(fst(X)) => active(fst(mark(X))) 
+    mark(pair(X, Y)) => active(pair(mark(X), mark(Y))) 
+    mark(snd(X)) => active(snd(mark(X))) 
+    mark(splitAt(X, Y)) => active(splitAt(mark(X), mark(Y))) 
+    mark(O) => active(O) 
+    mark(nil) => active(nil) 
+    mark(u(X, Y, Z, U)) => active(u(mark(X), Y, Z, U)) 
+    mark(head(X)) => active(head(mark(X))) 
+    mark(tail(X)) => active(tail(mark(X))) 
+    mark(sel(X, Y)) => active(sel(mark(X), mark(Y))) 
+    mark(afterNth(X, Y)) => active(afterNth(mark(X), mark(Y))) 
+    mark(take(X, Y)) => active(take(mark(X), mark(Y))) 
+    natsFrom(mark(X)) => natsFrom(X) 
+    natsFrom(active(X)) => natsFrom(X) 
+    cons(mark(X), Y) => cons(X, Y) 
+    cons(X, mark(Y)) => cons(X, Y) 
+    cons(active(X), Y) => cons(X, Y) 
+    cons(X, active(Y)) => cons(X, Y) 
+    s(mark(X)) => s(X) 
+    s(active(X)) => s(X) 
+    fst(mark(X)) => fst(X) 
+    fst(active(X)) => fst(X) 
+    pair(mark(X), Y) => pair(X, Y) 
+    pair(X, mark(Y)) => pair(X, Y) 
+    pair(active(X), Y) => pair(X, Y) 
+    pair(X, active(Y)) => pair(X, Y) 
+    snd(mark(X)) => snd(X) 
+    snd(active(X)) => snd(X) 
+    splitAt(mark(X), Y) => splitAt(X, Y) 
+    splitAt(X, mark(Y)) => splitAt(X, Y) 
+    splitAt(active(X), Y) => splitAt(X, Y) 
+    splitAt(X, active(Y)) => splitAt(X, Y) 
+    u(mark(X), Y, Z, U) => u(X, Y, Z, U) 
+    u(X, mark(Y), Z, U) => u(X, Y, Z, U) 
+    u(X, Y, mark(Z), U) => u(X, Y, Z, U) 
+    u(X, Y, Z, mark(U)) => u(X, Y, Z, U) 
+    u(active(X), Y, Z, U) => u(X, Y, Z, U) 
+    u(X, active(Y), Z, U) => u(X, Y, Z, U) 
+    u(X, Y, active(Z), U) => u(X, Y, Z, U) 
+    u(X, Y, Z, active(U)) => u(X, Y, Z, U) 
+    head(mark(X)) => head(X) 
+    head(active(X)) => head(X) 
+    tail(mark(X)) => tail(X) 
+    tail(active(X)) => tail(X) 
+    sel(mark(X), Y) => sel(X, Y) 
+    sel(X, mark(Y)) => sel(X, Y) 
+    sel(active(X), Y) => sel(X, Y) 
+    sel(X, active(Y)) => sel(X, Y) 
+    afterNth(mark(X), Y) => afterNth(X, Y) 
+    afterNth(X, mark(Y)) => afterNth(X, Y) 
+    afterNth(active(X), Y) => afterNth(X, Y) 
+    afterNth(X, active(Y)) => afterNth(X, Y) 
+    take(mark(X), Y) => take(X, Y) 
+    take(X, mark(Y)) => take(X, Y) 
+    take(active(X), Y) => take(X, Y) 
+    take(X, active(Y)) => take(X, Y) 
+    map(F, nil) => nil 
+    map(F, cons(X, Y)) => cons(F X, map(F, Y)) 
+    foldr(F, X, nil) => X 
+    foldr(F, X, cons(Y, Z)) => F Y foldr(F, X, Z) 
+
+Thus, the original system is terminating if (P_0, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, computable, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+    * 1 : 0, 1 
+    * 2 : 2 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    map#(F, cons(X, Y)) =#> map#(F, Y)   
+
+  P_2:
+
+    foldr#(F, X, cons(Y, Z)) =#> foldr#(F, X, Z)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f) and (P_2, R_0, m, f).
+
+Thus, the original system is terminating if each of (P_1, R_0, computable, formative) and (P_2, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_2, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(foldr#) = 3 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(foldr#(F, X, cons(Y, Z))) = cons(Y, Z) |> Z = nu(foldr#(F, X, Z)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_2, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+Thus, the original system is terminating if (P_1, R_0, computable, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, computable, formative).
+
+We apply the subterm criterion with the following projection function:
+
+  nu(map#) = 2 
+
+Thus, we can orient the dependency pairs as follows:
+
+  nu(map#(F, cons(X, Y))) = cons(X, Y) |> Y = nu(map#(F, Y)) 
+
+By [FuhKop19, Thm. 61], we may replace a dependency pair problem (P_1, R_0, computable, f) by ({}, R_0, computable, f).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[FuhKop19]  C. Fuhs, and C. Kop.  A static higher-order dependency pair framework.  In Proceedings of ESOP 2019, 2019.
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
+[KusIsoSakBla09]  K. Kusakari, Y. Isogai, M. Sakai, and F. Blanqui.  Static Dependency Pair Method Based On Strong Computability for Higher-Order Rewrite Systems.  In volume 92(10) of IEICE Transactions on Information and Systems.  2007--2015, 2009.

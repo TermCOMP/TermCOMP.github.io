@@ -1,0 +1,110 @@
+YES
+We consider the system 6NNfJ.
+
+  Alphabet:
+
+    !280 : [(nat -> nat) -> nat -> nat * nat -> nat] --> nat -> nat 
+    I : [nat] --> nat 
+    O : [] --> nat 
+    s : [nat] --> nat 
+
+  Rules:
+
+    I(s(X)) => s(!280(/\f./\x.f (f x), /\y.I(y)) X) 
+    I(O) => O 
+    !280(F, G) => F G 
+
+Symbol !280 is an encoding for application that is only used in innocuous ways.  We can simplify the program (without losing non-termination) by removing it.  This gives:
+
+  Alphabet:
+
+    I : [nat] --> nat 
+    O : [] --> nat 
+    s : [nat] --> nat 
+
+  Rules:
+
+    I(s(X)) => s((/\f./\x.f (f x)) (/\y.I(y)) X) 
+    I(O) => O 
+
+We use the dependency pair framework as described in [Kop12, Ch. 6/7], with dynamic dependency pairs.
+
+We thus obtain the following dependency pair problem (P_0, R_0, minimal, formative):
+
+  Dependency Pairs P_0:
+
+    0] I#(s(X)) =#> I#(x)   
+    1] I#(s(X)) =#> I#(X)   
+    2] I#(s(X)) =#> I#((/\x.I(x)) X)   
+    3] I#(s(X)) =#> I#(X)   
+
+  Rules R_0:
+
+    I(s(X)) => s((/\f./\x.f (f x)) (/\y.I(y)) X) 
+    I(O) => O 
+
+Thus, the original system is terminating if (P_0, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_0, R_0, minimal, formative).
+
+We place the elements of P in a dependency graph approximation G (see e.g. [Kop12, Thm. 7.27, 7.29], as follows:
+
+    * 0 :  
+    * 1 : 0, 1, 2, 3 
+    * 2 : 0, 1, 2, 3 
+    * 3 : 0, 1, 2, 3 
+
+This graph has the following strongly connected components:
+
+  P_1:
+
+    I#(s(X)) =#> I#(X)   
+    I#(s(X)) =#> I#((/\x.I(x)) X)   
+    I#(s(X)) =#> I#(X)   
+
+By [Kop12, Thm. 7.31], we may replace any dependency pair problem (P_0, R_0, m, f) by (P_1, R_0, m, f).
+
+Thus, the original system is terminating if (P_1, R_0, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_0, minimal, formative).
+
+The formative rules of (P_1, R_0) are R_1 ::=
+
+  I(s(X)) => s((/\f./\x.f (f x)) (/\y.I(y)) X) 
+
+By [Kop12, Thm. 7.17], we may replace the dependency pair problem (P_1, R_0, minimal, formative) by (P_1, R_1, minimal, formative).
+
+Thus, the original system is terminating if (P_1, R_1, minimal, formative) is finite.
+
+We consider the dependency pair problem (P_1, R_1, minimal, formative).
+
+We will use the reduction pair processor [Kop12, Thm. 7.16].  It suffices to find a standard reduction pair [Kop12, Def. 6.69].  Thus, we must orient:
+
+  I#(s(X)) >? I#(X) 
+  I#(s(X)) >? I#((/\x.I(x)) X) 
+  I#(s(X)) >? I#(X) 
+  I(s(X)) >= s((/\f./\x.f (f x)) (/\y.I(y)) X) 
+
+We orient these requirements with a polynomial interpretation in the natural numbers.
+
+The following interpretation satisfies the requirements:
+
+  I = Lam[y0].y0 
+  I# = Lam[y0].3*y0 
+  s = Lam[y0].3 + 3*y0 
+
+Using this interpretation, the requirements translate to:
+
+  [[I#(s(_x0))]] = 9 + 9*x0 > 3*x0 = [[I#(_x0)]] 
+  [[I#(s(_x0))]] = 9 + 9*x0 > 3*x0 = [[I#((/\x.I(x)) _x0)]] 
+  [[I#(s(_x0))]] = 9 + 9*x0 > 3*x0 = [[I#(_x0)]] 
+  [[I(s(_x0))]] = 3 + 3*x0 >= 3 + 3*x0 = [[s((/\f./\x.f (f x)) (/\y.I(y)) _x0)]] 
+
+By the observations in [Kop12, Sec. 6.6], this reduction pair suffices; we may thus replace a dependency pair problem (P_1, R_1) by ({}, R_1).  By the empty set processor [Kop12, Thm. 7.15] this problem may be immediately removed.
+
+As all dependency pair problems were succesfully simplified with sound (and complete) processors until nothing remained, we conclude termination.
+
+
++++ Citations +++
+
+[Kop12]  C. Kop.  Higher Order Termination.  PhD Thesis, 2012.
