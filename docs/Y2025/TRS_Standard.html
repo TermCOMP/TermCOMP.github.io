@@ -4,6 +4,28 @@
  <meta charset="utf-8">
  <meta http-equiv="Cache-Control" content="no-cache, no-store">
 
+ <script>
+   async function show_proof(url) {
+       try {
+           const response = await fetch(url + ".gz");
+           if (!response.ok) throw new Error("loading gzip failed");
+
+           // Gzip entpacken
+           const decompressedStream = response.body.pipeThrough(new DecompressionStream('gzip'));
+           const htmlContent = await new Response(decompressedStream).text();
+
+           // Erstellt ein temporäres Datei-Objekt (Blob) im Browser-Speicher
+           const blob = new Blob([htmlContent], { type: 'text/html' });
+           const blobUrl = URL.createObjectURL(blob);
+
+           // Öffnet diese temporäre Datei in einem neuen Tab
+           window.open(blobUrl, '_blank');
+       } catch (error) {
+           alert("error: " + error.message);
+       }
+   }
+ </script>
+
  <script src="../definitions.js"></script>
  <link rel="stylesheet" href="../master.css">
  <title>TermCOMP 2025: TRS Standard</title>
@@ -121,7 +143,7 @@ var filteredTable = FilteredTable(document.getElementById("theTable"));
    <a href="https://termcomp.github.io/tpdb.html?ver=11.5&path=TRS_Standard%2FAG01%2F%233.10.ari">AG01/<wbr>#3.10.ari</a></td>
   <td style="display:none">if  <td class="YES">YES
   <td class="YES">
-   <a href="https://raw.githubusercontent.com/TermCOMP/TermCOMP.github.io/refs/heads/master/jobs/job_60781488/uncert/proofs/benchmark_1/solver_3.txt">YES</a>
+   <span onclick="show_proof('https://raw.githubusercontent.com/TermCOMP/TermCOMP.github.io/refs/heads/master/jobs/job_60781488/uncert/proofs/benchmark_1/solver_3.txt');">YES</span>
     <span class="time">0.598</span>
     --<span class="time">0.0</span>
   <td class="YES">
